@@ -1,0 +1,42 @@
+{
+  "name": "@arising/characters",
+  "version": "1.0.0",
+  "description": "Contracts to deploy self-custody and self-managed Point-of-Sales for any EVM",
+  "bugs": {
+    "url": "https://github.com/playarising/characters/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/playarising/characters/.git"
+  },
+  "license": "MIT",
+  "author": "Enrique Berrueta",
+  "scripts": {
+    "ci": "env CI=true",
+    "compile": "hardhat compile",
+    "coverage": "env COVERAGE=true hardhat coverage",
+    "format": "prettier --write '**/*.{sol,js,json,md}' && yarn run sort",
+    "gas-report": "env ENABLE_GAS_REPORT=true yarn test",
+    "sort": "npx sort-package-json",
+    "test": "hardhat test"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "2.0.5",
+    "@nomiclabs/hardhat-waffle": "2.0.3",
+    "@openzeppelin/contracts": "4.6.0",
+    "@openzeppelin/test-helpers": "0.5.15",
+    "@uniswap/v2-core": "1.0.1",
+    "@uniswap/v2-periphery": "1.1.0-beta.0",
+    "bn.js": "5.2.0",
+    "chai": "4.3.6",
+    "dotenv": "16.0.0",
+    "ethereum-waffle": "3.4.4",
+    "ethers": "5.6.5",
+    "hardhat": "2.9.3",
+    "hardhat-gas-reporter": "1.0.8",
+    "prettier": "2.6.2",
+    "prettier-plugin-solidity": "1.0.0-beta.19",
+    "solidity-coverage": "0.7.21",
+    "typescript": "4.6.4"
+  }
+}
