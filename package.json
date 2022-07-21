@@ -1,7 +1,7 @@
 {
   "name": "@arising/characters",
   "version": "1.0.0",
-  "description": "Contracts to deploy self-custody and self-managed Point-of-Sales for any EVM",
+  "description": "Contracts for Arising characters NFT tokens",
   "bugs": {
     "url": "https://github.com/playarising/characters/issues"
   },
