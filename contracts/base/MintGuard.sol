@@ -13,16 +13,24 @@ contract MintGuard is Ownable, IMintGuard {
 
     // Protected contracts
     mapping(address => bool) private _protected;
+    address[] protected;
 
     /**
      * @dev Throws if called from an address or a contract not specified by the owner.
      */
     modifier onlyProtected() {
         require(
-            !_protected[msg.sender],
-            "BaseERC721: contract is not defined on the list of protected contracts"
+            _protected[msg.sender],
+            "MintGuard: contract is not defined on the list of protected contracts"
         );
         _;
+    }
+
+    /**
+     * @dev Returns the list of protected contracts
+     */
+    function getProtected() public view returns (address[] memory) {
+        return protected;
     }
 
     /**
@@ -30,6 +38,7 @@ contract MintGuard is Ownable, IMintGuard {
      */
     function addProtected(address _contract) public onlyOwner {
         _protected[_contract] = true;
+        protected.push(_contract);
     }
 
     /**
@@ -44,7 +53,7 @@ contract MintGuard is Ownable, IMintGuard {
      * This call will also add an extra layer to prevent contracts to mint (is not entirely safe, but prevents bots to spam-mint).
      */
     function hasMinted(address _minter) public view returns (bool) {
-        if (Address.isContract(_minter)) return false;
+        if (Address.isContract(_minter)) return true;
         return _minters[_minter];
     }
 }
