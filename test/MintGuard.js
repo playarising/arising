@@ -27,18 +27,15 @@ describe("MintGuard", () => {
     ).to.revertedWith("Ownable: caller is not the owner");
   });
 
-
   it("should fail to mark a minter from a non protected contract", async () => {
-    await expect(
-        this.mock.mintMock()
-    ).to.revertedWith("MintGuard: contract is not defined on the list of protected contracts");
+    await expect(this.mock.mintMock()).to.revertedWith(
+      "MintGuard: contract is not defined on the list of protected contracts"
+    );
   });
 
   it("should add a protected contract", async () => {
     await this.guard.addProtected(this.mock.address);
-    expect(await this.guard.getProtected()).to.include(
-      this.mock.address
-    );
+    expect(await this.guard.getProtected()).to.include(this.mock.address);
   });
 
   it("should mark minter as minted", async () => {

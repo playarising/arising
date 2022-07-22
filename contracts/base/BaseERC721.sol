@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IMintGuard.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 contract BaseERC721 is ERC721Enumerable, Ownable {
     // Mint guard.
@@ -19,16 +18,13 @@ contract BaseERC721 is ERC721Enumerable, Ownable {
     string baseURI;
 
     // Max available supply for the collection.
-    uint256 cap;
+    uint256 public cap;
 
     // Boolean to initialize the mint capabilities.
-    bool initialized;
+    bool public initialized;
 
-    // Price for each mint (in USD with 8 decimals)
-    uint256 price;
-
-    // Price feed oracle
-    address internal priceFeed;
+    // Price for each mint (in FTM in wei)
+    uint256 public price;
 
     /**
      * @dev Throws if called when the contract is not initialized.
@@ -61,10 +57,6 @@ contract BaseERC721 is ERC721Enumerable, Ownable {
      */
     function setInitialized() public onlyOwner {
         require(price != 0, "BaseERC721: can't initialize when price is 0");
-        require(
-            priceFeed != address(0),
-            "BaseERC721: can't initialize when priceFeed is not set"
-        );
         initialized = true;
     }
 
@@ -73,13 +65,6 @@ contract BaseERC721 is ERC721Enumerable, Ownable {
      */
     function setPrice(uint256 _price) public onlyOwner {
         price = _price;
-    }
-
-    /**
-     * @dev Set the price feed oracle
-     */
-    function setPriceFeed(address _priceFeed) public onlyOwner {
-        priceFeed = _priceFeed;
     }
 
     /**
@@ -92,21 +77,21 @@ contract BaseERC721 is ERC721Enumerable, Ownable {
     /**
      * @dev Creates a new token for the msg.sender
      */
-    function mint() public payable {
+    function mint() public payable onlyInitialized {
         require(
-            totalSupply() <= cap,
+            totalSupply() < cap,
             "BaseERC721: Max supply reached, wait for more tokens to be available"
         );
         require(
             !IMintGuard(guard).hasMinted(msg.sender),
             "BaseERC721: Address has already minted"
         );
-        int256 cost = getMintCost();
         require(
-            msg.value == uint256(cost),
+            msg.value == price,
             "BaseERC721: Tx doesn't include enough to pay the mint"
         );
-        Address.sendValue(payments_receiver, uint256(cost));
+        IMintGuard(guard).setMinter(msg.sender);
+        Address.sendValue(payments_receiver, price);
         _safeMint(msg.sender, totalSupply() + 1);
     }
 
@@ -115,14 +100,5 @@ contract BaseERC721 is ERC721Enumerable, Ownable {
      */
     function _baseURI() internal view virtual override returns (string memory) {
         return baseURI;
-    }
-
-    /**
-     * @dev Returns the total mint cost in FTM from the price feed.
-     */
-    function getMintCost() public view returns (int256) {
-        (, int256 _feedPrice, , , ) = AggregatorV3Interface(priceFeed)
-            .latestRoundData();
-        return (int256(price) / _feedPrice) * 1 ether;
     }
 }
