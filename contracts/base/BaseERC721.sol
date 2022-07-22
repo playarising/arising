@@ -15,7 +15,7 @@ contract BaseERC721 is ERC721Enumerable, Ownable {
     address payable payments_receiver;
 
     // Base URI.
-    string baseURI;
+    string public baseURI;
 
     // Max available supply for the collection.
     uint256 public cap;

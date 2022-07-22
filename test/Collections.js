@@ -92,7 +92,7 @@ describe("Collections", () => {
     expect(await this.zhand.symbol()).to.be.eq("ARISING")
     expect(await this.ikarans.symbol()).to.be.eq("ARISING")
     expect(await this.tarki.symbol()).to.be.eq("ARISING")
-    expect(await this.heartheim.name()).to.be.eq("ARISING")
+    expect(await this.heartheim.symbol()).to.be.eq("ARISING")
     expect(await this.shinkari.symbol()).to.be.eq("ARISING")
 
     expect(await this.ard.baseURI()).to.be.eq("https://characters.playarising.com/ard/")
