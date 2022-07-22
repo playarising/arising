@@ -80,6 +80,29 @@ describe("Collections", () => {
     await this.guard.addProtected(this.shinkari.address);
   });
 
+  it("should deploy everything correctly", async () => {
+    expect(await this.ard.name()).to.be.eq("Arising: Ard")
+    expect(await this.zhand.name()).to.be.eq("Arising: Zhand")
+    expect(await this.ikarans.name()).to.be.eq("Arising: I'Karans")
+    expect(await this.tarki.name()).to.be.eq("Arising: Tark'i")
+    expect(await this.heartheim.name()).to.be.eq("Arising: Heartheim")
+    expect(await this.shinkari.name()).to.be.eq("Arising: Shinkari")
+
+    expect(await this.ard.symbol()).to.be.eq("ARISING")
+    expect(await this.zhand.symbol()).to.be.eq("ARISING")
+    expect(await this.ikarans.symbol()).to.be.eq("ARISING")
+    expect(await this.tarki.symbol()).to.be.eq("ARISING")
+    expect(await this.heartheim.name()).to.be.eq("ARISING")
+    expect(await this.shinkari.symbol()).to.be.eq("ARISING")
+
+    expect(await this.ard.baseURI()).to.be.eq("https://characters.playarising.com/ard/")
+    expect(await this.zhand.baseURI()).to.be.eq("https://characters.playarising.com/zhand/")
+    expect(await this.ikarans.baseURI()).to.be.eq("https://characters.playarising.com/ikarans/")
+    expect(await this.tarki.baseURI()).to.be.eq("https://characters.playarising.com/tarki/")
+    expect(await this.heartheim.baseURI()).to.be.eq("https://characters.playarising.com/heartheim/")
+    expect(await this.shinkari.baseURI()).to.be.eq("https://characters.playarising.com/shinkari/")
+  });
+
   it("should initialize and mint an ard character", async () => {
     await this.ard.setPrice(ethers.utils.parseEther("10"));
     await this.ard.setInitialized();
