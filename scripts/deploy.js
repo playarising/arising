@@ -60,6 +60,14 @@ async function main() {
   console.log("==> Tark'i", tarki.address);
   console.log("==> Heartheim", heartheim.address);
   console.log("==> Shinkari", shinkari.address);
+
+  console.log("==> Adding protected contracts to MintGuard");
+  await guard.addProtected(ard.address);
+  await guard.addProtected(zhand.address);
+  await guard.addProtected(ikarans.address);
+  await guard.addProtected(tarki.address);
+  await guard.addProtected(heartheim.address);
+  await guard.addProtected(shinkari.address);
 }
 
 main()

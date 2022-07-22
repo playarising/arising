@@ -141,16 +141,16 @@ describe("BaseERC721", () => {
 
   it("should increase the cap for 1 more and mint it", async () => {
     await expect(
-        this.token
-            .connect(this.minter5)
-            .mint({ value: ethers.utils.parseEther("10") })
+      this.token
+        .connect(this.minter5)
+        .mint({ value: ethers.utils.parseEther("10") })
     ).to.revertedWith(
-        "BaseERC721: Max supply reached, wait for more tokens to be available"
+      "BaseERC721: Max supply reached, wait for more tokens to be available"
     );
     await this.token.setCap(6);
     await this.token
-        .connect(this.minter5)
-        .mint({ value: ethers.utils.parseEther("10") });
+      .connect(this.minter5)
+      .mint({ value: ethers.utils.parseEther("10") });
     expect(await this.token.balanceOf(this.minter5.address)).to.be.eq(1);
   });
 });
