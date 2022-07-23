@@ -53,7 +53,10 @@ contract MintGuard is Ownable, IMintGuard {
      * This call will also add an extra layer to prevent contracts to mint (is not entirely safe, but prevents bots to spam-mint).
      */
     function hasMinted(address _minter) public view returns (bool) {
-        if (Address.isContract(_minter)) return true;
+        require(
+            !Address.isContract(_minter),
+            "MintGuard: cannot mint from a contract"
+        );
         return _minters[_minter];
     }
 }

@@ -25,3 +25,13 @@ Once any collection reaches the cap, the collection will be extended to make pos
 The price for minting a character is adjustable to match a price in USD.
 
 ## Deployments
+
+| Contract                | Deployment |
+| ----------------------- | ---------- |
+| **MintGuard**           |            |
+| **ArdCharacters**       |            |
+| **HeartheimCharacters** |            |
+| **IkaranCharacter**     |            |
+| **ShinkariCharacters**  |            |
+| **TarkiCharacters**     |            |
+| **ZhandCharacters**     |            |

@@ -4,10 +4,11 @@ pragma solidity 0.8.9;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../interfaces/IMintGuard.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+import "../interfaces/IMintGuard.sol";
+import "../interfaces/IBaseERC721.sol";
 
-contract BaseERC721 is ERC721Enumerable, Ownable {
+contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
     // Mint guard.
     address guard;
 

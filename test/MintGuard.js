@@ -3,7 +3,7 @@ const { ethers } = require("hardhat");
 
 describe("MintGuard", () => {
   before(async () => {
-    const [owner, minter] = await ethers.getSigners();
+    const [owner, receiver, minter] = await ethers.getSigners();
 
     this.owner = owner;
     this.minter = minter;
@@ -12,8 +12,22 @@ describe("MintGuard", () => {
     this.guard = await MintGuard.deploy();
     await this.guard.deployed();
 
+    const BaseERC721 = await ethers.getContractFactory("BaseERC721");
+    this.token = await BaseERC721.deploy(
+      "Test",
+      "TEST",
+      this.guard.address,
+      "https://test.uri/",
+      5,
+      receiver.address
+    );
+    await this.token.deployed();
+
+    await this.token.setPrice("10");
+    await this.token.setInitialized();
     const MockMinter = await ethers.getContractFactory("MockMinter");
-    this.mock = await MockMinter.deploy(this.guard.address);
+    this.mock = await MockMinter.deploy(this.guard.address, this.token.address);
+
     await this.mock.deployed();
   });
 
@@ -42,5 +56,11 @@ describe("MintGuard", () => {
     expect(await this.guard.hasMinted(this.minter.address)).to.be.eq(false);
     await this.mock.connect(this.minter).mintMock();
     expect(await this.guard.hasMinted(this.minter.address)).to.be.eq(true);
+  });
+
+  it("should fail when trying to mint through a contract", async () => {
+    await expect(this.mock.testMint()).to.revertedWith(
+      "MintGuard: cannot mint from a contract"
+    );
   });
 });
