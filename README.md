@@ -27,7 +27,7 @@ The price for minting a character is adjustable to match a price in USD.
 ## Deployments
 
 | Contract                | Deployment |
-| ----------------------- | ---------- |
+|-------------------------|------------|
 | **MintGuard**           |            |
 | **ArdCharacters**       |            |
 | **HeartheimCharacters** |            |
