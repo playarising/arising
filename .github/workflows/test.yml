@@ -36,7 +36,7 @@ jobs:
           fetch-depth: 2
       - uses: actions/setup-node@v3
         with:
-          node-version: 12.x
+          node-version: latest
       - uses: actions/cache@v3
         id: cache
         with:
