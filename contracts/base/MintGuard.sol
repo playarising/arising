@@ -8,8 +8,8 @@ import "@openzeppelin/contracts/utils/Address.sol";
 contract MintGuard is Ownable, IMintGuard {
     using Address for address;
 
-    // Already minted addresses
-    mapping(address => bool) private _minters;
+    // Address minted counts
+    mapping(address => uint256) private _minters;
 
     // Protected contracts
     mapping(address => bool) private _protected;
@@ -42,10 +42,10 @@ contract MintGuard is Ownable, IMintGuard {
     }
 
     /**
-     * @dev Marks an address as minter to prevent multiple mints from the same address
+     * @dev Adds a mint count to an address an address as minter to prevent multiple mints from the same address
      */
     function setMinter(address _minter) public onlyProtected {
-        _minters[_minter] = true;
+        _minters[_minter] += 1;
     }
 
     /**
@@ -57,6 +57,6 @@ contract MintGuard is Ownable, IMintGuard {
             !Address.isContract(_minter),
             "MintGuard: cannot mint from a contract"
         );
-        return _minters[_minter];
+        return _minters[_minter] >= 5;
     }
 }

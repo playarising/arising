@@ -55,6 +55,10 @@ describe("MintGuard", () => {
   it("should mark minter as minted", async () => {
     expect(await this.guard.hasMinted(this.minter.address)).to.be.eq(false);
     await this.mock.connect(this.minter).mintMock();
+    await this.mock.connect(this.minter).mintMock();
+    await this.mock.connect(this.minter).mintMock();
+    await this.mock.connect(this.minter).mintMock();
+    await this.mock.connect(this.minter).mintMock();
     expect(await this.guard.hasMinted(this.minter.address)).to.be.eq(true);
   });
 

@@ -7,7 +7,7 @@ Arising: Characters is a set of collections that reflect the main civilizations 
 
 Using the ERC721 standard these contracts are personifications of main characters that live and work inside their respective cultures.
 
-All the collections are protected by a _MintGuard_ contract that prevents multiple minting for the same address and contract minting. We heavily encourage users to **not mint more than one character** since you don't need more than one to play the game.
+All the collections are protected by a _MintGuard_ contract that prevents minting more than 5 characters for the same address and contract minting. We heavily encourage users to **not mint more than five character** since you don't need more than one to play the game.
 
 There are 6 main collections (right now):
 
@@ -27,7 +27,7 @@ The price for minting a character is adjustable to match a price in USD.
 ## Deployments
 
 | Contract                | Deployment |
-|-------------------------|------------|
+| ----------------------- | ---------- |
 | **MintGuard**           |            |
 | **ArdCharacters**       |            |
 | **HeartheimCharacters** |            |

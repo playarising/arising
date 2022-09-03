@@ -96,7 +96,13 @@ describe("BaseERC721", () => {
     expect(await this.token.balanceOf(this.owner.address)).to.be.eq(1);
   });
 
-  it("should fail when trying to mint a second token from owner address", async () => {
+  it("should fail when trying to mint a 6th token from owner address", async () => {
+    await this.token.setCap(6);
+
+    await this.token.mint({ value: ethers.utils.parseEther("10") });
+    await this.token.mint({ value: ethers.utils.parseEther("10") });
+    await this.token.mint({ value: ethers.utils.parseEther("10") });
+    await this.token.mint({ value: ethers.utils.parseEther("10") });
     await expect(
       this.token.mint({ value: ethers.utils.parseEther("10") })
     ).to.revertedWith("BaseERC721: Address has already minted");
@@ -107,10 +113,10 @@ describe("BaseERC721", () => {
   });
 
   it("should change the max supply", async () => {
-    await expect(await this.token.cap()).to.be.eq(5);
-    await this.token.setCap(10);
-    await expect(await this.token.cap()).to.be.eq(10);
-    await this.token.setCap(5);
+    await expect(await this.token.cap()).to.be.eq(6);
+    await this.token.setCap(15);
+    await expect(await this.token.cap()).to.be.eq(15);
+    await this.token.setCap(9);
   });
 
   it("should mint until the cap is reached", async () => {
@@ -147,7 +153,7 @@ describe("BaseERC721", () => {
     ).to.revertedWith(
       "BaseERC721: Max supply reached, wait for more tokens to be available"
     );
-    await this.token.setCap(6);
+    await this.token.setCap(10);
     await this.token
       .connect(this.minter5)
       .mint({ value: ethers.utils.parseEther("10") });
