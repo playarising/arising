@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("RefresherToken", () => {
+describe("RefreshToken", () => {
   before(async () => {
     const [owner, minter] = await ethers.getSigners();
 
@@ -12,8 +12,8 @@ describe("RefresherToken", () => {
     this.mock = await MockToken.deploy(ethers.utils.parseEther("10"));
     await this.mock.deployed();
 
-    const RefresherToken = await ethers.getContractFactory("RefresherToken");
-    this.token = await RefresherToken.deploy(this.mock.address, 1);
+    const RefreshToken = await ethers.getContractFactory("RefreshToken");
+    this.token = await RefreshToken.deploy(this.mock.address, 1);
     await this.token.deployed();
   });
 

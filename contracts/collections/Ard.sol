@@ -3,12 +3,17 @@ pragma solidity 0.8.16;
 
 import "../base/BaseERC721.sol";
 
-/*
- * ArdCharacters the Ard collection token for Arising.
+/**
+ * @dev `Ard` is the `BaseERC721` instance for the people of Ard.
  */
-contract ArdCharacters is BaseERC721 {
+contract Ard is BaseERC721 {
+    // =============================================== Setters ========================================================
+
     /**
-     * @dev Initializes the contract by setting a `_guard`, `_cap` and the `_payments_receiver` for the token collection.
+     * @dev Constructor.
+     * @param _guard                  The `MintGuard` instance address.
+     * @param _cap                    The max supply for the tokens.
+     * @param _payments_receiver      The payments receiver address.
      */
     constructor(
         address _guard,

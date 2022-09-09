@@ -17,55 +17,37 @@ describe("Collections", () => {
     this.guard = await MintGuard.deploy();
     await this.guard.deployed();
 
-    const ArdCharacters = await ethers.getContractFactory("ArdCharacters");
-    this.ard = await ArdCharacters.deploy(
-      this.guard.address,
-      10,
-      receiver.address
-    );
+    const Ard = await ethers.getContractFactory("Ard");
+    this.ard = await Ard.deploy(this.guard.address, 10, receiver.address);
 
     await this.ard.deployed();
 
-    const ZhandCharacters = await ethers.getContractFactory("ZhandCharacters");
-    this.zhand = await ZhandCharacters.deploy(
-      this.guard.address,
-      10,
-      receiver.address
-    );
+    const Zhand = await ethers.getContractFactory("Zhand");
+    this.zhand = await Zhand.deploy(this.guard.address, 10, receiver.address);
     await this.zhand.deployed();
 
-    const IkaranCharacters = await ethers.getContractFactory(
-      "IKaransCharacters"
-    );
-    this.ikarans = await IkaranCharacters.deploy(
+    const IKarans = await ethers.getContractFactory("IKarans");
+    this.ikarans = await IKarans.deploy(
       this.guard.address,
       10,
       receiver.address
     );
     await this.ikarans.deployed();
 
-    const TarkiCharacters = await ethers.getContractFactory("TarkiCharacters");
-    this.tarki = await TarkiCharacters.deploy(
-      this.guard.address,
-      10,
-      receiver.address
-    );
+    const Tarki = await ethers.getContractFactory("Tarki");
+    this.tarki = await Tarki.deploy(this.guard.address, 10, receiver.address);
     await this.tarki.deployed();
 
-    const HeartheimCharacters = await ethers.getContractFactory(
-      "HeartheimCharacters"
-    );
-    this.heartheim = await HeartheimCharacters.deploy(
+    const Hartheim = await ethers.getContractFactory("Hartheim");
+    this.hartheim = await Hartheim.deploy(
       this.guard.address,
       10,
       receiver.address
     );
-    await this.heartheim.deployed();
+    await this.hartheim.deployed();
 
-    const ShinkariCharacters = await ethers.getContractFactory(
-      "ShinkariCharacters"
-    );
-    this.shinkari = await ShinkariCharacters.deploy(
+    const Shinkari = await ethers.getContractFactory("Shinkari");
+    this.shinkari = await Shinkari.deploy(
       this.guard.address,
       10,
       receiver.address
@@ -76,7 +58,7 @@ describe("Collections", () => {
     await this.guard.addProtected(this.zhand.address);
     await this.guard.addProtected(this.ikarans.address);
     await this.guard.addProtected(this.tarki.address);
-    await this.guard.addProtected(this.heartheim.address);
+    await this.guard.addProtected(this.hartheim.address);
     await this.guard.addProtected(this.shinkari.address);
   });
 
@@ -85,14 +67,14 @@ describe("Collections", () => {
     expect(await this.zhand.name()).to.be.eq("Arising: Zhand");
     expect(await this.ikarans.name()).to.be.eq("Arising: I'Karans");
     expect(await this.tarki.name()).to.be.eq("Arising: Tark'i");
-    expect(await this.heartheim.name()).to.be.eq("Arising: Heartheim");
+    expect(await this.hartheim.name()).to.be.eq("Arising: Hartheim");
     expect(await this.shinkari.name()).to.be.eq("Arising: Shinkari");
 
     expect(await this.ard.symbol()).to.be.eq("ARISING");
     expect(await this.zhand.symbol()).to.be.eq("ARISING");
     expect(await this.ikarans.symbol()).to.be.eq("ARISING");
     expect(await this.tarki.symbol()).to.be.eq("ARISING");
-    expect(await this.heartheim.symbol()).to.be.eq("ARISING");
+    expect(await this.hartheim.symbol()).to.be.eq("ARISING");
     expect(await this.shinkari.symbol()).to.be.eq("ARISING");
 
     expect(await this.ard.baseURI()).to.be.eq(
@@ -107,8 +89,8 @@ describe("Collections", () => {
     expect(await this.tarki.baseURI()).to.be.eq(
       "https://characters.playarising.com/tarki/"
     );
-    expect(await this.heartheim.baseURI()).to.be.eq(
-      "https://characters.playarising.com/heartheim/"
+    expect(await this.hartheim.baseURI()).to.be.eq(
+      "https://characters.playarising.com/hartheim/"
     );
     expect(await this.shinkari.baseURI()).to.be.eq(
       "https://characters.playarising.com/shinkari/"
@@ -157,14 +139,14 @@ describe("Collections", () => {
     );
   });
 
-  it("should initialize and mint an heartheim character", async () => {
-    await this.heartheim.setPrice(ethers.utils.parseEther("10"));
-    await this.heartheim.setInitialized();
-    await this.heartheim
+  it("should initialize and mint an hartheim character", async () => {
+    await this.hartheim.setPrice(ethers.utils.parseEther("10"));
+    await this.hartheim.setInitialized();
+    await this.hartheim
       .connect(this.minter4)
       .mint({ value: ethers.utils.parseEther("10") });
-    expect(await this.heartheim.tokenURI(1)).to.be.eq(
-      "https://characters.playarising.com/heartheim/1"
+    expect(await this.hartheim.tokenURI(1)).to.be.eq(
+      "https://characters.playarising.com/hartheim/1"
     );
   });
 

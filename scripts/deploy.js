@@ -1,13 +1,13 @@
 const { ethers } = require("hardhat");
 
-const PAYMENT_RECEIVER = "";
+const PAYMENT_RECEIVER = "0x6a10415B984DeaC967425E157B77a852978002EF";
 
-const ARD_CAP = 0;
-const ZHAND_CAP = 0;
-const IKARANS_CAP = 0;
-const TARKI_CAP = 0;
-const HEARTHEIM_CAP = 0;
-const SHINKARI_CAP = 0;
+const ARD_CAP = 4500;
+const ZHAND_CAP = 1000;
+const IKARANS_CAP = 2500;
+const TARKI_CAP = 2500;
+const HARTHEIM_CAP = 1000;
+const SHINKARI_CAP = 4500;
 
 async function main() {
   const MintGuard = await ethers.getContractFactory("MintGuard");
@@ -25,25 +25,25 @@ async function main() {
   const zhand = await Zhand.deploy(guard.address, ZHAND_CAP, PAYMENT_RECEIVER);
   await zhand.deployed();
 
-  const Ikarans = await ethers.getContractFactory("I'Karans");
-  const ikarans = await Ikarans.deploy(
+  const IKarans = await ethers.getContractFactory("IKarans");
+  const ikarans = await IKarans.deploy(
     guard.address,
     IKARANS_CAP,
     PAYMENT_RECEIVER
   );
   await ikarans.deployed();
 
-  const Tarki = await ethers.getContractFactory("Tark'i");
+  const Tarki = await ethers.getContractFactory("Tarki");
   const tarki = await Tarki.deploy(guard.address, TARKI_CAP, PAYMENT_RECEIVER);
   await tarki.deployed();
 
-  const Heartheim = await ethers.getContractFactory("Heartheim");
-  const heartheim = await Heartheim.deploy(
+  const Hartheim = await ethers.getContractFactory("Hartheim");
+  const hartheim = await Hartheim.deploy(
     guard.address,
-    HEARTHEIM_CAP,
+    HARTHEIM_CAP,
     PAYMENT_RECEIVER
   );
-  await heartheim.deployed();
+  await hartheim.deployed();
 
   const Shinkari = await ethers.getContractFactory("Shinkari");
   const shinkari = await Shinkari.deploy(
@@ -56,9 +56,9 @@ async function main() {
   console.log("==> Deployment finished");
   console.log("==> Ard", ard.address);
   console.log("==> Zhand", zhand.address);
-  console.log("==> I'karans", ikarans.address);
+  console.log("==> I'Karans", ikarans.address);
   console.log("==> Tark'i", tarki.address);
-  console.log("==> Heartheim", heartheim.address);
+  console.log("==> Hartheim", hartheim.address);
   console.log("==> Shinkari", shinkari.address);
 
   console.log("==> Adding protected contracts to MintGuard");
@@ -66,7 +66,7 @@ async function main() {
   await guard.addProtected(zhand.address);
   await guard.addProtected(ikarans.address);
   await guard.addProtected(tarki.address);
-  await guard.addProtected(heartheim.address);
+  await guard.addProtected(hartheim.address);
   await guard.addProtected(shinkari.address);
 }
 

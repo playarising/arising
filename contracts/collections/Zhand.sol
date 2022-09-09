@@ -3,12 +3,17 @@ pragma solidity 0.8.16;
 
 import "../base/BaseERC721.sol";
 
-/*
- * ZhandCharacters the Zhand collection token for Arising.
+/**
+ * @dev `Zhand` is the `BaseERC721` instance for the Zhand.
  */
-contract ZhandCharacters is BaseERC721 {
+contract Zhand is BaseERC721 {
+    // =============================================== Setters ========================================================
+
     /**
-     * @dev Initializes the contract by setting a `_guard`, `_cap` and the `_payments_receiver` for the token collection.
+     * @dev Constructor.
+     * @param _guard                  The `MintGuard` instance address.
+     * @param _cap                    The max supply for the tokens.
+     * @param _payments_receiver      The payments receiver address.
      */
     constructor(
         address _guard,

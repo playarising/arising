@@ -6,9 +6,15 @@ import "../interfaces/ILevelsTable.sol";
 /*
  * LevelsTable is the basic level table for global level and skills levels.
  */
+/**
+ * @dev `LevelsTable` is a basic tool to convert between experience points to level.
+ */
 contract LevelsTable is ILevelsTable {
+    // =============================================== Getters ========================================================
+
     /**
-     * @dev Returns the level based in an experience amount.
+     * @dev Returns the level from an experience amount.
+     * @param exp   Experience amount.
      */
     function getLevel(uint256 exp) public pure returns (uint256) {
         if (exp < 1000) {

@@ -8,38 +8,50 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "../interfaces/IMintGuard.sol";
 import "../interfaces/IBaseERC721.sol";
 
-/*
- * BaseERC721 is the modified ERC721 contract to be used as the main characters for Arising.
+/**
+ * @dev `BaseERC721` is the base ERC721 token for Arising Civilizations.
  */
 contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
-    // Mint guard.
+    // =============================================== Storage ========================================================
+
+    /** @dev The address of the `MintGuard` instance. **/
     address guard;
 
-    // Payments receiver.
+    /** @dev The receiver address. **/
     address payable payments_receiver;
 
-    // Base URI.
+    /** @dev Base URI of the token metadata. **/
     string public baseURI;
 
-    // Max available supply for the collection.
+    /** @dev Max token supply. **/
     uint256 public cap;
 
-    // Boolean to initialize the mint capabilities.
+    /** @dev Boolean to check if the implementation is usable. **/
     bool public initialized;
 
-    // Price for each mint (in MATIC in wei)
+    /** @dev Price of each mint in MATIC in wei. **/
     uint256 public price;
 
+    // ============================================== Modifiers =======================================================
+
     /**
-     * @dev Throws if called when the contract is not initialized.
+     * @dev Checks if `initialized` is enabled.
      */
     modifier onlyInitialized() {
         require(initialized, "BaseERC721: contract is not initialized");
         _;
     }
 
+    // =============================================== Setters ========================================================
+
     /**
-     * @dev Initializes the contract by setting a `_name`, `_symbol` and define the `_guard`, the `_uri`, the initial `_cap` and the `_payments_receiver` for the token collection.
+     * @dev Constructor.
+     * @param _name                 The name of the collection.
+     * @param _symbol               The symbol of the collection.
+     * @param _guard                The `MintGuard` instance address.
+     * @param _uri                  The base URI for the tokens metadata.
+     * @param _cap                  The max supply of the token.
+     * @param _payments_receiver    The address that will receive the payments.
      */
     constructor(
         string memory _name,
@@ -56,31 +68,27 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
         payments_receiver = _payments_receiver;
     }
 
-    /**
-     * @dev Enabled the collection to be minted
-     */
+    /** @dev Enables the `BaseERC721` implementation. */
     function setInitialized() public onlyOwner {
         require(price != 0, "BaseERC721: can't initialize when price is 0");
         initialized = true;
     }
 
-    /**
-     * @dev Set the mint price (in USD with 8 decimals)
+    /** @dev Sets the minting price.
+     *  @param _price   Price in MATIC in wei.
      */
     function setPrice(uint256 _price) public onlyOwner {
         price = _price;
     }
 
-    /**
-     * @dev Modifies the max supply for the collection
+    /** @dev Sets the max supply of the collection.
+     *  @param _cap     Max supply.
      */
     function setCap(uint256 _cap) public onlyOwner {
         cap = _cap;
     }
 
-    /**
-     * @dev Creates a new token for the msg.sender
-     */
+    /** @dev Mints a new token to `msg.sender`. */
     function mint() public payable onlyInitialized {
         require(
             totalSupply() < cap,
@@ -99,19 +107,12 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
         _safeMint(msg.sender, totalSupply() + 1);
     }
 
-    /**
-     * @dev Overrides the ERC721 _baseURI with an URI specified over the constructor.
-     */
-    function _baseURI() internal view virtual override returns (string memory) {
-        return baseURI;
-    }
+    // =============================================== Getters ========================================================
 
     /**
      * @dev Returns whether `spender` is allowed to manage `tokenId`.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
+     * @param spender   The account checking allowance.
+     * @param tokenId   The id of the token.
      */
     function isApprovedOrOwner(address spender, uint256 tokenId)
         public
@@ -123,5 +124,12 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
         return (spender == owner ||
             isApprovedForAll(owner, spender) ||
             getApproved(tokenId) == spender);
+    }
+
+    // =============================================== Internal =======================================================
+
+    /** @dev Overrides the ERC721 `_baseURI` function with an URI specified over the constructor. */
+    function _baseURI() internal view virtual override returns (string memory) {
+        return baseURI;
     }
 }

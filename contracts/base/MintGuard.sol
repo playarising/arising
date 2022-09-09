@@ -5,21 +5,27 @@ import "../interfaces/IMintGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
-/*
- * MintGuard is a contract to prevent minting more than five characters among a set of collections.
+/**
+ * @dev `MintGuard` a guard contract to prevent minting more than five characters among a set of collections.
  */
 contract MintGuard is Ownable, IMintGuard {
     using Address for address;
 
-    // Address minted counts
+    // =============================================== Storage ========================================================
+
+    /** @dev Map to track the amount of tokens minted by address. **/
     mapping(address => uint256) private _minters;
 
-    // Protected contracts
+    /** @dev Map to track the protected instances. **/
     mapping(address => bool) private _protected;
+
+    /** @dev Array to track the protected instances. **/
     address[] protected;
 
+    // ============================================== Modifiers =======================================================
+
     /**
-     * @dev Throws if called from an address or a contract not specified by the owner.
+     * @dev Checks if `msg.sender` is a protected contract.
      */
     modifier onlyProtected() {
         require(
@@ -29,15 +35,11 @@ contract MintGuard is Ownable, IMintGuard {
         _;
     }
 
-    /**
-     * @dev Returns the list of protected contracts
-     */
-    function getProtected() public view returns (address[] memory) {
-        return protected;
-    }
+    // =============================================== Setters ========================================================
 
     /**
-     * @dev Adds a contract address to the list of modifiers for the `_minters` list
+     * @dev Adds an instance to the list of protected instances.
+     * @param _contract The address of the instance.
      */
     function addProtected(address _contract) public onlyOwner {
         _protected[_contract] = true;
@@ -45,15 +47,18 @@ contract MintGuard is Ownable, IMintGuard {
     }
 
     /**
-     * @dev Adds a mint count to an address an address as minter to prevent multiple mints from the same address
+     * @dev Adds a mint to the mint counter for the address.
+     * @param _minter The minter address.
      */
     function setMinter(address _minter) public onlyProtected {
         _minters[_minter] += 1;
     }
 
+    // =============================================== Getters ========================================================
+
     /**
-     * @dev Checks if an address has already minted.
-     * This call will also add an extra layer to prevent contracts to mint (is not entirely safe, but prevents bots to spam-mint).
+     * @dev Checks if an address is not able to mint more tokens.
+     * @param _minter The minter address.
      */
     function hasMinted(address _minter) public view returns (bool) {
         require(
@@ -61,5 +66,12 @@ contract MintGuard is Ownable, IMintGuard {
             "MintGuard: cannot mint from a contract"
         );
         return _minters[_minter] >= 5;
+    }
+
+    /**
+     * @dev Returns the list of protected contracts.
+     */
+    function getProtected() public view returns (address[] memory) {
+        return protected;
     }
 }

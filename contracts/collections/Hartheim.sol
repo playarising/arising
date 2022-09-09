@@ -4,9 +4,9 @@ pragma solidity 0.8.16;
 import "../base/BaseERC721.sol";
 
 /**
- * @dev `Shinkari` is the `BaseERC721` instance for the Shinkari.
+ * @dev `Hartheim` is the `BaseERC721` instance for the Hartheim.
  */
-contract Shinkari is BaseERC721 {
+contract Hartheim is BaseERC721 {
     // =============================================== Setters ========================================================
 
     /**
@@ -21,10 +21,10 @@ contract Shinkari is BaseERC721 {
         address payable _payments_receiver
     )
         BaseERC721(
-            "Arising: Shinkari",
+            "Arising: Hartheim",
             "ARISING",
             _guard,
-            "https://characters.playarising.com/shinkari/",
+            "https://characters.playarising.com/hartheim/",
             _cap,
             _payments_receiver
         )
