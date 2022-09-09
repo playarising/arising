@@ -1,13 +1,13 @@
 {
-  "name": "@arising/characters",
+  "name": "@arising/aising",
   "version": "1.0.0",
-  "description": "Contracts for Arising characters ERC721 tokens",
+  "description": "Contracts for Arising: A Twirl of Destinies GameFi experience",
   "bugs": {
-    "url": "https://github.com/playarising/characters/issues"
+    "url": "https://github.com/playarising/arising/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/playarising/characters/.git"
+    "url": "git+https://github.com/playarising/arising/.git"
   },
   "license": "MIT",
   "author": "Enrique Berrueta",
@@ -15,7 +15,7 @@
     "ci": "env CI=true",
     "compile": "hardhat compile",
     "coverage": "env COVERAGE=true hardhat coverage",
-    "format": "prettier --write '**/*.{sol,js,json,md}' && yarn run sort",
+    "format": "prettier --write '**/*.{sol,js,json,md}'",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test",
     "sort": "npx sort-package-json",
     "test": "hardhat test"
@@ -27,10 +27,10 @@
     "chai": "4.3.6",
     "ethereum-waffle": "3.4.4",
     "ethers": "5.7.0",
-    "hardhat": "2.10.1",
-    "hardhat-gas-reporter": "1.0.8",
+    "hardhat": "2.11.1",
+    "hardhat-gas-reporter": "1.0.9",
     "prettier": "2.7.1",
     "prettier-plugin-solidity": "1.0.0-beta.24",
-    "solidity-coverage": "0.7.21"
+    "solidity-coverage": "0.8.2"
   }
 }

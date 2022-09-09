@@ -24,7 +24,7 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
     // Boolean to initialize the mint capabilities.
     bool public initialized;
 
-    // Price for each mint (in FTM in wei)
+    // Price for each mint (in MATIC in wei)
     uint256 public price;
 
     /**

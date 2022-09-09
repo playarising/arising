@@ -1,34 +1,29 @@
-# Arising: Characters
+# Arising: A Twirl of Destinies
 
-![BUILD](https://github.com/playarising/characters/actions/workflows/test.yml/badge.svg)
-[![codecov](https://codecov.io/gh/playarising/characters/branch/main/graph/badge.svg?token=CNNKAMNV9K)](https://codecov.io/gh/playarising/characters)
+![BUILD](https://github.com/playarising/arising/actions/workflows/test.yml/badge.svg)
+[![codecov](https://codecov.io/gh/playarising/arising/branch/main/graph/badge.svg?token=CNNKAMNV9K)](https://codecov.io/gh/playarising/arising)
 
-Arising: Characters is a set of collections that reflect the main civilizations of Etia.
+![Arising Logo](https://github.com/playarising/.github/blob/main/logo.png?raw=true)
 
-Using the ERC721 standard these contracts are personifications of main characters that live and work inside their respective cultures.
+<span align="center">
 
-All the collections are protected by a _MintGuard_ contract that prevents minting more than 5 characters for the same address and contract minting. We heavily encourage users to **not mint more than five character** since you don't need more than one to play the game.
+![Twitter Follow](https://img.shields.io/twitter/follow/playarising?style=social)
+![Discord](https://img.shields.io/discord/983345927131656244)
 
-There are 6 main collections (right now):
+</span>
 
-- Ard
-- Heartheim
-- I'Karans
-- Shinkari
-- Tark'i
-- Zhand
+Arising is the first web3-powered role-play community and experience. Through community participation and character creation, all players can create fantastic stories and moments through the world of Etia.
 
-The 6 main collections are soft-capped. Meaning that they have a modifiable cap to prevent minting more characters that art generated.
+Etia is a fantasy world in which all characters take part. A world with four big continents full of different races, cities, conflicts, mysteries, and more. Each character has a background, an ethnicity, a purpose, and definitively a story to tell.
 
-Once any collection reaches the cap, the collection will be extended to make possible for everyone to enter the world of Etia.
-
-The price for minting a character is adjustable to match a price in USD.
+This repository contains all the contracts that interact together to create the whole GameFi experience.
 
 ## Deployments
 
 | Contract                | Deployment |
 | ----------------------- | ---------- |
 | **MintGuard**           |            |
+| **LevelsTable**         |            |
 | **ArdCharacters**       |            |
 | **HeartheimCharacters** |            |
 | **IkaranCharacter**     |            |
