@@ -96,6 +96,19 @@ describe("BaseERC721", () => {
     expect(await this.token.balanceOf(this.owner.address)).to.be.eq(1);
   });
 
+  it("should check the token allowance", async () => {
+    expect(await this.token.isApprovedOrOwner(this.owner.address, 1)).to.be.eq(
+      true
+    );
+    expect(
+      await this.token.isApprovedOrOwner(this.receiver.address, 1)
+    ).to.be.eq(false);
+    await this.token.approve(this.receiver.address, 1);
+    expect(
+      await this.token.isApprovedOrOwner(this.receiver.address, 1)
+    ).to.be.eq(true);
+  });
+
   it("should fail when trying to mint a 6th token from owner address", async () => {
     await this.token.setCap(6);
 
