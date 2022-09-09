@@ -43,6 +43,6 @@ contract RefresherToken is ERC20Burnable, Ownable {
      */
     function withdraw() public onlyOwner {
         uint256 balance = IERC20(usd).balanceOf(address(this));
-        IERC20(usd).transferFrom(address(this), owner(), balance);
+        IERC20(usd).transfer(owner(), balance);
     }
 }
