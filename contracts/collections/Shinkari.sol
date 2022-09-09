@@ -3,6 +3,9 @@ pragma solidity 0.8.16;
 
 import "../base/BaseERC721.sol";
 
+/*
+ * ShinkariCharacters the Shinkari collection token for Arising.
+ */
 contract ShinkariCharacters is BaseERC721 {
     /**
      * @dev Initializes the contract by setting a `_guard`, `_cap` and the `_payments_receiver` for the token collection.

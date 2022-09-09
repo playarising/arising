@@ -9,4 +9,9 @@ interface IBaseERC721 {
     function setCap(uint256 _cap) external;
 
     function mint() external payable;
+
+    function isApprovedOrOwner(address spender, uint256 tokenId)
+        external
+        view
+        returns (bool);
 }

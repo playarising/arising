@@ -1,7 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.16;
 
-contract LevelsTable {
+import "../interfaces/ILevelsTable.sol";
+
+/*
+ * LevelsTable is the basic level table for global level and skills levels.
+ */
+contract LevelsTable is ILevelsTable {
+    /**
+     * @dev Returns the level based in an experience amount.
+     */
     function getLevel(uint256 exp) public pure returns (uint256) {
         if (exp < 1000) {
             return 0;

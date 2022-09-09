@@ -3,6 +3,9 @@ pragma solidity 0.8.16;
 
 import "../base/BaseERC721.sol";
 
+/*
+ * ArdCharacters the Ard collection token for Arising.
+ */
 contract ArdCharacters is BaseERC721 {
     /**
      * @dev Initializes the contract by setting a `_guard`, `_cap` and the `_payments_receiver` for the token collection.

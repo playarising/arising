@@ -2,12 +2,15 @@
 pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "../interfaces/IMintGuard.sol";
 import "../interfaces/IBaseERC721.sol";
 
+/*
+ * BaseERC721 is the modified ERC721 contract to be used as the main characters for Arising.
+ */
 contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
     // Mint guard.
     address guard;
@@ -101,5 +104,24 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
      */
     function _baseURI() internal view virtual override returns (string memory) {
         return baseURI;
+    }
+
+    /**
+     * @dev Returns whether `spender` is allowed to manage `tokenId`.
+     *
+     * Requirements:
+     *
+     * - `tokenId` must exist.
+     */
+    function isApprovedOrOwner(address spender, uint256 tokenId)
+        public
+        view
+        virtual
+        returns (bool)
+    {
+        address owner = ownerOf(tokenId);
+        return (spender == owner ||
+            isApprovedForAll(owner, spender) ||
+            getApproved(tokenId) == spender);
     }
 }

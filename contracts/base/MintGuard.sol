@@ -5,6 +5,9 @@ import "../interfaces/IMintGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
+/*
+ * MintGuard is a contract to prevent minting more than five characters among a set of collections.
+ */
 contract MintGuard is Ownable, IMintGuard {
     using Address for address;
 
