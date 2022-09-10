@@ -46,6 +46,15 @@ describe("BaseERC721", () => {
     ).to.revertedWith("Ownable: caller is not the owner");
   });
 
+  it("should check if a token exists", async () => {
+     expect(
+        await this.token.exists(1)
+    ).to.eq(true);
+     expect(
+        await this.token.exists(2)
+      ).to.eq(false);
+  });
+
   it("should mint until the cap is reached", async () => {
     await this.token.mint(this.owner.address);
     await this.token.mint(this.owner.address);
