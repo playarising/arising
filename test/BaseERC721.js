@@ -23,19 +23,6 @@ describe("BaseERC721", () => {
     expect(await this.token.balanceOf(this.owner.address)).to.eq(1);
   });
 
-  it("should check the token allowance", async () => {
-    expect(await this.token.isApprovedOrOwner(this.owner.address, 1)).to.eq(
-      true
-    );
-    expect(await this.token.isApprovedOrOwner(this.minter.address, 1)).to.eq(
-      false
-    );
-    await this.token.approve(this.minter.address, 1);
-    expect(await this.token.isApprovedOrOwner(this.minter.address, 1)).to.eq(
-      true
-    );
-  });
-
   it("should return the token URI correctly", async () => {
     expect(await this.token.tokenURI(1)).to.be.eq("https://test.uri/1");
   });
@@ -58,6 +45,23 @@ describe("BaseERC721", () => {
     await this.token.mint(this.owner.address);
     await expect(this.token.mint(this.owner.address)).to.revertedWith(
       "BaseERC721: Max supply reached."
+    );
+  });
+
+  it("should check the token allowance", async () => {
+    expect(await this.token.isApprovedOrOwner(this.owner.address, 1)).to.eq(
+      true
+    );
+    expect(await this.token.isApprovedOrOwner(this.minter.address, 1)).to.eq(
+      false
+    );
+    await this.token.approve(this.minter.address, 1);
+    expect(await this.token.isApprovedOrOwner(this.minter.address, 1)).to.eq(
+      true
+    );
+    await this.token.setApprovalForAll(this.minter.address, true);
+    expect(await this.token.isApprovedOrOwner(this.minter.address, 2)).to.eq(
+      true
     );
   });
 });
