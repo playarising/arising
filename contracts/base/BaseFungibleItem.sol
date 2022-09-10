@@ -17,121 +17,41 @@ contract BaseFungibleItem is Ownable {
     string symbol;
 
     /** @dev Balances. **/
-    mapping(uint256 => mapping(uint256 => uint256)) balances;
-
-    /** @dev Map to store the civilizations implemented. **/
-    mapping(uint256 => address) _civilizations;
-
-    /** @dev Array to store the civilizations implemented. **/
-    uint256[] civilizations;
-
-    /** @dev Address of the allowed minter. **/
-    address minter;
-
-    // ============================================== Modifiers =======================================================
-    /**
-     * @dev Checks if `msg.sender` is a minter.
-     */
-    modifier onlyMinter() {
-        require(
-            msg.sender == minter,
-            "BaseFungibleItems: msg.sender is not a minter"
-        );
-        _;
-    }
+    mapping(string => uint256) balances;
 
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
      * @param _name      The name of fungible token.
      * @param _symbol    The symbol of the fungible token.
-     * @param _minter    The address of the authorized minter.
      */
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        address _minter
-    ) {
+    constructor(string memory _name, string memory _symbol) {
         name = _name;
         symbol = _symbol;
-        minter = _minter;
-    }
-
-    /** @dev Adds a civilization to the fungible item.
-     *  @param _instance  Address of the `BaseERC721` instance.
-     */
-    function addCivilization(address _instance) public onlyOwner {
-        require(
-            _instance != address(0),
-            "BaseFungibleItems: instance address is null"
-        );
-        uint256 newId = civilizations.length + 1;
-        _civilizations[newId] = _instance;
-        civilizations.push(newId);
-    }
-
-    /** @dev Sets the `minter` address.
-     *  @param _minter   address of the authorized minter.
-     */
-    function setMinter(address _minter) public onlyOwner {
-        minter = _minter;
     }
 
     /** @dev Mints an specific amount of items to a character balance.
-     *  @param civilization     ID of the civilization.
-     *  @param id               ID of the token.
-     *  @param amount           Amount to be minted.
+     *  @param id       Composed ID of the token.
+     *  @param amount   Amount to be minted.
      */
-    function mintTo(
-        uint256 civilization,
-        uint256 id,
-        uint256 amount
-    ) public onlyMinter {
-        require(
-            _civilizations[civilization] != address(0),
-            "BaseFungibleItems: civilization doesn't exist"
-        );
-        balances[civilization][id] += amount;
+    function mintTo(string memory id, uint256 amount) public onlyOwner {
+        balances[id] += amount;
     }
 
     /** @dev Mints an specific amount of items to a character balance.
-     *  @param civilization     ID of the civilization.
-     *  @param id               ID of the token.
-     *  @param amount           Amount to be consumed.
+     *  @param id       Composed ID of the token.
+     *  @param amount   Amount to be consumed.
      */
-    function consume(
-        uint256 civilization,
-        uint256 id,
-        uint256 amount
-    ) public {
-        require(
-            _civilizations[civilization] != address(0),
-            "BaseFungibleItems: civilization doesn't exist"
-        );
-        require(
-            IBaseERC721(_civilizations[civilization]).isApprovedOrOwner(
-                msg.sender,
-                id
-            ),
-            "BaseFungibleItems: interaction is not from owner or allowed"
-        );
-        balances[civilization][id] -= amount;
+    function consume(string memory id, uint256 amount) public {
+        // TODO check ownership
+        balances[id] -= amount;
     }
 
     // =============================================== Getters ========================================================
     /** @dev Returns the balance of the item owned by a character.
-     *  @param civilization     ID of the civilization.
-     *  @param id               ID of the token.
+     *  @param id   Composed ID of the token.
      */
-    function balanceOf(uint256 civilization, uint256 id)
-        public
-        view
-        returns (uint256)
-    {
-        require(
-            _civilizations[civilization] != address(0),
-            "BaseFungibleItems: civilization doesn't exist"
-        );
-        return balances[civilization][id];
+    function balanceOf(string memory id) public view returns (uint256) {
+        return balances[id];
     }
 }

@@ -10,9 +10,6 @@ contract Coal is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
-     * @param _minter    The address of the authorized minter.
      */
-    constructor(address _minter)
-        BaseFungibleItem("Arising: Coal", "aCOAL", _minter)
-    {}
+    constructor() BaseFungibleItem("Arising: Coal", "aCOAL") {}
 }

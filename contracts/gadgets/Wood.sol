@@ -10,9 +10,6 @@ contract Wood is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
-     * @param _minter    The address of the authorized minter.
      */
-    constructor(address _minter)
-        BaseFungibleItem("Arising: Wood", "aWOOD", _minter)
-    {}
+    constructor() BaseFungibleItem("Arising: Wood", "aWOOD") {}
 }

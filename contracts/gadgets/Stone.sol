@@ -10,9 +10,6 @@ contract Stone is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
-     * @param _minter    The address of the authorized minter.
      */
-    constructor(address _minter)
-        BaseFungibleItem("Arising: Stone", "aSTONE", _minter)
-    {}
+    constructor(address _minter) BaseFungibleItem("Arising: Stone", "aSTONE") {}
 }

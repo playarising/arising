@@ -10,9 +10,6 @@ contract Gold is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
-     * @param _minter    The address of the authorized minter.
      */
-    constructor(address _minter)
-        BaseFungibleItem("Arising: Gold", "aGOLD", _minter)
-    {}
+    constructor() BaseFungibleItem("Arising: Gold", "aGOLD") {}
 }

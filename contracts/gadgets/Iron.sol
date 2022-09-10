@@ -10,9 +10,6 @@ contract Iron is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
-     * @param _minter    The address of the authorized minter.
      */
-    constructor(address _minter)
-        BaseFungibleItem("Arising: Iron", "aIRON", _minter)
-    {}
+    constructor() BaseFungibleItem("Arising: Iron", "aIRON") {}
 }

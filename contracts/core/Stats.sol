@@ -28,99 +28,41 @@ contract Stats is Ownable {
     /** @dev Amount of seconds for refresh cooldown.  **/
     uint256 REFRESH_COOLDOWN_SECONDS = 86400; // 1 day.
 
-    /** @dev Boolean to check if the implementation is usable. **/
-    bool public initialized;
+    /** @dev Map to store the base stats from composed IDs. **/
+    mapping(string => CharacterStats) base;
 
-    /** @dev Map to store the civilizations implemented. **/
-    mapping(uint256 => address) _civilizations;
+    /** @dev Map to store the pool stats from composed ID. **/
+    mapping(string => CharacterStats) pool;
 
-    /** @dev Array to store the civilizations implemented. **/
-    uint256[] civilizations;
-
-    /** @dev Map to store the maps for each civilization and token id base stats. **/
-    mapping(uint256 => mapping(uint256 => CharacterStats)) base;
-
-    /** @dev Map to store the maps for each civilization and token id pool stats. **/
-    mapping(uint256 => mapping(uint256 => CharacterStats)) pool;
-
-    /** @dev Map to store the last refresh for each civilization and token id. **/
-    mapping(uint256 => mapping(uint256 => uint256)) last_refresh;
+    /** @dev Map to store the the last refresh from composed ID. **/
+    mapping(string => uint256) last_refresh;
 
     /** @dev Implementation of the `Refresher` **/
     address refresher;
 
-    // =============================================== Events =========================================================
-    // ============================================== Modifiers =======================================================
-
-    /**
-     * @dev Checks if `initialized` is enabled.
-     */
-    modifier onlyInitialized() {
-        require(initialized, "StatsManager: contract is not initialized");
-        _;
-    }
-
     // =============================================== Setters ========================================================
 
-    /** @dev Enables the `StatsManager` implementation. */
-    function setInitialized() public onlyOwner {
-        require(
-            refresher != address(0),
-            "StatsManager: can't initialize when no refresh token set"
-        );
-        initialized = true;
-    }
-
-    /** @dev Sets the `RefreshToken` instance.
-     *  @param _token   address of the `RefreshToken` instance.
+    /** @dev Sets the `Refresher` instance.
+     *  @param _token   address of the `Refresher` instance.
      */
     function setRefreshToken(address _token) public onlyOwner {
         refresher = _token;
     }
 
-    /** @dev Adds a civilization to the stats manager.
-     *  @param _instance  Address of the `BaseERC721` instance.
-     */
-    function addCivilization(address _instance)
-        public
-        onlyOwner
-        onlyInitialized
-    {
-        require(
-            _instance != address(0),
-            "StatsManager: instance address is null"
-        );
-        uint256 newId = civilizations.length + 1;
-        _civilizations[newId] = _instance;
-        civilizations.push(newId);
-    }
-
     /** @dev Reduces stats points from the pool.
-     *  @param civilization     ID of the civilization.
-     *  @param id               ID of the token.
+     *  @param id               Composed ID of the token.
      *  @param might            Amount of might stat points reducing.
      *  @param speed            Amount of speed stat points reducing.
      *  @param intelect         Amount of intelect stat points reducing.
      */
     function consume(
-        uint256 civilization,
-        uint256 id,
+        string memory id,
         uint256 might,
         uint256 speed,
         uint256 intelect
-    ) public onlyInitialized {
-        require(
-            _civilizations[civilization] != address(0),
-            "StatsManager: civilization doesn't exist"
-        );
-        require(
-            IBaseERC721(_civilizations[civilization]).isApprovedOrOwner(
-                msg.sender,
-                id
-            ),
-            "StatsManager: interaction is not from owner or allowed"
-        );
-        CharacterStats storage currPool = pool[civilization][id];
+    ) public {
+        // TODO check ownership
+        CharacterStats storage currPool = pool[id];
         require(
             currPool.might - might > 0,
             "StatsManager: cannot consume less might than current available"
@@ -134,99 +76,62 @@ contract Stats is Ownable {
             "StatsManager: cannot consume less intelect than current available"
         );
 
-        pool[civilization][id].might -= might;
-        pool[civilization][id].speed -= speed;
-        pool[civilization][id].intelect -= intelect;
+        pool[id].might -= might;
+        pool[id].speed -= speed;
+        pool[id].intelect -= intelect;
     }
 
     /** @dev Performs a refresh filling the pool stats from the base stats.
-     *  @param civilization     ID of the civilization.
-     *  @param id               ID of the token.
+     *  @param id   Composed ID of the token.
      */
-    function refresh(uint256 civilization, uint256 id) public onlyInitialized {
-        require(
-            _civilizations[civilization] != address(0),
-            "StatsManager: civilization doesn't exist"
-        );
-        require(
-            IBaseERC721(_civilizations[civilization]).isApprovedOrOwner(
-                msg.sender,
-                id
-            ),
-            "StatsManager: interaction is not from owner or allowed"
-        );
-
-        uint256 last = last_refresh[civilization][id];
+    function refresh(string memory id) public {
+        // TODO check ownership
+        uint256 last = last_refresh[id];
         require(
             last == 0 || last + REFRESH_COOLDOWN_SECONDS <= block.timestamp,
             "StatsManager: not enough time has passed to refresh pool"
         );
-
-        pool[civilization][id].might = base[civilization][id].might;
-        pool[civilization][id].speed = base[civilization][id].speed;
-        pool[civilization][id].intelect = base[civilization][id].intelect;
-        last_refresh[civilization][id] = block.timestamp;
+        pool[id].might = base[id].might;
+        pool[id].speed = base[id].speed;
+        pool[id].intelect = base[id].intelect;
+        last_refresh[id] = block.timestamp;
     }
 
     /** @dev Performs a refresh filling the pool stats from the base stats without cooldown spending `RefreshToken`.
-     *  @param civilization     ID of the civilization.
-     *  @param id               ID of the token.
+     *  @param id   Composed ID of the token.
      */
-    function refreshWithToken(uint256 civilization, uint256 id)
-        public
-        onlyInitialized
-    {
-        require(
-            _civilizations[civilization] != address(0),
-            "StatsManager: civilization doesn't exist"
-        );
-        require(
-            IBaseERC721(_civilizations[civilization]).isApprovedOrOwner(
-                msg.sender,
-                id
-            ),
-            "StatsManager: interaction is not from owner or allowed"
-        );
+    function refreshWithToken(string memory id) public {
+        // TODO check ownership
 
         ERC20Burnable(refresher).burnFrom(msg.sender, 1);
 
-        pool[civilization][id].might = base[civilization][id].might;
-        pool[civilization][id].speed = base[civilization][id].speed;
-        pool[civilization][id].intelect = base[civilization][id].intelect;
-        last_refresh[civilization][id] = block.timestamp;
+        pool[id].might = base[id].might;
+        pool[id].speed = base[id].speed;
+        pool[id].intelect = base[id].intelect;
+        last_refresh[id] = block.timestamp;
     }
 
     // =============================================== Getters ========================================================
 
-    /** @dev Returns the base stats of the token from the civilization sent.
-     *  @param id               ID of the token.
-     *  @param civilization     ID of the civilization.
+    /** @dev Returns the base stats of the composed ID.
+     *  @param id   Composed ID of the token.
      */
-    function getBaseStats(uint256 id, uint256 civilization)
+    function getBaseStats(string memory id)
         public
         view
         returns (CharacterStats memory)
     {
-        require(
-            _civilizations[civilization] != address(0),
-            "StatsManager: civilization doesn't exist"
-        );
-        return base[civilization][id];
+        return base[id];
     }
 
-    /** @dev Returns the available pool stats of the token from the civilization sent.
-     *  @param id               ID of the token.
-     *  @param civilization     ID of the civilization.
+    /** @dev Returns the available pool stats of the composed ID.
+     *  @param id   Composed ID of the token.
      */
-    function getPoolStats(uint256 id, uint256 civilization)
+    function getPoolStats(string memory id)
         public
         view
         returns (CharacterStats memory)
     {
-        require(
-            _civilizations[civilization] != address(0),
-            "StatsManager: civilization doesn't exist"
-        );
-        return pool[civilization][id];
+        return pool[id];
     }
 }
