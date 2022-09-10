@@ -2,14 +2,14 @@
 pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "../interfaces/IBaseERC721.sol";
+import "../interfaces/ICivilizations.sol";
 
 /**
  * @dev `Civilizations` is the contract that stores all the usable civilizations.
  */
-contract Civilizations is Ownable {
+contract Civilizations is Ownable, ICivilizations {
     using Address for address;
 
     // =============================================== Storage ========================================================

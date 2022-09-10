@@ -2,13 +2,13 @@
 pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../interfaces/IBaseERC721.sol";
 import "../interfaces/ICivilizations.sol";
+import "../interfaces/IBaseFungibleItem.sol";
 
 /**
  * @dev `BaseFungibleItem` is a base contract to imitate the ERC20 functionality in the context of characters.
  */
-contract BaseFungibleItem is Ownable {
+contract BaseFungibleItem is Ownable, IBaseFungibleItem {
     // =============================================== Storage ========================================================
 
     /** @dev Name of the item. **/

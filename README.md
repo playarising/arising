@@ -1,11 +1,11 @@
 # Arising: A Twirl of Destinies
 
+<span align="center">
+
 ![BUILD](https://github.com/playarising/arising/actions/workflows/test.yml/badge.svg)
 [![codecov](https://codecov.io/gh/playarising/arising/branch/main/graph/badge.svg?token=CNNKAMNV9K)](https://codecov.io/gh/playarising/arising)
 
 [![Arising Logo](https://github.com/playarising/.github/blob/main/logo.png?raw=true)](https://playarising.com)
-
-<span align="center">
 
 [![Twitter Follow](https://img.shields.io/twitter/follow/playarising?style=social)](https://twitter.com/playarising)
 [![Discord](https://img.shields.io/discord/983345927131656244)](https://discord.gg/arising)
@@ -20,17 +20,25 @@ This repository contains all the contracts that interact together to create the 
 
 ## Deployments
 
-| Contract              | Deployment |
-| --------------------- | ---------- |
-| **MintGuard**         |            |
-| **LevelsTable**       |            |
-| **StatsManager**      |            |
-| **ExperienceManager** |            |
-| **RefreshToken**      |            |
-| **Gold**              |            |
-| **Ard**               |            |
-| **Hartheim**          |            |
-| **IKarans**           |            |
-| **Shinkari**          |            |
-| **Tarki**             |            |
-| **Zhand**             |            |
+| Contract          | Deployment |
+| ----------------- | ---------- |
+| **Ard**           |            |
+| **Hartheim**      |            |
+| **IKarans**       |            |
+| **Shinkari**      |            |
+| **Tarki**         |            |
+| **Zhand**         |            |
+| **Civilizations** |            |
+| **Craft**         |            |
+| **Equipment**     |            |
+| **Experience**    |            |
+| **Levels**        |            |
+| **Names**         |            |
+| **Quests**        |            |
+| **Stats**         |            |
+| **Coal**          |            |
+| **Gold**          |            |
+| **Iron**          |            |
+| **Refresher**     |            |
+| **Stone**         |            |
+| **Wood**          |            |
