@@ -20,17 +20,17 @@ This repository contains all the contracts that interact together to create the 
 
 ## Deployments
 
-| Contract                | Deployment |
-| ----------------------- | ---------- |
-| **MintGuard**           |            |
-| **LevelsTable**         |            |
-| **StatsManager**        |            |
-| **ExperienceManager**   |            |
-| **RefreshToken**        |            |
-| **Gold**                |            |
-| **ArdCharacters**       |            |
-| **HeartheimCharacters** |            |
-| **IkaranCharacter**     |            |
-| **ShinkariCharacters**  |            |
-| **TarkiCharacters**     |            |
-| **ZhandCharacters**     |            |
+| Contract              | Deployment |
+| --------------------- | ---------- |
+| **MintGuard**         |            |
+| **LevelsTable**       |            |
+| **StatsManager**      |            |
+| **ExperienceManager** |            |
+| **RefreshToken**      |            |
+| **Gold**              |            |
+| **Ard**               |            |
+| **Hartheim**          |            |
+| **IKarans**           |            |
+| **Shinkari**          |            |
+| **Tarki**             |            |
+| **Zhand**             |            |
