@@ -3,6 +3,7 @@ pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "../interfaces/IBaseERC721.sol";
 
 /**
  * @dev `Civilizations` is the contract that stores all the usable civilizations.
@@ -79,6 +80,10 @@ contract Civilizations is Ownable {
         require(
             id != 0,
             "Civilizations: instance is not an Arising civilization."
+        );
+        require(
+            IBaseERC721(_instance).exists(_id),
+            "Civilizations: token id is not minted."
         );
         return
             string(

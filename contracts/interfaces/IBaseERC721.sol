@@ -14,4 +14,6 @@ interface IBaseERC721 {
         external
         view
         returns (bool);
+
+    function exists(uint256 tokenId) external view returns (bool);
 }

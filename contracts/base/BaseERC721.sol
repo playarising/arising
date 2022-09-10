@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "../interfaces/IGuard.sol";
 import "../interfaces/IBaseERC721.sol";
 
 /**
@@ -14,8 +13,8 @@ import "../interfaces/IBaseERC721.sol";
 contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
     // =============================================== Storage ========================================================
 
-    /** @dev The address of the `Guard` instance. **/
-    address guard;
+    /** @dev The address of the `Civilizations` instance. **/
+    address civilizations;
 
     /** @dev The receiver address. **/
     address payable payments_receiver;
@@ -42,13 +41,24 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
         _;
     }
 
+    /**
+     * @dev Checks if `msg.sender` is the `Civilizations` contract.
+     */
+    modifier onlyCivilizationsMint() {
+        require(
+            msg.sender != civilizations,
+            "BaseERC721: minter is not authorized"
+        );
+        _;
+    }
+
     // =============================================== Setters ========================================================
 
     /**
      * @dev Constructor.
      * @param _name                 The name of the collection.
      * @param _symbol               The symbol of the collection.
-     * @param _guard                The `Guard` instance address.
+     * @param _civilizations        The `Civilizations` instance address.
      * @param _uri                  The base URI for the tokens metadata.
      * @param _cap                  The max supply of the token.
      * @param _payments_receiver    The address that will receive the payments.
@@ -56,12 +66,12 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
     constructor(
         string memory _name,
         string memory _symbol,
-        address _guard,
+        address _civilizations,
         string memory _uri,
         uint256 _cap,
         address payable _payments_receiver
     ) ERC721(_name, _symbol) {
-        guard = _guard;
+        civilizations = _civilizations;
         baseURI = _uri;
         cap = _cap;
         initialized = false;
@@ -89,20 +99,15 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
     }
 
     /** @dev Mints a new token to `msg.sender`. */
-    function mint() public payable onlyInitialized {
+    function mint() public payable onlyInitialized onlyCivilizationsMint {
         require(
             totalSupply() < cap,
             "BaseERC721: Max supply reached, wait for more tokens to be available"
         );
         require(
-            !IGuard(guard).hasMinted(msg.sender),
-            "BaseERC721: Address has already minted"
-        );
-        require(
             msg.value == price,
             "BaseERC721: Tx doesn't include enough to pay the mint"
         );
-        IGuard(guard).setMinter(msg.sender);
         Address.sendValue(payments_receiver, price);
         _safeMint(msg.sender, totalSupply() + 1);
     }
@@ -124,6 +129,14 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
         return (spender == owner ||
             isApprovedForAll(owner, spender) ||
             getApproved(tokenId) == spender);
+    }
+
+    /**
+     * @dev Returns a bool if a tokenId is already minted in the collection.
+     * @param tokenId   The id of the token.
+     */
+    function exists(uint256 tokenId) public view returns (bool) {
+        return _exists(tokenId);
     }
 
     // =============================================== Internal =======================================================

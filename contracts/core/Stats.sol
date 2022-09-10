@@ -46,8 +46,8 @@ contract Stats is Ownable {
     /** @dev Map to store the last refresh for each civilization and token id. **/
     mapping(uint256 => mapping(uint256 => uint256)) last_refresh;
 
-    /** @dev Implementation of the `RefreshToken` **/
-    address refresh_token;
+    /** @dev Implementation of the `Refresher` **/
+    address refresher;
 
     // =============================================== Events =========================================================
     // ============================================== Modifiers =======================================================
@@ -65,7 +65,7 @@ contract Stats is Ownable {
     /** @dev Enables the `StatsManager` implementation. */
     function setInitialized() public onlyOwner {
         require(
-            refresh_token != address(0),
+            refresher != address(0),
             "StatsManager: can't initialize when no refresh token set"
         );
         initialized = true;
@@ -75,7 +75,7 @@ contract Stats is Ownable {
      *  @param _token   address of the `RefreshToken` instance.
      */
     function setRefreshToken(address _token) public onlyOwner {
-        refresh_token = _token;
+        refresher = _token;
     }
 
     /** @dev Adds a civilization to the stats manager.
@@ -188,7 +188,7 @@ contract Stats is Ownable {
             "StatsManager: interaction is not from owner or allowed"
         );
 
-        ERC20Burnable(refresh_token).burnFrom(msg.sender, 1);
+        ERC20Burnable(refresher).burnFrom(msg.sender, 1);
 
         pool[civilization][id].might = base[civilization][id].might;
         pool[civilization][id].speed = base[civilization][id].speed;
