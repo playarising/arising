@@ -12,10 +12,10 @@ import "../interfaces/IRefreshToken.sol";
 contract RefreshToken is ERC20Burnable, Ownable, IRefreshToken {
     // =============================================== Storage ========================================================
     /** @dev Address of the token used to charge the mint. **/
-    address token;
+    address public token;
 
     /** @dev Amount of tokens required to mint one Refresh Token (in wei). **/
-    uint256 price;
+    uint256 public price;
 
     // =============================================== Setters ========================================================
     /**
@@ -49,11 +49,7 @@ contract RefreshToken is ERC20Burnable, Ownable, IRefreshToken {
      * @param amount    Amount of tokens to mint.
      */
     function mint(uint256 amount) public {
-        IERC20(token).transferFrom(
-            msg.sender,
-            address(this),
-            (amount * price) * 1 ether
-        );
+        IERC20(token).transferFrom(msg.sender, address(this), (amount * price));
         _mint(msg.sender, amount);
     }
 

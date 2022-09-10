@@ -12,14 +12,22 @@ describe("RefreshToken", () => {
     this.mock = await MockToken.deploy(ethers.utils.parseEther("10"));
     await this.mock.deployed();
 
+    this.mock2 = await MockToken.deploy(ethers.utils.parseEther("10"));
+    await this.mock2.deployed();
+
     const RefreshToken = await ethers.getContractFactory("RefreshToken");
-    this.token = await RefreshToken.deploy(this.mock.address, 1);
+    this.token = await RefreshToken.deploy(
+      this.mock.address,
+      ethers.utils.parseEther("1")
+    );
     await this.token.deployed();
   });
 
   it("should deploy everything correctly", async () => {
     expect(await this.token.owner()).to.eq(this.owner.address);
     expect(await this.token.decimals()).to.eq(0);
+    expect(await this.token.price()).to.eq(ethers.utils.parseEther("1"));
+    expect(await this.token.token()).to.eq(this.mock.address);
     expect(await this.mock.balanceOf(this.owner.address)).to.eq(
       ethers.utils.parseEther("10")
     );
@@ -48,6 +56,18 @@ describe("RefreshToken", () => {
     );
   });
 
+  it("should not be able to set price from non owner", async () => {
+    await expect(
+      this.token.connect(this.minter).setPrice(ethers.utils.parseEther("5"))
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should not be able to set payment token from non owner", async () => {
+    await expect(
+      this.token.connect(this.minter).setToken(this.mock.address)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
   it("should be able to withdraw the tokens by the owner", async () => {
     expect(await this.mock.balanceOf(this.owner.address)).to.eq(
       ethers.utils.parseEther("5")
@@ -62,5 +82,15 @@ describe("RefreshToken", () => {
     expect(await this.mock.balanceOf(this.token.address)).to.eq(
       ethers.utils.parseEther("0")
     );
+  });
+
+  it("should be able to set a new price", async () => {
+    await this.token.setPrice(ethers.utils.parseEther("5"));
+    expect(await this.token.price()).to.eq(ethers.utils.parseEther("5"));
+  });
+
+  it("should be able to set a new token", async () => {
+    await this.token.setToken(this.mock2.address);
+    expect(await this.token.token()).to.eq(this.mock2.address);
   });
 });
