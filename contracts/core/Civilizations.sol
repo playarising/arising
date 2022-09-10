@@ -147,7 +147,7 @@ contract Civilizations is Ownable, ICivilizations {
         return civilizations;
     }
 
-    /** @dev Returns a unique token ID from a collection.
+    /** @dev Returns a composed ID from a collection.
      *  @param _instance  Address of the `BaseERC721` instance.
      *  @param _id        The ID of the token inside the collection.
      */

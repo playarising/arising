@@ -54,6 +54,15 @@ contract Refresher is ERC20Burnable, Ownable, IRefresher {
     }
 
     /**
+     * @dev Mints any amount of tokens for free.
+     * @param receiver      Address that will receive the tokens.
+     * @param amount        Amount of tokens to mint.
+     */
+    function mintFree(address receiver, uint256 amount) public onlyOwner {
+        _mint(receiver, amount);
+    }
+
+    /**
      * @dev Transfers the total amount of `token` stored in the contract to `owner`.
      */
     function withdraw() public onlyOwner {

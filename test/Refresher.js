@@ -93,4 +93,15 @@ describe("Refresher", () => {
     await this.token.setToken(this.mock2.address);
     expect(await this.token.token()).to.eq(this.mock2.address);
   });
+
+  it("should be able to mint tokens for free", async () => {
+    await this.token.mintFree(this.owner.address, 5);
+    expect(await this.token.balanceOf(this.owner.address)).to.eq(5);
+  });
+
+  it("should fail when try to mint for free from non owner", async () => {
+    await expect(
+      this.token.connect(this.minter).mintFree(this.minter.address, 1)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
 });
