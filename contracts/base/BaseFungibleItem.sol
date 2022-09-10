@@ -113,7 +113,7 @@ contract BaseFungibleItems is Ownable {
                 msg.sender,
                 id
             ),
-            "StatsManager: interaction is not from owner or allowed"
+            "BaseFungibleItems: interaction is not from owner or allowed"
         );
         balances[civilization][id] -= amount;
     }
