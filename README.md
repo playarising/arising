@@ -24,6 +24,10 @@ This repository contains all the contracts that interact together to create the 
 | ----------------------- | ---------- |
 | **MintGuard**           |            |
 | **LevelsTable**         |            |
+| **StatsManager**        |            |
+| **ExperienceManager**   |            |
+| **RefreshToken**        |            |
+| **Gold**                |            |
 | **ArdCharacters**       |            |
 | **HeartheimCharacters** |            |
 | **IkaranCharacter**     |            |

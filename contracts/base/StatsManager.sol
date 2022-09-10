@@ -56,7 +56,7 @@ contract StatsManager is Ownable {
      * @dev Checks if `initialized` is enabled.
      */
     modifier onlyInitialized() {
-        require(initialized, "BaseERC721: contract is not initialized");
+        require(initialized, "StatsManager: contract is not initialized");
         _;
     }
 

@@ -5,9 +5,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IBaseERC721.sol";
 
 /**
- * @dev `BaseFungibleItems` is a base contract to imitate the ERC20 functionality in the context of characters.
+ * @dev `BaseFungibleItem` is a base contract to imitate the ERC20 functionality in the context of characters.
  */
-contract BaseFungibleItems is Ownable {
+contract BaseFungibleItem is Ownable {
     // =============================================== Storage ========================================================
 
     /** @dev Name of the item. **/
