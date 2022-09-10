@@ -11,22 +11,13 @@ contract IKarans is BaseERC721 {
 
     /**
      * @dev Constructor.
-     * @param _guard                  The `MintGuard` instance address.
-     * @param _cap                    The max supply for the tokens.
-     * @param _payments_receiver      The payments receiver address.
      */
-    constructor(
-        address _guard,
-        uint256 _cap,
-        address payable _payments_receiver
-    )
+    constructor()
         BaseERC721(
             "Arising: I'Karans",
             "ARISING",
-            _guard,
             "https://characters.playarising.com/ikarans/",
-            _cap,
-            _payments_receiver
+            2500
         )
     {}
 }

@@ -4,12 +4,12 @@ pragma solidity 0.8.16;
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../interfaces/IRefreshToken.sol";
+import "../interfaces/IRefresher.sol";
 
 /**
- * @dev `RefreshToken` is a contract serve as a self-served gadget to perform refreshes for the `StatsManafer` without cooldown.
+ * @dev `Refresher` is a contract serve as a self-served gadget to perform refreshes for `Stats` without cooldown.
  */
-contract RefreshToken is ERC20Burnable, Ownable, IRefreshToken {
+contract Refresher is ERC20Burnable, Ownable, IRefresher {
     // =============================================== Storage ========================================================
     /** @dev Address of the token used to charge the mint. **/
     address public token;

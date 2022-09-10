@@ -1,15 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.16;
 
-import "../interfaces/ILevelsTable.sol";
+import "../interfaces/ILevels.sol";
 
-/*
- * LevelsTable is the basic level table for global level and skills levels.
- */
 /**
- * @dev `LevelsTable` is a basic tool to convert between experience points to level.
+ * @dev `Levels` is a basic tool to convert between experience points to level.
  */
-contract LevelsTable is ILevelsTable {
+contract Levels is ILevels {
     // =============================================== Getters ========================================================
 
     /**
