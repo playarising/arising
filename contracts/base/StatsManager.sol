@@ -2,8 +2,8 @@
 pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../interfaces/IBaseERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "../interfaces/IBaseERC721.sol";
 
 /**
  * @dev `StatsManager` is a contract to manage the stats points and pools for a set of collections.
