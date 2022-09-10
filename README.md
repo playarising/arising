@@ -3,12 +3,12 @@
 ![BUILD](https://github.com/playarising/arising/actions/workflows/test.yml/badge.svg)
 [![codecov](https://codecov.io/gh/playarising/arising/branch/main/graph/badge.svg?token=CNNKAMNV9K)](https://codecov.io/gh/playarising/arising)
 
-![Arising Logo](https://github.com/playarising/.github/blob/main/logo.png?raw=true)
+[![Arising Logo](https://github.com/playarising/.github/blob/main/logo.png?raw=true)](https://playarising.com)
 
 <span align="center">
 
-![Twitter Follow](https://img.shields.io/twitter/follow/playarising?style=social)
-![Discord](https://img.shields.io/discord/983345927131656244)
+[![Twitter Follow](https://img.shields.io/twitter/follow/playarising?style=social)](https://twitter.com/playarising)
+[![Discord](https://img.shields.io/discord/983345927131656244)](https://discord.gg/arising)
 
 </span>
 
