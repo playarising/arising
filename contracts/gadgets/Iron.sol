@@ -10,6 +10,9 @@ contract Iron is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
+     * @param _civilizations    The address of the `Civilizations` instance.
      */
-    constructor() BaseFungibleItem("Arising: Iron", "aIRON") {}
+    constructor(address _civilizations)
+        BaseFungibleItem("Arising: Iron", "aIRON", _civilizations)
+    {}
 }

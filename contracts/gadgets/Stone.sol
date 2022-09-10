@@ -10,6 +10,9 @@ contract Stone is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
+     * @param _civilizations    The address of the `Civilizations` instance.
      */
-    constructor() BaseFungibleItem("Arising: Stone", "aSTONE") {}
+    constructor(address _civilizations)
+        BaseFungibleItem("Arising: Stone", "aSTONE", _civilizations)
+    {}
 }

@@ -154,29 +154,36 @@ contract Civilizations is Ownable {
     function getTokenID(address _instance, uint256 _id)
         public
         view
-        returns (string memory)
+        returns (bytes memory)
     {
         require(
             _instance != address(0),
             "Civilizations: instance address is null"
         );
-        uint256 id = _civilizations[_instance];
+        uint256 civilizationID = _civilizations[_instance];
         require(
-            id != 0,
+            civilizationID != 0,
             "Civilizations: instance is not an Arising civilization."
         );
         require(
             IBaseERC721(_instance).exists(_id),
             "Civilizations: token id is not minted."
         );
-        return
-            string(
-                abi.encodePacked(
-                    Strings.toString(id),
-                    "-",
-                    Strings.toString(_id)
-                )
-            );
+        return abi.encode(civilizationID, _id);
+    }
+
+    /** @dev Function to check if an address has allowance to a composed ID.
+     *  @param spender   Address to check ownership or allowance.
+     *  @param _id       Composed token id.
+     */
+    function isAllowed(address spender, bytes memory _id)
+        public
+        view
+        returns (bool)
+    {
+        (uint256 civilizationID, uint256 tokenID) = _decomposeTokenID(_id);
+        address instance = civilizations[civilizationID - 1];
+        return IBaseERC721(instance).isApprovedOrOwner(spender, tokenID);
     }
 
     // =============================================== Internal ========================================================
@@ -199,5 +206,17 @@ contract Civilizations is Ownable {
             "Civilizations: cannot mint from a contract"
         );
         return _minters[_minter] < 5;
+    }
+
+    /**
+     * @dev Decompose a byte encoded token ID.
+     * @param id The composed token id.
+     */
+    function _decomposeTokenID(bytes memory id)
+        internal
+        pure
+        returns (uint256, uint256)
+    {
+        return abi.decode(id, (uint256, uint256));
     }
 }

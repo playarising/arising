@@ -10,6 +10,9 @@ contract Gold is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
+     * @param _civilizations    The address of the `Civilizations` instance.
      */
-    constructor() BaseFungibleItem("Arising: Gold", "aGOLD") {}
+    constructor(address _civilizations)
+        BaseFungibleItem("Arising: Gold", "aGOLD", _civilizations)
+    {}
 }

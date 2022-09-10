@@ -4,6 +4,7 @@ pragma solidity 0.8.16;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "../interfaces/IBaseERC721.sol";
+import "../interfaces/ICivilizations.sol";
 
 /**
  * @dev `Stats` is a contract to manage the stats points and pools for a set of collections.
@@ -29,18 +30,42 @@ contract Stats is Ownable {
     uint256 REFRESH_COOLDOWN_SECONDS = 86400; // 1 day.
 
     /** @dev Map to store the base stats from composed IDs. **/
-    mapping(string => CharacterStats) base;
+    mapping(bytes => CharacterStats) base;
 
     /** @dev Map to store the pool stats from composed ID. **/
-    mapping(string => CharacterStats) pool;
+    mapping(bytes => CharacterStats) pool;
 
     /** @dev Map to store the the last refresh from composed ID. **/
-    mapping(string => uint256) last_refresh;
+    mapping(bytes => uint256) last_refresh;
 
     /** @dev Implementation of the `Refresher` **/
     address refresher;
 
+    /** @dev Address of the `Civilizations` instance. **/
+    address public civilizations;
+
+    // =============================================== Modifiers ======================================================
+
+    /**
+     * @dev Checks if `msg.sender` is owner or allowed to manipulate a composed ID.
+     */
+    modifier onlyAllowed(bytes memory id) {
+        require(
+            ICivilizations(civilizations).isAllowed(msg.sender, id),
+            "BaseFungibleItem: require consumer to be owner or have allowance"
+        );
+        _;
+    }
+
     // =============================================== Setters ========================================================
+
+    /**
+     * @dev Constructor.
+     * @param _civilizations    The address of the `Civilizations` instance.
+     */
+    constructor(address _civilizations) {
+        civilizations = _civilizations;
+    }
 
     /** @dev Sets the `Refresher` instance.
      *  @param _token   address of the `Refresher` instance.
@@ -56,12 +81,11 @@ contract Stats is Ownable {
      *  @param intelect         Amount of intelect stat points reducing.
      */
     function consume(
-        string memory id,
+        bytes memory id,
         uint256 might,
         uint256 speed,
         uint256 intelect
-    ) public {
-        // TODO check ownership
+    ) public onlyAllowed(id) {
         CharacterStats storage currPool = pool[id];
         require(
             currPool.might - might > 0,
@@ -84,8 +108,7 @@ contract Stats is Ownable {
     /** @dev Performs a refresh filling the pool stats from the base stats.
      *  @param id   Composed ID of the token.
      */
-    function refresh(string memory id) public {
-        // TODO check ownership
+    function refresh(bytes memory id) public onlyAllowed(id) {
         uint256 last = last_refresh[id];
         require(
             last == 0 || last + REFRESH_COOLDOWN_SECONDS <= block.timestamp,
@@ -100,9 +123,7 @@ contract Stats is Ownable {
     /** @dev Performs a refresh filling the pool stats from the base stats without cooldown spending `RefreshToken`.
      *  @param id   Composed ID of the token.
      */
-    function refreshWithToken(string memory id) public {
-        // TODO check ownership
-
+    function refreshWithToken(bytes memory id) public onlyAllowed(id) {
         ERC20Burnable(refresher).burnFrom(msg.sender, 1);
 
         pool[id].might = base[id].might;
@@ -116,7 +137,7 @@ contract Stats is Ownable {
     /** @dev Returns the base stats of the composed ID.
      *  @param id   Composed ID of the token.
      */
-    function getBaseStats(string memory id)
+    function getBaseStats(bytes memory id)
         public
         view
         returns (CharacterStats memory)
@@ -127,7 +148,7 @@ contract Stats is Ownable {
     /** @dev Returns the available pool stats of the composed ID.
      *  @param id   Composed ID of the token.
      */
-    function getPoolStats(string memory id)
+    function getPoolStats(bytes memory id)
         public
         view
         returns (CharacterStats memory)

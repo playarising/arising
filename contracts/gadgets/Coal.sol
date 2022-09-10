@@ -10,6 +10,9 @@ contract Coal is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
+     * @param _civilizations    The address of the `Civilizations` instance.
      */
-    constructor() BaseFungibleItem("Arising: Coal", "aCOAL") {}
+    constructor(address _civilizations)
+        BaseFungibleItem("Arising: Coal", "aCOAL", _civilizations)
+    {}
 }

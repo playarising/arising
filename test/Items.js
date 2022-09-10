@@ -7,20 +7,29 @@ describe("Civilizations", () => {
 
     this.owner = owner;
 
+    const Civilizations = await ethers.getContractFactory("Civilizations");
+    this.civilizations = await Civilizations.deploy(1, this.owner.address);
+    await this.civilizations.deployed();
+
     const Coal = await ethers.getContractFactory("Coal");
-    this.coal = await Coal.deploy();
+    this.coal = await Coal.deploy(this.civilizations.address);
+    await this.coal.deployed();
 
     const Gold = await ethers.getContractFactory("Gold");
-    this.gold = await Gold.deploy();
+    this.gold = await Gold.deploy(this.civilizations.address);
+    await this.gold.deployed();
 
     const Iron = await ethers.getContractFactory("Iron");
-    this.iron = await Iron.deploy();
+    this.iron = await Iron.deploy(this.civilizations.address);
+    await this.iron.deployed();
 
     const Stone = await ethers.getContractFactory("Stone");
-    this.stone = await Stone.deploy();
+    this.stone = await Stone.deploy(this.civilizations.address);
+    await this.stone.deployed();
 
     const Wood = await ethers.getContractFactory("Wood");
-    this.wood = await Wood.deploy();
+    this.wood = await Wood.deploy(this.civilizations.address);
+    await this.wood.deployed();
   });
 
   it("should deploy everything correctly", async () => {

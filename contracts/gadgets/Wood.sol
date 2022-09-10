@@ -10,6 +10,9 @@ contract Wood is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
+     * @param _civilizations    The address of the `Civilizations` instance.
      */
-    constructor() BaseFungibleItem("Arising: Wood", "aWOOD") {}
+    constructor(address _civilizations)
+        BaseFungibleItem("Arising: Wood", "aWOOD", _civilizations)
+    {}
 }

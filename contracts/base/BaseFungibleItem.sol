@@ -3,6 +3,7 @@ pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IBaseERC721.sol";
+import "../interfaces/ICivilizations.sol";
 
 /**
  * @dev `BaseFungibleItem` is a base contract to imitate the ERC20 functionality in the context of characters.
@@ -13,28 +14,50 @@ contract BaseFungibleItem is Ownable {
     /** @dev Name of the item. **/
     string public name;
 
+    /** @dev Address of the `Civilizations` instance. **/
+    address public civilizations;
+
     /** @dev Symbol of the item. **/
     string public symbol;
 
     /** @dev Balances. **/
-    mapping(string => uint256) balances;
+    mapping(bytes => uint256) balances;
+
+    // =============================================== Modifiers ======================================================
+
+    /**
+     * @dev Checks if `msg.sender` is owner or allowed to manipulate a composed ID.
+     */
+    modifier onlyAllowed(bytes memory id) {
+        require(
+            ICivilizations(civilizations).isAllowed(msg.sender, id),
+            "BaseFungibleItem: require consumer to be owner or have allowance"
+        );
+        _;
+    }
 
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
-     * @param _name      The name of fungible token.
-     * @param _symbol    The symbol of the fungible token.
+     * @param _name             The name of fungible token.
+     * @param _symbol           The symbol of the fungible token.
+     * @param _civilizations    The address of the `Civilizations` instance.
      */
-    constructor(string memory _name, string memory _symbol) {
+    constructor(
+        string memory _name,
+        string memory _symbol,
+        address _civilizations
+    ) {
         name = _name;
         symbol = _symbol;
+        civilizations = _civilizations;
     }
 
     /** @dev Mints an specific amount of items to a character balance.
      *  @param id       Composed ID of the token.
      *  @param amount   Amount to be minted.
      */
-    function mintTo(string memory id, uint256 amount) public onlyOwner {
+    function mintTo(bytes memory id, uint256 amount) public onlyOwner {
         balances[id] += amount;
     }
 
@@ -42,8 +65,7 @@ contract BaseFungibleItem is Ownable {
      *  @param id       Composed ID of the token.
      *  @param amount   Amount to be consumed.
      */
-    function consume(string memory id, uint256 amount) public {
-        // TODO check ownership
+    function consume(bytes memory id, uint256 amount) public onlyAllowed(id) {
         balances[id] -= amount;
     }
 
@@ -51,7 +73,7 @@ contract BaseFungibleItem is Ownable {
     /** @dev Returns the balance of the item owned by a character.
      *  @param id   Composed ID of the token.
      */
-    function balanceOf(string memory id) public view returns (uint256) {
+    function balanceOf(bytes memory id) public view returns (uint256) {
         return balances[id];
     }
 }
