@@ -17,17 +17,17 @@ const levels_increment = [
   55187, 57119, 59118, 61187, 63329, 65546,
 ];
 
-describe("LevelsTable", () => {
+describe("Levels", () => {
   before(async () => {
-    const LevelsTable = await ethers.getContractFactory("LevelsTable");
-    this.levels_table = await LevelsTable.deploy();
-    await this.levels_table.deployed();
+    const Levels = await ethers.getContractFactory("Levels");
+    this.levels = await Levels.deploy();
+    await this.levels.deployed();
   });
 
   it("should match the levels correctly", async () => {
     let exp = 0;
     for (let i = 0; i <= levels_increment.length; i++) {
-      const level = await this.levels_table.getLevel(exp);
+      const level = await this.levels.getLevel(exp);
       expect(level).to.eq(i);
       exp += levels_increment[i];
     }

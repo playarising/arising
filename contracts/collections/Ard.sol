@@ -11,7 +11,7 @@ contract Ard is BaseERC721 {
 
     /**
      * @dev Constructor.
-     * @param _guard                  The `MintGuard` instance address.
+     * @param _guard                  The `Guard` instance address.
      * @param _cap                    The max supply for the tokens.
      * @param _payments_receiver      The payments receiver address.
      */

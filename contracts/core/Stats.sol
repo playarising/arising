@@ -6,11 +6,11 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "../interfaces/IBaseERC721.sol";
 
 /**
- * @dev `StatsManager` is a contract to manage the stats points and pools for a set of collections.
+ * @dev `Stats` is a contract to manage the stats points and pools for a set of collections.
  *       The stats and the concept is created and modified based on the Cypher System for role playing games: http://cypher-system.com/.
  */
 
-contract StatsManager is Ownable {
+contract Stats is Ownable {
     // =============================================== Structs ========================================================
 
     /** @dev Struct to define the stats of a character.
@@ -18,7 +18,7 @@ contract StatsManager is Ownable {
      * @param speed    The amount of points for the speed stat.
      * @param intelect The amount of points for the intelect stat.
      */
-    struct Stats {
+    struct CharacterStats {
         uint256 might;
         uint256 speed;
         uint256 intelect;
@@ -38,10 +38,10 @@ contract StatsManager is Ownable {
     uint256[] civilizations;
 
     /** @dev Map to store the maps for each civilization and token id base stats. **/
-    mapping(uint256 => mapping(uint256 => Stats)) base;
+    mapping(uint256 => mapping(uint256 => CharacterStats)) base;
 
     /** @dev Map to store the maps for each civilization and token id pool stats. **/
-    mapping(uint256 => mapping(uint256 => Stats)) pool;
+    mapping(uint256 => mapping(uint256 => CharacterStats)) pool;
 
     /** @dev Map to store the last refresh for each civilization and token id. **/
     mapping(uint256 => mapping(uint256 => uint256)) last_refresh;
@@ -120,7 +120,7 @@ contract StatsManager is Ownable {
             ),
             "StatsManager: interaction is not from owner or allowed"
         );
-        Stats storage currPool = pool[civilization][id];
+        CharacterStats storage currPool = pool[civilization][id];
         require(
             currPool.might - might > 0,
             "StatsManager: cannot consume less might than current available"
@@ -205,7 +205,7 @@ contract StatsManager is Ownable {
     function getBaseStats(uint256 id, uint256 civilization)
         public
         view
-        returns (Stats memory)
+        returns (CharacterStats memory)
     {
         require(
             _civilizations[civilization] != address(0),
@@ -221,7 +221,7 @@ contract StatsManager is Ownable {
     function getPoolStats(uint256 id, uint256 civilization)
         public
         view
-        returns (Stats memory)
+        returns (CharacterStats memory)
     {
         require(
             _civilizations[civilization] != address(0),

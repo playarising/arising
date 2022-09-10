@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.16;
 
-import "../interfaces/IMintGuard.sol";
+import "../interfaces/IGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 
 /**
- * @dev `MintGuard` a guard contract to prevent minting more than five characters among a set of collections.
+ * @dev `Guard` a guard contract to prevent minting more than five characters among a set of collections.
  */
-contract MintGuard is Ownable, IMintGuard {
+contract Guard is Ownable, IGuard {
     using Address for address;
 
     // =============================================== Storage ========================================================

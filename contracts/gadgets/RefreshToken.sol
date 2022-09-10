@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IRefreshToken.sol";
 
 /**
- * @dev `RefreshToken` is a contract serve as a self-served gadget to perform refreshes for the `StatsManafer` without cooldown.
+ * @dev `Refresher` is a contract serve as a self-served gadget to perform refreshes for `Stats` without cooldown.
  */
 contract RefreshToken is ERC20Burnable, Ownable, IRefreshToken {
     // =============================================== Storage ========================================================

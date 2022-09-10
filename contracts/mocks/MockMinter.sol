@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.16;
 
-import "../interfaces/IMintGuard.sol";
+import "../interfaces/IGuard.sol";
 import "../interfaces/IBaseERC721.sol";
 
 contract MockMinter {
@@ -14,7 +14,7 @@ contract MockMinter {
     }
 
     function mintMock() public {
-        IMintGuard(guard).setMinter(msg.sender);
+        IGuard(guard).setMinter(msg.sender);
     }
 
     function testMint() public {

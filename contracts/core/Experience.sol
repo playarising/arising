@@ -4,10 +4,10 @@ pragma solidity 0.8.16;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
- * @dev `ExperienceManager` is the contract to manage the storage of experience and missions from all the civilizations.
+ * @dev `Experience` is the contract to manage the storage of experience and missions from all the civilizations.
  */
 
-contract ExperienceManager is Ownable {
+contract Experience is Ownable {
     // =============================================== Structs ========================================================
     // =============================================== Storage ========================================================
 

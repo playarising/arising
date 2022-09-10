@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "../interfaces/IMintGuard.sol";
+import "../interfaces/IGuard.sol";
 import "../interfaces/IBaseERC721.sol";
 
 /**
@@ -14,7 +14,7 @@ import "../interfaces/IBaseERC721.sol";
 contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
     // =============================================== Storage ========================================================
 
-    /** @dev The address of the `MintGuard` instance. **/
+    /** @dev The address of the `Guard` instance. **/
     address guard;
 
     /** @dev The receiver address. **/
@@ -48,7 +48,7 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
      * @dev Constructor.
      * @param _name                 The name of the collection.
      * @param _symbol               The symbol of the collection.
-     * @param _guard                The `MintGuard` instance address.
+     * @param _guard                The `Guard` instance address.
      * @param _uri                  The base URI for the tokens metadata.
      * @param _cap                  The max supply of the token.
      * @param _payments_receiver    The address that will receive the payments.
@@ -95,14 +95,14 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
             "BaseERC721: Max supply reached, wait for more tokens to be available"
         );
         require(
-            !IMintGuard(guard).hasMinted(msg.sender),
+            !IGuard(guard).hasMinted(msg.sender),
             "BaseERC721: Address has already minted"
         );
         require(
             msg.value == price,
             "BaseERC721: Tx doesn't include enough to pay the mint"
         );
-        IMintGuard(guard).setMinter(msg.sender);
+        IGuard(guard).setMinter(msg.sender);
         Address.sendValue(payments_receiver, price);
         _safeMint(msg.sender, totalSupply() + 1);
     }
