@@ -11,5 +11,5 @@ contract Stone is BaseFungibleItem {
     /**
      * @dev Constructor.
      */
-    constructor(address _minter) BaseFungibleItem("Arising: Stone", "aSTONE") {}
+    constructor() BaseFungibleItem("Arising: Stone", "aSTONE") {}
 }

@@ -11,10 +11,10 @@ contract BaseFungibleItem is Ownable {
     // =============================================== Storage ========================================================
 
     /** @dev Name of the item. **/
-    string name;
+    string public name;
 
     /** @dev Symbol of the item. **/
-    string symbol;
+    string public symbol;
 
     /** @dev Balances. **/
     mapping(string => uint256) balances;
