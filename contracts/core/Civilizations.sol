@@ -37,7 +37,7 @@ contract Civilizations is Ownable, ICivilizations {
      * @dev Checks if `initialized` is enabled.
      */
     modifier onlyInitialized() {
-        require(initialized, "BaseERC721: contract is not initialized");
+        require(initialized, "Civilizations: contract is not initialized");
         _;
     }
 
@@ -100,7 +100,7 @@ contract Civilizations is Ownable, ICivilizations {
     function mint(address _instance) public payable onlyInitialized {
         require(
             _instance != address(0),
-            "Civilizations: instance address is null"
+            "Civilizations: instance address is null."
         );
         require(
             _civilizations[_instance] != 0,
@@ -108,11 +108,11 @@ contract Civilizations is Ownable, ICivilizations {
         );
         require(
             msg.value == price,
-            "Civilizations: Tx doesn't include enough to pay the mint"
+            "Civilizations: Tx doesn't include enough to pay the mint."
         );
         require(
             _canMint(msg.sender),
-            "Civilizations: address used cannot mint"
+            "Civilizations: address used already minted 5 characters."
         );
         Address.sendValue(payments_receiver, price);
         IBaseERC721(_instance).mint(msg.sender);

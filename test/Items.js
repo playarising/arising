@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("Civilizations", () => {
+describe("Items", () => {
   before(async () => {
     const [owner] = await ethers.getSigners();
 
