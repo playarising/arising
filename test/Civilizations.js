@@ -153,10 +153,29 @@ describe("Civilizations", () => {
     );
   });
 
+  it("should not be able set the price from a non owner", async () => {
+    await expect(
+      this.civ.connect(this.receiver).setPrice(ethers.utils.parseEther("10"))
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
   it("should set the price correctly", async () => {
     expect(await this.civ.price()).to.eq(0);
     await this.civ.setPrice(ethers.utils.parseEther("10"));
     expect(await this.civ.price()).to.eq(ethers.utils.parseEther("10"));
+  });
+
+  it("should not be able to change the payment receiver from non owner", async () => {
+    await expect(
+      this.civ.connect(this.receiver).setPaymentsReceiver(this.owner.address)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should change the payment receiver", async () => {
+    expect(await this.civ.payments_receiver()).to.eq(this.receiver.address);
+    await this.civ.setPaymentsReceiver(this.owner.address);
+    expect(await this.civ.payments_receiver()).to.eq(this.owner.address);
+    await this.civ.setPaymentsReceiver(this.receiver.address);
   });
 
   it("should initialize correctly", async () => {
@@ -211,5 +230,83 @@ describe("Civilizations", () => {
         value: ethers.utils.parseEther("10"),
       })
     ).to.revertedWith("Civilizations: cannot mint from a contract");
+  });
+
+  it("should return civilizations correctly", async () => {
+    expect(await this.civ.getCivilizations()).to.eql([
+      this.ard.address,
+      this.zhand.address,
+      this.ikarans.address,
+      this.tarki.address,
+      this.hartheim.address,
+      this.shinkari.address,
+    ]);
+  });
+
+  it("should return civilization ids correctly", async () => {
+    expect(await this.civ.getID(this.ard.address)).to.eq(1);
+    expect(await this.civ.getID(this.zhand.address)).to.eq(2);
+    expect(await this.civ.getID(this.ikarans.address)).to.eq(3);
+    expect(await this.civ.getID(this.tarki.address)).to.eq(4);
+    expect(await this.civ.getID(this.hartheim.address)).to.eq(5);
+    expect(await this.civ.getID(this.shinkari.address)).to.eq(6);
+  });
+
+  it("should error when request civilizations doesnt exist or are not from arising", async () => {
+    await expect(
+      this.civ.getID("0x0000000000000000000000000000000000000000")
+    ).to.revertedWith("Civilizations: instance address is null.");
+    await expect(this.civ.getID(this.receiver.address)).to.revertedWith(
+      "Civilizations: instance is not an Arising civilization."
+    );
+  });
+
+  it("should return civilization token ids correctly", async () => {
+    expect(await this.civ.getTokenID(this.ard.address, 1)).to.eq(
+      "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"
+    );
+    expect(await this.civ.getTokenID(this.zhand.address, 1)).to.eq(
+      "0x00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000001"
+    );
+    expect(await this.civ.getTokenID(this.ikarans.address, 1)).to.eq(
+      "0x00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000001"
+    );
+    expect(await this.civ.getTokenID(this.tarki.address, 1)).to.eq(
+      "0x00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000001"
+    );
+    expect(await this.civ.getTokenID(this.hartheim.address, 1)).to.eq(
+      "0x00000000000000000000000000000000000000000000000000000000000000050000000000000000000000000000000000000000000000000000000000000001"
+    );
+    expect(await this.civ.getTokenID(this.shinkari.address, 1)).to.eq(
+      "0x00000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000001"
+    );
+  });
+
+  it("should fail when try to get the civilization token ids from an invalid instance", async () => {
+    await expect(
+      this.civ.getTokenID("0x0000000000000000000000000000000000000000", 1)
+    ).to.revertedWith("Civilizations: instance address is null.");
+    await expect(this.civ.getTokenID(this.receiver.address, 1)).to.revertedWith(
+      "Civilizations: instance is not an Arising civilization."
+    );
+  });
+
+  it("should fail when try to get the civilization token ids from a non minted token", async () => {
+    await expect(this.civ.getTokenID(this.ard.address, 3)).to.revertedWith(
+      "Civilizations: token id is not minted."
+    );
+  });
+
+  it("should return false for not allowance token", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    expect(await this.civ.isAllowed(this.minter.address, id)).to.eq(false);
+  });
+
+  it("should return true when allowed and approved for all", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.ard.approve(this.receiver.address, 1);
+    await this.ard.setApprovalForAll(this.minter.address, true);
+    expect(await this.civ.isAllowed(this.minter.address, id)).to.eq(true);
+    expect(await this.civ.isAllowed(this.receiver.address, id)).to.eq(true);
   });
 });

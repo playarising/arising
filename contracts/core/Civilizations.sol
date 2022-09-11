@@ -23,7 +23,7 @@ contract Civilizations is Ownable, ICivilizations {
     mapping(address => uint256) private _minters;
 
     /** @dev The receiver address. **/
-    address payable payments_receiver;
+    address payable public payments_receiver;
 
     /** @dev Price of each mint in MATIC in wei. **/
     uint256 public price;
@@ -137,17 +137,8 @@ contract Civilizations is Ownable, ICivilizations {
     }
 
     /** @dev Returns the list of civilizations.
-     *  @param _instance  Address of the `BaseERC721` instance.
      */
-    function getCivilizations(address _instance)
-        public
-        view
-        returns (address[] memory)
-    {
-        require(
-            _instance != address(0),
-            "Civilizations: instance address is null"
-        );
+    function getCivilizations() public view returns (address[] memory) {
         return civilizations;
     }
 
@@ -162,7 +153,7 @@ contract Civilizations is Ownable, ICivilizations {
     {
         require(
             _instance != address(0),
-            "Civilizations: instance address is null"
+            "Civilizations: instance address is null."
         );
         uint256 civilizationID = _civilizations[_instance];
         require(

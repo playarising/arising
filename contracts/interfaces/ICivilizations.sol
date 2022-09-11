@@ -14,10 +14,7 @@ interface ICivilizations {
 
     function getID(address _instance) external view returns (uint256);
 
-    function getCivilizations(address _instance)
-        external
-        view
-        returns (address[] memory);
+    function getCivilizations() external view returns (address[] memory);
 
     function getTokenID(address _instance, uint256 _id)
         external
