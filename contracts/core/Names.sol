@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/ICivilizations.sol";
+import "../interfaces/INames.sol";
 
 /**
  * @dev `Names` is a contract manage the names of Arising characters.
@@ -10,7 +11,7 @@ import "../interfaces/ICivilizations.sol";
  *       created by https://twitter.com/mat_nadler.
  */
 
-contract Names {
+contract Names is INames {
     // =============================================== Storage ========================================================
     /** @dev Address of the `Civilizations` implementation. **/
     address public civilizations;
@@ -169,6 +170,4 @@ contract Names {
         }
         return string(b_lower);
     }
-
-    // =============================================== Internal =======================================================
 }

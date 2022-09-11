@@ -5,26 +5,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/IExperience.sol";
+import "../interfaces/IStats.sol";
 
 /**
  * @dev `Stats` is a contract to manage the stats points and pools for a set of collections.
  *       The stats and the concept is created and modified based on the Cypher System for role playing games: http://cypher-system.com/.
  */
 
-contract Stats is Ownable {
-    // =============================================== Structs ========================================================
-
-    /** @dev Struct to define the stats of a character.
-     * @param might    The amount of points for the might stat.
-     * @param speed    The amount of points for the speed stat.
-     * @param intelect The amount of points for the intelect stat.
-     */
-    struct CharacterStats {
-        uint256 might;
-        uint256 speed;
-        uint256 intelect;
-    }
-
+contract Stats is Ownable, IStats {
     // =============================================== Storage ========================================================
     /** @dev Amount of seconds for refresh cooldown.  **/
     uint256 REFRESH_COOLDOWN_SECONDS = 86400; // 1 day.
