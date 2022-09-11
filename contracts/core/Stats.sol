@@ -65,7 +65,7 @@ contract Stats is Ownable {
     /**
      * @dev Constructor.
      * @param _civilizations    The address of the `Civilizations` instance.
-     * @param _civilizations    The address of the `Experience` instance.
+     * @param _experience       The address of the `Experience` instance.
      */
     constructor(address _civilizations, address _experience) {
         civilizations = _civilizations;
@@ -91,6 +91,10 @@ contract Stats is Ownable {
         uint256 speed,
         uint256 intelect
     ) public onlyAllowed(id) {
+        require(
+            ICivilizations(civilizations).exists(id),
+            "Stats: can't consume to non minted token."
+        );
         CharacterStats storage currPool = pool[id];
         require(
             currPool.might - might > 0,
@@ -122,6 +126,10 @@ contract Stats is Ownable {
         uint256 speed,
         uint256 intelect
     ) public onlyAllowed(id) {
+        require(
+            ICivilizations(civilizations).exists(id),
+            "Stats: can't sacrifice to non minted token."
+        );
         CharacterStats storage currBase = base[id];
         require(
             currBase.might - might > 0,
@@ -145,6 +153,10 @@ contract Stats is Ownable {
      *  @param id   Composed ID of the token.
      */
     function refresh(bytes memory id) public onlyAllowed(id) {
+        require(
+            ICivilizations(civilizations).exists(id),
+            "Stats: can't refresh to non minted token."
+        );
         uint256 last = last_refresh[id];
         require(
             last == 0 || last + REFRESH_COOLDOWN_SECONDS <= block.timestamp,
@@ -160,6 +172,10 @@ contract Stats is Ownable {
      *  @param id   Composed ID of the token.
      */
     function refreshWithToken(bytes memory id) public onlyAllowed(id) {
+        require(
+            ICivilizations(civilizations).exists(id),
+            "Stats: can't refresh to non minted token."
+        );
         ERC20Burnable(refresher).burnFrom(msg.sender, 1);
 
         pool[id].might = base[id].might;
@@ -180,6 +196,10 @@ contract Stats is Ownable {
         uint256 speed,
         uint256 intelect
     ) public onlyAllowed(id) {
+        require(
+            ICivilizations(civilizations).exists(id),
+            "Stats: can't assign stats to non minted token."
+        );
         uint256 sum = might + speed + intelect;
         uint256 available = getAvailablePoints(id);
         require(
