@@ -16,6 +16,7 @@
     "compile": "hardhat compile",
     "coverage": "env COVERAGE=true hardhat coverage",
     "format": "prettier --write '**/*.{sol,js,json,md}'",
+    "flat": "./scripts/flat.sh",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test",
     "sort": "npx sort-package-json",
     "test": "hardhat test"
