@@ -4,9 +4,9 @@ pragma solidity 0.8.17;
 import "../../base/BaseFungibleItem.sol";
 
 /**
- * @dev `Iron` is a fungible item resource for the Arising ecosystem.
+ * @dev `Adamantine` is a fungible item resource for the Arising ecosystem.
  */
-contract Iron is BaseFungibleItem {
+contract Adamantine is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
@@ -14,9 +14,9 @@ contract Iron is BaseFungibleItem {
      */
     constructor(address _civilizations)
         BaseFungibleItem(
-            "Arising: Iron",
-            "aIRON",
-            "https://playarising.com/gadgets/raw/iron.png",
+            "Arising: Adamantine",
+            "aADAMANTINE",
+            "https://playarising.com/material/raw/adamantine.png",
             _civilizations
         )
     {}

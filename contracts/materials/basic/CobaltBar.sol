@@ -4,9 +4,9 @@ pragma solidity 0.8.17;
 import "../../base/BaseFungibleItem.sol";
 
 /**
- * @dev `Coal` is a fungible item resource for the Arising ecosystem.
+ * @dev `CobaltBar` is a fungible item to serve as a craftable resource for the Arising ecosystem.
  */
-contract Coal is BaseFungibleItem {
+contract CobaltBar is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
@@ -14,9 +14,9 @@ contract Coal is BaseFungibleItem {
      */
     constructor(address _civilizations)
         BaseFungibleItem(
-            "Arising: Coal",
-            "aCOAL",
-            "https://playarising.com/gadgets/raw/coal.png",
+            "Arising: Cobalt Bar",
+            "aCOBALTBAR",
+            "https://playarising.com/material/basic/cobaltbar.png",
             _civilizations
         )
     {}

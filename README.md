@@ -18,14 +18,21 @@ Etia is a fantasy world in which all characters take part. A world with four big
 
 ## Deployments
 
+### Civilizations
+
+| Contract     | Deployment |
+| ------------ | ---------- |
+| **Ard**      |            |
+| **Hartheim** |            |
+| **IKarans**  |            |
+| **Shinkari** |            |
+| **Tarki**    |            |
+| **Zhand**    |            |
+
+### Core
+
 | Contract          | Deployment |
 | ----------------- | ---------- |
-| **Ard**           |            |
-| **Hartheim**      |            |
-| **IKarans**       |            |
-| **Shinkari**      |            |
-| **Tarki**         |            |
-| **Zhand**         |            |
 | **Civilizations** |            |
 | **Craft**         |            |
 | **Enchantments**  |            |
@@ -36,9 +43,38 @@ Etia is a fantasy world in which all characters take part. A world with four big
 | **Names**         |            |
 | **Quests**        |            |
 | **Stats**         |            |
-| **Coal**          |            |
-| **Gold**          |            |
-| **Iron**          |            |
-| **Refresher**     |            |
-| **Stone**         |            |
-| **Wood**          |            |
+
+### Raw Materials
+
+| Contract       | Deployment |
+| -------------- | ---------- |
+| **Adamantine** |            |
+| **Bronze**     |            |
+| **Coal**       |            |
+| **Cobalt**     |            |
+| **Iron**       |            |
+| **Platinum**   |            |
+| **Silver**     |            |
+| **Stone**      |            |
+| **Wood**       |            |
+
+### Basic Materials
+
+| Contract          | Deployment |
+| ----------------- | ---------- |
+| **AdamantineBar** |            |
+| **BronzeBar**     |            |
+| **CobaltBar**     |            |
+| **GoldBar**       |            |
+| **IronBar**       |            |
+| **PlatinumBar**   |            |
+| **SilverBar**     |            |
+| **SteelBar**      |            |
+| **WoodPlank**     |            |
+
+### Gadgets
+
+| Contract      | Deployment |
+| ------------- | ---------- |
+| **Gold**      |            |
+| **Refresher** |            |

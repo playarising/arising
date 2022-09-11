@@ -4,19 +4,19 @@ pragma solidity 0.8.17;
 import "../../base/BaseFungibleItem.sol";
 
 /**
- * @dev `Wood` is a fungible item resource for the Arising ecosystem.
+ * @dev `SteelBar` is a fungible item to serve as a usable resource for the Arising ecosystem.
  */
-contract Wood is BaseFungibleItem {
+contract SteelBar is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
-     * @param _civilizations    The address of the `Civilizations` instance.
+     * @param _civilizations  The address of the `Civilizations` instance.
      */
     constructor(address _civilizations)
         BaseFungibleItem(
-            "Arising: Wood",
-            "aWOOD",
-            "https://playarising.com/gadgets/raw/wood.png",
+            "Arising: Steel Bar",
+            "aSTEELBAR",
+            "https://playarising.com/material/basic/steelbar.png",
             _civilizations
         )
     {}
