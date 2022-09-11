@@ -186,7 +186,7 @@ contract Civilizations is Ownable, ICivilizations {
     }
 
     /** @dev Function to check if a composed ID is already minted.
-     *  @param _id       Composed token id.
+     *  @param _id Composed token id.
      */
     function exists(bytes memory _id) public view returns (bool) {
         (uint256 civilizationID, uint256 tokenID) = _decomposeTokenID(_id);

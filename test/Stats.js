@@ -19,11 +19,11 @@ const next_level_experience = [
 
 describe("Stats", () => {
   before(async () => {
-    const [owner, receiver, authority] = await ethers.getSigners();
+    const [owner, receiver, allowed] = await ethers.getSigners();
 
     this.owner = owner;
     this.receiver = receiver;
-    this.authority = authority;
+    this.allowed = allowed;
 
     const MockToken = await ethers.getContractFactory("MockToken");
     this.mock = await MockToken.deploy(ethers.utils.parseEther("10"));
@@ -64,6 +64,8 @@ describe("Stats", () => {
     const Stats = await ethers.getContractFactory("Stats");
     this.stats = await Stats.deploy(this.civ.address, this.experience.address);
     await this.stats.deployed();
+
+    await this.stats.setRefreshToken(this.refresher.address);
   });
 
   it("should deploy everything correctly", async () => {
@@ -91,5 +93,126 @@ describe("Stats", () => {
       available++;
       expect(await this.stats.getAvailablePoints(id)).to.eq(available);
     }
+  });
+
+  it("should change the refresher token", async () => {
+    expect(await this.stats.refresher()).to.eq(this.refresher.address);
+    await this.stats.setRefreshToken(this.mock.address);
+    expect(await this.stats.refresher()).to.eq(this.mock.address);
+    await this.stats.setRefreshToken(this.refresher.address);
+  });
+
+  it("should fail change the refresher token from non owner", async () => {
+    await expect(
+      this.stats.connect(this.receiver).setRefreshToken(this.mock.address)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should fail assign points from non allowed address", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(
+      this.stats.connect(this.receiver).assignPoints(id, 2, 2, 2)
+    ).to.revertedWith("Stats: require consumer to be owner or have allowance");
+  });
+
+  it("should fail assign more points than allowed", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.stats.assignPoints(id, 52, 52, 53)).to.revertedWith(
+      "Stats: can't assign more points than available."
+    );
+  });
+
+  it("should fail assign points to not minted token", async () => {
+    await expect(
+      this.stats.assignPoints(
+        "0x00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000001",
+        52,
+        52,
+        53
+      )
+    ).to.revertedWith("Civilizations: id of the civilization is not valid.");
+    await expect(
+      this.stats.assignPoints(
+        "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002",
+        52,
+        52,
+        53
+      )
+    ).to.revertedWith("Stats: can't get access to a non minted token.");
+  });
+
+  it("should assign points correctly", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    expect(await this.stats.getAvailablePoints(id)).to.eq(156);
+    await this.stats.assignPoints(id, 52, 52, 52);
+    const pool = await this.stats.getPoolStats(id);
+    expect(pool.might).to.eq(0);
+    expect(pool.speed).to.eq(0);
+    expect(pool.intelect).to.eq(0);
+    const base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(52);
+    expect(base.speed).to.eq(52);
+    expect(base.intelect).to.eq(52);
+    expect(await this.stats.getAvailablePoints(id)).to.eq(0);
+  });
+
+  it("should fail to sacrifice from non allowed", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(
+      this.stats.connect(this.receiver).sacrifice(id, 1, 1, 1)
+    ).revertedWith("Stats: require consumer to be owner or have allowance");
+  });
+
+  it("should fail to perform a free refresh from non allowed", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.stats.connect(this.receiver).refresh(id)).to.revertedWith(
+      "Stats: require consumer to be owner or have allowance"
+    );
+  });
+
+  it("should be able to sacrifice base stats with allowance and approval", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.stats.sacrifice(id, 1, 1, 1);
+    let base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(51);
+    expect(base.speed).to.eq(51);
+    expect(base.intelect).to.eq(51);
+    await this.ard.approve(this.receiver.address, 1);
+    await this.stats.connect(this.receiver).sacrifice(id, 1, 1, 1);
+    base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(50);
+    expect(base.speed).to.eq(50);
+    expect(base.intelect).to.eq(50);
+    await this.ard.setApprovalForAll(this.allowed.address, true);
+    await this.stats.connect(this.allowed).sacrifice(id, 1, 1, 1);
+    base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(49);
+    expect(base.speed).to.eq(49);
+    expect(base.intelect).to.eq(49);
+  });
+
+  it("should fail consume when pool is empty", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.stats.consume(id, 1, 0, 0)).revertedWith(
+      "Stats: cannot consume more might than currently available"
+    );
+    await expect(this.stats.consume(id, 0, 1, 0)).revertedWith(
+      "Stats: cannot consume more speed than currently available"
+    );
+    await expect(this.stats.consume(id, 0, 0, 1)).revertedWith(
+      "Stats: cannot consume more intelect than currently available"
+    );
+  });
+
+  it("should perform a free refresh correctly and prevent a second refresh instantly", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.stats.refresh(id);
+    const pool = await this.stats.getPoolStats(id);
+    expect(pool.might).to.eq(49);
+    expect(pool.speed).to.eq(49);
+    expect(pool.intelect).to.eq(49);
+    await expect(this.stats.refresh(id)).to.revertedWith(
+      "Stats: not enough time has passed to refresh pool"
+    );
   });
 });

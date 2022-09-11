@@ -39,7 +39,7 @@ contract Stats is Ownable {
     mapping(bytes => uint256) last_refresh;
 
     /** @dev Implementation of the `Refresher` **/
-    address refresher;
+    address public refresher;
 
     /** @dev Address of the `Civilizations` instance. **/
     address public civilizations;
@@ -54,8 +54,12 @@ contract Stats is Ownable {
      */
     modifier onlyAllowed(bytes memory id) {
         require(
+            ICivilizations(civilizations).exists(id),
+            "Stats: can't get access to a non minted token."
+        );
+        require(
             ICivilizations(civilizations).isAllowed(msg.sender, id),
-            "BaseFungibleItem: require consumer to be owner or have allowance"
+            "Stats: require consumer to be owner or have allowance"
         );
         _;
     }
@@ -91,22 +95,18 @@ contract Stats is Ownable {
         uint256 speed,
         uint256 intelect
     ) public onlyAllowed(id) {
-        require(
-            ICivilizations(civilizations).exists(id),
-            "Stats: can't consume to non minted token."
-        );
         CharacterStats storage currPool = pool[id];
         require(
-            currPool.might - might > 0,
-            "Stats: cannot consume less might than current available"
+            might <= currPool.might,
+            "Stats: cannot consume more might than currently available."
         );
         require(
-            currPool.speed - speed > 0,
-            "Stats: cannot consume less speed than current available"
+            speed <= currPool.speed,
+            "Stats: cannot consume more speed than currently available."
         );
         require(
-            currPool.intelect - intelect > 0,
-            "Stats: cannot consume less intelect than current available"
+            intelect <= currPool.intelect,
+            "Stats: cannot consume more intelect than currently available."
         );
 
         pool[id].might -= might;
@@ -126,22 +126,18 @@ contract Stats is Ownable {
         uint256 speed,
         uint256 intelect
     ) public onlyAllowed(id) {
-        require(
-            ICivilizations(civilizations).exists(id),
-            "Stats: can't sacrifice to non minted token."
-        );
         CharacterStats storage currBase = base[id];
         require(
-            currBase.might - might > 0,
-            "Stats: cannot sacrifice less might than current available"
+            might <= currBase.might,
+            "Stats: cannot sacrifice more might than currently available."
         );
         require(
-            currBase.speed - speed > 0,
-            "Stats: cannot sacrifice less speed than current available"
+            speed <= currBase.speed,
+            "Stats: cannot sacrifice more speed than currently available."
         );
         require(
-            currBase.intelect - intelect > 0,
-            "Stats: cannot sacrifice less intelect than current available"
+            intelect <= currBase.intelect,
+            "Stats: cannot sacrifice more intelect than currently available."
         );
 
         base[id].might -= might;
@@ -153,10 +149,6 @@ contract Stats is Ownable {
      *  @param id   Composed ID of the token.
      */
     function refresh(bytes memory id) public onlyAllowed(id) {
-        require(
-            ICivilizations(civilizations).exists(id),
-            "Stats: can't refresh to non minted token."
-        );
         uint256 last = last_refresh[id];
         require(
             last == 0 || last + REFRESH_COOLDOWN_SECONDS <= block.timestamp,
@@ -172,10 +164,6 @@ contract Stats is Ownable {
      *  @param id   Composed ID of the token.
      */
     function refreshWithToken(bytes memory id) public onlyAllowed(id) {
-        require(
-            ICivilizations(civilizations).exists(id),
-            "Stats: can't refresh to non minted token."
-        );
         ERC20Burnable(refresher).burnFrom(msg.sender, 1);
 
         pool[id].might = base[id].might;
@@ -196,15 +184,11 @@ contract Stats is Ownable {
         uint256 speed,
         uint256 intelect
     ) public onlyAllowed(id) {
-        require(
-            ICivilizations(civilizations).exists(id),
-            "Stats: can't assign stats to non minted token."
-        );
         uint256 sum = might + speed + intelect;
         uint256 available = getAvailablePoints(id);
         require(
             sum <= available,
-            "Stats: can't assign more points than available"
+            "Stats: can't assign more points than available."
         );
         base[id].might += might;
         base[id].speed += speed;
