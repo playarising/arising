@@ -215,4 +215,20 @@ describe("Stats", () => {
       "Stats: not enough time has passed to refresh pool"
     );
   });
+
+  it("should perform a free refresh when time is available", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    const nextTime = await this.stats.getNextRefreshTime(id);
+    await this.stats.consume(id, 45, 45, 45);
+    let pool = await this.stats.getPoolStats(id);
+    expect(pool.might).to.eq(4);
+    expect(pool.speed).to.eq(4);
+    expect(pool.intelect).to.eq(4);
+    await ethers.provider.send("evm_mine", [nextTime.toNumber()]);
+    await this.stats.refresh(id);
+    pool = await this.stats.getPoolStats(id);
+    expect(pool.might).to.eq(49);
+    expect(pool.speed).to.eq(49);
+    expect(pool.intelect).to.eq(49);
+  });
 });

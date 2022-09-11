@@ -230,6 +230,13 @@ contract Stats is Ownable {
         return assignableByLevel - sum;
     }
 
+    /** @dev Returns the amount of points available to assign.
+     *  @param id   Composed ID of the token.
+     */
+    function getNextRefreshTime(bytes memory id) public view returns (uint256) {
+        return last_refresh[id] + REFRESH_COOLDOWN_SECONDS;
+    }
+
     // =============================================== Internal ========================================================
     /** @dev Returns the amount of total asignable points by level.
      *  @param level   Level number to check points.
