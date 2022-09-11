@@ -36,15 +36,20 @@ Etia is a fantasy world in which all characters take part. A world with four big
 | Contract          | Deployment |
 | ----------------- | ---------- |
 | **Civilizations** |            |
-| **Craft**         |            |
-| **Enchantments**  |            |
-| **Equipment**     |            |
 | **Experience**    |            |
 | **Forge**         |            |
 | **Levels**        |            |
 | **Names**         |            |
 | **Quests**        |            |
 | **Stats**         |            |
+
+### Expansions
+
+| Contract         | Deployment |
+| ---------------- | ---------- |
+| **Craft**        |            |
+| **Enchantments** |            |
+| **Equipment**    |            |
 
 ### Raw Materials
 
