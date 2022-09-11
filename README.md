@@ -28,8 +28,10 @@ Etia is a fantasy world in which all characters take part. A world with four big
 | **Zhand**         |            |
 | **Civilizations** |            |
 | **Craft**         |            |
+| **Enchantments**  |            |
 | **Equipment**     |            |
 | **Experience**    |            |
+| **Forge**         |            |
 | **Levels**        |            |
 | **Names**         |            |
 | **Quests**        |            |
