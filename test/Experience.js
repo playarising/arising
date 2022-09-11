@@ -3,10 +3,11 @@ const { ethers } = require("hardhat");
 
 describe("Civilizations", () => {
   before(async () => {
-    const [owner, receiver] = await ethers.getSigners();
+    const [owner, receiver, authority] = await ethers.getSigners();
 
     this.owner = owner;
     this.receiver = receiver;
+    this.authority = authority;
 
     const Levels = await ethers.getContractFactory("Levels");
     const levels = await Levels.deploy();
@@ -29,10 +30,6 @@ describe("Civilizations", () => {
     await this.civ.mint(this.ard.address, {
       value: ethers.utils.parseEther("1"),
     });
-    await this.civ.mint(this.ard.address, {
-      value: ethers.utils.parseEther("1"),
-    });
-
     const Experience = await ethers.getContractFactory("Experience");
     this.experience = await Experience.deploy(levels.address, this.civ.address);
     await this.experience.deployed();
@@ -69,5 +66,33 @@ describe("Civilizations", () => {
     await expect(
       this.experience.connect(this.receiver).addAuthority(this.owner.address)
     ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should add a second authority and check missing experience for next level", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 1);
+    await this.experience.addAuthority(this.owner.address);
+    await this.experience.assignExperience(id, 500);
+    const missing = await this.experience.getExperienceForNextLevel(id);
+    expect(missing).to.eq(540);
+    await this.experience.addAuthority(this.authority.address);
+    await this.experience.connect(this.authority).assignExperience(id, 540);
+    expect(await this.experience.getLevel(id)).to.eq(3);
+  });
+
+  it("should fail adding experience when token not minted and collection not available", async () => {
+    await expect(
+      this.experience.assignExperience(
+        "0x00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000001",
+        500
+      )
+    ).to.revertedWith("Civilizations: id of the civilization is not valid.");
+    await expect(
+      this.experience.assignExperience(
+        "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002",
+        500
+      )
+    ).to.revertedWith(
+      "Experience: can't assign experience to non minted token."
+    );
   });
 });

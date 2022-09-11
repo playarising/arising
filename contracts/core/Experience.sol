@@ -60,7 +60,7 @@ contract Experience is Ownable, IExperience {
     {
         require(
             ICivilizations(civilizations).exists(id),
-            "Experience: can't assign experience to non minted token"
+            "Experience: can't assign experience to non minted token."
         );
         experience[id] += amount;
     }
@@ -103,9 +103,6 @@ contract Experience is Ownable, IExperience {
         view
         returns (uint256)
     {
-        return
-            ILevels(levels).getExperience(
-                ILevels(levels).getLevel(experience[id]) + 1
-            ) - experience[id];
+        return ILevels(levels).getExperience(getLevel(id)) - experience[id];
     }
 }

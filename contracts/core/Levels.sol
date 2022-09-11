@@ -217,7 +217,7 @@ contract Levels is ILevels {
     }
 
     /**
-     * @dev Returns the amount of experience required for the level.
+     * @dev Returns the amount of experience required to pass the current level.
      * @param level   Level to get the experience required.
      */
     function getExperience(uint256 level) public view returns (uint256) {
