@@ -188,16 +188,20 @@ contract Levels is ILevels {
      * @param exp   Experience amount.
      */
     function getLevel(uint256 exp) public view returns (uint256) {
-        uint256 i;
+        uint256 i = 0;
 
-        if (exp > levels[33].min) {
-            i = 33;
-        } else if (exp > levels[66].min) {
-            i = 66;
-        } else if (exp > levels[99].min) {
-            i = 99;
-        } else {
+        if (exp < levels[25].min) {
             i = 0;
+        } else if (exp >= levels[25].min && exp < levels[50].min) {
+            i = 25;
+        } else if (exp >= levels[50].min && exp < levels[75].min) {
+            i = 50;
+        } else if (exp >= levels[75].min && exp < levels[100].min) {
+            i = 75;
+        } else if (exp >= levels[100].min && exp < levels[125].min) {
+            i = 100;
+        } else if (exp >= levels[125].min && exp < levels[150].min) {
+            i = 125;
         }
 
         while (true) {

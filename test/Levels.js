@@ -45,9 +45,13 @@ describe("Levels", () => {
 
   it("should match the levels correctly", async () => {
     let exp = 0;
-    for (let i = 0; i <= 150; i++) {
+    for (let i = 0; i <= 151; i++) {
       const level = await this.levels.getLevel(exp);
-      expect(level).to.eq(i);
+      if (i > 150) {
+        expect(level).to.eq(150);
+      } else {
+        expect(level).to.eq(i);
+      }
       exp += levels_increment[i];
     }
   });
