@@ -35,6 +35,7 @@ describe("Stats", () => {
       ethers.utils.parseEther("1")
     );
     await this.refresher.deployed();
+    await this.refresher.mintFree(this.owner.address, 1);
 
     const Levels = await ethers.getContractFactory("Levels");
     const levels = await Levels.deploy();
@@ -226,6 +227,38 @@ describe("Stats", () => {
     expect(pool.intelect).to.eq(4);
     await ethers.provider.send("evm_mine", [nextTime.toNumber()]);
     await this.stats.refresh(id);
+    pool = await this.stats.getPoolStats(id);
+    expect(pool.might).to.eq(49);
+    expect(pool.speed).to.eq(49);
+    expect(pool.intelect).to.eq(49);
+  });
+
+  it("should fail to sacrifice more points than available", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.stats.sacrifice(id, 50, 0, 0)).revertedWith(
+      "Stats: cannot sacrifice more might than currently available"
+    );
+    await expect(this.stats.sacrifice(id, 0, 50, 0)).revertedWith(
+      "Stats: cannot sacrifice more speed than currently available"
+    );
+    await expect(this.stats.sacrifice(id, 0, 0, 50)).revertedWith(
+      "Stats: cannot sacrifice more intelect than currently available"
+    );
+  });
+
+  it("should be able to refresh using the refresher token", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    expect(await this.refresher.balanceOf(this.owner.address)).to.eq(1);
+    await this.stats.consume(id, 45, 45, 45);
+    let pool = await this.stats.getPoolStats(id);
+    expect(pool.might).to.eq(4);
+    expect(pool.speed).to.eq(4);
+    expect(pool.intelect).to.eq(4);
+    await expect(this.stats.refresh(id)).to.revertedWith(
+      "Stats: not enough time has passed to refresh pool"
+    );
+    await this.refresher.approve(this.stats.address, 1000);
+    await this.stats.refreshWithToken(id);
     pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(49);
     expect(pool.speed).to.eq(49);
