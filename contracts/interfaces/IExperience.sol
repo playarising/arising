@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.16;
+pragma solidity 0.8.17;
 
 interface IExperience {
     function assignExperience(bytes memory id, uint256 amount) external;

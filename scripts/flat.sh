@@ -25,4 +25,4 @@ iterate_sources "$ROOT"/gadgets/ "$FLAT"/gadgets/
 
 sed -i '' '/SPDX-License-Identifier: MIT/d' flat/**/*.sol
 sed -i '' '/pragma solidity/d' flat/**/*.sol
-sed -i '' '1s/^/pragma solidity 0.8.16;\n/' flat/**/*.sol
+sed -i '' '1s/^/pragma solidity 0.8.17;\n/' flat/**/*.sol

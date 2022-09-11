@@ -17,7 +17,7 @@ const argv = require("yargs/yargs")()
     compiler: {
       alias: "compileVersion",
       type: "string",
-      default: "0.8.16",
+      default: "0.8.17",
     },
   }).argv;
 
