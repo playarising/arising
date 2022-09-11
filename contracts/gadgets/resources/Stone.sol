@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "../base/BaseFungibleItem.sol";
+import "../../base/BaseFungibleItem.sol";
 
 /**
- * @dev `Gold` is a fungible item to serve as base currency for the Arising ecosystem.
+ * @dev `Stone` is a fungible item resource for the Arising ecosystem.
  */
-contract Gold is BaseFungibleItem {
+contract Stone is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
@@ -14,9 +14,9 @@ contract Gold is BaseFungibleItem {
      */
     constructor(address _civilizations)
         BaseFungibleItem(
-            "Arising: Gold",
-            "aGOLD",
-            "https://playarising.com/gadgets/gold.png",
+            "Arising: Stone",
+            "aSTONE",
+            "https://playarising.com/gadgets/raw/stone.png",
             _civilizations
         )
     {}

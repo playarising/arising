@@ -1,18 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "../base/BaseFungibleItem.sol";
+import "../../base/BaseFungibleItem.sol";
 
 /**
- * @dev `Iron` is a fungible item resource for the Arising ecosystem.
+ * @dev `Coal` is a fungible item resource for the Arising ecosystem.
  */
-contract Iron is BaseFungibleItem {
+contract Coal is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
      * @dev Constructor.
      * @param _civilizations    The address of the `Civilizations` instance.
      */
     constructor(address _civilizations)
-        BaseFungibleItem("Arising: Iron", "aIRON", _civilizations)
+        BaseFungibleItem(
+            "Arising: Coal",
+            "aCOAL",
+            "https://playarising.com/gadgets/raw/coal.png",
+            _civilizations
+        )
     {}
 }

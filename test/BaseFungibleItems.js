@@ -34,6 +34,7 @@ describe("BaseFungibleItems", () => {
     this.token = await BaseFungibleItem.deploy(
       "Test",
       "TEST",
+      "https://test.test",
       this.civ.address
     );
     await this.token.deployed();
@@ -42,6 +43,7 @@ describe("BaseFungibleItems", () => {
   it("should deploy everything correctly", async () => {
     expect(await this.token.name()).to.eq("Test");
     expect(await this.token.symbol()).to.eq("TEST");
+    expect(await this.token.image()).to.eq("https://test.test");
   });
 
   it("should add and remove tokens", async () => {

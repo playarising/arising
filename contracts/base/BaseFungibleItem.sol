@@ -14,6 +14,9 @@ contract BaseFungibleItem is Ownable, IBaseFungibleItem {
     /** @dev Name of the item. **/
     string public name;
 
+    /** @dev Url pointing an image of the item. **/
+    string public image;
+
     /** @dev Symbol of the item. **/
     string public symbol;
 
@@ -41,15 +44,18 @@ contract BaseFungibleItem is Ownable, IBaseFungibleItem {
      * @dev Constructor.
      * @param _name             The name of fungible token.
      * @param _symbol           The symbol of the fungible token.
+     * @param _image            Url of the token image.
      * @param _civilizations    The address of the `Civilizations` instance.
      */
     constructor(
         string memory _name,
         string memory _symbol,
+        string memory _image,
         address _civilizations
     ) {
         name = _name;
         symbol = _symbol;
+        image = _image;
         civilizations = _civilizations;
     }
 
