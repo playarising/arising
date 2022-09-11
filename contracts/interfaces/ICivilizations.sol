@@ -25,4 +25,6 @@ interface ICivilizations {
         external
         view
         returns (bool);
+
+    function exists(bytes memory _id) external view returns (bool);
 }

@@ -177,8 +177,25 @@ contract Civilizations is Ownable, ICivilizations {
         returns (bool)
     {
         (uint256 civilizationID, uint256 tokenID) = _decomposeTokenID(_id);
+        require(
+            civilizationID <= civilizations.length,
+            "Civilizations: id of the civilization is not valid."
+        );
         address instance = civilizations[civilizationID - 1];
         return IBaseERC721(instance).isApprovedOrOwner(spender, tokenID);
+    }
+
+    /** @dev Function to check if a composed ID is already minted.
+     *  @param _id       Composed token id.
+     */
+    function exists(bytes memory _id) public view returns (bool) {
+        (uint256 civilizationID, uint256 tokenID) = _decomposeTokenID(_id);
+        require(
+            civilizationID <= civilizations.length,
+            "Civilizations: id of the civilization is not valid."
+        );
+        address instance = civilizations[civilizationID - 1];
+        return IBaseERC721(instance).exists(tokenID);
     }
 
     // =============================================== Internal ========================================================

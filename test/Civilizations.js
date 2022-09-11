@@ -309,4 +309,37 @@ describe("Civilizations", () => {
     expect(await this.civ.isAllowed(this.minter.address, id)).to.eq(true);
     expect(await this.civ.isAllowed(this.receiver.address, id)).to.eq(true);
   });
+
+  it("should revert when check allowance from a wrong civilization composed ID", async () => {
+    await expect(
+      this.civ.isAllowed(
+        this.minter.address,
+        "0x00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000001"
+      )
+    ).to.revertedWith("Civilizations: id of the civilization is not valid.");
+  });
+
+  it("should check if a token is already minted", async () => {
+    expect(
+      await this.civ.exists(
+        "0x00000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000001"
+      )
+    ).to.eq(true);
+  });
+
+  it("should fail when trying to check if a token exists from an invalid civilization", async () => {
+    await expect(
+      this.civ.exists(
+        "0x00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000001"
+      )
+    ).to.revertedWith("Civilizations: id of the civilization is not valid.");
+  });
+
+  it("should fail when trying to check if a token exists from a non minted id", async () => {
+    expect(
+      await this.civ.exists(
+        "0x00000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000004"
+      )
+    ).to.eq(false);
+  });
 });

@@ -4,6 +4,7 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/ILevels.sol";
 import "../interfaces/IExperience.sol";
+import "../interfaces/ICivilizations.sol";
 
 /**
  * @dev `Experience` is the contract to manage the storage of experience and missions from all the civilizations.
@@ -15,8 +16,11 @@ contract Experience is Ownable, IExperience {
     /** @dev Map to store the experience from composed ID. **/
     mapping(bytes => uint256) experience;
 
-    /** @dev Address of the levels table implementation. **/
-    address levels;
+    /** @dev Address of the `Levels` implementation. **/
+    address public levels;
+
+    /** @dev Address of the `Civilizations` implementation. **/
+    address public civilizations;
 
     /** @dev Map to store the list of authorized addresses to assign experience. **/
     mapping(address => bool) authorized;
@@ -38,10 +42,12 @@ contract Experience is Ownable, IExperience {
 
     /**
      * @dev Constructor.
-     * @param _levels   The address of the levels table.
+     * @param _levels           The address of the `Levels` instance.
+     * @param _civilizations    The address of the `Civilizations` instance.
      */
-    constructor(address _levels) {
+    constructor(address _levels, address _civilizations) {
         levels = _levels;
+        civilizations = _civilizations;
         authorized[msg.sender] = true;
     }
 
@@ -52,6 +58,10 @@ contract Experience is Ownable, IExperience {
         public
         onlyAuthorized
     {
+        require(
+            ICivilizations(civilizations).exists(id),
+            "Experience: can't assign experience to non minted token"
+        );
         experience[id] += amount;
     }
 
