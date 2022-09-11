@@ -14,7 +14,7 @@ const levels_increment = [
   21066, 21803, 22566, 23356, 24173, 25019, 25895, 26801, 27739, 28627, 29543,
   30488, 31464, 32471, 33120, 33782, 34458, 35147, 35850, 36567, 37298, 38044,
   38805, 39581, 40848, 42155, 43504, 44896, 46467, 48093, 49776, 51518, 53321,
-  55187, 57119, 59118, 61187, 63329, 65546,
+  55187, 57119, 59118, 61187, 63329, 65546, 150000,
 ];
 
 const levels_experience = [
@@ -45,7 +45,7 @@ describe("Levels", () => {
 
   it("should match the levels correctly", async () => {
     let exp = 0;
-    for (let i = 0; i <= levels_increment.length; i++) {
+    for (let i = 0; i <= 150; i++) {
       const level = await this.levels.getLevel(exp);
       expect(level).to.eq(i);
       exp += levels_increment[i];
