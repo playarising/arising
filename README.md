@@ -16,7 +16,7 @@ Arising is the first web3-powered role-play community and experience. Through co
 
 Etia is a fantasy world in which all characters take part. A world with four big continents full of different races, cities, conflicts, mysteries, and more. Each character has a background, an ethnicity, a purpose, and definitively a story to tell.
 
-### [Contracts interaction map](diagram/arising.jpeg?raw=true)
+### [Contracts interaction map](diagram/arising-diagram.jpeg?raw=true)
 
 ## Deployments
 
