@@ -4,6 +4,7 @@ pragma solidity 0.8.16;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "../interfaces/ICivilizations.sol";
+import "../interfaces/IExperience.sol";
 
 /**
  * @dev `Stats` is a contract to manage the stats points and pools for a set of collections.
@@ -43,6 +44,9 @@ contract Stats is Ownable {
     /** @dev Address of the `Civilizations` instance. **/
     address public civilizations;
 
+    /** @dev Address of the `Experience` instance. **/
+    address public experience;
+
     // =============================================== Modifiers ======================================================
 
     /**
@@ -61,9 +65,11 @@ contract Stats is Ownable {
     /**
      * @dev Constructor.
      * @param _civilizations    The address of the `Civilizations` instance.
+     * @param _civilizations    The address of the `Experience` instance.
      */
-    constructor(address _civilizations) {
+    constructor(address _civilizations, address _experience) {
         civilizations = _civilizations;
+        experience = _experience;
     }
 
     /** @dev Sets the `Refresher` instance.
@@ -74,10 +80,10 @@ contract Stats is Ownable {
     }
 
     /** @dev Reduces stats points from the pool.
-     *  @param id               Composed ID of the token.
-     *  @param might            Amount of might stat points reducing.
-     *  @param speed            Amount of speed stat points reducing.
-     *  @param intelect         Amount of intelect stat points reducing.
+     *  @param id         Composed ID of the token.
+     *  @param might      Amount of might stat points reducing.
+     *  @param speed      Amount of speed stat points reducing.
+     *  @param intelect   Amount of intelect stat points reducing.
      */
     function consume(
         bytes memory id,
@@ -88,20 +94,51 @@ contract Stats is Ownable {
         CharacterStats storage currPool = pool[id];
         require(
             currPool.might - might > 0,
-            "StatsManager: cannot consume less might than current available"
+            "Stats: cannot consume less might than current available"
         );
         require(
             currPool.speed - speed > 0,
-            "StatsManager: cannot consume less speed than current available"
+            "Stats: cannot consume less speed than current available"
         );
         require(
             currPool.intelect - intelect > 0,
-            "StatsManager: cannot consume less intelect than current available"
+            "Stats: cannot consume less intelect than current available"
         );
 
         pool[id].might -= might;
         pool[id].speed -= speed;
         pool[id].intelect -= intelect;
+    }
+
+    /** @dev Reduces points to the base stats forever.
+     *  @param id         Composed ID of the token.
+     *  @param might      Amount of might stat points reducing.
+     *  @param speed      Amount of speed stat points reducing.
+     *  @param intelect   Amount of intelect stat points reducing.
+     */
+    function sacrifice(
+        bytes memory id,
+        uint256 might,
+        uint256 speed,
+        uint256 intelect
+    ) public onlyAllowed(id) {
+        CharacterStats storage currBase = base[id];
+        require(
+            currBase.might - might > 0,
+            "Stats: cannot sacrifice less might than current available"
+        );
+        require(
+            currBase.speed - speed > 0,
+            "Stats: cannot sacrifice less speed than current available"
+        );
+        require(
+            currBase.intelect - intelect > 0,
+            "Stats: cannot sacrifice less intelect than current available"
+        );
+
+        base[id].might -= might;
+        base[id].speed -= speed;
+        base[id].intelect -= intelect;
     }
 
     /** @dev Performs a refresh filling the pool stats from the base stats.
@@ -111,7 +148,7 @@ contract Stats is Ownable {
         uint256 last = last_refresh[id];
         require(
             last == 0 || last + REFRESH_COOLDOWN_SECONDS <= block.timestamp,
-            "StatsManager: not enough time has passed to refresh pool"
+            "Stats: not enough time has passed to refresh pool"
         );
         pool[id].might = base[id].might;
         pool[id].speed = base[id].speed;
@@ -129,6 +166,29 @@ contract Stats is Ownable {
         pool[id].speed = base[id].speed;
         pool[id].intelect = base[id].intelect;
         last_refresh[id] = block.timestamp;
+    }
+
+    /** @dev Assigns the points to the base pool.
+     *  @param id         Composed ID of the token.
+     *  @param might     Amount of might stat points assign.
+     *  @param speed     Amount of speed stat points assign.
+     *  @param intelect  Amount of intelect stat points assign.
+     */
+    function assignPoints(
+        bytes memory id,
+        uint256 might,
+        uint256 speed,
+        uint256 intelect
+    ) public onlyAllowed(id) {
+        uint256 sum = might + speed + intelect;
+        uint256 available = getAvailablePoints(id);
+        require(
+            sum <= available,
+            "Stats: can't assign more points than available"
+        );
+        base[id].might += might;
+        base[id].speed += speed;
+        base[id].intelect += intelect;
     }
 
     // =============================================== Getters ========================================================
@@ -153,5 +213,29 @@ contract Stats is Ownable {
         returns (CharacterStats memory)
     {
         return pool[id];
+    }
+
+    /** @dev Returns the amount of points available to assign.
+     *  @param id   Composed ID of the token.
+     */
+    function getAvailablePoints(bytes memory id) public view returns (uint256) {
+        CharacterStats memory p = base[id];
+        uint256 sum = p.intelect + p.might + p.speed;
+        uint256 level = IExperience(experience).getLevel(id);
+        uint256 assignableByLevel = _assignablePointsByLevel(level);
+        return assignableByLevel - sum;
+    }
+
+    // =============================================== Internal ========================================================
+    /** @dev Returns the amount of total asignable points by level.
+     *  @param level   Level number to check points.
+     */
+    function _assignablePointsByLevel(uint256 level)
+        internal
+        pure
+        returns (uint256)
+    {
+        uint256 points = 6;
+        return points + level;
     }
 }
