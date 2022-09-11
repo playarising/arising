@@ -14,11 +14,11 @@ contract BaseFungibleItem is Ownable, IBaseFungibleItem {
     /** @dev Name of the item. **/
     string public name;
 
-    /** @dev Address of the `Civilizations` instance. **/
-    address public civilizations;
-
     /** @dev Symbol of the item. **/
     string public symbol;
+
+    /** @dev Address of the `Civilizations` instance. **/
+    address public civilizations;
 
     /** @dev Balances. **/
     mapping(bytes => uint256) balances;

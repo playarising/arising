@@ -83,7 +83,11 @@ contract Civilizations is Ownable, ICivilizations {
     function addCivilization(address _instance) public onlyOwner {
         require(
             _instance != address(0),
-            "Civilizations: instance address is null"
+            "Civilizations: instance address is null."
+        );
+        require(
+            msg.sender == Ownable(_instance).owner(),
+            "Civilizations: msg.sender must be the owner of the instance added."
         );
         uint256 newId = civilizations.length + 1;
         _civilizations[_instance] = newId;
@@ -93,7 +97,7 @@ contract Civilizations is Ownable, ICivilizations {
     /** @dev Mints a token from an .
      *  @param _instance  Address of the `BaseERC721` instance to mint.
      */
-    function mint(address _instance) public payable {
+    function mint(address _instance) public payable onlyInitialized {
         require(
             _instance != address(0),
             "Civilizations: instance address is null"
