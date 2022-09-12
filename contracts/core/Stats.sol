@@ -150,6 +150,18 @@ contract Stats is Ownable, IStats {
         base[id].might -= might;
         base[id].speed -= speed;
         base[id].intelect -= intelect;
+
+        if (pool[id].might > base[id].might) {
+            pool[id].might = base[id].might;
+        }
+
+        if (pool[id].speed > base[id].speed) {
+            pool[id].speed = base[id].speed;
+        }
+
+        if (pool[id].intelect > base[id].intelect) {
+            pool[id].intelect = base[id].intelect;
+        }
     }
 
     /** @dev Performs a refresh filling the pool stats from the base stats.
@@ -249,6 +261,9 @@ contract Stats is Ownable, IStats {
         base[id].might += might;
         base[id].speed += speed;
         base[id].intelect += intelect;
+        pool[id].might += might;
+        pool[id].speed += speed;
+        pool[id].intelect += intelect;
 
         vitality_uses[id] += 1;
     }
@@ -274,6 +289,9 @@ contract Stats is Ownable, IStats {
         base[id].might += might;
         base[id].speed += speed;
         base[id].intelect += intelect;
+        pool[id].might += might;
+        pool[id].speed += speed;
+        pool[id].intelect += intelect;
     }
 
     // =============================================== Getters ========================================================
