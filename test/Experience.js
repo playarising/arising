@@ -18,18 +18,13 @@ describe("Civilizations", () => {
     await this.ard.deployed();
 
     const Civilizations = await ethers.getContractFactory("Civilizations");
-    this.civ = await Civilizations.deploy(
-      ethers.utils.parseEther("1"),
-      receiver.address
-    );
+    this.civ = await Civilizations.deploy(receiver.address);
     await this.civ.deployed();
     await this.civ.addCivilization(this.ard.address);
     await this.civ.setInitialized();
 
     await this.ard.transferOwnership(this.civ.address);
-    await this.civ.mint(this.ard.address, {
-      value: ethers.utils.parseEther("1"),
-    });
+    await this.civ.mint(this.ard.address);
     const Experience = await ethers.getContractFactory("Experience");
     this.experience = await Experience.deploy(levels.address, this.civ.address);
     await this.experience.deployed();

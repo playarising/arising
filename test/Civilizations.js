@@ -116,8 +116,12 @@ describe("Civilizations", () => {
   });
 
   it("should deploy an initialize the civilizations contract", async () => {
+    const MockToken = await ethers.getContractFactory("MockToken");
+    this.mock = await MockToken.deploy(ethers.utils.parseEther("100"));
+    await this.mock.deployed();
+
     const Civilizations = await ethers.getContractFactory("Civilizations");
-    this.civ = await Civilizations.deploy(0, this.receiver.address);
+    this.civ = await Civilizations.deploy(this.mock.address);
     await this.civ.deployed();
 
     await this.civ.addCivilization(this.ard.address);
@@ -136,46 +140,15 @@ describe("Civilizations", () => {
   });
 
   it("should not be able to mint when not initialized", async () => {
-    await expect(this.civ.mint(this.ard.address), {
-      value: ethers.utils.parseEther("1"),
-    }).to.revertedWith("Civilizations: contract is not initialized");
+    await expect(this.civ.mint(this.ard.address)).to.revertedWith(
+      "Civilizations: contract is not initialized"
+    );
   });
 
   it("should not be able to initialize by a non owner", async () => {
     await expect(
       this.civ.connect(this.receiver).setInitialized()
     ).to.revertedWith("Ownable: caller is not the owner");
-  });
-
-  it("should not be able to initialize when no price set", async () => {
-    await expect(this.civ.setInitialized()).to.revertedWith(
-      "Civilizations: can't initialize when price is 0"
-    );
-  });
-
-  it("should not be able set the price from a non owner", async () => {
-    await expect(
-      this.civ.connect(this.receiver).setPrice(ethers.utils.parseEther("10"))
-    ).to.revertedWith("Ownable: caller is not the owner");
-  });
-
-  it("should set the price correctly", async () => {
-    expect(await this.civ.price()).to.eq(0);
-    await this.civ.setPrice(ethers.utils.parseEther("10"));
-    expect(await this.civ.price()).to.eq(ethers.utils.parseEther("10"));
-  });
-
-  it("should not be able to change the payment receiver from non owner", async () => {
-    await expect(
-      this.civ.connect(this.receiver).setPaymentsReceiver(this.owner.address)
-    ).to.revertedWith("Ownable: caller is not the owner");
-  });
-
-  it("should change the payment receiver", async () => {
-    expect(await this.civ.payments_receiver()).to.eq(this.receiver.address);
-    await this.civ.setPaymentsReceiver(this.owner.address);
-    expect(await this.civ.payments_receiver()).to.eq(this.owner.address);
-    await this.civ.setPaymentsReceiver(this.receiver.address);
   });
 
   it("should initialize correctly", async () => {
@@ -196,23 +169,9 @@ describe("Civilizations", () => {
     );
   });
 
-  it("should try to mint sending less than required", async () => {
-    await expect(this.civ.mint(this.ard.address), {
-      value: ethers.utils.parseEther("9"),
-    }).to.revertedWith(
-      "Civilizations: Tx doesn't include enough to pay the mint."
-    );
-  });
-
   it("should mint a token correctly", async () => {
-    const balance = await ethers.provider.getBalance(this.receiver.address);
-    await this.civ.connect(this.minter).mint(this.ard.address, {
-      value: ethers.utils.parseEther("10"),
-    });
+    await this.civ.connect(this.minter).mint(this.ard.address);
     expect(await this.ard.balanceOf(this.minter.address)).to.eq(1);
-    expect(await ethers.provider.getBalance(this.receiver.address)).to.eq(
-      balance.add(ethers.utils.parseEther("10"))
-    );
   });
 
   it("should attempt to add a civilization contract from a non owner", async () => {
@@ -225,11 +184,9 @@ describe("Civilizations", () => {
     const MockMinter = await ethers.getContractFactory("MockMinter");
     this.mock = await MockMinter.deploy(this.civ.address);
     await this.mock.deployed();
-    await expect(
-      this.mock.mintMock(this.ard.address, {
-        value: ethers.utils.parseEther("10"),
-      })
-    ).to.revertedWith("Civilizations: cannot mint from a contract");
+    await expect(this.mock.mintMock(this.ard.address)).to.revertedWith(
+      "Civilizations: cannot mint from a contract"
+    );
   });
 
   it("should return civilizations correctly", async () => {

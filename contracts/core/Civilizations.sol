@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IBaseERC721.sol";
 import "../interfaces/ICivilizations.sol";
 
@@ -22,14 +23,17 @@ contract Civilizations is Ownable, ICivilizations {
     /** @dev Map to track the amount of tokens minted by address. **/
     mapping(address => uint256) private _minters;
 
-    /** @dev The receiver address. **/
-    address payable public payments_receiver;
-
-    /** @dev Price of each mint in MATIC in wei. **/
-    uint256 public price;
-
     /** @dev Boolean to check if the implementation is usable. **/
     bool public initialized;
+
+    /** @dev Address of the token used to charge the mint. **/
+    address public token;
+
+    /** @dev Map to track the character upgrades. **/
+    UpgradedCharacters private _upgrades;
+
+    /** @dev Map to track upgrades information. **/
+    mapping(uint256 => Upgrade) public upgrades;
 
     // ============================================== Modifiers =======================================================
 
@@ -45,36 +49,49 @@ contract Civilizations is Ownable, ICivilizations {
 
     /**
      * @dev Constructor.
-     * @param _price                The price for each token minted.
-     * @param _payments_receiver    The address that will receive the payments.
+     * @param _token   Address of the token to charge.
      */
-    constructor(uint256 _price, address payable _payments_receiver) {
-        price = _price;
-        payments_receiver = _payments_receiver;
+    constructor(address _token) {
+        token = _token;
         initialized = false;
+        upgrades[1] = Upgrade(0, false);
+        upgrades[2] = Upgrade(0, false);
+        upgrades[3] = Upgrade(0, false);
     }
 
     /** @dev Enables the `Civilizations` implementation. */
     function setInitialized() public onlyOwner {
-        require(price != 0, "Civilizations: can't initialize when price is 0");
         initialized = true;
     }
 
-    /** @dev Sets the minting price.
-     *  @param _price   Price in MATIC in wei.
+    /** @dev Adds a civilization to the contract.
+     *  @param upgrade  The ID of the upgrade.
+     *  @param price  The amount of tokens to charge for the upgrade.
      */
-    function setPrice(uint256 _price) public onlyOwner {
-        price = _price;
-    }
-
-    /** @dev Sets payment receive address.
-     *  @param _payments_receiver   Address to receive the payments.
-     */
-    function setPaymentsReceiver(address payable _payments_receiver)
+    function setInitializeUpgrade(uint256 upgrade, uint256 price)
         public
         onlyOwner
     {
-        payments_receiver = _payments_receiver;
+        require(
+            upgrades[upgrade].price != 0,
+            "Civilizations: to initialize an upgrade set the price first"
+        );
+        upgrades[upgrade].price = price;
+    }
+
+    /** @dev Adds a civilization to the contract.
+     *  @param upgrade  The ID of the upgrade.
+     *  @param price  The amount of tokens to charge for the upgrade.
+     */
+    function setUpgradePrice(uint256 upgrade, uint256 price) public onlyOwner {
+        upgrades[upgrade].price = price;
+    }
+
+    /** @dev Sets the `token` address.
+     *  @param _token   address of the token to use for charge.
+     */
+    function setToken(address _token) public onlyOwner {
+        token = _token;
     }
 
     /** @dev Adds a civilization to the contract.
@@ -94,10 +111,10 @@ contract Civilizations is Ownable, ICivilizations {
         civilizations.push(_instance);
     }
 
-    /** @dev Mints a token from an .
+    /** @dev Mints a token.
      *  @param _instance  Address of the `BaseERC721` instance to mint.
      */
-    function mint(address _instance) public payable onlyInitialized {
+    function mint(address _instance) public onlyInitialized {
         require(
             _instance != address(0),
             "Civilizations: instance address is null."
@@ -107,16 +124,50 @@ contract Civilizations is Ownable, ICivilizations {
             "Civilizations: instance is not an Arising civilization."
         );
         require(
-            msg.value == price,
-            "Civilizations: Tx doesn't include enough to pay the mint."
-        );
-        require(
             _canMint(msg.sender),
             "Civilizations: address used already minted 5 characters."
         );
-        Address.sendValue(payments_receiver, price);
         IBaseERC721(_instance).mint(msg.sender);
         _addMinted(msg.sender);
+    }
+
+    /**
+     * @dev Marks a character upgrade as purchased.
+     * @param id         Composed ID of the token.
+     * @param upgrade    Upgrade id.
+     */
+    function buyUpgrade(bytes memory id, uint256 upgrade) public {
+        require(
+            upgrades[upgrade].price != 0,
+            "Civilizations: can't purchase an upgrade with zero value."
+        );
+        require(
+            upgrade > 0 && upgrade <= 3,
+            "Civilizations: upgrade id doesn't exist."
+        );
+        require(
+            IERC20(token).balanceOf(msg.sender) >= upgrades[upgrade].price,
+            "Civilizations: not enough balance of payment tokens to mint tokens."
+        );
+        require(
+            IERC20(token).allowance(msg.sender, address(this)) >=
+                upgrades[upgrade].price,
+            "Civilizations: not enough allowance to mint tokens."
+        );
+        IERC20(token).transferFrom(
+            msg.sender,
+            address(this),
+            upgrades[upgrade].price
+        );
+        if (upgrade == 1) {
+            _upgrades.upgrade_1[id] = true;
+        }
+        if (upgrade == 2) {
+            _upgrades.upgrade_2[id] = true;
+        }
+        if (upgrade == 3) {
+            _upgrades.upgrade_3[id] = true;
+        }
     }
 
     // =============================================== Getters ========================================================
@@ -134,6 +185,25 @@ contract Civilizations is Ownable, ICivilizations {
             "Civilizations: instance is not an Arising civilization."
         );
         return _civilizations[_instance];
+    }
+
+    /** @dev Returns the upgrades for a composed ID.
+     *  @param id Composed token id.
+     */
+    function getTokenUpgrades(bytes memory id)
+        public
+        view
+        returns (
+            bool,
+            bool,
+            bool
+        )
+    {
+        return (
+            _upgrades.upgrade_1[id],
+            _upgrades.upgrade_2[id],
+            _upgrades.upgrade_3[id]
+        );
     }
 
     /** @dev Returns the list of civilizations.

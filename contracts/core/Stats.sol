@@ -41,9 +41,6 @@ contract Stats is Ownable, IStats {
     /** @dev Map to track the usage of vitality tokens. **/
     mapping(bytes => uint256) public vitality_uses;
 
-    /** @dev Map to track the daily usages of refresher tokens. **/
-    mapping(bytes => uint256) public refresher_counts;
-
     /** @dev Map to track the first refresher usage timestamp. **/
     mapping(bytes => uint256) public refresher_usage_time;
 
@@ -193,9 +190,8 @@ contract Stats is Ownable, IStats {
         );
 
         require(
-            refresher_counts[id] < 5 ||
-                getNextRefreshWithTokenTime(id) <= block.timestamp,
-            "Stats: already five refreshers used for the day."
+            getNextRefreshWithTokenTime(id) <= block.timestamp,
+            "Stats: already used a refresher for this day."
         );
 
         ERC20Burnable(refresher).burnFrom(msg.sender, 1);
@@ -218,12 +214,7 @@ contract Stats is Ownable, IStats {
             pool[id].intellect = base[id].intellect;
         }
 
-        if (getNextRefreshWithTokenTime(id) <= block.timestamp) {
-            refresher_counts[id] = 0;
-            refresher_usage_time[id] = block.timestamp;
-        }
-
-        refresher_counts[id] += 1;
+        refresher_usage_time[id] = block.timestamp;
     }
 
     /** @dev Consumes a vitalizer token to increase one point of a base stat.

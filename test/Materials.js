@@ -8,7 +8,7 @@ describe("Materials", () => {
     this.owner = owner;
 
     const Civilizations = await ethers.getContractFactory("Civilizations");
-    this.civilizations = await Civilizations.deploy(1, this.owner.address);
+    this.civilizations = await Civilizations.deploy(this.owner.address);
     await this.civilizations.deployed();
 
     const Gold = await ethers.getContractFactory("Gold");

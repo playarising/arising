@@ -10,7 +10,7 @@ contract MockMinter {
         civilizations = _civilizations;
     }
 
-    function mintMock(address _instance) public payable {
-        ICivilizations(civilizations).mint{value: msg.value}(_instance);
+    function mintMock(address _instance) public {
+        ICivilizations(civilizations).mint(_instance);
     }
 }
