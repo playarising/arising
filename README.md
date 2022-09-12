@@ -50,6 +50,7 @@ Etia is a fantasy world in which all characters take part. A world with four big
 | **Craft**        |            |
 | **Enchantments** |            |
 | **Equipment**    |            |
+| **Arena**        |            |
 
 ### Raw Materials
 
