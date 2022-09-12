@@ -113,7 +113,7 @@ describe("Stats", () => {
     const id = await this.civ.getTokenID(this.ard.address, 1);
     await expect(
       this.stats.connect(this.receiver).assignPoints(id, 2, 2, 2)
-    ).to.revertedWith("Stats: require consumer to be owner or have allowance");
+    ).to.revertedWith("Stats: msg.sender is not allowed to access this token.");
   });
 
   it("should fail assign more points than allowed", async () => {
@@ -161,13 +161,13 @@ describe("Stats", () => {
     const id = await this.civ.getTokenID(this.ard.address, 1);
     await expect(
       this.stats.connect(this.receiver).sacrifice(id, 1, 1, 1)
-    ).revertedWith("Stats: require consumer to be owner or have allowance");
+    ).revertedWith("Stats: msg.sender is not allowed to access this token.");
   });
 
   it("should fail to perform a free refresh from non allowed", async () => {
     const id = await this.civ.getTokenID(this.ard.address, 1);
     await expect(this.stats.connect(this.receiver).refresh(id)).to.revertedWith(
-      "Stats: require consumer to be owner or have allowance"
+      "Stats: msg.sender is not allowed to access this token."
     );
   });
 

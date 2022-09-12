@@ -34,7 +34,7 @@ contract Names is INames {
         );
         require(
             ICivilizations(civilizations).isAllowed(msg.sender, id),
-            "Names: require consumer to be owner or have allowance"
+            "Names: msg.sender is not allowed to access this token."
         );
         _;
     }

@@ -3,9 +3,11 @@ const { ethers } = require("hardhat");
 
 describe("Names", () => {
   before(async () => {
-    const [owner, receiver] = await ethers.getSigners();
+    const [owner, receiver, minter1, minter2] = await ethers.getSigners();
 
     this.owner = owner;
+    this.minter1 = minter1;
+    this.minter2 = minter2;
 
     const Ard = await ethers.getContractFactory("Ard");
     this.ard = await Ard.deploy();
@@ -21,6 +23,9 @@ describe("Names", () => {
     await this.civ.setInitialized();
 
     await this.ard.transferOwnership(this.civ.address);
+    await this.civ.mint(this.ard.address, {
+      value: ethers.utils.parseEther("1"),
+    });
     await this.civ.mint(this.ard.address, {
       value: ethers.utils.parseEther("1"),
     });
@@ -118,5 +123,55 @@ describe("Names", () => {
     await this.names.replaceName(id, "Radagast The Brown");
     expect(await this.names.getTokenName(id)).to.eq("Radagast The Brown");
     expect(await this.names.isNameAvailable("Conan de Barbarian")).to.eq(true);
+  });
+
+  it("should fail trying to clear a name from a token without name", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 3);
+    await expect(this.names.clearName(id)).to.revertedWith(
+      "Name: can't clear name of token without a name."
+    );
+  });
+
+  it("should clear a name correctly", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 1);
+    expect(await this.names.getTokenName(id)).to.eq("Radagast The Brown");
+    await this.names.clearName(id);
+    expect(await this.names.getTokenName(id)).to.eq("");
+    expect(await this.names.isNameAvailable("Radagast The Brown")).to.eq(true);
+  });
+
+  it("should fail to assign a name from a non existing civilization and non minted token", async () => {
+    await expect(
+      this.names.claimName(
+        "0x00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000001",
+        "Conan"
+      )
+    ).to.revertedWith("Civilizations: id of the civilization is not valid.");
+    await expect(
+      this.names.claimName(
+        "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000005",
+        "Conan"
+      )
+    ).to.revertedWith("Names: can't get access to a non minted token.");
+  });
+
+  it("should fail to rename a token from a non allowed", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 1);
+    await expect(
+      this.names.connect(this.minter1).replaceName(id, "Conan")
+    ).to.revertedWith("Names: msg.sender is not allowed to access this token.");
+  });
+
+  it("should be able to replace a name with approval and allowance", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 1);
+    await this.ard.approve(this.minter1.address, 1);
+    await this.ard.setApprovalForAll(this.minter2.address, true);
+    expect(await this.names.getTokenName(id)).to.eq("");
+    await this.names.connect(this.minter1).claimName(id, "Conan The Barb");
+    expect(await this.names.getTokenName(id)).to.eq("Conan The Barb");
+    await this.names
+      .connect(this.minter2)
+      .replaceName(id, "Conan The Barbarian");
+    expect(await this.names.getTokenName(id)).to.eq("Conan The Barbarian");
   });
 });

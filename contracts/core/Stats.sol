@@ -47,7 +47,7 @@ contract Stats is Ownable, IStats {
         );
         require(
             ICivilizations(civilizations).isAllowed(msg.sender, id),
-            "Stats: require consumer to be owner or have allowance"
+            "Stats: msg.sender is not allowed to access this token."
         );
         _;
     }
