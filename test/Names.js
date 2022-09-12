@@ -33,8 +33,16 @@ describe("Names", () => {
       value: ethers.utils.parseEther("1"),
     });
 
+    const Levels = await ethers.getContractFactory("Levels");
+    const levels = await Levels.deploy();
+    await levels.deployed();
+
+    const Experience = await ethers.getContractFactory("Experience");
+    this.experience = await Experience.deploy(levels.address, this.civ.address);
+    await this.experience.deployed();
+
     const Names = await ethers.getContractFactory("Names");
-    this.names = await Names.deploy(this.civ.address);
+    this.names = await Names.deploy(this.civ.address, this.experience.address);
     await this.names.deployed();
   });
 
@@ -66,8 +74,23 @@ describe("Names", () => {
     );
   });
 
+  it("should fail trying to claim a name from a non level 5 character", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 1);
+    await expect(
+      this.names.claimName(id, "Conan de Barbarian")
+    ).to.revertedWith("Name: claim name requires level 5.");
+  });
+
+  it("should fail trying to replacing a name from a non level 5 character", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 1);
+    await expect(
+      this.names.replaceName(id, "Conan de Barbarian")
+    ).to.revertedWith("Name: replace a name requires level 5.");
+  });
+
   it("should fail trying to claim an invalid name", async () => {
     const id = this.civ.getTokenID(this.ard.address, 1);
+    await this.experience.assignExperience(id, 20000);
     await expect(this.names.claimName(id, "trailing space ")).to.revertedWith(
       "Name: name trying to claim is not valid."
     );
@@ -82,6 +105,7 @@ describe("Names", () => {
 
   it("should fail trying to claim a name already claimed for a token", async () => {
     const id = this.civ.getTokenID(this.ard.address, 2);
+    await this.experience.assignExperience(id, 20000);
     await expect(
       this.names.claimName(id, "Conan de Barbarian")
     ).to.revertedWith("Name: name trying to claim is already claimed.");

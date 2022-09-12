@@ -4,6 +4,7 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/INames.sol";
+import "../interfaces/IExperience.sol";
 
 /**
  * @dev `Names` is a contract manage the names of Arising characters.
@@ -15,6 +16,9 @@ contract Names is INames {
     // =============================================== Storage ========================================================
     /** @dev Address of the `Civilizations` implementation. **/
     address public civilizations;
+
+    /** @dev Address of the `Experience` implementation. **/
+    address public experience;
 
     /** @dev Map storing the names for each character. **/
     mapping(bytes => string) public names;
@@ -44,9 +48,11 @@ contract Names is INames {
     /**
      * @dev Constructor.
      * @param _civilizations    The address of the `Civilizations` instance.
+     * @param _experience    The address of the `Experience` instance.
      */
-    constructor(address _civilizations) {
+    constructor(address _civilizations, address _experience) {
         civilizations = _civilizations;
+        experience = _experience;
     }
 
     /**
@@ -58,6 +64,10 @@ contract Names is INames {
         public
         onlyAllowed(id)
     {
+        require(
+            IExperience(experience).getLevel(id) >= 5,
+            "Name: claim name requires level 5."
+        );
         require(
             bytes(names[id]).length == 0,
             "Name: token already have a name."
@@ -80,6 +90,10 @@ contract Names is INames {
         public
         onlyAllowed(id)
     {
+        require(
+            IExperience(experience).getLevel(id) >= 5,
+            "Name: replace a name requires level 5."
+        );
         require(
             isNameValid(newName),
             "Name: name trying to replace with is not valid."
