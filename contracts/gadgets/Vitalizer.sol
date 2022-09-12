@@ -4,9 +4,9 @@ pragma solidity 0.8.17;
 import "../base/BaseGadgetToken.sol";
 
 /**
- * @dev `Refresher` is a contract serve as a self-served gadget to perform refreshes for `Stats` without cooldown.
+ * @dev `Vitalizer` is a contract serve as a self-served gadget to perform base stats increase for `Stats`.
  */
-contract Refresher is BaseGadgetToken {
+contract Vitalizer is BaseGadgetToken {
     // =============================================== Setters ========================================================
 
     /**
@@ -15,6 +15,6 @@ contract Refresher is BaseGadgetToken {
      * @param _price   Amount of tokens to charge.
      */
     constructor(address _token, uint256 _price)
-        BaseGadgetToken("Arising: Refresh Token", "REFRESHER", _token, _price)
+        BaseGadgetToken("Arising: Vitalizer Token", "VITALIZER", _token, _price)
     {}
 }

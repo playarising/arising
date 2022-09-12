@@ -148,15 +148,30 @@ contract Stats is Ownable, IStats {
         last_refresh[id] = block.timestamp;
     }
 
-    /** @dev Performs a refresh filling the pool stats from the base stats without cooldown spending `RefreshToken`.
+    /** @dev Performs a refresh filling the pool stats from the base stats without cooldown spending `RefreshToken` (max 20 points per stat).
      *  @param id   Composed ID of the token.
      */
     function refreshWithToken(bytes memory id) public onlyAllowed(id) {
         ERC20Burnable(refresher).burnFrom(msg.sender, 1);
 
-        pool[id].might = base[id].might;
-        pool[id].speed = base[id].speed;
-        pool[id].intelect = base[id].intelect;
+        if ((base[id].might - pool[id].might) > 20) {
+            pool[id].might += 20;
+        } else {
+            pool[id].might = base[id].might;
+        }
+
+        if ((base[id].speed - pool[id].speed) > 20) {
+            pool[id].speed += 20;
+        } else {
+            pool[id].speed = base[id].speed;
+        }
+
+        if ((base[id].intelect - pool[id].intelect) > 20) {
+            pool[id].intelect += 20;
+        } else {
+            pool[id].intelect = base[id].intelect;
+        }
+
         last_refresh[id] = block.timestamp;
     }
 

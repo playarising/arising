@@ -7,7 +7,6 @@ describe("Forge", () => {
 
     this.owner = owner;
 
-
     const Levels = await ethers.getContractFactory("Levels");
     const levels = await Levels.deploy();
     await levels.deployed();

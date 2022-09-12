@@ -35,7 +35,7 @@ describe("Stats", () => {
       ethers.utils.parseEther("1")
     );
     await this.refresher.deployed();
-    await this.refresher.mintFree(this.owner.address, 1);
+    await this.refresher.mintFree(this.owner.address, 3);
 
     const Levels = await ethers.getContractFactory("Levels");
     const levels = await Levels.deploy();
@@ -248,7 +248,7 @@ describe("Stats", () => {
 
   it("should be able to refresh using the refresher token", async () => {
     const id = await this.civ.getTokenID(this.ard.address, 1);
-    expect(await this.refresher.balanceOf(this.owner.address)).to.eq(1);
+    expect(await this.refresher.balanceOf(this.owner.address)).to.eq(3);
     await this.stats.consume(id, 45, 45, 45);
     let pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(4);
@@ -260,8 +260,22 @@ describe("Stats", () => {
     await this.refresher.approve(this.stats.address, 1000);
     await this.stats.refreshWithToken(id);
     pool = await this.stats.getPoolStats(id);
+    expect(pool.might).to.eq(24);
+    expect(pool.speed).to.eq(24);
+    expect(pool.intelect).to.eq(24);
+
+    await this.stats.refreshWithToken(id);
+    pool = await this.stats.getPoolStats(id);
+    expect(pool.might).to.eq(44);
+    expect(pool.speed).to.eq(44);
+    expect(pool.intelect).to.eq(44);
+
+    await this.stats.refreshWithToken(id);
+    pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(49);
     expect(pool.speed).to.eq(49);
     expect(pool.intelect).to.eq(49);
+    expect(await this.refresher.balanceOf(this.owner.address)).to.eq(0);
+
   });
 });
