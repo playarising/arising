@@ -16,8 +16,7 @@ contract Tarki is BaseERC721 {
         BaseERC721(
             "Arising: Tark'i",
             "ARISING",
-            "https://characters.playarising.com/tarki/",
-            2500
+            "https://characters.playarising.com/tarki/"
         )
     {}
 }

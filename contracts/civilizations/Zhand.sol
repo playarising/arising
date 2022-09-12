@@ -16,8 +16,7 @@ contract Zhand is BaseERC721 {
         BaseERC721(
             "Arising: Zhand",
             "ARISING",
-            "https://characters.playarising.com/zhand/",
-            1000
+            "https://characters.playarising.com/zhand/"
         )
     {}
 }

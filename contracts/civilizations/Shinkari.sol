@@ -16,8 +16,7 @@ contract Shinkari is BaseERC721 {
         BaseERC721(
             "Arising: Shinkari",
             "ARISING",
-            "https://characters.playarising.com/shinkari/",
-            4500
+            "https://characters.playarising.com/shinkari/"
         )
     {}
 }

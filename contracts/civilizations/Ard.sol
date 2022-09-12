@@ -16,8 +16,7 @@ contract Ard is BaseERC721 {
         BaseERC721(
             "Arising: Ard",
             "ARISING",
-            "https://characters.playarising.com/ard/",
-            4500
+            "https://characters.playarising.com/ard/"
         )
     {}
 }

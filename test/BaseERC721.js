@@ -9,12 +9,7 @@ describe("BaseERC721", () => {
     this.minter = minter;
 
     const BaseERC721 = await ethers.getContractFactory("BaseERC721");
-    this.token = await BaseERC721.deploy(
-      "Test",
-      "TEST",
-      "https://test.uri/",
-      5
-    );
+    this.token = await BaseERC721.deploy("Test", "TEST", "https://test.uri/");
     await this.token.deployed();
   });
 
@@ -38,17 +33,8 @@ describe("BaseERC721", () => {
     expect(await this.token.exists(2)).to.eq(false);
   });
 
-  it("should mint until the cap is reached", async () => {
-    await this.token.mint(this.owner.address);
-    await this.token.mint(this.owner.address);
-    await this.token.mint(this.owner.address);
-    await this.token.mint(this.owner.address);
-    await expect(this.token.mint(this.owner.address)).to.revertedWith(
-      "BaseERC721: Max supply reached."
-    );
-  });
-
   it("should check the token allowance", async () => {
+    await this.token.mint(this.owner.address);
     expect(await this.token.isApprovedOrOwner(this.owner.address, 1)).to.eq(
       true
     );

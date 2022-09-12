@@ -16,8 +16,7 @@ contract Hartheim is BaseERC721 {
         BaseERC721(
             "Arising: Hartheim",
             "ARISING",
-            "https://characters.playarising.com/hartheim/",
-            1000
+            "https://characters.playarising.com/hartheim/"
         )
     {}
 }

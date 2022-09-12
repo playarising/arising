@@ -14,9 +14,6 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
     /** @dev Base URI of the token metadata. **/
     string public baseURI;
 
-    /** @dev Max token supply. **/
-    uint256 public cap;
-
     // =============================================== Setters ========================================================
 
     /**
@@ -24,21 +21,17 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
      * @param _name                 The name of the collection.
      * @param _symbol               The symbol of the collection.
      * @param _uri                  The base URI for the tokens metadata.
-     * @param _cap                  The max supply of the token.
      */
     constructor(
         string memory _name,
         string memory _symbol,
-        string memory _uri,
-        uint256 _cap
+        string memory _uri
     ) ERC721(_name, _symbol) {
         baseURI = _uri;
-        cap = _cap;
     }
 
     /** @dev Mints a new token to `msg.sender`. */
     function mint(address to) public onlyOwner {
-        require(totalSupply() < cap, "BaseERC721: Max supply reached.");
         _safeMint(to, totalSupply() + 1);
     }
 

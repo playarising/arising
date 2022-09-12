@@ -16,8 +16,7 @@ contract IKarans is BaseERC721 {
         BaseERC721(
             "Arising: I'Karans",
             "ARISING",
-            "https://characters.playarising.com/ikarans/",
-            2500
+            "https://characters.playarising.com/ikarans/"
         )
     {}
 }
