@@ -58,10 +58,14 @@ contract Names is INames {
         public
         onlyAllowed(id)
     {
-        require(isNameValid(name), "Name: name trying to claim is not valid");
+        require(
+            bytes(names[id]).length == 0,
+            "Name: token already have a name."
+        );
+        require(isNameValid(name), "Name: name trying to claim is not valid.");
         require(
             isNameAvailable(name),
-            "Name: name trying to claim is already claimed"
+            "Name: name trying to claim is already claimed."
         );
         claimed_names[toLowerCase(name)] = true;
         names[id] = name;
@@ -116,7 +120,7 @@ contract Names is INames {
      * @param str   String to checked.
      */
     function isNameAvailable(string memory str) public view returns (bool) {
-        return claimed_names[toLowerCase(str)];
+        return !claimed_names[toLowerCase(str)];
     }
 
     /**

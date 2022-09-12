@@ -24,6 +24,9 @@ describe("Names", () => {
     await this.civ.mint(this.ard.address, {
       value: ethers.utils.parseEther("1"),
     });
+    await this.civ.mint(this.ard.address, {
+      value: ethers.utils.parseEther("1"),
+    });
 
     const Names = await ethers.getContractFactory("Names");
     this.names = await Names.deploy(this.civ.address);
@@ -55,6 +58,34 @@ describe("Names", () => {
   it("should convert names to lowercase correctly", async () => {
     expect(await this.names.toLowerCase("CoNaN tH3 B4rb")).to.eq(
       "conan th3 b4rb"
+    );
+  });
+
+  it("should fail trying to claim an invalid name", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.names.claimName(id, "trailing space ")).to.revertedWith(
+      "Name: name trying to claim is not valid."
+    );
+  });
+
+  it("should claim a name for a token", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 1);
+    expect(await this.names.getTokenName(id)).to.eq("");
+    await this.names.claimName(id, "Conan de Barbarian");
+    expect(await this.names.getTokenName(id)).to.eq("Conan de Barbarian");
+  });
+
+  it("should fail trying to claim a name already claimed for a token", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 2);
+    await expect(
+      this.names.claimName(id, "Conan de Barbarian")
+    ).to.revertedWith("Name: name trying to claim is already claimed.");
+  });
+
+  it("should fail to claim a name for a token with a name already claimed", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.names.claimName(id, "Conan")).to.revertedWith(
+      "Name: token already have a name."
     );
   });
 });
