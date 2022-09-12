@@ -88,4 +88,35 @@ describe("Names", () => {
       "Name: token already have a name."
     );
   });
+
+  it("should fail trying to replace an invalid name", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.names.replaceName(id, "trailing space ")).to.revertedWith(
+      "Name: name trying to replace with is not valid."
+    );
+  });
+
+  it("should fail trying to replace a name for a token with no name", async () => {
+    const id2 = this.civ.getTokenID(this.ard.address, 2);
+    await expect(
+      this.names.replaceName(id2, "Gandalf the White")
+    ).to.revertedWith("Name: can't replace name of token without a name.");
+  });
+
+  it("should fail trying to replace an already used name", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 1);
+    const id2 = this.civ.getTokenID(this.ard.address, 2);
+    await this.names.claimName(id2, "Gandalf the White");
+    await expect(
+      this.names.replaceName(id, "Gandalf the White")
+    ).to.revertedWith("Name: name trying to replace with is already claimed.");
+  });
+
+  it("should replace a name correctly", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 1);
+    expect(await this.names.getTokenName(id)).to.eq("Conan de Barbarian");
+    await this.names.replaceName(id, "Radagast The Brown");
+    expect(await this.names.getTokenName(id)).to.eq("Radagast The Brown");
+    expect(await this.names.isNameAvailable("Conan de Barbarian")).to.eq(true);
+  });
 });

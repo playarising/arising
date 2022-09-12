@@ -82,13 +82,17 @@ contract Names is INames {
     {
         require(
             isNameValid(newName),
-            "Name: name trying to replace with is not valid"
+            "Name: name trying to replace with is not valid."
         );
         require(
             isNameAvailable(newName),
-            "Name: name trying to replace with is already claimed"
+            "Name: name trying to replace with is already claimed."
         );
         string memory oldName = names[id];
+        require(
+            bytes(oldName).length != 0,
+            "Name: can't replace name of token without a name."
+        );
         claimed_names[toLowerCase(oldName)] = false;
         claimed_names[toLowerCase(newName)] = false;
 
@@ -101,6 +105,10 @@ contract Names is INames {
      */
     function clearName(bytes memory id) public onlyAllowed(id) {
         string memory oldName = names[id];
+        require(
+            bytes(oldName).length != 0,
+            "Name: can't clear name of token without a name."
+        );
         claimed_names[toLowerCase(oldName)] = false;
         names[id] = "";
     }
