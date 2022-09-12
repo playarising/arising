@@ -29,11 +29,23 @@ contract Stats is Ownable, IStats {
     /** @dev Implementation of the `Refresher` **/
     address public refresher;
 
+    /** @dev Implementation of the `Vitalizer` **/
+    address public vitalizer;
+
     /** @dev Address of the `Civilizations` instance. **/
     address public civilizations;
 
     /** @dev Address of the `Experience` instance. **/
     address public experience;
+
+    /** @dev Map to track the usage of vitality tokens. **/
+    mapping(bytes => uint256) public vitality_uses;
+
+    /** @dev Map to track the daily usages of refresher tokens. **/
+    mapping(bytes => uint256) public refresher_counts;
+
+    /** @dev Map to track the first refresher usage timestamp. **/
+    mapping(bytes => uint256) public refresher_usage_time;
 
     // =============================================== Modifiers ======================================================
 
@@ -69,6 +81,13 @@ contract Stats is Ownable, IStats {
      */
     function setRefreshToken(address _token) public onlyOwner {
         refresher = _token;
+    }
+
+    /** @dev Sets the `Vitalizer` instance.
+     *  @param _token   address of the `Vitalizer` instance.
+     */
+    function setVitalizerToken(address _token) public onlyOwner {
+        vitalizer = _token;
     }
 
     /** @dev Reduces stats points from the pool.
@@ -139,7 +158,7 @@ contract Stats is Ownable, IStats {
     function refresh(bytes memory id) public onlyAllowed(id) {
         uint256 last = last_refresh[id];
         require(
-            last == 0 || last + REFRESH_COOLDOWN_SECONDS <= block.timestamp,
+            last == 0 || getNextRefreshTime(id) <= block.timestamp,
             "Stats: not enough time has passed to refresh pool"
         );
         pool[id].might = base[id].might;
@@ -152,6 +171,21 @@ contract Stats is Ownable, IStats {
      *  @param id   Composed ID of the token.
      */
     function refreshWithToken(bytes memory id) public onlyAllowed(id) {
+        require(
+            IERC20(refresher).balanceOf(msg.sender) >= 1,
+            "Stats: not enough refresh tokens balance to perform a refresh."
+        );
+        require(
+            IERC20(refresher).allowance(msg.sender, address(this)) >= 1,
+            "Stats: not enough refresh tokens allowance to perform a refresh."
+        );
+
+        require(
+            refresher_counts[id] < 5 ||
+                getNextRefreshWithTokenTime(id) <= block.timestamp,
+            "Stats: already five refreshers used for the day."
+        );
+
         ERC20Burnable(refresher).burnFrom(msg.sender, 1);
 
         if ((base[id].might - pool[id].might) > 20) {
@@ -172,7 +206,51 @@ contract Stats is Ownable, IStats {
             pool[id].intelect = base[id].intelect;
         }
 
-        last_refresh[id] = block.timestamp;
+        if (getNextRefreshWithTokenTime(id) <= block.timestamp) {
+            refresher_counts[id] = 0;
+            refresher_usage_time[id] = block.timestamp;
+        }
+
+        refresher_counts[id] += 1;
+    }
+
+    /** @dev Consumes a vitalizer token to increase one point of a base stat.
+     *  @param id         Composed ID of the token.
+     *  @param might      Amount of might stat points increasing.
+     *  @param speed      Amount of speed stat points increasing.
+     *  @param intelect   Amount of intelect stat points increasing.
+     */
+    function consumeVitalizer(
+        bytes memory id,
+        uint256 might,
+        uint256 speed,
+        uint256 intelect
+    ) public onlyAllowed(id) {
+        require(
+            vitality_uses[id] < 10,
+            "Stats: character already used all possible vitalize consumes."
+        );
+        uint256 sum = might + speed + intelect;
+        require(
+            sum == 1,
+            "Stats: vitalizer should increase one point for a single stat."
+        );
+        require(
+            IERC20(vitalizer).balanceOf(msg.sender) >= 1,
+            "Stats: not enough vitalizer tokens balance to perform a vitalize."
+        );
+        require(
+            IERC20(vitalizer).allowance(msg.sender, address(this)) >= 1,
+            "Stats: not enough vitalizer tokens allowance to perform a vitalize."
+        );
+
+        ERC20Burnable(vitalizer).burnFrom(msg.sender, 1);
+
+        base[id].might += might;
+        base[id].speed += speed;
+        base[id].intelect += intelect;
+
+        vitality_uses[id] += 1;
     }
 
     /** @dev Assigns the points to the base pool.
@@ -233,11 +311,22 @@ contract Stats is Ownable, IStats {
         return assignableByLevel - sum;
     }
 
-    /** @dev Returns the amount of points available to assign.
+    /** @dev Returns the time for the next free refresh.
      *  @param id   Composed ID of the token.
      */
     function getNextRefreshTime(bytes memory id) public view returns (uint256) {
         return last_refresh[id] + REFRESH_COOLDOWN_SECONDS;
+    }
+
+    /** @dev Returns the time of the refresh with tokens reset.
+     *  @param id   Composed ID of the token.
+     */
+    function getNextRefreshWithTokenTime(bytes memory id)
+        public
+        view
+        returns (uint256)
+    {
+        return refresher_usage_time[id] + REFRESH_COOLDOWN_SECONDS;
     }
 
     // =============================================== Internal ========================================================

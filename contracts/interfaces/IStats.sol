@@ -10,6 +10,8 @@ interface IStats {
 
     function setRefreshToken(address _token) external;
 
+    function setVitalizerToken(address _token) external;
+
     function consume(
         bytes memory id,
         uint256 might,
@@ -27,6 +29,13 @@ interface IStats {
     function refresh(bytes memory id) external;
 
     function refreshWithToken(bytes memory id) external;
+
+    function consumeVitalizer(
+        bytes memory id,
+        uint256 might,
+        uint256 speed,
+        uint256 intelect
+    ) external;
 
     function assignPoints(
         bytes memory id,
@@ -51,6 +60,11 @@ interface IStats {
         returns (uint256);
 
     function getNextRefreshTime(bytes memory id)
+        external
+        view
+        returns (uint256);
+
+    function getNextRefreshWithTokenTime(bytes memory id)
         external
         view
         returns (uint256);

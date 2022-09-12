@@ -35,7 +35,13 @@ describe("Stats", () => {
       ethers.utils.parseEther("1")
     );
     await this.refresher.deployed();
-    await this.refresher.mintFree(this.owner.address, 3);
+
+    const Vitalizer = await ethers.getContractFactory("Vitalizer");
+    this.vitalizer = await Vitalizer.deploy(
+      this.mock.address,
+      ethers.utils.parseEther("1")
+    );
+    await this.vitalizer.deployed();
 
     const Levels = await ethers.getContractFactory("Levels");
     const levels = await Levels.deploy();
@@ -67,6 +73,7 @@ describe("Stats", () => {
     await this.stats.deployed();
 
     await this.stats.setRefreshToken(this.refresher.address);
+    await this.stats.setVitalizerToken(this.vitalizer.address);
   });
 
   it("should deploy everything correctly", async () => {
@@ -103,9 +110,22 @@ describe("Stats", () => {
     await this.stats.setRefreshToken(this.refresher.address);
   });
 
+  it("should change the vitalizer token", async () => {
+    expect(await this.stats.vitalizer()).to.eq(this.vitalizer.address);
+    await this.stats.setVitalizerToken(this.mock.address);
+    expect(await this.stats.vitalizer()).to.eq(this.mock.address);
+    await this.stats.setVitalizerToken(this.vitalizer.address);
+  });
+
   it("should fail change the refresher token from non owner", async () => {
     await expect(
       this.stats.connect(this.receiver).setRefreshToken(this.mock.address)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should fail change the vitalizer token from non owner", async () => {
+    await expect(
+      this.stats.connect(this.receiver).setVitalizerToken(this.mock.address)
     ).to.revertedWith("Ownable: caller is not the owner");
   });
 
@@ -246,9 +266,24 @@ describe("Stats", () => {
     );
   });
 
+  it("should fail to use a refresh with token with no balance", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.stats.refreshWithToken(id)).to.revertedWith(
+      "Stats: not enough refresh tokens balance to perform a refresh."
+    );
+  });
+
+  it("should fail to use a refresh with token with no allowance", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.refresher.mintFree(this.owner.address, 6);
+    await expect(this.stats.refreshWithToken(id)).to.revertedWith(
+      "Stats: not enough refresh tokens allowance to perform a refresh."
+    );
+  });
+
   it("should be able to refresh using the refresher token", async () => {
     const id = await this.civ.getTokenID(this.ard.address, 1);
-    expect(await this.refresher.balanceOf(this.owner.address)).to.eq(3);
+    expect(await this.refresher.balanceOf(this.owner.address)).to.eq(6);
     await this.stats.consume(id, 45, 45, 45);
     let pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(4);
@@ -275,6 +310,30 @@ describe("Stats", () => {
     expect(pool.might).to.eq(49);
     expect(pool.speed).to.eq(49);
     expect(pool.intelect).to.eq(49);
-    expect(await this.refresher.balanceOf(this.owner.address)).to.eq(0);
+    expect(await this.refresher.balanceOf(this.owner.address)).to.eq(3);
+  });
+
+  it("should be not be able to use more than five refreshes a day", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.stats.refreshWithToken(id);
+    await this.stats.refreshWithToken(id);
+    await expect(this.stats.refreshWithToken(id)).to.revertedWith(
+      "Stats: already five refreshers used for the day."
+    );
+  });
+
+  it("should be able to use five new resets for the next day", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    const time = await this.stats.getNextRefreshWithTokenTime(id);
+    await ethers.provider.send("evm_mine", [time.toNumber()]);
+    await this.refresher.mintFree(this.owner.address, 5);
+    await this.stats.refreshWithToken(id);
+    await this.stats.refreshWithToken(id);
+    await this.stats.refreshWithToken(id);
+    await this.stats.refreshWithToken(id);
+    await this.stats.refreshWithToken(id);
+    await expect(this.stats.refreshWithToken(id)).to.revertedWith(
+      "Stats: already five refreshers used for the day."
+    );
   });
 });
