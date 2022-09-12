@@ -94,13 +94,13 @@ contract Stats is Ownable, IStats {
      *  @param id         Composed ID of the token.
      *  @param might      Amount of might stat points reducing.
      *  @param speed      Amount of speed stat points reducing.
-     *  @param intelect   Amount of intelect stat points reducing.
+     *  @param intellect   Amount of intellect stat points reducing.
      */
     function consume(
         bytes memory id,
         uint256 might,
         uint256 speed,
-        uint256 intelect
+        uint256 intellect
     ) public onlyAllowed(id) {
         CharacterStats storage currPool = pool[id];
         require(
@@ -112,26 +112,26 @@ contract Stats is Ownable, IStats {
             "Stats: cannot consume more speed than currently available."
         );
         require(
-            intelect <= currPool.intelect,
-            "Stats: cannot consume more intelect than currently available."
+            intellect <= currPool.intellect,
+            "Stats: cannot consume more intellect than currently available."
         );
 
         pool[id].might -= might;
         pool[id].speed -= speed;
-        pool[id].intelect -= intelect;
+        pool[id].intellect -= intellect;
     }
 
     /** @dev Reduces points to the base stats forever.
      *  @param id         Composed ID of the token.
      *  @param might      Amount of might stat points reducing.
      *  @param speed      Amount of speed stat points reducing.
-     *  @param intelect   Amount of intelect stat points reducing.
+     *  @param intellect   Amount of intellect stat points reducing.
      */
     function sacrifice(
         bytes memory id,
         uint256 might,
         uint256 speed,
-        uint256 intelect
+        uint256 intellect
     ) public onlyAllowed(id) {
         CharacterStats storage currBase = base[id];
         require(
@@ -143,13 +143,13 @@ contract Stats is Ownable, IStats {
             "Stats: cannot sacrifice more speed than currently available."
         );
         require(
-            intelect <= currBase.intelect,
-            "Stats: cannot sacrifice more intelect than currently available."
+            intellect <= currBase.intellect,
+            "Stats: cannot sacrifice more intellect than currently available."
         );
 
         base[id].might -= might;
         base[id].speed -= speed;
-        base[id].intelect -= intelect;
+        base[id].intellect -= intellect;
 
         if (pool[id].might > base[id].might) {
             pool[id].might = base[id].might;
@@ -159,8 +159,8 @@ contract Stats is Ownable, IStats {
             pool[id].speed = base[id].speed;
         }
 
-        if (pool[id].intelect > base[id].intelect) {
-            pool[id].intelect = base[id].intelect;
+        if (pool[id].intellect > base[id].intellect) {
+            pool[id].intellect = base[id].intellect;
         }
     }
 
@@ -175,7 +175,7 @@ contract Stats is Ownable, IStats {
         );
         pool[id].might = base[id].might;
         pool[id].speed = base[id].speed;
-        pool[id].intelect = base[id].intelect;
+        pool[id].intellect = base[id].intellect;
         last_refresh[id] = block.timestamp;
     }
 
@@ -212,10 +212,10 @@ contract Stats is Ownable, IStats {
             pool[id].speed = base[id].speed;
         }
 
-        if ((base[id].intelect - pool[id].intelect) > 20) {
-            pool[id].intelect += 20;
+        if ((base[id].intellect - pool[id].intellect) > 20) {
+            pool[id].intellect += 20;
         } else {
-            pool[id].intelect = base[id].intelect;
+            pool[id].intellect = base[id].intellect;
         }
 
         if (getNextRefreshWithTokenTime(id) <= block.timestamp) {
@@ -230,19 +230,19 @@ contract Stats is Ownable, IStats {
      *  @param id         Composed ID of the token.
      *  @param might      Amount of might stat points increasing.
      *  @param speed      Amount of speed stat points increasing.
-     *  @param intelect   Amount of intelect stat points increasing.
+     *  @param intellect   Amount of intellect stat points increasing.
      */
     function consumeVitalizer(
         bytes memory id,
         uint256 might,
         uint256 speed,
-        uint256 intelect
+        uint256 intellect
     ) public onlyAllowed(id) {
         require(
             vitality_uses[id] < 10,
             "Stats: character already used all possible vitalize consumes."
         );
-        uint256 sum = might + speed + intelect;
+        uint256 sum = might + speed + intellect;
         require(
             sum == 1,
             "Stats: vitalizer should increase one point for a single stat."
@@ -260,10 +260,10 @@ contract Stats is Ownable, IStats {
 
         base[id].might += might;
         base[id].speed += speed;
-        base[id].intelect += intelect;
+        base[id].intellect += intellect;
         pool[id].might += might;
         pool[id].speed += speed;
-        pool[id].intelect += intelect;
+        pool[id].intellect += intellect;
 
         vitality_uses[id] += 1;
     }
@@ -272,15 +272,15 @@ contract Stats is Ownable, IStats {
      *  @param id         Composed ID of the token.
      *  @param might     Amount of might stat points assign.
      *  @param speed     Amount of speed stat points assign.
-     *  @param intelect  Amount of intelect stat points assign.
+     *  @param intellect  Amount of intellect stat points assign.
      */
     function assignPoints(
         bytes memory id,
         uint256 might,
         uint256 speed,
-        uint256 intelect
+        uint256 intellect
     ) public onlyAllowed(id) {
-        uint256 sum = might + speed + intelect;
+        uint256 sum = might + speed + intellect;
         uint256 available = getAvailablePoints(id);
         require(
             sum <= available,
@@ -288,10 +288,10 @@ contract Stats is Ownable, IStats {
         );
         base[id].might += might;
         base[id].speed += speed;
-        base[id].intelect += intelect;
+        base[id].intellect += intellect;
         pool[id].might += might;
         pool[id].speed += speed;
-        pool[id].intelect += intelect;
+        pool[id].intellect += intellect;
     }
 
     // =============================================== Getters ========================================================
@@ -323,7 +323,7 @@ contract Stats is Ownable, IStats {
      */
     function getAvailablePoints(bytes memory id) public view returns (uint256) {
         CharacterStats memory p = base[id];
-        uint256 sum = p.intelect + p.might + p.speed;
+        uint256 sum = p.intellect + p.might + p.speed;
         uint256 level = IExperience(experience).getLevel(id);
         uint256 assignableByLevel = _assignablePointsByLevel(level);
         return assignableByLevel - sum;

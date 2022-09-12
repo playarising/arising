@@ -5,7 +5,7 @@ interface IStats {
     struct CharacterStats {
         uint256 might;
         uint256 speed;
-        uint256 intelect;
+        uint256 intellect;
     }
 
     function setRefreshToken(address _token) external;
@@ -16,14 +16,14 @@ interface IStats {
         bytes memory id,
         uint256 might,
         uint256 speed,
-        uint256 intelect
+        uint256 intellect
     ) external;
 
     function sacrifice(
         bytes memory id,
         uint256 might,
         uint256 speed,
-        uint256 intelect
+        uint256 intellect
     ) external;
 
     function refresh(bytes memory id) external;
@@ -34,14 +34,14 @@ interface IStats {
         bytes memory id,
         uint256 might,
         uint256 speed,
-        uint256 intelect
+        uint256 intellect
     ) external;
 
     function assignPoints(
         bytes memory id,
         uint256 might,
         uint256 speed,
-        uint256 intelect
+        uint256 intellect
     ) external;
 
     function getBaseStats(bytes memory id)

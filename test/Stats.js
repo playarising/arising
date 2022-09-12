@@ -85,11 +85,11 @@ describe("Stats", () => {
     const pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(0);
     expect(pool.speed).to.eq(0);
-    expect(pool.intelect).to.eq(0);
+    expect(pool.intellect).to.eq(0);
     const base = await this.stats.getBaseStats(id);
     expect(base.might).to.eq(0);
     expect(base.speed).to.eq(0);
-    expect(base.intelect).to.eq(0);
+    expect(base.intellect).to.eq(0);
   });
 
   it("should return the amount of available points correctly", async () => {
@@ -169,11 +169,11 @@ describe("Stats", () => {
     const pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(52);
     expect(pool.speed).to.eq(52);
-    expect(pool.intelect).to.eq(52);
+    expect(pool.intellect).to.eq(52);
     const base = await this.stats.getBaseStats(id);
     expect(base.might).to.eq(52);
     expect(base.speed).to.eq(52);
-    expect(base.intelect).to.eq(52);
+    expect(base.intellect).to.eq(52);
     expect(await this.stats.getAvailablePoints(id)).to.eq(0);
   });
 
@@ -198,30 +198,30 @@ describe("Stats", () => {
     let pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(51);
     expect(base.speed).to.eq(51);
-    expect(base.intelect).to.eq(51);
+    expect(base.intellect).to.eq(51);
     expect(pool.might).to.eq(51);
     expect(pool.speed).to.eq(51);
-    expect(pool.intelect).to.eq(51);
+    expect(pool.intellect).to.eq(51);
     await this.ard.approve(this.receiver.address, 1);
     await this.stats.connect(this.receiver).sacrifice(id, 1, 1, 1);
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(50);
     expect(base.speed).to.eq(50);
-    expect(base.intelect).to.eq(50);
+    expect(base.intellect).to.eq(50);
     expect(pool.might).to.eq(50);
     expect(pool.speed).to.eq(50);
-    expect(pool.intelect).to.eq(50);
+    expect(pool.intellect).to.eq(50);
     await this.ard.setApprovalForAll(this.allowed.address, true);
     await this.stats.connect(this.allowed).sacrifice(id, 1, 1, 1);
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(49);
     expect(base.speed).to.eq(49);
-    expect(base.intelect).to.eq(49);
+    expect(base.intellect).to.eq(49);
     expect(pool.might).to.eq(49);
     expect(pool.speed).to.eq(49);
-    expect(pool.intelect).to.eq(49);
+    expect(pool.intellect).to.eq(49);
   });
 
   it("should fail consume when pool is empty", async () => {
@@ -234,7 +234,7 @@ describe("Stats", () => {
       "Stats: cannot consume more speed than currently available"
     );
     await expect(this.stats.consume(id, 0, 0, 1)).revertedWith(
-      "Stats: cannot consume more intelect than currently available"
+      "Stats: cannot consume more intellect than currently available"
     );
   });
 
@@ -244,7 +244,7 @@ describe("Stats", () => {
     const pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(49);
     expect(pool.speed).to.eq(49);
-    expect(pool.intelect).to.eq(49);
+    expect(pool.intellect).to.eq(49);
     await expect(this.stats.refresh(id)).to.revertedWith(
       "Stats: not enough time has passed to refresh pool"
     );
@@ -257,13 +257,13 @@ describe("Stats", () => {
     let pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(4);
     expect(pool.speed).to.eq(4);
-    expect(pool.intelect).to.eq(4);
+    expect(pool.intellect).to.eq(4);
     await ethers.provider.send("evm_mine", [nextTime.toNumber()]);
     await this.stats.refresh(id);
     pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(49);
     expect(pool.speed).to.eq(49);
-    expect(pool.intelect).to.eq(49);
+    expect(pool.intellect).to.eq(49);
   });
 
   it("should fail to sacrifice more points than available", async () => {
@@ -275,7 +275,7 @@ describe("Stats", () => {
       "Stats: cannot sacrifice more speed than currently available"
     );
     await expect(this.stats.sacrifice(id, 0, 0, 50)).revertedWith(
-      "Stats: cannot sacrifice more intelect than currently available"
+      "Stats: cannot sacrifice more intellect than currently available"
     );
   });
 
@@ -301,7 +301,7 @@ describe("Stats", () => {
     let pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(4);
     expect(pool.speed).to.eq(4);
-    expect(pool.intelect).to.eq(4);
+    expect(pool.intellect).to.eq(4);
     await expect(this.stats.refresh(id)).to.revertedWith(
       "Stats: not enough time has passed to refresh pool"
     );
@@ -310,19 +310,19 @@ describe("Stats", () => {
     pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(24);
     expect(pool.speed).to.eq(24);
-    expect(pool.intelect).to.eq(24);
+    expect(pool.intellect).to.eq(24);
 
     await this.stats.refreshWithToken(id);
     pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(44);
     expect(pool.speed).to.eq(44);
-    expect(pool.intelect).to.eq(44);
+    expect(pool.intellect).to.eq(44);
 
     await this.stats.refreshWithToken(id);
     pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(49);
     expect(pool.speed).to.eq(49);
-    expect(pool.intelect).to.eq(49);
+    expect(pool.intellect).to.eq(49);
     expect(await this.refresher.balanceOf(this.owner.address)).to.eq(3);
   });
 
@@ -385,91 +385,91 @@ describe("Stats", () => {
     let pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(50);
     expect(base.speed).to.eq(49);
-    expect(base.intelect).to.eq(49);
+    expect(base.intellect).to.eq(49);
     expect(pool.might).to.eq(30);
     expect(pool.speed).to.eq(29);
-    expect(pool.intelect).to.eq(29);
+    expect(pool.intellect).to.eq(29);
     await this.stats.consumeVitalizer(id, 0, 1, 0);
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(50);
     expect(base.speed).to.eq(50);
-    expect(base.intelect).to.eq(49);
+    expect(base.intellect).to.eq(49);
     expect(pool.might).to.eq(30);
     expect(pool.speed).to.eq(30);
-    expect(pool.intelect).to.eq(29);
+    expect(pool.intellect).to.eq(29);
     await this.stats.consumeVitalizer(id, 0, 0, 1);
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(50);
     expect(base.speed).to.eq(50);
-    expect(base.intelect).to.eq(50);
+    expect(base.intellect).to.eq(50);
     expect(pool.might).to.eq(30);
     expect(pool.speed).to.eq(30);
-    expect(pool.intelect).to.eq(30);
+    expect(pool.intellect).to.eq(30);
     await this.stats.consumeVitalizer(id, 1, 0, 0);
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(51);
     expect(base.speed).to.eq(50);
-    expect(base.intelect).to.eq(50);
+    expect(base.intellect).to.eq(50);
     expect(pool.might).to.eq(31);
     expect(pool.speed).to.eq(30);
-    expect(pool.intelect).to.eq(30);
+    expect(pool.intellect).to.eq(30);
     await this.stats.consumeVitalizer(id, 0, 1, 0);
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(51);
     expect(base.speed).to.eq(51);
-    expect(base.intelect).to.eq(50);
+    expect(base.intellect).to.eq(50);
     expect(pool.might).to.eq(31);
     expect(pool.speed).to.eq(31);
-    expect(pool.intelect).to.eq(30);
+    expect(pool.intellect).to.eq(30);
     await this.stats.consumeVitalizer(id, 0, 0, 1);
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(51);
     expect(base.speed).to.eq(51);
-    expect(base.intelect).to.eq(51);
+    expect(base.intellect).to.eq(51);
     expect(pool.might).to.eq(31);
     expect(pool.speed).to.eq(31);
-    expect(pool.intelect).to.eq(31);
+    expect(pool.intellect).to.eq(31);
     await this.stats.consumeVitalizer(id, 1, 0, 0);
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(52);
     expect(base.speed).to.eq(51);
-    expect(base.intelect).to.eq(51);
+    expect(base.intellect).to.eq(51);
     expect(pool.might).to.eq(32);
     expect(pool.speed).to.eq(31);
-    expect(pool.intelect).to.eq(31);
+    expect(pool.intellect).to.eq(31);
     await this.stats.consumeVitalizer(id, 0, 1, 0);
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(52);
     expect(base.speed).to.eq(52);
-    expect(base.intelect).to.eq(51);
+    expect(base.intellect).to.eq(51);
     expect(pool.might).to.eq(32);
     expect(pool.speed).to.eq(32);
-    expect(pool.intelect).to.eq(31);
+    expect(pool.intellect).to.eq(31);
     await this.stats.consumeVitalizer(id, 0, 0, 1);
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(52);
     expect(base.speed).to.eq(52);
-    expect(base.intelect).to.eq(52);
+    expect(base.intellect).to.eq(52);
     expect(pool.might).to.eq(32);
     expect(pool.speed).to.eq(32);
-    expect(pool.intelect).to.eq(32);
+    expect(pool.intellect).to.eq(32);
     await this.stats.consumeVitalizer(id, 1, 0, 0);
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(53);
     expect(base.speed).to.eq(52);
-    expect(base.intelect).to.eq(52);
+    expect(base.intellect).to.eq(52);
     expect(pool.might).to.eq(33);
     expect(pool.speed).to.eq(32);
-    expect(pool.intelect).to.eq(32);
+    expect(pool.intellect).to.eq(32);
   });
 
   it("should not change pool values when sacrifice and pool has less than max", async () => {
@@ -479,10 +479,10 @@ describe("Stats", () => {
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(52);
     expect(base.speed).to.eq(51);
-    expect(base.intelect).to.eq(51);
+    expect(base.intellect).to.eq(51);
     expect(pool.might).to.eq(33);
     expect(pool.speed).to.eq(32);
-    expect(pool.intelect).to.eq(32);
+    expect(pool.intellect).to.eq(32);
   });
 
   it("should fail to use a vitalizer when limit reached", async () => {
