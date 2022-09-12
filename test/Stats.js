@@ -472,6 +472,19 @@ describe("Stats", () => {
     expect(pool.intelect).to.eq(32);
   });
 
+  it("should not change pool values when sacrifice and pool has less than max", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.stats.sacrifice(id, 1, 1, 1);
+    base = await this.stats.getBaseStats(id);
+    pool = await this.stats.getPoolStats(id);
+    expect(base.might).to.eq(52);
+    expect(base.speed).to.eq(51);
+    expect(base.intelect).to.eq(51);
+    expect(pool.might).to.eq(33);
+    expect(pool.speed).to.eq(32);
+    expect(pool.intelect).to.eq(32);
+  });
+
   it("should fail to use a vitalizer when limit reached", async () => {
     const id = await this.civ.getTokenID(this.ard.address, 1);
     await this.vitalizer.mintFree(this.owner.address, 1);
