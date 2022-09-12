@@ -299,4 +299,112 @@ describe("Civilizations", () => {
       )
     ).to.eq(false);
   });
+
+  it("should fail to set upgrade price from non owner", async () => {
+    await expect(
+      this.civ.connect(this.minter).setUpgradePrice(1, 1)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should fail to set intialize upgrade from non owner", async () => {
+    await expect(
+      this.civ.connect(this.minter).setInitializeUpgrade(1, 1)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should fail to set intialize charge token from non owner", async () => {
+    await expect(
+      this.civ.connect(this.minter).setToken(this.owner.address)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should fail when trying to set price and initialize invalid upgrades", async () => {
+    await expect(this.civ.setUpgradePrice(0, 1)).to.revertedWith(
+      "Civilizations: upgrade id doesn't exist."
+    );
+    await expect(this.civ.setUpgradePrice(4, 1)).to.revertedWith(
+      "Civilizations: upgrade id doesn't exist."
+    );
+    await expect(this.civ.setInitializeUpgrade(0, 1)).to.revertedWith(
+      "Civilizations: upgrade id doesn't exist."
+    );
+    await expect(this.civ.setInitializeUpgrade(4, 1)).to.revertedWith(
+      "Civilizations: upgrade id doesn't exist."
+    );
+  });
+
+  it("should fail trying to initialize an upgrade when no price is set", async () => {
+    await expect(this.civ.setInitializeUpgrade(1, 1)).to.revertedWith(
+      "Civilizations: to initialize an upgrade set the price first."
+    );
+    await expect(this.civ.setInitializeUpgrade(2, 1)).to.revertedWith(
+      "Civilizations: to initialize an upgrade set the price first."
+    );
+    await expect(this.civ.setInitializeUpgrade(3, 1)).to.revertedWith(
+      "Civilizations: to initialize an upgrade set the price first."
+    );
+  });
+
+  it("should fail to get information of an invalid upgrade", async () => {
+    await expect(this.civ.getUpgradeInformation(0)).to.revertedWith(
+      "Civilizations: upgrade id doesn't exist."
+    );
+    await expect(this.civ.getUpgradeInformation(4)).to.revertedWith(
+      "Civilizations: upgrade id doesn't exist."
+    );
+  });
+
+  it("should set the price of the upgrades correctly", async () => {
+    await this.civ.setUpgradePrice(1, ethers.utils.parseEther("39.99"));
+    await this.civ.setUpgradePrice(2, ethers.utils.parseEther("49.99"));
+    await this.civ.setUpgradePrice(3, ethers.utils.parseEther("89.99"));
+    const upgrade1 = await this.civ.getUpgradeInformation(1);
+    expect(upgrade1.available).to.eq(false);
+    expect(upgrade1.price).to.eq(ethers.utils.parseEther("39.99"));
+    const upgrade2 = await this.civ.getUpgradeInformation(2);
+    expect(upgrade2.available).to.eq(false);
+    expect(upgrade2.price).to.eq(ethers.utils.parseEther("49.99"));
+    const upgrade3 = await this.civ.getUpgradeInformation(3);
+    expect(upgrade3.available).to.eq(false);
+    expect(upgrade3.price).to.eq(ethers.utils.parseEther("89.99"));
+  });
+
+  it("should change the charge token correctly", async () => {
+    await this.civ.setToken(this.owner.address);
+    expect(await this.civ.token()).to.eq(this.owner.address);
+    await this.civ.setToken(this.mock.address);
+    expect(await this.civ.token()).to.eq(this.mock.address);
+  });
+
+  it("should set initialize upgrades correctly", async () => {
+    await this.civ.setInitializeUpgrade(1, true);
+    await this.civ.setInitializeUpgrade(2, true);
+    await this.civ.setInitializeUpgrade(3, true);
+    let upgrade1 = await this.civ.getUpgradeInformation(1);
+    expect(upgrade1.available).to.eq(true);
+    let upgrade2 = await this.civ.getUpgradeInformation(2);
+    expect(upgrade2.available).to.eq(true);
+    let upgrade3 = await this.civ.getUpgradeInformation(3);
+    expect(upgrade3.available).to.eq(true);
+
+    await this.civ.setInitializeUpgrade(1, false);
+    await this.civ.setInitializeUpgrade(2, false);
+    await this.civ.setInitializeUpgrade(3, false);
+    upgrade1 = await this.civ.getUpgradeInformation(1);
+    expect(upgrade1.available).to.eq(false);
+    upgrade2 = await this.civ.getUpgradeInformation(2);
+    expect(upgrade2.available).to.eq(false);
+    upgrade3 = await this.civ.getUpgradeInformation(3);
+    expect(upgrade3.available).to.eq(false);
+
+    await this.civ.setInitializeUpgrade(1, true);
+    await this.civ.setInitializeUpgrade(2, true);
+    await this.civ.setInitializeUpgrade(3, true);
+    upgrade1 = await this.civ.getUpgradeInformation(1);
+    expect(upgrade1.available).to.eq(true);
+    upgrade2 = await this.civ.getUpgradeInformation(2);
+    expect(upgrade2.available).to.eq(true);
+    upgrade3 = await this.civ.getUpgradeInformation(3);
+    expect(upgrade3.available).to.eq(true);
+  });
 });

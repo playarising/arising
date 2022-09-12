@@ -15,7 +15,7 @@ interface ICivilizations {
 
     function setInitialized() external;
 
-    function setInitializeUpgrade(uint256 upgrade, uint256 price) external;
+    function setInitializeUpgrade(uint256 upgrade, bool available) external;
 
     function setUpgradePrice(uint256 upgrade, uint256 price) external;
 

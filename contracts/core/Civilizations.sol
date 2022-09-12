@@ -65,25 +65,33 @@ contract Civilizations is Ownable, ICivilizations {
     }
 
     /** @dev Adds a civilization to the contract.
-     *  @param upgrade  The ID of the upgrade.
-     *  @param price  The amount of tokens to charge for the upgrade.
+     *  @param upgrade      The ID of the upgrade.
+     *  @param available    The availability of the upgrade.
      */
-    function setInitializeUpgrade(uint256 upgrade, uint256 price)
+    function setInitializeUpgrade(uint256 upgrade, bool available)
         public
         onlyOwner
     {
         require(
-            upgrades[upgrade].price != 0,
-            "Civilizations: to initialize an upgrade set the price first"
+            upgrade > 0 && upgrade <= 3,
+            "Civilizations: upgrade id doesn't exist."
         );
-        upgrades[upgrade].price = price;
+        require(
+            upgrades[upgrade].price != 0,
+            "Civilizations: to initialize an upgrade set the price first."
+        );
+        upgrades[upgrade].available = available;
     }
 
     /** @dev Adds a civilization to the contract.
      *  @param upgrade  The ID of the upgrade.
-     *  @param price  The amount of tokens to charge for the upgrade.
+     *  @param price    The amount of tokens to charge for the upgrade.
      */
     function setUpgradePrice(uint256 upgrade, uint256 price) public onlyOwner {
+        require(
+            upgrade > 0 && upgrade <= 3,
+            "Civilizations: upgrade id doesn't exist."
+        );
         upgrades[upgrade].price = price;
     }
 
@@ -138,8 +146,12 @@ contract Civilizations is Ownable, ICivilizations {
      */
     function buyUpgrade(bytes memory id, uint256 upgrade) public {
         require(
-            upgrades[upgrade].price != 0,
-            "Civilizations: can't purchase an upgrade with zero value."
+            isAllowed(msg.sender, id),
+            "Civilizations: can't purchase for a non owned token."
+        );
+        require(
+            upgrades[upgrade].available,
+            "Civilizations: can't purchase an upgrade not initialized."
         );
         require(
             upgrade > 0 && upgrade <= 3,
@@ -204,6 +216,21 @@ contract Civilizations is Ownable, ICivilizations {
             _upgrades.upgrade_2[id],
             _upgrades.upgrade_3[id]
         );
+    }
+
+    /** @dev Returns the upgrades for a composed ID.
+     *  @param upgrade ID of the upgrade.
+     */
+    function getUpgradeInformation(uint256 upgrade)
+        public
+        view
+        returns (Upgrade memory)
+    {
+        require(
+            upgrade > 0 && upgrade <= 3,
+            "Civilizations: upgrade id doesn't exist."
+        );
+        return upgrades[upgrade];
     }
 
     /** @dev Returns the list of civilizations.
