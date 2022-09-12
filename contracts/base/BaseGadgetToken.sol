@@ -54,6 +54,15 @@ contract BaseGadgetToken is ERC20Burnable, Ownable, IBaseGadgetToken {
      * @param amount    Amount of tokens to mint.
      */
     function mint(uint256 amount) public {
+        require(
+            IERC20(token).balanceOf(msg.sender) >= totalCost(amount),
+            "BaseGadgetToken: not enough balance of payment tokens to mint tokens."
+        );
+        require(
+            IERC20(token).allowance(msg.sender, address(this)) >=
+                totalCost(amount),
+            "BaseGadgetToken: not enough allowance to mint tokens."
+        );
         IERC20(token).transferFrom(msg.sender, address(this), (amount * price));
         _mint(msg.sender, amount);
     }
@@ -76,6 +85,14 @@ contract BaseGadgetToken is ERC20Burnable, Ownable, IBaseGadgetToken {
     }
 
     // =============================================== Getters ========================================================
+
+    /**
+     * @dev Returns the total cost to mint a number of tokens.
+     * @param amount    Amount of tokens to mint.
+     */
+    function totalCost(uint256 amount) public view returns (uint256) {
+        return amount * price;
+    }
 
     /** @dev Overrides the ERC20 `decimals` function with an URI specified over the constructor. */
     function decimals() public view virtual override returns (uint8) {

@@ -276,6 +276,5 @@ describe("Stats", () => {
     expect(pool.speed).to.eq(49);
     expect(pool.intelect).to.eq(49);
     expect(await this.refresher.balanceOf(this.owner.address)).to.eq(0);
-
   });
 });

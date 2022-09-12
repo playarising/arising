@@ -5,4 +5,6 @@ interface IBaseGadgetToken {
     function mint(uint256 amount) external;
 
     function withdraw() external;
+
+    function totalCost(uint256 amount) external returns (uint256);
 }

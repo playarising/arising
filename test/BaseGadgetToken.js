@@ -35,15 +35,31 @@ describe("BaseGadgetToken", () => {
     );
   });
 
-  it("should be able to mint tokens", async () => {
+  it("should not be able to mint tokens with no balance of payment token", async () => {
+    await expect(this.token.connect(this.minter).mint(5)).to.revertedWith(
+      "BaseGadgetToken: not enough balance of payment tokens to mint tokens."
+    );
+  });
+
+  it("should return the total cost correctly", async () => {
+    expect(await this.token.totalCost(1)).to.eq(ethers.utils.parseEther("1"));
+    expect(await this.token.totalCost(2)).to.eq(ethers.utils.parseEther("2"));
+    expect(await this.token.totalCost(4)).to.eq(ethers.utils.parseEther("4"));
+    expect(await this.token.totalCost(10)).to.eq(ethers.utils.parseEther("10"));
+  });
+
+  it("should not be able to mint tokens for not enough allowance", async () => {
     expect(await this.mock.balanceOf(this.minter.address)).to.eq(0);
     await this.mock.transfer(this.minter.address, ethers.utils.parseEther("5"));
     expect(await this.mock.balanceOf(this.minter.address)).to.eq(
       ethers.utils.parseEther("5")
     );
-    expect(await this.mock.balanceOf(this.owner.address)).to.eq(
-      ethers.utils.parseEther("5")
+    await expect(this.token.connect(this.minter).mint(5)).to.revertedWith(
+      "BaseGadgetToken: not enough allowance to mint tokens."
     );
+  });
+
+  it("should be able to mint tokens", async () => {
     expect(await this.token.balanceOf(this.minter.address)).to.eq(0);
     await this.mock
       .connect(this.minter)
