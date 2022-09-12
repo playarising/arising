@@ -336,4 +336,93 @@ describe("Stats", () => {
       "Stats: already five refreshers used for the day."
     );
   });
+
+  it("should fail to use a vitalizer with no tokens", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.stats.consumeVitalizer(id, 1, 0, 0)).to.revertedWith(
+      "Stats: not enough vitalizer tokens balance to perform a vitalize."
+    );
+  });
+
+  it("should fail to use a vitalizer with no allowance", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.vitalizer.mintFree(this.owner.address, 10);
+    await expect(this.stats.consumeVitalizer(id, 1, 0, 0)).to.revertedWith(
+      "Stats: not enough vitalizer tokens allowance to perform a vitalize."
+    );
+  });
+
+  it("should fail to use a vitalizer when trying to upgrade more than one stat or empty", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.vitalizer.mintFree(this.owner.address, 10);
+    await this.vitalizer.approve(this.stats.address, 10);
+    await expect(this.stats.consumeVitalizer(id, 1, 1, 0)).to.revertedWith(
+      "Stats: vitalizer should increase one point for a single stat."
+    );
+    await expect(this.stats.consumeVitalizer(id, 0, 0, 0)).to.revertedWith(
+      "Stats: vitalizer should increase one point for a single stat."
+    );
+  });
+
+  it("should use vitalizer correctly", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.stats.consumeVitalizer(id, 1, 0, 0);
+    let base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(50);
+    expect(base.speed).to.eq(49);
+    expect(base.intelect).to.eq(49);
+    await this.stats.consumeVitalizer(id, 0, 1, 0);
+    base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(50);
+    expect(base.speed).to.eq(50);
+    expect(base.intelect).to.eq(49);
+    await this.stats.consumeVitalizer(id, 0, 0, 1);
+    base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(50);
+    expect(base.speed).to.eq(50);
+    expect(base.intelect).to.eq(50);
+    await this.stats.consumeVitalizer(id, 1, 0, 0);
+    base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(51);
+    expect(base.speed).to.eq(50);
+    expect(base.intelect).to.eq(50);
+    await this.stats.consumeVitalizer(id, 0, 1, 0);
+    base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(51);
+    expect(base.speed).to.eq(51);
+    expect(base.intelect).to.eq(50);
+    await this.stats.consumeVitalizer(id, 0, 0, 1);
+    base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(51);
+    expect(base.speed).to.eq(51);
+    expect(base.intelect).to.eq(51);
+    await this.stats.consumeVitalizer(id, 1, 0, 0);
+    base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(52);
+    expect(base.speed).to.eq(51);
+    expect(base.intelect).to.eq(51);
+    await this.stats.consumeVitalizer(id, 0, 1, 0);
+    base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(52);
+    expect(base.speed).to.eq(52);
+    expect(base.intelect).to.eq(51);
+    await this.stats.consumeVitalizer(id, 0, 0, 1);
+    base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(52);
+    expect(base.speed).to.eq(52);
+    expect(base.intelect).to.eq(52);
+    await this.stats.consumeVitalizer(id, 1, 0, 0);
+    base = await this.stats.getBaseStats(id);
+    expect(base.might).to.eq(53);
+    expect(base.speed).to.eq(52);
+    expect(base.intelect).to.eq(52);
+  });
+
+  it("should fail to use a vitalizer when limit reached", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.vitalizer.mintFree(this.owner.address, 1);
+    await expect(this.stats.consumeVitalizer(id, 1, 0, 0)).to.revertedWith(
+      "Stats: character already used all possible vitalize consumes."
+    );
+  });
 });
