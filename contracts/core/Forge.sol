@@ -10,13 +10,25 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract Forge is Ownable {
     // =============================================== Structs ========================================================
     // =============================================== Storage ========================================================
+
+    /** @dev Address of the `Civilizations` instance. **/
+    address public civilizations;
+
+    /** @dev Address of the `Experience` instance. **/
+    address public experience;
+
     // =============================================== Modifiers ======================================================
     // =============================================== Setters ========================================================
 
     /**
      * @dev Constructor.
+     * @param _civilizations    The address of the `Civilizations` instance.
+     * @param _experience       The address of the `Experience` instance.
      */
-    constructor() {}
+    constructor(address _civilizations, address _experience) {
+        civilizations = _civilizations;
+        experience = _experience;
+    }
 
     // =============================================== Getters ========================================================
     // =============================================== Internal =======================================================
