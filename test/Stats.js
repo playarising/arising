@@ -437,15 +437,13 @@ describe("Stats", () => {
     expect(pool.might).to.eq(27);
     expect(pool.speed).to.eq(27);
     expect(pool.intellect).to.eq(27);
-    await this.stats.consumeVitalizer(id, 1, 0, 0);
-    base = await this.stats.getBaseStats(id);
-    pool = await this.stats.getPoolStats(id);
-    expect(base.might).to.eq(53);
-    expect(base.speed).to.eq(52);
-    expect(base.intellect).to.eq(52);
-    expect(pool.might).to.eq(28);
-    expect(pool.speed).to.eq(27);
-    expect(pool.intellect).to.eq(27);
+  });
+
+  it("should fail to use a vitalizer without sacrificed points", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.stats.consumeVitalizer(id, 0, 0, 1)).to.revertedWith(
+      "Stats: user doesn't have sacrificed points to recover"
+    );
   });
 
   it("should not change pool values when sacrifice and pool has less than max", async () => {
@@ -453,20 +451,12 @@ describe("Stats", () => {
     await this.stats.sacrifice(id, 1, 1, 1);
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
-    expect(base.might).to.eq(52);
+    expect(base.might).to.eq(51);
     expect(base.speed).to.eq(51);
     expect(base.intellect).to.eq(51);
-    expect(pool.might).to.eq(28);
+    expect(pool.might).to.eq(27);
     expect(pool.speed).to.eq(27);
     expect(pool.intellect).to.eq(27);
-  });
-
-  it("should fail to use a vitalizer when limit reached", async () => {
-    const id = await this.civ.getTokenID(this.ard.address, 1);
-    await this.vitalizer.mintFree(this.owner.address, 1);
-    await expect(this.stats.consumeVitalizer(id, 1, 0, 0)).to.revertedWith(
-      "Stats: character already used all possible vitalize consumes."
-    );
   });
 
   it("should be able to use a new refresh until pool is equal to base", async () => {

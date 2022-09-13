@@ -38,8 +38,8 @@ contract Stats is Ownable, IStats {
     /** @dev Address of the `Experience` instance. **/
     address public experience;
 
-    /** @dev Map to track the usage of vitality tokens. **/
-    mapping(bytes => uint256) public vitality_uses;
+    /** @dev Map to track the amount of points sacrificed by a character. **/
+    mapping(bytes => uint256) public sacrifices;
 
     /** @dev Map to track the first refresher usage timestamp. **/
     mapping(bytes => uint256) public refresher_usage_time;
@@ -159,6 +159,10 @@ contract Stats is Ownable, IStats {
         if (pool[id].intellect > base[id].intellect) {
             pool[id].intellect = base[id].intellect;
         }
+
+        sacrifices[id] += might;
+        sacrifices[id] += speed;
+        sacrifices[id] += intellect;
     }
 
     /** @dev Performs a refresh filling the pool stats from the base stats.
@@ -230,8 +234,8 @@ contract Stats is Ownable, IStats {
         uint256 intellect
     ) public onlyAllowed(id) {
         require(
-            vitality_uses[id] < 10,
-            "Stats: character already used all possible vitalize consumes."
+            sacrifices[id] > 0,
+            "Stats: user doesn't have sacrificed points to recover"
         );
         uint256 sum = might + speed + intellect;
         require(
@@ -256,7 +260,7 @@ contract Stats is Ownable, IStats {
         pool[id].speed += speed;
         pool[id].intellect += intellect;
 
-        vitality_uses[id] += 1;
+        sacrifices[id] -= 1;
     }
 
     /** @dev Assigns the points to the base pool.
