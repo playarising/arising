@@ -15,7 +15,7 @@ contract Coal is BaseFungibleItem {
     constructor(address _civilizations)
         BaseFungibleItem(
             "Arising: Coal",
-            "aCOAL",
+            "COAL",
             "https://playarising.com/material/raw/coal.png",
             _civilizations
         )

@@ -15,7 +15,7 @@ contract Bronze is BaseFungibleItem {
     constructor(address _civilizations)
         BaseFungibleItem(
             "Arising: Bronze",
-            "aBRONZE",
+            "BRONZE",
             "https://playarising.com/material/raw/bronze.png",
             _civilizations
         )

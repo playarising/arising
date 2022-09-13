@@ -15,8 +15,8 @@ contract SteelBar is BaseFungibleItem {
     constructor(address _civilizations)
         BaseFungibleItem(
             "Arising: Steel Bar",
-            "aSTEELBAR",
-            "https://playarising.com/material/basic/steelbar.png",
+            "STEEL_BAR",
+            "https://playarising.com/material/basic/steel_bar.png",
             _civilizations
         )
     {}

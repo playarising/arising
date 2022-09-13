@@ -36,21 +36,14 @@ Etia is a fantasy world in which all characters take part. A world with four big
 | Contract          | Deployment |
 | ----------------- | ---------- |
 | **Civilizations** |            |
+| **Craft**         |            |
+| **Equipment**     |            |
 | **Experience**    |            |
 | **Forge**         |            |
 | **Levels**        |            |
 | **Names**         |            |
 | **Quests**        |            |
 | **Stats**         |            |
-
-### Expansions
-
-| Contract         | Deployment |
-| ---------------- | ---------- |
-| **Craft**        |            |
-| **Enchantments** |            |
-| **Equipment**    |            |
-| **Arena**        |            |
 
 ### Raw Materials
 
@@ -60,25 +53,33 @@ Etia is a fantasy world in which all characters take part. A world with four big
 | **Bronze**     |            |
 | **Coal**       |            |
 | **Cobalt**     |            |
+| **Cotton**     |            |
 | **Iron**       |            |
+| **Leather**    |            |
 | **Platinum**   |            |
+| **Silk**       |            |
 | **Silver**     |            |
 | **Stone**      |            |
 | **Wood**       |            |
+| **Wool**       |            |
 
 ### Basic Materials
 
-| Contract          | Deployment |
-| ----------------- | ---------- |
-| **AdamantineBar** |            |
-| **BronzeBar**     |            |
-| **CobaltBar**     |            |
-| **GoldBar**       |            |
-| **IronBar**       |            |
-| **PlatinumBar**   |            |
-| **SilverBar**     |            |
-| **SteelBar**      |            |
-| **WoodPlank**     |            |
+| Contract            | Deployment |
+| ------------------- | ---------- |
+| **AdamantineBar**   |            |
+| **BronzeBar**       |            |
+| **CobaltBar**       |            |
+| **CottonFabric**    |            |
+| **GoldBar**         |            |
+| **HardenedLeather** |            |
+| **IronBar**         |            |
+| **PlatinumBar**     |            |
+| **SilkFabric**      |            |
+| **SilverBar**       |            |
+| **SteelBar**        |            |
+| **WoodPlank**       |            |
+| **WoolFabric**      |            |
 
 ### Gadgets
 

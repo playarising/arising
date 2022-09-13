@@ -15,7 +15,7 @@ contract Platinum is BaseFungibleItem {
     constructor(address _civilizations)
         BaseFungibleItem(
             "Arising: Platinum",
-            "aPLATINUM",
+            "PLATINUM",
             "https://playarising.com/material/raw/platinum.png",
             _civilizations
         )

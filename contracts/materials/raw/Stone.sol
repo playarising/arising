@@ -15,7 +15,7 @@ contract Stone is BaseFungibleItem {
     constructor(address _civilizations)
         BaseFungibleItem(
             "Arising: Stone",
-            "aSTONE",
+            "STONE",
             "https://playarising.com/material/raw/stone.png",
             _civilizations
         )

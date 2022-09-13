@@ -15,7 +15,7 @@ contract Cobalt is BaseFungibleItem {
     constructor(address _civilizations)
         BaseFungibleItem(
             "Arising: Cobalt",
-            "aCOBALT",
+            "COBALT",
             "https://playarising.com/material/raw/cobalt.png",
             _civilizations
         )

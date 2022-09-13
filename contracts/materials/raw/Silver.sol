@@ -15,7 +15,7 @@ contract Silver is BaseFungibleItem {
     constructor(address _civilizations)
         BaseFungibleItem(
             "Arising: Silver",
-            "aSILVER",
+            "SILVER",
             "https://playarising.com/material/raw/silver.png",
             _civilizations
         )

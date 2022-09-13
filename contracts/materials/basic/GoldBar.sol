@@ -15,8 +15,8 @@ contract GoldBar is BaseFungibleItem {
     constructor(address _civilizations)
         BaseFungibleItem(
             "Arising: Gold Bar",
-            "aGOLDBAR",
-            "https://playarising.com/material/basic/goldbar.png",
+            "GOLD_BAR",
+            "https://playarising.com/material/basic/gold_bar.png",
             _civilizations
         )
     {}

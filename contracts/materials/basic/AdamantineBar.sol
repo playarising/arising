@@ -15,8 +15,8 @@ contract AdamantineBar is BaseFungibleItem {
     constructor(address _civilizations)
         BaseFungibleItem(
             "Arising: Adamantine Bar",
-            "aADAMANTINEBAR",
-            "https://playarising.com/material/basic/adamantinebar.png",
+            "ADAMANTINE_BAR",
+            "https://playarising.com/material/basic/adamantine_bar.png",
             _civilizations
         )
     {}

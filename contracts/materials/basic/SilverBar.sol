@@ -15,8 +15,8 @@ contract SilverBar is BaseFungibleItem {
     constructor(address _civilizations)
         BaseFungibleItem(
             "Arising: Silver Bar",
-            "aSILVERBAR",
-            "https://playarising.com/material/basic/silverbar.png",
+            "SILVER_BAR",
+            "https://playarising.com/material/basic/silver_bar.png",
             _civilizations
         )
     {}

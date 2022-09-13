@@ -15,8 +15,8 @@ contract WoodPlank is BaseFungibleItem {
     constructor(address _civilizations)
         BaseFungibleItem(
             "Arising: Wood Plank",
-            "aWOODPLANK",
-            "https://playarising.com/material/basic/woodplank.png",
+            "WOOD_PLANK",
+            "https://playarising.com/material/basic/wood_plank.png",
             _civilizations
         )
     {}
