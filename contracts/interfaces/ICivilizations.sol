@@ -13,6 +13,12 @@ interface ICivilizations {
         mapping(bytes => bool) upgrade_3;
     }
 
+    struct TokenUpgrades {
+        bool upgrade_1;
+        bool upgrade_2;
+        bool upgrade_3;
+    }
+
     function setInitialized() external;
 
     function setInitializeUpgrade(uint256 upgrade, bool available) external;
@@ -27,16 +33,14 @@ interface ICivilizations {
 
     function buyUpgrade(bytes memory id, uint256 upgrade) external;
 
+    function withdraw() external;
+
     function getID(address _instance) external view returns (uint256);
 
     function getTokenUpgrades(bytes memory id)
         external
         view
-        returns (
-            bool,
-            bool,
-            bool
-        );
+        returns (TokenUpgrades memory);
 
     function getCivilizations() external view returns (address[] memory);
 

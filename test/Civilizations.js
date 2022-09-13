@@ -3,12 +3,12 @@ const { ethers } = require("hardhat");
 
 describe("Civilizations", () => {
   before(async () => {
-    const [owner, receiver, minter] = await ethers.getSigners();
+    const [owner, receiver, minter, noallowance] = await ethers.getSigners();
 
     this.owner = owner;
     this.receiver = receiver;
     this.minter = minter;
-
+    this.noallowance = noallowance;
     const Ard = await ethers.getContractFactory("Ard");
     this.ard = await Ard.deploy();
     await this.ard.deployed();
@@ -117,11 +117,11 @@ describe("Civilizations", () => {
 
   it("should deploy an initialize the civilizations contract", async () => {
     const MockToken = await ethers.getContractFactory("MockToken");
-    this.mock = await MockToken.deploy(ethers.utils.parseEther("100"));
-    await this.mock.deployed();
+    this.mockToken = await MockToken.deploy(ethers.utils.parseEther("5000"));
+    await this.mockToken.deployed();
 
     const Civilizations = await ethers.getContractFactory("Civilizations");
-    this.civ = await Civilizations.deploy(this.mock.address);
+    this.civ = await Civilizations.deploy(this.mockToken.address);
     await this.civ.deployed();
 
     await this.civ.addCivilization(this.ard.address);
@@ -372,8 +372,8 @@ describe("Civilizations", () => {
   it("should change the charge token correctly", async () => {
     await this.civ.setToken(this.owner.address);
     expect(await this.civ.token()).to.eq(this.owner.address);
-    await this.civ.setToken(this.mock.address);
-    expect(await this.civ.token()).to.eq(this.mock.address);
+    await this.civ.setToken(this.mockToken.address);
+    expect(await this.civ.token()).to.eq(this.mockToken.address);
   });
 
   it("should set initialize upgrades correctly", async () => {
@@ -406,5 +406,99 @@ describe("Civilizations", () => {
     expect(upgrade2.available).to.eq(true);
     upgrade3 = await this.civ.getUpgradeInformation(3);
     expect(upgrade3.available).to.eq(true);
+  });
+
+  it("should set initialize upgrades correctly", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    const upgrades = await this.civ.getTokenUpgrades(id);
+    expect(upgrades.upgrade_1).to.eq(false);
+    expect(upgrades.upgrade_2).to.eq(false);
+    expect(upgrades.upgrade_3).to.eq(false);
+  });
+
+  it("should fail buying an upgrade from for a non available upgrade", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.civ.setInitializeUpgrade(1, false);
+    await expect(this.civ.buyUpgrade(id, 1)).to.revertedWith(
+      "Civilizations: can't purchase an upgrade not initialized."
+    );
+    await this.civ.setInitializeUpgrade(1, true);
+  });
+
+  it("should fail buying an upgrade for an invalid upgrade", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.civ.buyUpgrade(id, 0)).to.revertedWith(
+      "Civilizations: upgrade id doesn't exist."
+    );
+  });
+
+  it("should fail buying an upgrade from a non allowed address", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(
+      this.civ.connect(this.noallowance).buyUpgrade(id, 1)
+    ).to.revertedWith("Civilizations: can't purchase for a non owned token.");
+  });
+
+  it("should fail buying an upgrade when no enough balance.", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.ard.setApprovalForAll(this.noallowance.address, true);
+    await expect(
+      this.civ.connect(this.noallowance).buyUpgrade(id, 1)
+    ).to.revertedWith(
+      "Civilizations: not enough balance of payment tokens to mint tokens."
+    );
+  });
+
+  it("should fail buying an upgrade when no allowance.", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.ard.setApprovalForAll(this.noallowance.address, true);
+    await this.mockToken.transfer(
+      this.noallowance.address,
+      ethers.utils.parseEther("1000")
+    );
+    await expect(
+      this.civ.connect(this.noallowance).buyUpgrade(id, 1)
+    ).to.revertedWith("Civilizations: not enough allowance to mint tokens.");
+  });
+
+  it("should buy upgrades correctly.", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.ard.setApprovalForAll(this.noallowance.address, true);
+    await this.mockToken.transfer(
+      this.noallowance.address,
+      ethers.utils.parseEther("500")
+    );
+    await this.mockToken
+      .connect(this.noallowance)
+      .approve(this.civ.address, ethers.utils.parseEther("1000"));
+    await this.civ.connect(this.noallowance).buyUpgrade(id, 1);
+    await this.civ.connect(this.noallowance).buyUpgrade(id, 2);
+    await this.civ.connect(this.noallowance).buyUpgrade(id, 3);
+    const upgrades = await this.civ.getTokenUpgrades(id);
+    expect(upgrades.upgrade_1).to.eq(true);
+    expect(upgrades.upgrade_2).to.eq(true);
+    expect(upgrades.upgrade_3).to.eq(true);
+  });
+
+  it("should not be able to withdraw from non owner", async () => {
+    await expect(this.civ.connect(this.minter).withdraw()).to.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+  });
+
+  it("should be able to withdraw the tokens by the owner", async () => {
+    expect(await this.mockToken.balanceOf(this.owner.address)).to.eq(
+      ethers.utils.parseEther("3500")
+    );
+    expect(await this.mockToken.balanceOf(this.civ.address)).to.eq(
+      ethers.utils.parseEther("179.97")
+    );
+    await this.civ.withdraw();
+    expect(await this.mockToken.balanceOf(this.owner.address)).to.eq(
+      ethers.utils.parseEther("3679.97")
+    );
+    expect(await this.mockToken.balanceOf(this.civ.address)).to.eq(
+      ethers.utils.parseEther("0")
+    );
   });
 });

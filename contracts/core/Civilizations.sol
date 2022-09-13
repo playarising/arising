@@ -146,6 +146,10 @@ contract Civilizations is Ownable, ICivilizations {
      */
     function buyUpgrade(bytes memory id, uint256 upgrade) public {
         require(
+            upgrade > 0 && upgrade <= 3,
+            "Civilizations: upgrade id doesn't exist."
+        );
+        require(
             isAllowed(msg.sender, id),
             "Civilizations: can't purchase for a non owned token."
         );
@@ -153,12 +157,9 @@ contract Civilizations is Ownable, ICivilizations {
             upgrades[upgrade].available,
             "Civilizations: can't purchase an upgrade not initialized."
         );
+        uint256 price = upgrades[upgrade].price;
         require(
-            upgrade > 0 && upgrade <= 3,
-            "Civilizations: upgrade id doesn't exist."
-        );
-        require(
-            IERC20(token).balanceOf(msg.sender) >= upgrades[upgrade].price,
+            IERC20(token).balanceOf(msg.sender) >= price,
             "Civilizations: not enough balance of payment tokens to mint tokens."
         );
         require(
@@ -166,11 +167,7 @@ contract Civilizations is Ownable, ICivilizations {
                 upgrades[upgrade].price,
             "Civilizations: not enough allowance to mint tokens."
         );
-        IERC20(token).transferFrom(
-            msg.sender,
-            address(this),
-            upgrades[upgrade].price
-        );
+        IERC20(token).transferFrom(msg.sender, address(this), price);
         if (upgrade == 1) {
             _upgrades.upgrade_1[id] = true;
         }
@@ -180,6 +177,14 @@ contract Civilizations is Ownable, ICivilizations {
         if (upgrade == 3) {
             _upgrades.upgrade_3[id] = true;
         }
+    }
+
+    /**
+     * @dev Transfers the total amount of `token` stored in the contract to `owner`.
+     */
+    function withdraw() public onlyOwner {
+        uint256 balance = IERC20(token).balanceOf(address(this));
+        IERC20(token).transfer(owner(), balance);
     }
 
     // =============================================== Getters ========================================================
@@ -205,17 +210,14 @@ contract Civilizations is Ownable, ICivilizations {
     function getTokenUpgrades(bytes memory id)
         public
         view
-        returns (
-            bool,
-            bool,
-            bool
-        )
+        returns (TokenUpgrades memory)
     {
-        return (
-            _upgrades.upgrade_1[id],
-            _upgrades.upgrade_2[id],
-            _upgrades.upgrade_3[id]
-        );
+        return
+            TokenUpgrades(
+                _upgrades.upgrade_1[id],
+                _upgrades.upgrade_2[id],
+                _upgrades.upgrade_3[id]
+            );
     }
 
     /** @dev Returns the upgrades for a composed ID.
