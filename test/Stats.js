@@ -317,7 +317,7 @@ describe("Stats", () => {
 
   it("should be able to use a new refresh for the next day", async () => {
     const id = await this.civ.getTokenID(this.ard.address, 1);
-    const time = await this.stats.getNextRefreshWithTokenTime(id);
+    let time = await this.stats.getNextRefreshWithTokenTime(id);
     await ethers.provider.send("evm_mine", [time.toNumber()]);
     await this.refresher.mintFree(this.owner.address, 5);
     await this.stats.refreshWithToken(id);
@@ -467,5 +467,30 @@ describe("Stats", () => {
     await expect(this.stats.consumeVitalizer(id, 1, 0, 0)).to.revertedWith(
       "Stats: character already used all possible vitalize consumes."
     );
+  });
+
+  it("should be able to use a new refresh until pool is equal to base", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    let time = await this.stats.getNextRefreshWithTokenTime(id);
+    await ethers.provider.send("evm_mine", [time.toNumber()]);
+    await this.refresher.mintFree(this.owner.address, 5);
+    await this.stats.refreshWithToken(id);
+    await expect(this.stats.refreshWithToken(id)).to.revertedWith(
+      "Stats: already used a refresher for this day."
+    );
+
+    time = await this.stats.getNextRefreshWithTokenTime(id);
+    await ethers.provider.send("evm_mine", [time.toNumber()]);
+    await this.refresher.mintFree(this.owner.address, 5);
+    await this.stats.refreshWithToken(id);
+    await expect(this.stats.refreshWithToken(id)).to.revertedWith(
+      "Stats: already used a refresher for this day."
+    );
+
+    const base = await this.stats.getBaseStats(id);
+    const pool = await this.stats.getPoolStats(id);
+    expect(pool.might).to.eq(base.might);
+    expect(pool.speed).to.eq(base.speed);
+    expect(pool.intellect).to.eq(base.intellect);
   });
 });
