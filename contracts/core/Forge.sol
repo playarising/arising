@@ -67,8 +67,6 @@ contract Forge is Ownable, IForge {
      * @param _civilizations        The address of the `Civilizations` instance.
      * @param _experience           The address of the `Experience` instance.
      * @param _stats                The address of the `Experience` instance.
-     * @param _raw_resources        Addresses of the raw resources (0. Adamantine, 1. Bronze, 2. Coal, 3. Cobalt, 4. Cotton, 5. Iron, 6. Leather, 7. Platinum, 8. Silk, 9. Silver, 10. Stone, 11. Wood, 12. Wool).
-     * @param _basic_resources      Addresses of the basic resources (0. Adamantine Bar, 1. Bronze Bar, 2. Cobalt Bar, 3. Cotton Fabric, 4. Gold Bar, 5. Hardened Leather, 6. Iron Bar, 7. Ironstone, 8. Platinum Bar, 9. Silk Fabric, 10. Silver Bar, 11. Steel Bar, 12. Wood Plank, 13. Wool Fabric).
      * @param _gold                 The address of the `Gold` instance.
      * @param _token                Address of the token to charge for forge upgrades.
      * @param _price                Price of forge upgrades.
@@ -77,8 +75,6 @@ contract Forge is Ownable, IForge {
         address _civilizations,
         address _experience,
         address _stats,
-        address[] memory _raw_resources,
-        address[] memory _basic_resources,
         address _gold,
         address _token,
         uint256 _price
@@ -89,228 +85,6 @@ contract Forge is Ownable, IForge {
         token = _token;
         price = _price;
         gold = _gold;
-        address[] memory emptyAddr;
-        uint256[] memory emptyAmounts;
-
-        recipes[1] = Recipe(
-            1,
-            emptyAddr,
-            emptyAmounts,
-            Stats(0, 1, 0),
-            300,
-            5,
-            _basic_resources[12],
-            25,
-            2,
-            true
-        );
-        recipes[1].raw_materials[0] = _raw_resources[11];
-        recipes[1].raw_amounts[0] = 1;
-
-        recipes[2] = Recipe(
-            2,
-            emptyAddr,
-            emptyAmounts,
-            Stats(5, 3, 0),
-            10800,
-            10,
-            _basic_resources[1],
-            100,
-            5,
-            true
-        );
-        recipes[2].raw_materials[0] = _raw_resources[1];
-        recipes[2].raw_amounts[0] = 10;
-
-        recipes[3] = Recipe(
-            3,
-            emptyAddr,
-            emptyAmounts,
-            Stats(8, 2, 3),
-            12600,
-            15,
-            _basic_resources[7],
-            150,
-            25,
-            true
-        );
-        recipes[3].raw_materials[0] = _raw_resources[6];
-        recipes[3].raw_amounts[0] = 10;
-        recipes[3].raw_materials[1] = _raw_resources[6];
-        recipes[3].raw_amounts[1] = 10;
-
-        recipes[4] = Recipe(
-            4,
-            emptyAddr,
-            emptyAmounts,
-            Stats(2, 1, 2),
-            1800,
-            15,
-            _basic_resources[5],
-            50,
-            3,
-            true
-        );
-        recipes[4].raw_materials[0] = _raw_resources[6];
-        recipes[4].raw_amounts[0] = 1;
-
-        recipes[5] = Recipe(
-            5,
-            emptyAddr,
-            emptyAmounts,
-            Stats(3, 5, 7),
-            6000,
-            15,
-            _basic_resources[3],
-            75,
-            10,
-            true
-        );
-        recipes[5].raw_materials[0] = _raw_resources[4];
-        recipes[5].raw_amounts[0] = 20;
-
-        recipes[6] = Recipe(
-            6,
-            emptyAddr,
-            emptyAmounts,
-            Stats(3, 5, 7),
-            6000,
-            15,
-            _basic_resources[9],
-            75,
-            10,
-            true
-        );
-        recipes[6].raw_materials[0] = _raw_resources[8];
-        recipes[6].raw_amounts[0] = 20;
-
-        recipes[7] = Recipe(
-            7,
-            emptyAddr,
-            emptyAmounts,
-            Stats(3, 5, 7),
-            6000,
-            15,
-            _basic_resources[13],
-            75,
-            10,
-            true
-        );
-        recipes[7].raw_materials[0] = _raw_resources[12];
-        recipes[7].raw_amounts[0] = 20;
-
-        recipes[8] = Recipe(
-            8,
-            emptyAddr,
-            emptyAmounts,
-            Stats(10, 6, 3),
-            21600,
-            20,
-            _basic_resources[6],
-            150,
-            50,
-            true
-        );
-        recipes[8].raw_materials[0] = _raw_resources[9];
-        recipes[8].raw_amounts[0] = 10;
-
-        recipes[9] = Recipe(
-            9,
-            emptyAddr,
-            emptyAmounts,
-            Stats(12, 8, 3),
-            28800,
-            25,
-            _basic_resources[10],
-            200,
-            0,
-            true
-        );
-        recipes[9].raw_materials[0] = _gold;
-        recipes[9].raw_amounts[0] = 10;
-
-        recipes[10] = Recipe(
-            10,
-            emptyAddr,
-            emptyAmounts,
-            Stats(12, 8, 3),
-            28800,
-            25,
-            _basic_resources[4],
-            200,
-            0,
-            true
-        );
-        recipes[10].raw_materials[0] = _basic_resources[6];
-        recipes[10].raw_amounts[0] = 1;
-
-        recipes[11] = Recipe(
-            11,
-            emptyAddr,
-            emptyAmounts,
-            Stats(15, 10, 3),
-            36000,
-            30,
-            _basic_resources[11],
-            250,
-            100,
-            true
-        );
-        recipes[11].raw_materials[0] = _raw_resources[3];
-        recipes[11].raw_amounts[0] = 10;
-        recipes[11].raw_materials[1] = _raw_resources[2];
-        recipes[11].raw_amounts[1] = 20;
-
-        recipes[12] = Recipe(
-            12,
-            emptyAddr,
-            emptyAmounts,
-            Stats(17, 12, 5),
-            43200,
-            40,
-            _basic_resources[2],
-            300,
-            150,
-            true
-        );
-        recipes[12].raw_materials[0] = _raw_resources[7];
-        recipes[12].raw_amounts[0] = 10;
-        recipes[12].raw_materials[1] = _raw_resources[2];
-        recipes[12].raw_amounts[1] = 20;
-
-        recipes[13] = Recipe(
-            13,
-            emptyAddr,
-            emptyAmounts,
-            Stats(23, 15, 8),
-            54000,
-            50,
-            _basic_resources[8],
-            350,
-            175,
-            true
-        );
-        recipes[13].raw_materials[0] = _raw_resources[0];
-        recipes[13].raw_amounts[0] = 10;
-        recipes[13].raw_materials[1] = _raw_resources[2];
-        recipes[13].raw_amounts[1] = 20;
-
-        recipes[14] = Recipe(
-            14,
-            emptyAddr,
-            emptyAmounts,
-            Stats(28, 17, 11),
-            61200,
-            60,
-            _basic_resources[0],
-            400,
-            200,
-            true
-        );
-        recipes[14].raw_materials[0] = _raw_resources[0];
-        recipes[14].raw_amounts[0] = 10;
-        recipes[14].raw_materials[1] = _raw_resources[2];
-        recipes[14].raw_amounts[1] = 20;
     }
 
     /**
@@ -341,16 +115,20 @@ contract Forge is Ownable, IForge {
     function addRecipe(
         address[] memory _materials,
         uint256[] memory _amounts,
-        uint256 cooldown,
-        uint256 level_required,
-        uint256 cost,
         uint256 might_cost,
         uint256 speed_cost,
         uint256 intellect_cost,
-        address reward,
-        uint256 exp_reward
+        uint256 cooldown,
+        uint256 level_required,
+        uint256 cost,
+        uint256 exp_reward,
+        address reward
     ) public onlyOwner {
         uint256 id = _recipes.length + 1;
+        require(
+            _materials.length == _amounts.length,
+            "Forge: materials and amounts arrays should be the same length"
+        );
         recipes[id] = Recipe(
             id,
             _materials,
@@ -455,7 +233,9 @@ contract Forge is Ownable, IForge {
             "Forge: the character doesn't have the level required to forge the material."
         );
 
-        IBaseFungibleItem(gold).consume(id, r.cost);
+        if (r.cost > 0) {
+            IBaseFungibleItem(gold).consume(id, r.cost);
+        }
 
         for (uint256 i = 0; i < r.raw_materials.length; i++) {
             IBaseFungibleItem(r.raw_materials[i]).consume(id, r.raw_amounts[i]);
