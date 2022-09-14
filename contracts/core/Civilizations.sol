@@ -4,6 +4,7 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "../interfaces/IBaseERC721.sol";
 import "../interfaces/ICivilizations.sol";
 
@@ -295,6 +296,19 @@ contract Civilizations is Ownable, ICivilizations {
         );
         address instance = civilizations[civilizationID - 1];
         return IBaseERC721(instance).exists(tokenID);
+    }
+
+    /** @dev Function to returns the actual owner of a composed ID.
+     *  @param _id Composed token id.
+     */
+    function ownerOf(bytes memory _id) public view returns (address) {
+        (uint256 civilizationID, uint256 tokenID) = _decomposeTokenID(_id);
+        require(
+            civilizationID <= civilizations.length,
+            "Civilizations: id of the civilization is not valid."
+        );
+        address instance = civilizations[civilizationID - 1];
+        return IERC721(instance).ownerOf(tokenID);
     }
 
     // =============================================== Internal ========================================================

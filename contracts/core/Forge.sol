@@ -5,6 +5,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../interfaces/IForge.sol";
 import "../interfaces/ICivilizations.sol";
+import "../interfaces/IExperience.sol";
+import "../interfaces/IStats.sol";
+import "../interfaces/IBaseFungibleItem.sol";
 
 /**
  * @dev `Forge` is a contract to convert the raw material to craftable pieces.
@@ -36,6 +39,9 @@ contract Forge is Ownable, IForge {
 
     /** @dev Price of forge upgrades. **/
     uint256 public price;
+
+    /** @dev The address of the `Gold` instance. **/
+    address public gold;
 
     // =============================================== Modifiers ======================================================
 
@@ -82,6 +88,7 @@ contract Forge is Ownable, IForge {
         stats = _stats;
         token = _token;
         price = _price;
+        gold = _gold;
         address[] memory emptyAddr;
         uint256[] memory emptyAmounts;
 
@@ -93,6 +100,7 @@ contract Forge is Ownable, IForge {
             300,
             5,
             _basic_resources[11],
+            25,
             2,
             true
         );
@@ -107,6 +115,7 @@ contract Forge is Ownable, IForge {
             10800,
             10,
             _basic_resources[1],
+            100,
             5,
             true
         );
@@ -121,6 +130,7 @@ contract Forge is Ownable, IForge {
             12600,
             15,
             _basic_resources[5],
+            150,
             7,
             true
         );
@@ -135,6 +145,7 @@ contract Forge is Ownable, IForge {
             1800,
             15,
             _basic_resources[5],
+            50,
             3,
             true
         );
@@ -149,6 +160,7 @@ contract Forge is Ownable, IForge {
             6000,
             15,
             _basic_resources[3],
+            75,
             10,
             true
         );
@@ -163,6 +175,7 @@ contract Forge is Ownable, IForge {
             6000,
             15,
             _basic_resources[8],
+            75,
             10,
             true
         );
@@ -177,6 +190,7 @@ contract Forge is Ownable, IForge {
             6000,
             15,
             _basic_resources[12],
+            75,
             10,
             true
         );
@@ -191,6 +205,7 @@ contract Forge is Ownable, IForge {
             14400,
             20,
             _basic_resources[9],
+            200,
             0,
             true
         );
@@ -205,6 +220,7 @@ contract Forge is Ownable, IForge {
             14400,
             20,
             _basic_resources[4],
+            200,
             0,
             true
         );
@@ -219,6 +235,7 @@ contract Forge is Ownable, IForge {
             18000,
             25,
             _basic_resources[10],
+            250,
             100,
             true
         );
@@ -235,6 +252,7 @@ contract Forge is Ownable, IForge {
             19800,
             35,
             _basic_resources[2],
+            300,
             150,
             true
         );
@@ -251,6 +269,7 @@ contract Forge is Ownable, IForge {
             21600,
             45,
             _basic_resources[7],
+            350,
             175,
             true
         );
@@ -267,6 +286,7 @@ contract Forge is Ownable, IForge {
             43200,
             50,
             _basic_resources[0],
+            400,
             200,
             true
         );
@@ -301,6 +321,7 @@ contract Forge is Ownable, IForge {
      * @param speed_cost        Speed stat cost from the stats pool.
      * @param intellect_cost    Intelect stat cost from the stats pool.
      * @param reward            Address of the reward contract.
+     * @param exp_reward            Amount of experience rewarded.
      */
     function addRecipe(
         address[] memory _materials,
@@ -311,7 +332,8 @@ contract Forge is Ownable, IForge {
         uint256 might_cost,
         uint256 speed_cost,
         uint256 intellect_cost,
-        address reward
+        address reward,
+        uint256 exp_reward
     ) public onlyOwner {
         uint256 id = _recipes.length + 1;
         recipes[id] = Recipe(
@@ -322,6 +344,7 @@ contract Forge is Ownable, IForge {
             cooldown,
             level_required,
             reward,
+            exp_reward,
             cost,
             true
         );
@@ -360,15 +383,106 @@ contract Forge is Ownable, IForge {
         if (!forges[id].forge_3.available) {
             canUpgrade = true;
         }
+
         require(canUpgrade, "Forge: user doesn't have buyable spots");
         IERC20(token).transferFrom(msg.sender, address(this), price);
 
         if (!forges[id].forge_2.available) {
             forges[id].forge_2.available = true;
+            return;
         }
+
         if (!forges[id].forge_3.available) {
             forges[id].forge_3.available = true;
+            return;
         }
+    }
+
+    /**
+     * @dev Forges a recipe.
+     * @param id        Composed ID of the character.
+     * @param recipe    ID of the recipe to forge.
+     * @param _forge    Number of the forge to use.
+     */
+    function forge(
+        bytes memory id,
+        uint256 recipe,
+        uint256 _forge
+    ) public onlyAllowed(id) {
+        if (_forge == 2) {
+            require(
+                forges[id].forge_2.available,
+                "Forge: forge 2 is not upgraded"
+            );
+        }
+        if (_forge == 3) {
+            require(
+                forges[id].forge_3.available,
+                "Forge: forge 3 is not upgraded"
+            );
+        }
+        require(
+            recipe != 0 && recipe <= _recipes.length,
+            "Forge: recipe id doesn't exist."
+        );
+        require(
+            _isForgeAvailable(id, _forge),
+            "Forge: the forge trying to use is not available for use."
+        );
+
+        Recipe memory r = recipes[recipe];
+
+        require(
+            IExperience(experience).getLevel(id) >= r.level_required,
+            "Forge: the character doesn't have the level required to forge the material."
+        );
+
+        IBaseFungibleItem(gold).consume(id, r.cost);
+
+        for (uint256 i = 0; i < r.raw_materials.length; i++) {
+            IBaseFungibleItem(r.raw_materials[i]).consume(id, r.raw_amounts[i]);
+        }
+
+        IStats(stats).consume(
+            id,
+            r.requirements.might,
+            r.requirements.speed,
+            r.requirements.intellect
+        );
+
+        require(
+            _assignRecipeToForge(id, _forge, r),
+            "Forge: unable to assign recipe to forge."
+        );
+    }
+
+    /**
+     * @dev Claims a recipe already forged.
+     * @param id        Composed ID of the character.
+     * @param _forge    Number of the forge to use.
+     */
+    function claim(bytes memory id, uint256 _forge) public onlyAllowed(id) {
+        if (_forge == 2) {
+            require(
+                forges[id].forge_2.available,
+                "Forge: forge 2 is not upgraded"
+            );
+        }
+        if (_forge == 3) {
+            require(
+                forges[id].forge_3.available,
+                "Forge: forge 3 is not upgrades"
+            );
+        }
+
+        require(
+            _isForgeClaimable(id, _forge),
+            "Forge: the forge trying to use is not available for claim."
+        );
+
+        (bool success, uint256 reward) = _claimForge(id, _forge);
+        require(success, "Forge: unable to claim recipe from forge.");
+        IExperience(experience).assignExperience(id, reward);
     }
 
     /**
@@ -381,4 +495,124 @@ contract Forge is Ownable, IForge {
 
     // =============================================== Getters ========================================================
     // =============================================== Internal =======================================================
+
+    /**
+     * @dev Internal function to check if a forge id is available to use.
+     * @param id        Composed ID of the character.
+     * @param _forge     Number of the forge to use.
+     */
+    function _isForgeAvailable(bytes memory id, uint256 _forge)
+        internal
+        view
+        returns (bool)
+    {
+        (bool valid, Forge memory f) = _getForgeFromID(id, _forge);
+        require(valid, "Forge: selected forge is invalid");
+
+        if (f.cooldown == 0) {
+            return true;
+        }
+
+        return f.cooldown <= block.timestamp && f.last_recipe_claimed;
+    }
+
+    /**
+     * @dev Internal function to check if a forge id is ready to claim.
+     * @param id        Composed ID of the character.
+     * @param _forge     Number of the forge to use.
+     */
+    function _isForgeClaimable(bytes memory id, uint256 _forge)
+        internal
+        view
+        returns (bool)
+    {
+        (bool valid, Forge memory f) = _getForgeFromID(id, _forge);
+        require(valid, "Forge: selected forge is invalid");
+        return
+            f.cooldown <= block.timestamp &&
+            !f.last_recipe_claimed &&
+            f.last_recipe != 0;
+    }
+
+    /**
+     * @dev Internal function to assign a recipe to a forge to create. This function assumes the forge trying to accessing
+     *      is available (upgraded) and usable.
+     * @param id        Composed ID of the character.
+     * @param _forge    Number of the forge to use.
+     * @param r         Recipe to be assigned.
+     */
+    function _assignRecipeToForge(
+        bytes memory id,
+        uint256 _forge,
+        Recipe memory r
+    ) internal returns (bool) {
+        Forge memory f = Forge(true, block.timestamp + r.cooldown, r.id, false);
+        if (_forge == 1) {
+            forges[id].forge_1 = f;
+            return true;
+        }
+        if (_forge == 2) {
+            forges[id].forge_2 = f;
+            return true;
+        }
+        if (_forge == 3) {
+            forges[id].forge_3 = f;
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @dev Internal function claim a reward from a forge.
+     * @param id        Composed ID of the character.
+     * @param _forge    Number of the forge to use.
+     */
+    function _claimForge(bytes memory id, uint256 _forge)
+        internal
+        returns (bool, uint256)
+    {
+        Recipe memory r;
+        if (_forge == 1) {
+            r = recipes[forges[id].forge_1.last_recipe];
+            forges[id].forge_1.last_recipe_claimed = true;
+        } else if (_forge == 2) {
+            r = recipes[forges[id].forge_2.last_recipe];
+            forges[id].forge_1.last_recipe_claimed = true;
+        } else if (_forge == 3) {
+            r = recipes[forges[id].forge_3.last_recipe];
+            forges[id].forge_1.last_recipe_claimed = true;
+        } else {
+            return (false, 0);
+        }
+
+        IBaseFungibleItem(r.reward).mintTo(id, 1);
+
+        return (true, r.exp_reward);
+    }
+
+    /**
+     * @dev Internal function to return a forge instance from a number.
+     * @param id        Composed ID of the character.
+     * @param _forge    Number of the forge to use.
+     */
+    function _getForgeFromID(bytes memory id, uint256 _forge)
+        internal
+        view
+        returns (bool, Forge memory)
+    {
+        Forge memory f;
+        if (_forge == 1) {
+            f = forges[id].forge_1;
+            return (true, f);
+        } else if (_forge == 2) {
+            f = forges[id].forge_2;
+            return (true, f);
+        } else if (_forge == 3) {
+            f = forges[id].forge_3;
+            return (true, f);
+        } else {
+            return (false, f);
+        }
+    }
 }

@@ -72,6 +72,10 @@ contract BaseFungibleItem is Ownable, IBaseFungibleItem {
      *  @param amount   Amount to be consumed.
      */
     function consume(bytes memory id, uint256 amount) public onlyAllowed(id) {
+        require(
+            balances[id] >= amount,
+            "BaseFungibleItem: not enough balance to consume"
+        );
         balances[id] -= amount;
     }
 

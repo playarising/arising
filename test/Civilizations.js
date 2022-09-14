@@ -300,6 +300,30 @@ describe("Civilizations", () => {
     ).to.eq(false);
   });
 
+  it("should check the owner of a minted token", async () => {
+    expect(
+      await this.civ.ownerOf(
+        "0x00000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000001"
+      )
+    ).to.eq(this.owner.address);
+  });
+
+  it("should fail when trying to check if the owner of a token from an invalid civilization", async () => {
+    await expect(
+      this.civ.ownerOf(
+        "0x00000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000001"
+      )
+    ).to.revertedWith("Civilizations: id of the civilization is not valid.");
+  });
+
+  it("should fail when trying to check the token owner from a non minted id", async () => {
+    await expect(
+      this.civ.ownerOf(
+        "0x00000000000000000000000000000000000000000000000000000000000000060000000000000000000000000000000000000000000000000000000000000004"
+      )
+    ).to.revertedWith("ERC721: invalid token ID");
+  });
+
   it("should fail to set upgrade price from non owner", async () => {
     await expect(
       this.civ.connect(this.minter).setUpgradePrice(1, 1)

@@ -16,6 +16,7 @@ interface IForge {
         uint256 cooldown;
         uint256 level_required;
         address reward;
+        uint256 exp_reward;
         uint256 cost;
         bool available;
     }
@@ -23,6 +24,8 @@ interface IForge {
     struct Forge {
         bool available;
         uint256 cooldown;
+        uint256 last_recipe;
+        bool last_recipe_claimed;
     }
 
     struct Forges {

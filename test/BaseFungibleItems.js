@@ -75,4 +75,12 @@ describe("BaseFungibleItems", () => {
     await this.token.connect(this.minter2).consume(id, 1);
     expect(await this.token.balanceOf(id)).to.eq(3);
   });
+
+  it("should fail to consume when no enough balance", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.token.consume(id, 3);
+    await expect(this.token.consume(id, 1)).to.revertedWith(
+      "BaseFungibleItem: not enough balance to consume"
+    );
+  });
 });
