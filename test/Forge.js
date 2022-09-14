@@ -338,4 +338,55 @@ describe("Forge", () => {
       this.adamantine_bar.address
     );
   });
+
+  it("should fail adding a recipe when material and amounts are not the same", async () => {
+    await expect(
+      this.forge.addRecipe(
+        [this.wood.address],
+        [1, 2],
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        this.owner.address
+      )
+    ).to.revertedWith(
+      "Forge: materials and amounts arrays should be the same length"
+    );
+  });
+
+  it("should fail disabling a recibe when no owner", async () => {
+    await expect(
+      this.forge.connect(this.receiver).disableRecipe(1)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should fail enabling a recibe when no owner", async () => {
+    await expect(
+      this.forge.connect(this.receiver).enableRecipe(1)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should fail disabling a recibe when it doesn't exists", async () => {
+    await expect(this.forge.disableRecipe(0)).to.revertedWith(
+      "Forge: recipe id doesn't exist."
+    );
+    await expect(this.forge.disableRecipe(15)).to.revertedWith(
+      "Forge: recipe id doesn't exist."
+    );
+  });
+
+  it("should disable and enable a recipe correctly", async () => {
+    let r = await this.forge.getRecipe(1);
+    expect(r.available).to.eq(true);
+    await this.forge.disableRecipe(1);
+    r = await this.forge.getRecipe(1);
+    expect(r.available).to.eq(false);
+    await this.forge.enableRecipe(1);
+    r = await this.forge.getRecipe(1);
+    expect(r.available).to.eq(true);
+  });
 });

@@ -100,6 +100,18 @@ contract Forge is Ownable, IForge {
     }
 
     /**
+     * @dev Enables a forge recipe.
+     * @param id  ID of the recipe.
+     */
+    function enableRecipe(uint256 id) public onlyOwner {
+        require(
+            id != 0 && id <= _recipes.length,
+            "Forge: recipe id doesn't exist."
+        );
+        recipes[id].available = true;
+    }
+
+    /**
      * @dev Adds a new recipe to the forge.
      * @param _materials        Addresses of the raw resources for the creation.
      * @param _amounts          Amounts for each raw resource.
@@ -142,18 +154,6 @@ contract Forge is Ownable, IForge {
             true
         );
         _recipes.push(id);
-    }
-
-    /**
-     * @dev Enables a forge recipe.
-     * @param id  ID of the recipe.
-     */
-    function enableRecipe(uint256 id) public onlyOwner {
-        require(
-            id != 0 && id <= _recipes.length,
-            "Forge: recipe id doesn't exist."
-        );
-        recipes[id].available = true;
     }
 
     /**
@@ -292,6 +292,34 @@ contract Forge is Ownable, IForge {
     }
 
     // =============================================== Getters ========================================================
+
+    /**
+     * @dev Reurns the recipe information of a recipe id.
+     * @param id  ID of the recipe.
+     */
+    function getRecipe(uint256 id) public view returns (Recipe memory) {
+        require(
+            id != 0 && id <= _recipes.length,
+            "Forge: recipe id doesn't exist."
+        );
+        return recipes[id];
+    }
+
+    /**
+     * @dev Reurns the forge information of a composed ID.
+     * @param id    Composed ID of the character.
+     * @param _forge ID of the forge.
+     */
+    function getCharacterForge(bytes memory id, uint256 _forge)
+        public
+        view
+        returns (Forge memory)
+    {
+        (bool valid, Forge memory f) = _getForgeFromID(id, _forge);
+        require(valid, "Forge: selected forge is invalid");
+        return f;
+    }
+
     // =============================================== Internal =======================================================
 
     /**
