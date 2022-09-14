@@ -68,7 +68,7 @@ contract Forge is Ownable, IForge {
      * @param _experience           The address of the `Experience` instance.
      * @param _stats                The address of the `Experience` instance.
      * @param _raw_resources        Addresses of the raw resources (0. Adamantine, 1. Bronze, 2. Coal, 3. Cobalt, 4. Cotton, 5. Iron, 6. Leather, 7. Platinum, 8. Silk, 9. Silver, 10. Stone, 11. Wood, 12. Wool).
-     * @param _basic_resources      Addresses of the basic resources (0. Adamantine Bar, 1. Bronze Bar, 2. Cobalt Bar, 3. Cotton Fabric, 4. Gold Bar, 5. Hardened Leather, 6. Iron Bar, 7. Platinum Bar, 8. Silk Fabric, 9. Silver Bar, 10. Steel Bar, 11. Wood Plank, 12. Wool Fabric).
+     * @param _basic_resources      Addresses of the basic resources (0. Adamantine Bar, 1. Bronze Bar, 2. Cobalt Bar, 3. Cotton Fabric, 4. Gold Bar, 5. Hardened Leather, 6. Iron Bar, 7. Ironstone, 8. Platinum Bar, 9. Silk Fabric, 10. Silver Bar, 11. Steel Bar, 12. Wood Plank, 13. Wool Fabric).
      * @param _gold                 The address of the `Gold` instance.
      * @param _token                Address of the token to charge for forge upgrades.
      * @param _price                Price of forge upgrades.
@@ -99,7 +99,7 @@ contract Forge is Ownable, IForge {
             Stats(0, 1, 0),
             300,
             5,
-            _basic_resources[11],
+            _basic_resources[12],
             25,
             2,
             true
@@ -129,13 +129,15 @@ contract Forge is Ownable, IForge {
             Stats(8, 2, 3),
             12600,
             15,
-            _basic_resources[5],
+            _basic_resources[7],
             150,
-            7,
+            25,
             true
         );
         recipes[3].raw_materials[0] = _raw_resources[6];
         recipes[3].raw_amounts[0] = 10;
+        recipes[3].raw_materials[1] = _raw_resources[6];
+        recipes[3].raw_amounts[1] = 10;
 
         recipes[4] = Recipe(
             4,
@@ -174,7 +176,7 @@ contract Forge is Ownable, IForge {
             Stats(3, 5, 7),
             6000,
             15,
-            _basic_resources[8],
+            _basic_resources[9],
             75,
             10,
             true
@@ -189,7 +191,7 @@ contract Forge is Ownable, IForge {
             Stats(3, 5, 7),
             6000,
             15,
-            _basic_resources[12],
+            _basic_resources[13],
             75,
             10,
             true
@@ -201,12 +203,12 @@ contract Forge is Ownable, IForge {
             8,
             emptyAddr,
             emptyAmounts,
-            Stats(10, 3, 4),
-            14400,
+            Stats(10, 6, 3),
+            21600,
             20,
-            _basic_resources[9],
-            200,
-            0,
+            _basic_resources[6],
+            150,
+            50,
             true
         );
         recipes[8].raw_materials[0] = _raw_resources[9];
@@ -216,10 +218,10 @@ contract Forge is Ownable, IForge {
             9,
             emptyAddr,
             emptyAmounts,
-            Stats(10, 3, 4),
-            14400,
-            20,
-            _basic_resources[4],
+            Stats(12, 8, 3),
+            28800,
+            25,
+            _basic_resources[10],
             200,
             0,
             true
@@ -231,29 +233,27 @@ contract Forge is Ownable, IForge {
             10,
             emptyAddr,
             emptyAmounts,
-            Stats(12, 4, 5),
-            18000,
+            Stats(12, 8, 3),
+            28800,
             25,
-            _basic_resources[10],
-            250,
-            100,
+            _basic_resources[4],
+            200,
+            0,
             true
         );
         recipes[10].raw_materials[0] = _basic_resources[6];
         recipes[10].raw_amounts[0] = 1;
-        recipes[10].raw_materials[1] = _raw_resources[2];
-        recipes[10].raw_amounts[1] = 10;
 
         recipes[11] = Recipe(
             11,
             emptyAddr,
             emptyAmounts,
-            Stats(17, 4, 5),
-            19800,
-            35,
-            _basic_resources[2],
-            300,
-            150,
+            Stats(15, 10, 3),
+            36000,
+            30,
+            _basic_resources[11],
+            250,
+            100,
             true
         );
         recipes[11].raw_materials[0] = _raw_resources[3];
@@ -265,12 +265,12 @@ contract Forge is Ownable, IForge {
             12,
             emptyAddr,
             emptyAmounts,
-            Stats(23, 7, 8),
-            21600,
-            45,
-            _basic_resources[7],
-            350,
-            175,
+            Stats(17, 12, 5),
+            43200,
+            40,
+            _basic_resources[2],
+            300,
+            150,
             true
         );
         recipes[12].raw_materials[0] = _raw_resources[7];
@@ -282,12 +282,12 @@ contract Forge is Ownable, IForge {
             13,
             emptyAddr,
             emptyAmounts,
-            Stats(28, 9, 11),
-            43200,
+            Stats(23, 15, 8),
+            54000,
             50,
-            _basic_resources[0],
-            400,
-            200,
+            _basic_resources[8],
+            350,
+            175,
             true
         );
         recipes[13].raw_materials[0] = _raw_resources[0];
@@ -295,7 +295,22 @@ contract Forge is Ownable, IForge {
         recipes[13].raw_materials[1] = _raw_resources[2];
         recipes[13].raw_amounts[1] = 20;
 
-        _recipes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+        recipes[14] = Recipe(
+            14,
+            emptyAddr,
+            emptyAmounts,
+            Stats(28, 17, 11),
+            61200,
+            60,
+            _basic_resources[0],
+            400,
+            200,
+            true
+        );
+        recipes[14].raw_materials[0] = _raw_resources[0];
+        recipes[14].raw_amounts[0] = 10;
+        recipes[14].raw_materials[1] = _raw_resources[2];
+        recipes[14].raw_amounts[1] = 20;
     }
 
     /**
@@ -431,7 +446,10 @@ contract Forge is Ownable, IForge {
         );
 
         Recipe memory r = recipes[recipe];
-
+        require(
+            r.available,
+            "Forge: the recipe trying to forge is not available at the momento."
+        );
         require(
             IExperience(experience).getLevel(id) >= r.level_required,
             "Forge: the character doesn't have the level required to forge the material."

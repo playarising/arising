@@ -30,7 +30,9 @@ require("@nomiclabs/hardhat-waffle");
 module.exports = {
   defaultNetwork: "hardhat",
   networks: {
-    hardhat: {},
+    hardhat: {
+      blockGasLimit: 30000000,
+    },
   },
   solidity: {
     compilers: [

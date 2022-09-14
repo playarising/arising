@@ -99,6 +99,10 @@ describe("Materials", () => {
     this.iron_bar = await IronBar.deploy(this.civilizations.address);
     await this.iron_bar.deployed();
 
+    const Ironstone = await ethers.getContractFactory("Ironstone");
+    this.ironstone = await Ironstone.deploy(this.civilizations.address);
+    await this.ironstone.deployed();
+
     const PlatinumBar = await ethers.getContractFactory("PlatinumBar");
     this.platinum_bar = await PlatinumBar.deploy(this.civilizations.address);
     await this.platinum_bar.deployed();
@@ -152,6 +156,7 @@ describe("Materials", () => {
       "Arising: Hardened Leather"
     );
     expect(await this.iron_bar.name()).to.be.eq("Arising: Iron Bar");
+    expect(await this.ironstone.name()).to.be.eq("Arising: Ironstone");
     expect(await this.platinum_bar.name()).to.be.eq("Arising: Platinum Bar");
     expect(await this.silk_fabric.name()).to.be.eq("Arising: Silk Fabric");
     expect(await this.silver_bar.name()).to.be.eq("Arising: Silver Bar");
@@ -181,6 +186,7 @@ describe("Materials", () => {
     expect(await this.gold_bar.symbol()).to.be.eq("GOLD_BAR");
     expect(await this.hardened_leather.symbol()).to.be.eq("HARDENED_LEATHER");
     expect(await this.iron_bar.symbol()).to.be.eq("IRON_BAR");
+    expect(await this.ironstone.symbol()).to.be.eq("IRONSTONE");
     expect(await this.platinum_bar.symbol()).to.be.eq("PLATINUM_BAR");
     expect(await this.silk_fabric.symbol()).to.be.eq("SILK_FABRIC");
     expect(await this.silver_bar.symbol()).to.be.eq("SILVER_BAR");
@@ -253,6 +259,9 @@ describe("Materials", () => {
     );
     expect(await this.iron_bar.image()).to.be.eq(
       "https://playarising.com/material/basic/iron_bar.png"
+    );
+    expect(await this.ironstone.image()).to.be.eq(
+      "https://playarising.com/material/basic/ironstone.png"
     );
     expect(await this.platinum_bar.image()).to.be.eq(
       "https://playarising.com/material/basic/platinum_bar.png"
