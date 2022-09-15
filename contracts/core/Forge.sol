@@ -249,10 +249,7 @@ contract Forge is Ownable, IForge {
             r.requirements.intellect
         );
 
-        require(
-            _assignRecipeToForge(id, _forge, r),
-            "Forge: unable to assign recipe to forge."
-        );
+        _assignRecipeToForge(id, _forge, r);
     }
 
     /**
@@ -279,8 +276,7 @@ contract Forge is Ownable, IForge {
             "Forge: the forge trying to use is not available for claim."
         );
 
-        (bool success, uint256 reward) = _claimForge(id, _forge);
-        require(success, "Forge: unable to claim recipe from forge.");
+        uint256 reward = _claimForge(id, _forge);
         IExperience(experience).assignExperience(id, reward);
     }
 
@@ -405,22 +401,17 @@ contract Forge is Ownable, IForge {
         bytes memory id,
         uint256 _forge,
         Recipe memory r
-    ) internal returns (bool) {
+    ) internal {
         Forge memory f = Forge(true, block.timestamp + r.cooldown, r.id, false);
         if (_forge == 1) {
             forges[id].forge_1 = f;
-            return true;
         }
         if (_forge == 2) {
             forges[id].forge_2 = f;
-            return true;
         }
         if (_forge == 3) {
             forges[id].forge_3 = f;
-            return true;
         }
-
-        return false;
     }
 
     /**
@@ -430,25 +421,26 @@ contract Forge is Ownable, IForge {
      */
     function _claimForge(bytes memory id, uint256 _forge)
         internal
-        returns (bool, uint256)
+        returns (uint256)
     {
         Recipe memory r;
         if (_forge == 1) {
             r = recipes[forges[id].forge_1.last_recipe];
             forges[id].forge_1.last_recipe_claimed = true;
-        } else if (_forge == 2) {
+        }
+        if (_forge == 2) {
             r = recipes[forges[id].forge_2.last_recipe];
             forges[id].forge_1.last_recipe_claimed = true;
-        } else if (_forge == 3) {
+        }
+
+        if (_forge == 3) {
             r = recipes[forges[id].forge_3.last_recipe];
             forges[id].forge_1.last_recipe_claimed = true;
-        } else {
-            return (false, 0);
         }
 
         IBaseFungibleItem(r.reward).mintTo(id, 1);
 
-        return (true, r.exp_reward);
+        return r.exp_reward;
     }
 
     /**
