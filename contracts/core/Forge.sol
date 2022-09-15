@@ -226,8 +226,9 @@ contract Forge is Ownable, IForge {
         Recipe memory r = recipes[recipe];
         require(
             r.available,
-            "Forge: the recipe trying to forge is not available at the momento."
+            "Forge: the recipe trying to forge is not available at the moment."
         );
+
         require(
             IExperience(experience).getLevel(id) >= r.level_required,
             "Forge: the character doesn't have the level required to forge the material."
@@ -269,7 +270,7 @@ contract Forge is Ownable, IForge {
         if (_forge == 3) {
             require(
                 forges[id].forge_3.available,
-                "Forge: forge 3 is not upgrades"
+                "Forge: forge 3 is not upgraded"
             );
         }
 

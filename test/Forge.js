@@ -24,6 +24,8 @@ describe("Forge", () => {
 
     await this.ard.transferOwnership(this.civ.address);
     await this.civ.mint(this.ard.address);
+    await this.civ.connect(this.receiver).mint(this.ard.address);
+
     const Experience = await ethers.getContractFactory("Experience");
     this.experience = await Experience.deploy(levels.address, this.civ.address);
     await this.experience.deployed();
@@ -395,7 +397,7 @@ describe("Forge", () => {
       this.forge
         .connect(this.receiver)
         .buyUpgrade(
-          "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002"
+          "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000005"
         )
     ).to.revertedWith("Forge: can't get access to a non minted token.");
   });
@@ -527,10 +529,132 @@ describe("Forge", () => {
     expect(availability[2]).to.eq(true);
   });
 
-  it("should failt trying to purchase a fourth upgrade", async () => {
+  it("should fail trying to purchase a fourth upgrade", async () => {
     const id = await this.civ.getTokenID(this.ard.address, 1);
     await expect(this.forge.buyUpgrade(id)).to.revertedWith(
       "Forge: user doesn't have buyable spots"
+    );
+  });
+
+  it("should fail when trying to withdraw tokens from non owner", async () => {
+    await expect(this.forge.connect(this.receiver).withdraw()).to.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+  });
+
+  it("should withdraw tokens correctly", async () => {
+    let balance = await this.mock.balanceOf(this.owner.address);
+    await this.forge.withdraw();
+    balance = await this.mock.balanceOf(this.owner.address);
+    expect(balance).to.eq(ethers.utils.parseEther("1000"));
+  });
+
+  it("should fail trying to claim from non purchased forge 2", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 2);
+    await expect(
+      this.forge.connect(this.receiver).claim(id, 2)
+    ).to.revertedWith("Forge: forge 2 is not upgraded");
+  });
+
+  it("should fail trying to forge from non purchased forge 2", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 2);
+    await expect(
+      this.forge.connect(this.receiver).forge(id, 1, 2)
+    ).to.revertedWith("Forge: forge 2 is not upgraded");
+  });
+
+  it("should fail trying to claim from non purchased forge 3", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 2);
+    await expect(
+      this.forge.connect(this.receiver).claim(id, 3)
+    ).to.revertedWith("Forge: forge 3 is not upgraded");
+  });
+
+  it("should fail trying to forge from non purchased forge 3", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 2);
+    await expect(
+      this.forge.connect(this.receiver).forge(id, 1, 3)
+    ).to.revertedWith("Forge: forge 3 is not upgraded");
+  });
+
+  it("should fail trying to forge a recipe that doesnt exist", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 2);
+    await expect(
+      this.forge.connect(this.receiver).forge(id, 0, 1)
+    ).to.revertedWith("Forge: recipe id doesn't exist.");
+  });
+
+  it("should fail trying to forge a recipe that is not available", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 2);
+    await this.forge.disableRecipe(1);
+    await expect(
+      this.forge.connect(this.receiver).forge(id, 1, 1)
+    ).to.revertedWith(
+      "Forge: the recipe trying to forge is not available at the moment."
+    );
+    await this.forge.enableRecipe(1);
+  });
+
+  it("should fail trying to forge a recipe with no enough level", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 2);
+    await expect(
+      this.forge.connect(this.receiver).forge(id, 1, 1)
+    ).to.revertedWith(
+      "Forge: the character doesn't have the level required to forge the material."
+    );
+  });
+
+  it("should fail trying to forge a recipe with no enough gold", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 2);
+    await this.experience.assignExperience(id, 50000);
+    await this.ard
+      .connect(this.receiver)
+      .setApprovalForAll(this.forge.address, true);
+    await expect(
+      this.forge.connect(this.receiver).forge(id, 1, 1)
+    ).to.revertedWith("BaseFungibleItem: not enough balance to consume");
+  });
+
+  it("should fail trying to forge a recipe with no enough materials", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 2);
+    await this.gold.mintTo(id, 500);
+    await expect(
+      this.forge.connect(this.receiver).forge(id, 1, 1)
+    ).to.revertedWith("BaseFungibleItem: not enough balance to consume");
+  });
+
+  it("should fail trying to forge a recipe with no enough stats", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 2);
+    await this.wood.mintTo(id, 1);
+    await expect(
+      this.forge.connect(this.receiver).forge(id, 1, 1)
+    ).to.revertedWith(
+      "Stats: cannot consume more speed than currently available."
+    );
+  });
+
+  it("should forge an item correctly", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 2);
+    await this.stats.connect(this.receiver).assignPoints(id, 0, 2, 0);
+    await this.forge.connect(this.receiver).forge(id, 1, 1);
+    const forge1 = await this.forge.getCharacterForge(id, 1);
+    expect(forge1.available).to.eq(true);
+    expect(forge1.last_recipe).to.eq(1);
+    expect(forge1.last_recipe_claimed).to.eq(false);
+
+    const availability = await this.forge.getCharacterForgesAvailability(id);
+    expect(availability.length).to.eq(3);
+    expect(availability[0]).to.eq(false);
+    expect(availability[1]).to.eq(false);
+    expect(availability[2]).to.eq(false);
+  });
+
+  it("should forge try to use the same forge already being used", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 2);
+    await expect(
+      this.forge.connect(this.receiver).forge(id, 1, 1)
+    ).to.revertedWith(
+      "Forge: the forge trying to use is not available for use."
     );
   });
 });
