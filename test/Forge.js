@@ -749,10 +749,53 @@ describe("Forge", () => {
     const id = await this.civ.getTokenID(this.ard.address, 1);
     const forge3 = await this.forge.getCharacterForge(id, 3);
     await ethers.provider.send("evm_mine", [forge3.cooldown.toNumber()]);
+    let exp = await this.experience.getExperience(id);
+    expect(exp).to.eq(50000);
+
     await this.forge.claim(id, 1);
     await this.forge.claim(id, 2);
     await this.forge.claim(id, 3);
 
+    exp = await this.experience.getExperience(id);
+    expect(exp).to.eq(50075);
+    let availability = await this.forge.getCharacterForgesAvailability(id);
+    expect(availability[0]).to.eq(true);
+    expect(availability[1]).to.eq(true);
+    expect(availability[2]).to.eq(true);
+
     expect(await this.wood_plank.balanceOf(id)).to.eq(3);
+  });
+
+  it("should fail when trying to claim after claimed", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.forge.claim(id, 1)).to.revertedWith(
+      "Forge: the forge trying to use is not available for claim."
+    );
+    await expect(this.forge.claim(id, 2)).to.revertedWith(
+      "Forge: the forge trying to use is not available for claim."
+    );
+    await expect(this.forge.claim(id, 3)).to.revertedWith(
+      "Forge: the forge trying to use is not available for claim."
+    );
+  });
+
+  it("should be able to forge and claim again", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.gold.mintTo(id, 6);
+    await this.wood.mintTo(id, 3);
+
+    await this.forge.forge(id, 1, 1);
+    await this.forge.forge(id, 1, 2);
+    await this.forge.forge(id, 1, 3);
+
+    const forge3 = await this.forge.getCharacterForge(id, 3);
+    await ethers.provider.send("evm_mine", [forge3.cooldown.toNumber()]);
+
+    await this.forge.claim(id, 1);
+    await this.forge.claim(id, 2);
+    await this.forge.claim(id, 3);
+
+    expect(await this.experience.getExperience(id)).to.eq(50150);
+    expect(await this.wood_plank.balanceOf(id)).to.eq(6);
   });
 });

@@ -430,12 +430,12 @@ contract Forge is Ownable, IForge {
         }
         if (_forge == 2) {
             r = recipes[forges[id].forge_2.last_recipe];
-            forges[id].forge_1.last_recipe_claimed = true;
+            forges[id].forge_2.last_recipe_claimed = true;
         }
 
         if (_forge == 3) {
             r = recipes[forges[id].forge_3.last_recipe];
-            forges[id].forge_1.last_recipe_claimed = true;
+            forges[id].forge_3.last_recipe_claimed = true;
         }
 
         IBaseFungibleItem(r.reward).mintTo(id, 1);
