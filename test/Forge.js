@@ -53,6 +53,8 @@ describe("Forge", () => {
     );
     await this.forge.deployed();
 
+    await this.experience.addAuthority(this.forge.address);
+
     const Adamantine = await ethers.getContractFactory("Adamantine");
     this.adamantine = await Adamantine.deploy(this.civ.address);
     await this.adamantine.deployed();
@@ -156,6 +158,7 @@ describe("Forge", () => {
     const WoodPlank = await ethers.getContractFactory("WoodPlank");
     this.wood_plank = await WoodPlank.deploy(this.civ.address);
     await this.wood_plank.deployed();
+    await this.wood_plank.transferOwnership(this.forge.address);
 
     const WoolFabric = await ethers.getContractFactory("WoolFabric");
     this.wool_fabric = await WoolFabric.deploy(this.civ.address);
@@ -727,5 +730,29 @@ describe("Forge", () => {
 
     expect(await this.gold.balanceOf(id)).to.eq(0);
     expect(await this.wood.balanceOf(id)).to.eq(0);
+  });
+
+  it("should fail trying to claim forges before cooldown", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.forge.claim(id, 1)).to.revertedWith(
+      "Forge: the forge trying to use is not available for claim."
+    );
+    await expect(this.forge.claim(id, 2)).to.revertedWith(
+      "Forge: the forge trying to use is not available for claim."
+    );
+    await expect(this.forge.claim(id, 3)).to.revertedWith(
+      "Forge: the forge trying to use is not available for claim."
+    );
+  });
+
+  it("should claim correctly all forges", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    const forge3 = await this.forge.getCharacterForge(id, 3);
+    await ethers.provider.send("evm_mine", [forge3.cooldown.toNumber()]);
+    await this.forge.claim(id, 1);
+    await this.forge.claim(id, 2);
+    await this.forge.claim(id, 3);
+
+    expect(await this.wood_plank.balanceOf(id)).to.eq(3);
   });
 });
