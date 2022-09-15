@@ -582,6 +582,9 @@ describe("Forge", () => {
     await expect(
       this.forge.connect(this.receiver).forge(id, 0, 1)
     ).to.revertedWith("Forge: recipe id doesn't exist.");
+    await expect(
+      this.forge.connect(this.receiver).forge(id, 15, 1)
+    ).to.revertedWith("Forge: recipe id doesn't exist.");
   });
 
   it("should fail trying to forge a recipe that is not available", async () => {
