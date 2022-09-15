@@ -320,6 +320,39 @@ contract Forge is Ownable, IForge {
         return f;
     }
 
+    /**
+     * @dev Reurns an array of booleans for the character forges upgraded.
+     * @param id  Composed ID of the character.
+     */
+    function getCharacterForgesUpgrades(bytes memory id)
+        public
+        view
+        returns (bool[3] memory)
+    {
+        return [
+            true,
+            forges[id].forge_2.available,
+            forges[id].forge_3.available
+        ];
+    }
+
+    /**
+     * @dev Reurns an array of booleans for the character forges available to use.
+     * @param id  Composed ID of the character.
+     */
+    function getCharacterForgesAvailability(bytes memory id)
+        public
+        view
+        returns (bool[3] memory)
+    {
+        bool[3] memory upgrades = getCharacterForgesUpgrades(id);
+        return [
+            upgrades[0] && _isForgeAvailable(id, 1),
+            upgrades[1] && _isForgeAvailable(id, 2),
+            upgrades[2] && _isForgeAvailable(id, 3)
+        ];
+    }
+
     // =============================================== Internal =======================================================
 
     /**

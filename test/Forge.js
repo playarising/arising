@@ -389,4 +389,148 @@ describe("Forge", () => {
     r = await this.forge.getRecipe(1);
     expect(r.available).to.eq(true);
   });
+
+  it("should fail when trying to purchase an upgrade from a non existing character", async () => {
+    await expect(
+      this.forge
+        .connect(this.receiver)
+        .buyUpgrade(
+          "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000002"
+        )
+    ).to.revertedWith("Forge: can't get access to a non minted token.");
+  });
+
+  it("should fail when trying to purchase an upgrade from a non owner character", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(
+      this.forge.connect(this.receiver).buyUpgrade(id)
+    ).to.revertedWith("Forge: msg.sender is not allowed to access this token.");
+  });
+
+  it("should fail when trying to purchase an upgrade with no tokens", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.ard.setApprovalForAll(this.receiver.address, true);
+    await expect(
+      this.forge.connect(this.receiver).buyUpgrade(id)
+    ).to.revertedWith(
+      "Forge: not enough balance of payment tokens to mint tokens."
+    );
+  });
+
+  it("should fail when trying to purchase an upgrade with no allowance", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.forge.buyUpgrade(id)).to.revertedWith(
+      "Forge: not enough allowance to mint tokens."
+    );
+  });
+
+  it("should return the character initial forges correctly", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    const forge1 = await this.forge.getCharacterForge(id, 1);
+    expect(forge1.available).to.eq(false);
+    expect(forge1.cooldown).to.eq(0);
+    expect(forge1.last_recipe).to.eq(0);
+    expect(forge1.last_recipe_claimed).to.eq(false);
+    const forge2 = await this.forge.getCharacterForge(id, 2);
+    expect(forge2.available).to.eq(false);
+    expect(forge2.cooldown).to.eq(0);
+    expect(forge2.last_recipe).to.eq(0);
+    expect(forge2.last_recipe_claimed).to.eq(false);
+    const forge3 = await this.forge.getCharacterForge(id, 3);
+    expect(forge3.available).to.eq(false);
+    expect(forge3.cooldown).to.eq(0);
+    expect(forge3.last_recipe).to.eq(0);
+    expect(forge3.last_recipe_claimed).to.eq(false);
+  });
+
+  it("should return initial upgrades correctly", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    const upgrades = await this.forge.getCharacterForgesUpgrades(id);
+    expect(upgrades.length).to.eq(3);
+    expect(upgrades[0]).to.eq(true);
+    expect(upgrades[1]).to.eq(false);
+    expect(upgrades[2]).to.eq(false);
+  });
+
+  it("should fail trying to return an invalid forge", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.forge.getCharacterForge(id, 0)).to.revertedWith(
+      "Forge: selected forge is invalid"
+    );
+    await expect(this.forge.getCharacterForge(id, 4)).to.revertedWith(
+      "Forge: selected forge is invalid"
+    );
+  });
+
+  it("should return initial availability correctly", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    const availability = await this.forge.getCharacterForgesAvailability(id);
+    expect(availability.length).to.eq(3);
+    expect(availability[0]).to.eq(true);
+    expect(availability[1]).to.eq(false);
+    expect(availability[2]).to.eq(false);
+  });
+
+  it("should be able to purchase the second upgrade", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.mock.approve(
+      this.forge.address,
+      ethers.utils.parseEther("1000")
+    );
+    await this.forge.buyUpgrade(id);
+    expect(await this.mock.balanceOf(this.forge.address)).to.eq(
+      ethers.utils.parseEther("49.99")
+    );
+
+    const forge2 = await this.forge.getCharacterForge(id, 2);
+    expect(forge2.available).to.eq(true);
+    expect(forge2.cooldown).to.eq(0);
+    expect(forge2.last_recipe).to.eq(0);
+    expect(forge2.last_recipe_claimed).to.eq(false);
+
+    const upgrades = await this.forge.getCharacterForgesUpgrades(id);
+    expect(upgrades.length).to.eq(3);
+    expect(upgrades[0]).to.eq(true);
+    expect(upgrades[1]).to.eq(true);
+    expect(upgrades[2]).to.eq(false);
+
+    const availability = await this.forge.getCharacterForgesAvailability(id);
+    expect(availability.length).to.eq(3);
+    expect(availability[0]).to.eq(true);
+    expect(availability[1]).to.eq(true);
+    expect(availability[2]).to.eq(false);
+  });
+
+  it("should be able to purchase the third upgrade", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.forge.buyUpgrade(id);
+    expect(await this.mock.balanceOf(this.forge.address)).to.eq(
+      ethers.utils.parseEther("99.98")
+    );
+
+    const forge3 = await this.forge.getCharacterForge(id, 3);
+    expect(forge3.available).to.eq(true);
+    expect(forge3.cooldown).to.eq(0);
+    expect(forge3.last_recipe).to.eq(0);
+    expect(forge3.last_recipe_claimed).to.eq(false);
+
+    const upgrades = await this.forge.getCharacterForgesUpgrades(id);
+    expect(upgrades.length).to.eq(3);
+    expect(upgrades[0]).to.eq(true);
+    expect(upgrades[1]).to.eq(true);
+    expect(upgrades[2]).to.eq(true);
+
+    const availability = await this.forge.getCharacterForgesAvailability(id);
+    expect(availability.length).to.eq(3);
+    expect(availability[0]).to.eq(true);
+    expect(availability[1]).to.eq(true);
+    expect(availability[2]).to.eq(true);
+  });
+
+  it("should failt trying to purchase a fourth upgrade", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await expect(this.forge.buyUpgrade(id)).to.revertedWith(
+      "Forge: user doesn't have buyable spots"
+    );
+  });
 });
