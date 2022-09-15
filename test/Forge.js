@@ -660,4 +660,72 @@ describe("Forge", () => {
       "Forge: the forge trying to use is not available for use."
     );
   });
+
+  it("should forge and fill all 3 forges", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    await this.experience.assignExperience(id, 50000);
+    await this.ard.setApprovalForAll(this.forge.address, true);
+    await this.stats.assignPoints(id, 0, 10, 0);
+    await this.gold.mintTo(id, 6);
+    await this.wood.mintTo(id, 3);
+
+    expect(await this.gold.balanceOf(id)).to.eq(6);
+    expect(await this.wood.balanceOf(id)).to.eq(3);
+
+    let availability = await this.forge.getCharacterForgesAvailability(id);
+    expect(availability[0]).to.eq(true);
+    expect(availability[1]).to.eq(true);
+    expect(availability[2]).to.eq(true);
+
+    let forge1 = await this.forge.getCharacterForge(id, 1);
+    expect(forge1.available).to.eq(false);
+    expect(forge1.last_recipe).to.eq(0);
+    expect(forge1.last_recipe_claimed).to.eq(false);
+
+    await this.forge.forge(id, 1, 1);
+    availability = await this.forge.getCharacterForgesAvailability(id);
+    expect(availability[0]).to.eq(false);
+    expect(availability[1]).to.eq(true);
+    expect(availability[2]).to.eq(true);
+
+    forge1 = await this.forge.getCharacterForge(id, 1);
+    expect(forge1.available).to.eq(true);
+    expect(forge1.last_recipe).to.eq(1);
+    expect(forge1.last_recipe_claimed).to.eq(false);
+
+    let forge2 = await this.forge.getCharacterForge(id, 2);
+    expect(forge2.available).to.eq(true);
+    expect(forge2.last_recipe).to.eq(0);
+    expect(forge2.last_recipe_claimed).to.eq(false);
+
+    await this.forge.forge(id, 1, 2);
+    availability = await this.forge.getCharacterForgesAvailability(id);
+    expect(availability[0]).to.eq(false);
+    expect(availability[1]).to.eq(false);
+    expect(availability[2]).to.eq(true);
+
+    forge2 = await this.forge.getCharacterForge(id, 2);
+    expect(forge2.available).to.eq(true);
+    expect(forge2.last_recipe).to.eq(1);
+    expect(forge2.last_recipe_claimed).to.eq(false);
+
+    let forge3 = await this.forge.getCharacterForge(id, 3);
+    expect(forge3.available).to.eq(true);
+    expect(forge3.last_recipe).to.eq(0);
+    expect(forge3.last_recipe_claimed).to.eq(false);
+
+    await this.forge.forge(id, 1, 3);
+    availability = await this.forge.getCharacterForgesAvailability(id);
+    expect(availability[0]).to.eq(false);
+    expect(availability[1]).to.eq(false);
+    expect(availability[2]).to.eq(false);
+
+    forge3 = await this.forge.getCharacterForge(id, 3);
+    expect(forge3.available).to.eq(true);
+    expect(forge3.last_recipe).to.eq(1);
+    expect(forge3.last_recipe_claimed).to.eq(false);
+
+    expect(await this.gold.balanceOf(id)).to.eq(0);
+    expect(await this.wood.balanceOf(id)).to.eq(0);
+  });
 });
