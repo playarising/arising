@@ -68,6 +68,27 @@ describe("BaseGadgetToken", () => {
     expect(await this.token.balanceOf(this.minter.address)).to.eq(5);
   });
 
+  it("should not be able to mint tokens when paused", async () => {
+    expect(await this.token.paused()).to.eq(false);
+    await this.token.pause();
+    expect(await this.token.paused()).to.eq(true);
+    await expect(this.token.mint(5)).to.revertedWith("Pausable: paused");
+    await expect(this.token.mintFree(this.minter.address, 5)).to.revertedWith(
+      "Pausable: paused"
+    );
+    await this.token.unpause();
+    expect(await this.token.paused()).to.eq(false);
+  });
+
+  it("should not be able pause when not owner", async () => {
+    await expect(this.token.connect(this.minter).pause()).to.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+    await expect(this.token.connect(this.minter).unpause()).to.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+  });
+
   it("should not be able to withdraw from non owner", async () => {
     await expect(this.token.connect(this.minter).withdraw()).to.revertedWith(
       "Ownable: caller is not the owner"

@@ -64,7 +64,7 @@ contract BaseGadgetToken is ERC20Burnable, Ownable, IBaseGadgetToken, Pausable {
      * @dev Mints any amount of tokens to the `msg.sender` by paying the price in `token`.
      * @param amount    Amount of tokens to mint.
      */
-    function mint(uint256 amount) public {
+    function mint(uint256 amount) public whenNotPaused {
         require(
             IERC20(token).balanceOf(msg.sender) >= totalCost(amount),
             "BaseGadgetToken: not enough balance of payment tokens to mint tokens."
@@ -83,7 +83,11 @@ contract BaseGadgetToken is ERC20Burnable, Ownable, IBaseGadgetToken, Pausable {
      * @param receiver      Address that will receive the tokens.
      * @param amount        Amount of tokens to mint.
      */
-    function mintFree(address receiver, uint256 amount) public onlyOwner {
+    function mintFree(address receiver, uint256 amount)
+        public
+        whenNotPaused
+        onlyOwner
+    {
         _mint(receiver, amount);
     }
 
