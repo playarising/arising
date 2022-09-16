@@ -4,7 +4,6 @@ pragma solidity 0.8.17;
 interface IItems {
     struct Item {
         uint256 id;
-        uint256 external_id;
         uint256 level_required;
         ItemType item_type;
         StatsModifiers stat_modifiers;
@@ -68,7 +67,6 @@ interface IItems {
     }
 
     function addItem(
-        uint256 external_id,
         uint256 level_required,
         ItemType item_type,
         StatsModifiers memory stat_modifiers,
@@ -80,4 +78,6 @@ interface IItems {
     function enableItem(uint256 id) external;
 
     function getItem(uint256 id) external view returns (Item memory);
+
+    function mint(address to, uint256 id) external;
 }

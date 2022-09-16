@@ -1,30 +1,24 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
+import "../interfaces/IStats.sol";
 
 interface ICraft {
-    struct Stats {
-        uint256 might;
-        uint256 speed;
-        uint256 intellect;
-    }
-
     struct Recipe {
         uint256 id;
         address[] materials;
-        uint256[] amounts;
-        Stats requirements;
+        uint256[] material_amounts;
+        IStats.BasicStats stats_required;
         uint256 cooldown;
         uint256 level_required;
-        address reward;
-        uint256 exp_reward;
+        uint256 experience_reward;
         uint256 cost;
         bool available;
+        uint256 item_reward;
     }
 
-    struct Forge {
-        bool available;
+    struct CraftSlot {
         uint256 cooldown;
         uint256 last_recipe;
-        bool last_recipe_claimed;
+        bool claimed;
     }
 }

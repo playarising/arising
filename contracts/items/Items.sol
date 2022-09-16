@@ -30,20 +30,18 @@ contract Items is Ownable, IItems, ERC1155 {
      * @param to       The address of the receiver
      * @param id       The token and item ID
      */
-    function mint(address to, uint256 id) external onlyOwner {
+    function mint(address to, uint256 id) public onlyOwner {
         _mint(to, id, 1, "");
     }
 
     /**
      * @dev Adds a new recipe to the forge.
-     * @param external_id       The ID of the item on the ERC1155 token.
      * @param level_required    Minimum level required to equip.
      * @param item_type         Enum number of the item type.
      * @param stat_modifiers    Stats modifiers with reducers.
      * @param attributes        Item attributes with reducers.
      */
     function addItem(
-        uint256 external_id,
         uint256 level_required,
         ItemType item_type,
         StatsModifiers memory stat_modifiers,
@@ -52,7 +50,6 @@ contract Items is Ownable, IItems, ERC1155 {
         uint256 id = _items.length + 1;
         items[id] = Item(
             id,
-            external_id,
             level_required,
             item_type,
             stat_modifiers,
