@@ -2,16 +2,18 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+
 import "../interfaces/IBaseERC721.sol";
 import "../interfaces/ICivilizations.sol";
 
 /**
  * @dev `Civilizations` is the contract that stores all the usable civilizations.
  */
-contract Civilizations is Ownable, ICivilizations {
+contract Civilizations is Ownable, ICivilizations, Pausable {
     using Address for address;
 
     // =============================================== Storage ========================================================
@@ -24,9 +26,6 @@ contract Civilizations is Ownable, ICivilizations {
     /** @dev Map to track the amount of tokens minted by address. **/
     mapping(address => uint256) private _minters;
 
-    /** @dev Boolean to check if the implementation is usable. **/
-    bool public initialized;
-
     /** @dev Address of the token used to charge the mint. **/
     address public token;
 
@@ -36,36 +35,27 @@ contract Civilizations is Ownable, ICivilizations {
     /** @dev Map to track upgrades information. **/
     mapping(uint256 => Upgrade) public upgrades;
 
-    // ============================================== Modifiers =======================================================
-
-    /**
-     * @dev Checks if `initialized` is enabled.
-     */
-    modifier onlyInitialized() {
-        require(initialized, "Civilizations: contract is not initialized");
-        _;
-    }
-
     // =============================================== Setters ========================================================
 
     /**
      * @dev Constructor.
-     * @param _token   Address of the token to charge.
+     * @param _token   Address of the token to charge for upgrades.
      */
     constructor(address _token) {
         token = _token;
-        initialized = false;
         upgrades[1] = Upgrade(0, false);
         upgrades[2] = Upgrade(0, false);
         upgrades[3] = Upgrade(0, false);
     }
 
-    /**
-     * @dev Enables or disables the `Civilizations` implementation.
-     * @param _init       Enable or disable the instance
-     */
-    function setInitialized(bool _init) public onlyOwner {
-        initialized = _init;
+    /** @dev Pauses the contract */
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    /** @dev Resumes the contract */
+    function unpause() public onlyOwner {
+        _unpause();
     }
 
     /** @dev Marks an upgrade to available.
@@ -126,7 +116,7 @@ contract Civilizations is Ownable, ICivilizations {
     /** @dev Mints a token.
      *  @param _instance  Address of the `BaseERC721` instance to mint.
      */
-    function mint(address _instance) public onlyInitialized {
+    function mint(address _instance) public {
         require(
             _instance != address(0),
             "Civilizations: instance address is null."

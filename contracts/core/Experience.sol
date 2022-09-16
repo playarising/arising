@@ -2,6 +2,7 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "../interfaces/ILevels.sol";
 import "../interfaces/IExperience.sol";
 import "../interfaces/ICivilizations.sol";
@@ -10,7 +11,7 @@ import "../interfaces/ICivilizations.sol";
  * @dev `Experience` is the contract to manage the storage of experience and missions from all the civilizations.
  */
 
-contract Experience is Ownable, IExperience {
+contract Experience is Ownable, IExperience, Pausable {
     // =============================================== Storage ========================================================
 
     /** @dev Map to store the experience from composed ID. **/
@@ -49,6 +50,16 @@ contract Experience is Ownable, IExperience {
         levels = _levels;
         civilizations = _civilizations;
         authorized[msg.sender] = true;
+    }
+
+    /** @dev Pauses the contract */
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    /** @dev Resumes the contract */
+    function unpause() public onlyOwner {
+        _unpause();
     }
 
     /** @dev Adds experience to the character from a composed ID.

@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/IExperience.sol";
 import "../interfaces/IStats.sol";
@@ -12,7 +13,7 @@ import "../interfaces/IStats.sol";
  *       The stats and the concept is created and modified based on the Cypher System for role playing games: http://cypher-system.com/.
  */
 
-contract Stats is Ownable, IStats {
+contract Stats is Ownable, IStats, Pausable {
     // =============================================== Storage ========================================================
     /** @dev Amount of seconds for refresh cooldown.  **/
     uint256 REFRESH_COOLDOWN_SECONDS = 86400; // 1 day.
@@ -71,6 +72,16 @@ contract Stats is Ownable, IStats {
     constructor(address _civilizations, address _experience) {
         civilizations = _civilizations;
         experience = _experience;
+    }
+
+    /** @dev Pauses the contract */
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    /** @dev Resumes the contract */
+    function unpause() public onlyOwner {
+        _unpause();
     }
 
     /** @dev Sets the `Refresher` instance.

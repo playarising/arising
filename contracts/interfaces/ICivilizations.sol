@@ -19,8 +19,6 @@ interface ICivilizations {
         bool upgrade_3;
     }
 
-    function setInitialized(bool _init) external;
-
     function setInitializeUpgrade(uint256 upgrade, bool available) external;
 
     function setUpgradePrice(uint256 upgrade, uint256 price) external;
@@ -41,6 +39,11 @@ interface ICivilizations {
         external
         view
         returns (TokenUpgrades memory);
+
+    function getUpgradeInformation(uint256 upgrade)
+        external
+        view
+        returns (Upgrade memory);
 
     function getCivilizations() external view returns (address[] memory);
 

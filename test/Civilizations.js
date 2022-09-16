@@ -139,27 +139,6 @@ describe("Civilizations", () => {
     await this.shinkari.transferOwnership(this.civ.address);
   });
 
-  it("should not be able to mint when not initialized", async () => {
-    await expect(this.civ.mint(this.ard.address)).to.revertedWith(
-      "Civilizations: contract is not initialized"
-    );
-  });
-
-  it("should not be able to initialize by a non owner", async () => {
-    await expect(
-      this.civ.connect(this.receiver).setInitialized(true)
-    ).to.revertedWith("Ownable: caller is not the owner");
-  });
-
-  it("should initialize correctly", async () => {
-    expect(await this.civ.initialized()).to.be.eq(false);
-    await this.civ.setInitialized(true);
-    expect(await this.civ.initialized()).to.be.eq(true);
-    await this.civ.setInitialized(false);
-    expect(await this.civ.initialized()).to.be.eq(false);
-    await this.civ.setInitialized(true);
-  });
-
   it("should try to mint to an empty instance", async () => {
     await expect(
       this.civ.mint("0x0000000000000000000000000000000000000000")

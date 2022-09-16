@@ -26,6 +26,7 @@ if (argv.enableGasReport) {
 }
 
 require("@nomiclabs/hardhat-waffle");
+require("@openzeppelin/hardhat-upgrades");
 
 module.exports = {
   defaultNetwork: "hardhat",

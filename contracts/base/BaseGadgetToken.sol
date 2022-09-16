@@ -3,13 +3,14 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IBaseGadgetToken.sol";
 
 /**
  * @dev `BaseGadgetToken` is a contract serve as a self-served tokens to perform upgrades for `Stats`.
  */
-contract BaseGadgetToken is ERC20Burnable, Ownable, IBaseGadgetToken {
+contract BaseGadgetToken is ERC20Burnable, Ownable, IBaseGadgetToken, Pausable {
     // =============================================== Storage ========================================================
     /** @dev Address of the token used to charge the mint. **/
     address public token;
@@ -33,6 +34,16 @@ contract BaseGadgetToken is ERC20Burnable, Ownable, IBaseGadgetToken {
     ) ERC20(name, symbol) {
         token = _token;
         price = _price;
+    }
+
+    /** @dev Pauses the contract */
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    /** @dev Resumes the contract */
+    function unpause() public onlyOwner {
+        _unpause();
     }
 
     /** @dev Sets the minting price.

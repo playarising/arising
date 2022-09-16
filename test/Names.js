@@ -17,7 +17,6 @@ describe("Names", () => {
     this.civ = await Civilizations.deploy(receiver.address);
     await this.civ.deployed();
     await this.civ.addCivilization(this.ard.address);
-    await this.civ.setInitialized(true);
 
     await this.ard.transferOwnership(this.civ.address);
     await this.civ.mint(this.ard.address);

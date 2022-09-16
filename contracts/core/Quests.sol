@@ -2,12 +2,13 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
 /**
  * @dev `Quests` is a contract to manage the different missions characters can do.
  */
 
-contract Quests is Ownable {
+contract Quests is Ownable, Pausable {
     // =============================================== Structs ========================================================
     // =============================================== Storage ========================================================
 
@@ -18,6 +19,7 @@ contract Quests is Ownable {
     address public experience;
 
     // =============================================== Modifiers ======================================================
+
     // =============================================== Setters ========================================================
 
     /**
@@ -28,6 +30,16 @@ contract Quests is Ownable {
     constructor(address _civilizations, address _experience) {
         civilizations = _civilizations;
         experience = _experience;
+    }
+
+    /** @dev Pauses the contract */
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    /** @dev Resumes the contract */
+    function unpause() public onlyOwner {
+        _unpause();
     }
 
     // =============================================== Getters ========================================================

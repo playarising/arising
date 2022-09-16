@@ -4,17 +4,18 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/IExperience.sol";
 import "../interfaces/IEquipment.sol";
-import "../interfaces/IBaseERC1155.sol";
+import "../interfaces/IItems.sol";
 
 /**
  * @dev `Equipment` is the contract to equip gear for Arising characters.
  */
 
 // TODO
-contract Equipment is Ownable, ERC1155Holder, IEquipment {
+contract Equipment is Ownable, ERC1155Holder, IEquipment, Pausable {
     // =============================================== Storage ========================================================
 
     /** @dev Address of the `Civilizations` instance. **/
@@ -64,6 +65,16 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment {
         items = _items;
     }
 
+    /** @dev Pauses the contract */
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    /** @dev Resumes the contract */
+    function unpause() public onlyOwner {
+        _unpause();
+    }
+
     /**
      * @dev Assigns an item to an item slot. If it is already used, it replaces it.
      * @param id            Composed ID of the character.
@@ -75,9 +86,7 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment {
         EquipmentSlot item_slot,
         uint256 item_id
     ) public onlyAllowed(id) {
-        IBaseERC1155.Item memory item_data = IBaseERC1155(items).getItem(
-            item_id
-        );
+        IItems.Item memory item_data = IItems(items).getItem(item_id);
 
         // TODO check item type to match the item slot
 
@@ -158,17 +167,15 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment {
     function getCharacterTotalStatsModifiers(bytes memory id)
         public
         view
-        returns (IBaseERC1155.Stats memory, IBaseERC1155.Stats memory)
+        returns (IItems.Stats memory, IItems.Stats memory)
     {
-        IBaseERC1155.Stats memory additions = IBaseERC1155.Stats(0, 0, 0);
-        IBaseERC1155.Stats memory reductions = IBaseERC1155.Stats(0, 0, 0);
+        IItems.Stats memory additions = IItems.Stats(0, 0, 0);
+        IItems.Stats memory reductions = IItems.Stats(0, 0, 0);
 
         for (uint256 i = 0; i < 13; i++) {
             ItemEquiped memory e = character_equipments[id][EquipmentSlot(i)];
             if (e.equiped) {
-                IBaseERC1155.Item memory item = IBaseERC1155(items).getItem(
-                    e.id
-                );
+                IItems.Item memory item = IItems(items).getItem(e.id);
                 additions.might += item.stat_modifiers.might;
                 additions.speed += item.stat_modifiers.speed;
                 additions.intellect += item.stat_modifiers.intellect;
@@ -187,22 +194,29 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment {
     function getCharacterTotalAttributes(bytes memory id)
         public
         view
-        returns (
-            IBaseERC1155.BaseAttributes memory,
-            IBaseERC1155.BaseAttributes memory
-        )
+        returns (IItems.BaseAttributes memory, IItems.BaseAttributes memory)
     {
-        IBaseERC1155.BaseAttributes memory additions = IBaseERC1155
-            .BaseAttributes(0, 0, 0, 0, 0, 0);
-        IBaseERC1155.BaseAttributes memory reductions = IBaseERC1155
-            .BaseAttributes(0, 0, 0, 0, 0, 0);
+        IItems.BaseAttributes memory additions = IItems.BaseAttributes(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
+        IItems.BaseAttributes memory reductions = IItems.BaseAttributes(
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        );
 
         for (uint256 i = 0; i < 13; i++) {
             ItemEquiped memory e = character_equipments[id][EquipmentSlot(i)];
             if (e.equiped) {
-                IBaseERC1155.Item memory item = IBaseERC1155(items).getItem(
-                    e.id
-                );
+                IItems.Item memory item = IItems(items).getItem(e.id);
                 additions.atk += item.attributes.atk;
                 additions.def += item.attributes.def;
                 additions.range += item.attributes.range;

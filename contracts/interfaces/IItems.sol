@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-interface IBaseERC1155 {
+interface IItems {
     struct Item {
         uint256 id;
         uint256 external_id;

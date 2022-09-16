@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "../interfaces/IForge.sol";
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/IExperience.sol";
@@ -13,7 +14,7 @@ import "../interfaces/IBaseFungibleItem.sol";
  * @dev `Forge` is a contract to convert the raw material to craftable pieces.
  */
 
-contract Forge is Ownable, IForge {
+contract Forge is Ownable, IForge, Pausable {
     // =============================================== Storage ========================================================
 
     /** @dev Address of the `Civilizations` instance. **/
@@ -85,6 +86,16 @@ contract Forge is Ownable, IForge {
         token = _token;
         price = _price;
         gold = _gold;
+    }
+
+    /** @dev Pauses the contract */
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    /** @dev Resumes the contract */
+    function unpause() public onlyOwner {
+        _unpause();
     }
 
     /**

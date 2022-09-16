@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/INames.sol";
 import "../interfaces/IExperience.sol";
@@ -11,7 +13,7 @@ import "../interfaces/IExperience.sol";
  *       created by https://twitter.com/mat_nadler.
  */
 
-contract Names is INames {
+contract Names is INames, Pausable, Ownable {
     // =============================================== Storage ========================================================
     /** @dev Address of the `Civilizations` implementation. **/
     address public civilizations;
@@ -52,6 +54,16 @@ contract Names is INames {
     constructor(address _civilizations, address _experience) {
         civilizations = _civilizations;
         experience = _experience;
+    }
+
+    /** @dev Pauses the contract */
+    function pause() public onlyOwner {
+        _pause();
+    }
+
+    /** @dev Resumes the contract */
+    function unpause() public onlyOwner {
+        _unpause();
     }
 
     /**
