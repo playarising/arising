@@ -26,7 +26,7 @@ if (argv.enableGasReport) {
 }
 
 require("@nomiclabs/hardhat-waffle");
-require('solidity-docgen');
+require("solidity-docgen");
 
 module.exports = {
   defaultNetwork: "hardhat",
@@ -53,11 +53,12 @@ module.exports = {
     outputFile: argv.ci ? "gas-report.txt" : undefined,
   },
   docgen: {
-    path: './docs',
+    path: "./docs",
     clear: true,
     runOnCompile: true,
-    except: ["mocks/*"]
-  }
+    pages: "files",
+    exclude: ["mocks/"],
+  },
 };
 
 if (argv.coverage) {

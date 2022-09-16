@@ -103,7 +103,7 @@ contract Items is IItems, Ownable, ERC1155 {
      * Requirements:
      * @param _id   ID of the item.
      *
-     * @return IItem.Item 
+     * @return IItem.Item
      */
     function getItem(uint256 _id) public view returns (Item memory) {
         return items[_id];

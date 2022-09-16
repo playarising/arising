@@ -1,0 +1,183 @@
+# Solidity API
+
+## BaseFungibleItem
+
+This contract an imitation of the ERC20 standard to work around the character context.
+It tracks balances of characters tokens. This also includes functions to wrap and unwrap to a
+{BaseERC20Wrapper} instance.
+
+_Implementation of the {IBaseFungibleItem} interface._
+
+### name
+
+```solidity
+string name
+```
+
+Constant for the name of the item.
+
+### image
+
+```solidity
+string image
+```
+
+Constant the url pointing to the image of the item.
+
+### symbol
+
+```solidity
+string symbol
+```
+
+Constant for the symbol of the item.
+
+### civilizations
+
+```solidity
+address civilizations
+```
+
+Constant for the address of the {Civilizations} instance.
+
+### balances
+
+```solidity
+mapping(bytes => uint256) balances
+```
+
+Map to track the balances of characters.
+
+### wrapper
+
+```solidity
+address wrapper
+```
+
+Constant for the address of the {BaseERC20Wrapper} instance.
+
+### onlyAllowed
+
+```solidity
+modifier onlyAllowed(bytes _id)
+```
+
+Checks against the {Civilizations} instance if the {msg.sender} is the owner or
+has allowance to access a composed ID.
+
+Requirements:
+
+| Name | Type  | Description               |
+| ---- | ----- | ------------------------- |
+| \_id | bytes | Composed ID of the token. |
+
+### constructor
+
+```solidity
+constructor(string _name, string _symbol, string _image, address _civilizations) public
+```
+
+Constructor.
+
+Requirements:
+
+| Name            | Type    | Description                              |
+| --------------- | ------- | ---------------------------------------- |
+| \_name          | string  | Name of the ERC20 token.                 |
+| \_symbol        | string  | Symbol of the ERC20 token.               |
+| \_image         | string  | Url of the item image.                   |
+| \_civilizations | address | Address of the {Civilizations} instance. |
+
+### mintTo
+
+```solidity
+function mintTo(bytes _id, uint256 _amount) public
+```
+
+Creates tokens to the character composed ID provided.
+
+Requirements:
+
+| Name     | Type    | Description                   |
+| -------- | ------- | ----------------------------- |
+| \_id     | bytes   | Composed ID of the character. |
+| \_amount | uint256 | Amount of tokens to create.   |
+
+### consume
+
+```solidity
+function consume(bytes _id, uint256 _amount) public
+```
+
+Reduces tokens to the character composed ID provided.
+
+Requirements:
+
+| Name     | Type    | Description                   |
+| -------- | ------- | ----------------------------- |
+| \_id     | bytes   | Composed ID of the character. |
+| \_amount | uint256 | Amount of tokens to create.   |
+
+### wrap
+
+```solidity
+function wrap(bytes _id, uint256 _amount) public
+```
+
+Converts the internal item to an ERC20 through the {BaseERC20Wrapper}.
+
+Requirements:
+
+| Name     | Type    | Description                   |
+| -------- | ------- | ----------------------------- |
+| \_id     | bytes   | Composed ID of the character. |
+| \_amount | uint256 | Amount of tokens to create.   |
+
+### unwrap
+
+```solidity
+function unwrap(bytes _id, uint256 _amount) public
+```
+
+Converts the wrapped ERC20 token to an internal fungible item.
+
+Requirements:
+
+| Name     | Type    | Description                   |
+| -------- | ------- | ----------------------------- |
+| \_id     | bytes   | Composed ID of the character. |
+| \_amount | uint256 | Amount of tokens to create.   |
+
+### balanceOf
+
+```solidity
+function balanceOf(bytes _id) public view returns (uint256)
+```
+
+External function to get the balance of the character composed ID provided.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| [0]  | uint256 | uint256     |
+
+### \_mint
+
+```solidity
+function _mint(bytes _id, uint256 _amount) internal
+```
+
+Internal function to create tokens to the character composed ID provided without
+without owner check.
+
+Requirements:
+
+| Name     | Type    | Description                   |
+| -------- | ------- | ----------------------------- |
+| \_id     | bytes   | Composed ID of the character. |
+| \_amount | uint256 | Amount of tokens to create.   |

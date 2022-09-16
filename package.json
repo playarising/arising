@@ -17,6 +17,7 @@
     "coverage": "env COVERAGE=true hardhat coverage",
     "flat": "./scripts/flat.sh",
     "format": "prettier --write '**/*.{sol,js,json,md}'",
+    "doc": "rm -rf docs/ && hardhat docgen && yarn format",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test",
     "sort": "npx sort-package-json",
     "test": "hardhat test"
@@ -30,10 +31,10 @@
     "ethereum-waffle": "3.4.4",
     "ethers": "5.7.1",
     "hardhat": "2.11.2",
-    "solidity-docgen": "0.6.0-beta.26",
     "hardhat-gas-reporter": "1.0.9",
     "prettier": "2.7.1",
     "prettier-plugin-solidity": "1.0.0-beta.24",
-    "solidity-coverage": "0.8.2"
+    "solidity-coverage": "0.8.2",
+    "solidity-docgen": "0.6.0-beta.26"
   }
 }
