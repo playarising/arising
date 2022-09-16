@@ -4,13 +4,16 @@ pragma solidity 0.8.17;
 import "../../base/BaseFungibleItem.sol";
 
 /**
- * @dev `CobaltBar` is a fungible item to serve as a craftable resource for the Arising ecosystem.
+ * @title CobaltBar
+ * @notice This contract is an instance of {BaseFungibleItem} to serve as an asset for the ecosystem.
  */
 contract CobaltBar is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
-     * @dev Constructor.
-     * @param _civilizations    The address of the `Civilizations` instance.
+     * @notice Constructor.
+     *
+     * Requirements:
+     * @param _civilizations    Address of the {Civilizations} instance.
      */
     constructor(address _civilizations)
         BaseFungibleItem(

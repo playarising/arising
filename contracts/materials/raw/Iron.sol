@@ -4,13 +4,16 @@ pragma solidity 0.8.17;
 import "../../base/BaseFungibleItem.sol";
 
 /**
- * @dev `Iron` is a fungible item resource for the Arising ecosystem.
+ * @title Iron
+ * @notice This contract is an instance of {BaseFungibleItem} to serve as an asset for the ecosystem.
  */
 contract Iron is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
-     * @dev Constructor.
-     * @param _civilizations    The address of the `Civilizations` instance.
+     * @notice Constructor.
+     *
+     * Requirements:
+     * @param _civilizations    Address of the {Civilizations} instance.
      */
     constructor(address _civilizations)
         BaseFungibleItem(

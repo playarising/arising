@@ -4,13 +4,16 @@ pragma solidity 0.8.17;
 import "../base/BaseFungibleItem.sol";
 
 /**
- * @dev `Gold` is a fungible item to serve as base currency for the Arising ecosystem.
+ * @title Gold
+ * @notice This contract is an instance of {BaseFungibleItem} to serve as the main currency of the whole internal ecosystem.
  */
 contract Gold is BaseFungibleItem {
     // =============================================== Setters ========================================================
     /**
-     * @dev Constructor.
-     * @param _civilizations    The address of the `Civilizations` instance.
+     * @notice Constructor.
+     *
+     * Requirements:
+     * @param _civilizations    Address of the {Civilizations} instance.
      */
     constructor(address _civilizations)
         BaseFungibleItem(
