@@ -1,22 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-interface IForge {
-    struct Stats {
-        uint256 might;
-        uint256 speed;
-        uint256 intellect;
-    }
+import "../interfaces/IStats.sol";
 
+interface IForge {
     struct Recipe {
         uint256 id;
-        address[] raw_materials;
-        uint256[] raw_amounts;
-        Stats requirements;
+        address[] materials;
+        uint256[] material_amounts;
+        IStats.BasicStats stats_required;
         uint256 cooldown;
         uint256 level_required;
         address reward;
-        uint256 exp_reward;
+        uint256 experience_reward;
         uint256 cost;
         bool available;
     }
@@ -41,9 +37,7 @@ interface IForge {
     function addRecipe(
         address[] memory _materials,
         uint256[] memory _amounts,
-        uint256 might_cost,
-        uint256 speed_cost,
-        uint256 intellect_cost,
+        IStats.BasicStats memory stats,
         uint256 cooldown,
         uint256 level_required,
         uint256 cost,

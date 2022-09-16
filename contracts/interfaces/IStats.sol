@@ -2,7 +2,7 @@
 pragma solidity 0.8.17;
 
 interface IStats {
-    struct CharacterStats {
+    struct BasicStats {
         uint256 might;
         uint256 speed;
         uint256 intellect;
@@ -12,47 +12,28 @@ interface IStats {
 
     function setVitalizerToken(address _token) external;
 
-    function consume(
-        bytes memory id,
-        uint256 might,
-        uint256 speed,
-        uint256 intellect
-    ) external;
+    function consume(bytes memory id, BasicStats memory stats) external;
 
-    function sacrifice(
-        bytes memory id,
-        uint256 might,
-        uint256 speed,
-        uint256 intellect
-    ) external;
+    function sacrifice(bytes memory id, BasicStats memory stats) external;
 
     function refresh(bytes memory id) external;
 
     function refreshWithToken(bytes memory id) external;
 
-    function consumeVitalizer(
-        bytes memory id,
-        uint256 might,
-        uint256 speed,
-        uint256 intellect
-    ) external;
+    function consumeVitalizer(bytes memory id, BasicStats memory stats)
+        external;
 
-    function assignPoints(
-        bytes memory id,
-        uint256 might,
-        uint256 speed,
-        uint256 intellect
-    ) external;
+    function assignPoints(bytes memory id, BasicStats memory stats) external;
 
     function getBaseStats(bytes memory id)
         external
         view
-        returns (CharacterStats memory);
+        returns (BasicStats memory);
 
     function getPoolStats(bytes memory id)
         external
         view
-        returns (CharacterStats memory);
+        returns (BasicStats memory);
 
     function getAvailablePoints(bytes memory id)
         external

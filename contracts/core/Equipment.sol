@@ -30,7 +30,7 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment, Pausable {
     mapping(bytes => mapping(EquipmentSlot => ItemEquiped)) character_equipments;
 
     /** @dev Map to track the slots that can be used by an item type. **/
-    mapping(EquipmentSlot => mapping(ItemType => bool)) slots_types;
+    mapping(EquipmentSlot => mapping(IItems.ItemType => bool)) slots_types;
 
     // =============================================== Modifiers ======================================================
 
@@ -66,22 +66,26 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment, Pausable {
         experience = _experience;
         items = _items;
 
-        slots_types[EquipmentSlot.HELMET][IItems.HELMET] = true;
+        slots_types[EquipmentSlot.HELMET][IItems.ItemType.HELMET] = true;
         slots_types[EquipmentSlot.SHOULDER_GUARDS][
-            IItems.SHOULDER_GUARDS
+            IItems.ItemType.SHOULDER_GUARDS
         ] = true;
-        slots_types[EquipmentSlot.ARM_GUARDS][IItems.ARM_GUARDS] = true;
-        slots_types[EquipmentSlot.HANDS][IItems.HANDS] = true;
-        slots_types[EquipmentSlot.RING][IItems.RING] = true;
-        slots_types[EquipmentSlot.NECKLACE][IItems.NECKLACE] = true;
-        slots_types[EquipmentSlot.CHEST][IItems.CHEST] = true;
-        slots_types[EquipmentSlot.LEGS][IItems.LEGS] = true;
-        slots_types[EquipmentSlot.BELT][IItems.BELT] = true;
-        slots_types[EquipmentSlot.FEET][IItems.FEET] = true;
-        slots_types[EquipmentSlot.CAPE][IItems.CAPE] = true;
-        slots_types[EquipmentSlot.LEFT_HAND][IItems.ONE_HANDED] = true;
-        slots_types[EquipmentSlot.LEFT_HAND][IItems.TWO_HANDED] = true;
-        slots_types[EquipmentSlot.RIGHT_HAND][IItems.ONE_HANDED] = true;
+        slots_types[EquipmentSlot.ARM_GUARDS][
+            IItems.ItemType.ARM_GUARDS
+        ] = true;
+        slots_types[EquipmentSlot.HANDS][IItems.ItemType.HANDS] = true;
+        slots_types[EquipmentSlot.RING][IItems.ItemType.RING] = true;
+        slots_types[EquipmentSlot.NECKLACE][IItems.ItemType.NECKLACE] = true;
+        slots_types[EquipmentSlot.CHEST][IItems.ItemType.CHEST] = true;
+        slots_types[EquipmentSlot.LEGS][IItems.ItemType.LEGS] = true;
+        slots_types[EquipmentSlot.BELT][IItems.ItemType.BELT] = true;
+        slots_types[EquipmentSlot.FEET][IItems.ItemType.FEET] = true;
+        slots_types[EquipmentSlot.CAPE][IItems.ItemType.CAPE] = true;
+        slots_types[EquipmentSlot.LEFT_HAND][IItems.ItemType.ONE_HANDED] = true;
+        slots_types[EquipmentSlot.LEFT_HAND][IItems.ItemType.TWO_HANDED] = true;
+        slots_types[EquipmentSlot.RIGHT_HAND][
+            IItems.ItemType.ONE_HANDED
+        ] = true;
     }
 
     /** @dev Pauses the contract */
@@ -112,12 +116,9 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment, Pausable {
             "Equipment: item can't be assigned to that slot"
         );
 
-        if (item_data.item_type == IItems.TWO_HANDED) {
-            ItemEquiped memory right_hand = character_equipments[id][
-                EquipmentSlot.RIGHT_HAND
-            ];
-            if (right_hand.equiped) {
-                unequip(right_hand.id, EquipmentSlot.RIGHT_HAND);
+        if (item_data.item_type == IItems.ItemType.TWO_HANDED) {
+            if (character_equipments[id][EquipmentSlot.RIGHT_HAND].equiped) {
+                unequip(id, EquipmentSlot.RIGHT_HAND);
             }
         }
 
@@ -181,11 +182,11 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment, Pausable {
                 character_equipments[id][EquipmentSlot.SHOULDER_GUARDS],
                 character_equipments[id][EquipmentSlot.ARM_GUARDS],
                 character_equipments[id][EquipmentSlot.HANDS],
-                character_equipments[id][EquipmentSlot.RINGS],
+                character_equipments[id][EquipmentSlot.RING],
                 character_equipments[id][EquipmentSlot.NECKLACE],
                 character_equipments[id][EquipmentSlot.CHEST],
                 character_equipments[id][EquipmentSlot.LEGS],
-                character_equipments[id][EquipmentSlot.BELTS],
+                character_equipments[id][EquipmentSlot.BELT],
                 character_equipments[id][EquipmentSlot.FEET],
                 character_equipments[id][EquipmentSlot.CAPE],
                 character_equipments[id][EquipmentSlot.LEFT_HAND],

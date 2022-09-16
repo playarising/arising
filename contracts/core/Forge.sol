@@ -124,43 +124,39 @@ contract Forge is Ownable, IForge, Pausable {
 
     /**
      * @dev Adds a new recipe to the forge.
-     * @param _materials        Addresses of the raw resources for the creation.
-     * @param _amounts          Amounts for each raw resource.
-     * @param cooldown          Cooldown in seconds for the recipe.
-     * @param level_required    Minimum level required.
-     * @param cost              Gold cost of the recipe.
-     * @param might_cost        Might stat cost from the stats pool.
-     * @param speed_cost        Speed stat cost from the stats pool.
-     * @param intellect_cost    Intelect stat cost from the stats pool.
-     * @param reward            Address of the reward contract.
-     * @param exp_reward            Amount of experience rewarded.
+     * @param materials            Addresses of the raw resources for the creation.
+     * @param amounts              Amounts for each raw resource.
+     * @param cooldown              Cooldown in seconds for the recipe.
+     * @param level_required        Minimum level required.
+     * @param cost                  Gold cost of the recipe.
+     * @param stats                 Stat cost for the recipe.
+     * @param reward                Address of the reward contract.
+     * @param experience_reward     Amount of experience rewarded.
      */
     function addRecipe(
-        address[] memory _materials,
-        uint256[] memory _amounts,
-        uint256 might_cost,
-        uint256 speed_cost,
-        uint256 intellect_cost,
+        address[] memory materials,
+        uint256[] memory amounts,
+        IStats.BasicStats memory stats,
         uint256 cooldown,
         uint256 level_required,
         uint256 cost,
-        uint256 exp_reward,
+        uint256 experience_reward,
         address reward
     ) public onlyOwner {
         uint256 id = _recipes.length + 1;
         require(
-            _materials.length == _amounts.length,
+            materials.length == amounts.length,
             "Forge: materials and amounts arrays should be the same length"
         );
         recipes[id] = Recipe(
             id,
-            _materials,
-            _amounts,
-            Stats(might_cost, speed_cost, intellect_cost),
+            materials,
+            amounts,
+            stats,
             cooldown,
             level_required,
             reward,
-            exp_reward,
+            experience_reward,
             cost,
             true
         );
@@ -249,16 +245,14 @@ contract Forge is Ownable, IForge, Pausable {
             IBaseFungibleItem(gold).consume(id, r.cost);
         }
 
-        for (uint256 i = 0; i < r.raw_materials.length; i++) {
-            IBaseFungibleItem(r.raw_materials[i]).consume(id, r.raw_amounts[i]);
+        for (uint256 i = 0; i < r.materials.length; i++) {
+            IBaseFungibleItem(r.materials[i]).consume(
+                id,
+                r.material_amounts[i]
+            );
         }
 
-        IStats(stats).consume(
-            id,
-            r.requirements.might,
-            r.requirements.speed,
-            r.requirements.intellect
-        );
+        IStats(stats).consume(id, r.stats_required);
 
         _assignRecipeToForge(id, _forge, r);
     }
@@ -455,7 +449,7 @@ contract Forge is Ownable, IForge, Pausable {
 
         IBaseFungibleItem(r.reward).mintTo(id, 1);
 
-        return r.exp_reward;
+        return r.experience_reward;
     }
 
     /**

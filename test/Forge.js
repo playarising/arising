@@ -189,7 +189,16 @@ describe("Forge", () => {
     await expect(
       this.forge
         .connect(this.receiver)
-        .addRecipe([], [], 1, 1, 1, 1, 1, 1, 1, this.owner.address)
+        .addRecipe(
+          [],
+          [],
+          { might: 1, speed: 1, intellect: 1 },
+          1,
+          1,
+          1,
+          1,
+          this.owner.address
+        )
     ).to.revertedWith("Ownable: caller is not the owner");
   });
 
@@ -197,9 +206,7 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.wood.address],
       [1],
-      0,
-      1,
-      0,
+      { might: 0, speed: 1, intellect: 0 },
       300,
       5,
       2,
@@ -209,9 +216,7 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.bronze.address],
       [10],
-      5,
-      3,
-      0,
+      { might: 5, speed: 3, intellect: 0 },
       10800,
       10,
       5,
@@ -221,9 +226,7 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.stone.address, this.iron.address],
       [10, 1],
-      8,
-      2,
-      3,
+      { might: 8, speed: 2, intellect: 3 },
       12600,
       15,
       25,
@@ -233,9 +236,7 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.leather.address],
       [1],
-      2,
-      1,
-      2,
+      { might: 2, speed: 1, intellect: 2 },
       1800,
       15,
       3,
@@ -245,9 +246,7 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.cotton.address],
       [20],
-      3,
-      5,
-      7,
+      { might: 3, speed: 5, intellect: 7 },
       6000,
       15,
       10,
@@ -257,9 +256,7 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.silk.address],
       [20],
-      3,
-      5,
-      7,
+      { might: 3, speed: 5, intellect: 7 },
       6000,
       15,
       10,
@@ -269,9 +266,8 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.wool.address],
       [20],
-      3,
-      5,
-      7,
+      { might: 3, speed: 5, intellect: 7 },
+
       6000,
       15,
       10,
@@ -281,9 +277,7 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.iron.address],
       [10],
-      10,
-      6,
-      3,
+      { might: 10, speed: 6, intellect: 3 },
       21600,
       20,
       50,
@@ -293,9 +287,8 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.silver.address],
       [10],
-      12,
-      8,
-      3,
+      { might: 12, speed: 8, intellect: 3 },
+
       28800,
       25,
       0,
@@ -305,9 +298,8 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.gold.address],
       [10],
-      12,
-      8,
-      3,
+      { might: 12, speed: 8, intellect: 3 },
+
       28800,
       25,
       0,
@@ -317,9 +309,8 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.iron_bar.address, this.coal.address],
       [1, 10],
-      15,
-      10,
-      3,
+      { might: 15, speed: 10, intellect: 3 },
+
       36000,
       30,
       100,
@@ -329,9 +320,8 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.cobalt.address, this.coal.address],
       [10, 20],
-      17,
-      12,
-      5,
+      { might: 17, speed: 12, intellect: 5 },
+
       43200,
       40,
       150,
@@ -341,9 +331,8 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.platinum.address, this.coal.address],
       [10, 20],
-      23,
-      15,
-      8,
+      { might: 23, speed: 15, intellect: 8 },
+
       54000,
       50,
       175,
@@ -353,9 +342,7 @@ describe("Forge", () => {
     await this.forge.addRecipe(
       [this.adamantine.address, this.coal.address],
       [10, 20],
-      28,
-      17,
-      11,
+      { might: 28, speed: 17, intellect: 11 },
       61200,
       60,
       200,
@@ -369,9 +356,7 @@ describe("Forge", () => {
       this.forge.addRecipe(
         [this.wood.address],
         [1, 2],
-        1,
-        1,
-        1,
+        { might: 1, speed: 1, intellect: 1 },
         1,
         1,
         1,
