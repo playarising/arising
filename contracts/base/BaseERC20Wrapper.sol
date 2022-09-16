@@ -4,27 +4,39 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
 import "../interfaces/IBaseERC20Wrapper.sol";
 
 /**
- * @dev `BaseERC20Wrapper` is a a ERC20 token implementation to wrap around `BaseFungibleItem` instances.
+ * @title BaseERC20Wrapper
+ * @notice This contract is a standard {ERC20} implementation with burnable and mintable
+ * functions exposed to the contract owner. This contract is a wrapper for the {BaseFungibleItem} instance to convert
+ * an internal fungible token to the ERC20 standard.
+ *
+ * @dev Implementation of the {IBaseERC20Wrapper} interface.
  */
-contract BaseERC20Wrapper is Ownable, ERC20Burnable, IBaseERC20Wrapper {
+contract BaseERC20Wrapper is IBaseERC20Wrapper, Ownable, ERC20Burnable {
     // =============================================== Setters ========================================================
+
     /**
-     * @dev Constructor.
-     * @param _name     The name of the token.
-     * @param _symbol   The symbol of the token.
+     * @notice Constructor.
+     *
+     * Requirements:
+     * @param _name     Name of the ERC20 token.
+     * @param _symbol   Symbol of the ERC20 token.
      */
     constructor(string memory _name, string memory _symbol)
         ERC20(_name, _symbol)
     {}
 
-    /** @dev Mints an specific amount of tokens to an address.
-     *  @param to       Address that receives the tokens.
-     *  @param amount   Amount to be minted.
+    /**
+     * @notice Creates tokens to the address provided.
+     *
+     * Requirements:
+     * @param _to        Address that receives the tokens.
+     * @param _amount    Amount to be minted.
      */
-    function mint(address to, uint256 amount) public onlyOwner {
-        _mint(to, amount);
+    function mint(address _to, uint256 _amount) public onlyOwner {
+        _mint(_to, _amount);
     }
 }

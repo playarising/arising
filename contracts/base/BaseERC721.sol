@@ -3,24 +3,31 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
 import "../interfaces/IBaseERC721.sol";
 
 /**
- * @dev `BaseERC721` is the base ERC721 token for Arising Civilizations.
+ * @title BaseERC721
+ * @notice This contract is a {ERC721Enumerable} implementation for the different civilizations.
+ * Exposes the mint function to the owner and some check functions.
+ *
+ * @dev Implementation of the {IBaseERC721} interface.
  */
-contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
+contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
     // =============================================== Storage ========================================================
 
-    /** @dev Base URI of the token metadata. **/
+    /** @notice Constant for the base url of the token metadata. */
     string public baseURI;
 
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
-     * @param _name                 The name of the collection.
-     * @param _symbol               The symbol of the collection.
-     * @param _uri                  The base URI for the tokens metadata.
+     * @notice Constructor.
+     *
+     * Requirements:
+     * @param _name     Name of the ERC20 token.
+     * @param _symbol   Symbol of the ERC20 token.
+     * @param _uri      Base url for the tokens metadata.
      */
     constructor(
         string memory _name,
@@ -30,7 +37,12 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
         baseURI = _uri;
     }
 
-    /** @dev Mints a new token to `msg.sender`. */
+    /**
+     * @notice Creates tokens to the address provided.
+     *
+     * Requirements:
+     * @param to    Address that receives the tokens.
+     */
     function mint(address to) public onlyOwner {
         _safeMint(to, totalSupply() + 1);
     }
@@ -38,33 +50,46 @@ contract BaseERC721 is ERC721Enumerable, Ownable, IBaseERC721 {
     // =============================================== Getters ========================================================
 
     /**
-     * @dev Returns whether `spender` is allowed to manage `tokenId`.
-     * @param spender   The account checking allowance.
-     * @param tokenId   The id of the token.
+     * @notice External function to check if an address is allowed to access a token.
+     *
+     * Requirements:
+     * @param spender   Address that will access the token.
+     * @param id        ID of the token to be accessed.
+     *
+     * @return bool     Boolean to determine if is allowed or the owner.
      */
-    function isApprovedOrOwner(address spender, uint256 tokenId)
+    function isApprovedOrOwner(address spender, uint256 id)
         public
         view
         virtual
         returns (bool)
     {
-        address owner = ownerOf(tokenId);
+        address owner = ownerOf(id);
         return (spender == owner ||
             isApprovedForAll(owner, spender) ||
-            getApproved(tokenId) == spender);
+            getApproved(id) == spender);
     }
 
     /**
-     * @dev Returns a bool if a tokenId is already minted in the collection.
-     * @param tokenId   The id of the token.
+     * @notice External function to check if a token id is minted.
+     *
+     * Requirements:
+     * @param id    ID of the token to be checked.
+     *
+     * @return bool Boolean to determine if is minted.
      */
-    function exists(uint256 tokenId) public view returns (bool) {
-        return _exists(tokenId);
+    function exists(uint256 id) public view returns (bool) {
+        return _exists(id);
     }
 
     // =============================================== Internal =======================================================
 
-    /** @dev Overrides the ERC721 `_baseURI` function with an URI specified over the constructor. */
+    /**
+     * @notice Internal function that overrides the {ERC721_baseURI} function
+     * with an URI specified over the constructor.
+     *
+     * @return string Base url provided on constructor.
+     */
     function _baseURI() internal view virtual override returns (string memory) {
         return baseURI;
     }

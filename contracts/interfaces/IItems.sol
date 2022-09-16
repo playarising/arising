@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+/**
+ * @title IItems
+ * @notice Interface for the {Items} contract.
+ */
 interface IItems {
     struct Item {
         uint256 id;

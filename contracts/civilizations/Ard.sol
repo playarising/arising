@@ -4,13 +4,14 @@ pragma solidity 0.8.17;
 import "../base/BaseERC721.sol";
 
 /**
- * @dev `Ard` is the `BaseERC721` instance for the people of Ard.
+ * @title Ard
+ * @notice Implementation of the {BaseERC721} contract for the Ard civilization.
  */
 contract Ard is BaseERC721 {
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
+     * @notice Constructor.
      */
     constructor()
         BaseERC721(

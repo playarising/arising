@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+/**
+ * @title INames
+ * @notice Interface for the {Names} contract.
+ */
 interface INames {
     function claimName(bytes memory id, string memory name) external;
 

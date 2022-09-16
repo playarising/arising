@@ -4,13 +4,14 @@ pragma solidity 0.8.17;
 import "../base/BaseERC721.sol";
 
 /**
- * @dev `IKarans` is the `BaseERC721` instance for the IKarans.
+ * @title IKarans
+ * @notice Implementation of the {BaseERC721} contract for the I'Karans civilization.
  */
 contract IKarans is BaseERC721 {
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
+     * @notice Constructor.
      */
     constructor()
         BaseERC721(

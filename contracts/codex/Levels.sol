@@ -4,13 +4,20 @@ pragma solidity 0.8.17;
 import "../interfaces/ILevels.sol";
 
 /**
- * @dev `Levels` is a basic tool to convert between experience points to level.
+ * @title Levels
+ * @notice This contract is a static storage with utility functions to determine the level
+ * table for the {Experience} contract.
+ *
+ * @dev Implementation of the {ILevels} interface.
  */
 contract Levels is ILevels {
     // =============================================== Struct ========================================================
-    /** @dev Struct define a level.
-     * @param min    The minimum amount of experience to achieve the level.
-     * @param max    The maximum amount of experience for this level (non inclusive).
+    /**
+     * @dev Internal struct to define the level ranges.
+     *
+     * Requirements:
+     * @param min   The minimum amount of experience to achieve the level.
+     * @param max   The maximum amount of experience for this level (non inclusive).
      */
     struct Level {
         uint256 min;
@@ -19,13 +26,14 @@ contract Levels is ILevels {
 
     // =============================================== Storage ========================================================
 
-    /** @dev Map for the levels information.  **/
+    /** @notice Map to track the levels. */
     mapping(uint256 => Level) levels;
 
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
+     * @notice Constructor.
+     * @dev Initializes the lable table.
      */
     constructor() {
         levels[0] = Level(0, 1000);
@@ -184,28 +192,42 @@ contract Levels is ILevels {
     // =============================================== Getters ========================================================
 
     /**
-     * @dev Returns the level from an experience amount.
-     * @param exp   Experience amount.
+     * @notice External function to return the level number from an experience amount.
+     *
+     * Requirements:
+     * @param _experience   Amount of experience to check.
+     *
+     * @return uint256      Level number from experience provided.
      */
-    function getLevel(uint256 exp) public view returns (uint256) {
+    function getLevel(uint256 _experience) public view returns (uint256) {
         uint256 i = 0;
 
-        if (exp < levels[25].min) {
+        if (_experience < levels[25].min) {
             i = 0;
-        } else if (exp >= levels[25].min && exp < levels[50].min) {
+        } else if (
+            _experience >= levels[25].min && _experience < levels[50].min
+        ) {
             i = 25;
-        } else if (exp >= levels[50].min && exp < levels[75].min) {
+        } else if (
+            _experience >= levels[50].min && _experience < levels[75].min
+        ) {
             i = 50;
-        } else if (exp >= levels[75].min && exp < levels[100].min) {
+        } else if (
+            _experience >= levels[75].min && _experience < levels[100].min
+        ) {
             i = 75;
-        } else if (exp >= levels[100].min && exp < levels[125].min) {
+        } else if (
+            _experience >= levels[100].min && _experience < levels[125].min
+        ) {
             i = 100;
-        } else if (exp >= levels[125].min && exp < levels[150].min) {
+        } else if (
+            _experience >= levels[125].min && _experience < levels[150].min
+        ) {
             i = 125;
         }
 
         while (true) {
-            if (exp >= levels[i].min && exp < levels[i].max) {
+            if (_experience >= levels[i].min && _experience < levels[i].max) {
                 return i;
             }
             if (i > 150) {
@@ -217,10 +239,14 @@ contract Levels is ILevels {
     }
 
     /**
-     * @dev Returns the amount of experience required to pass the current level.
-     * @param level   Level to get the experience required.
+     * @notice External function to return the total amount of experience required to reach a level.
+     *
+     * Requirements:
+     * @param _level    Amount of experience to check.
+     *
+     * @return uint256  Total amount of experience required to reach the level provided.
      */
-    function getExperience(uint256 level) public view returns (uint256) {
-        return levels[level].max;
+    function getExperience(uint256 _level) public view returns (uint256) {
+        return levels[_level].max;
     }
 }

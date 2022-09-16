@@ -2,6 +2,10 @@
 pragma solidity 0.8.17;
 import "../interfaces/IStats.sol";
 
+/**
+ * @title ICraft
+ * @notice Interface for the {Craft} contract.
+ */
 interface ICraft {
     struct Recipe {
         uint256 id;

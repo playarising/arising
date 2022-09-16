@@ -4,13 +4,14 @@ pragma solidity 0.8.17;
 import "../base/BaseERC721.sol";
 
 /**
- * @dev `Shinkari` is the `BaseERC721` instance for the Shinkari.
+ * @title Shinkari
+ * @notice Implementation of the {BaseERC721} contract for the Shinkari civilization.
  */
 contract Shinkari is BaseERC721 {
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
+     * @notice Constructor.
      */
     constructor()
         BaseERC721(

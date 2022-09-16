@@ -3,6 +3,10 @@ pragma solidity 0.8.17;
 
 import "../interfaces/IStats.sol";
 
+/**
+ * @title IForge
+ * @notice Interface for the {Forge} contract.
+ */
 interface IForge {
     struct Recipe {
         uint256 id;

@@ -3,55 +3,69 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/IBaseFungibleItem.sol";
 import "../interfaces/IBaseERC20Wrapper.sol";
+
 import "./BaseERC20Wrapper.sol";
 
 /**
- * @dev `BaseFungibleItem` is a base contract to imitate the ERC20 functionality in the context of characters.
+ * @title BaseERC721
+ * @notice This contract an imitation of the ERC20 standard to work around the character context.
+ * It tracks balances of characters tokens. This also includes functions to wrap and unwrap to a
+ * {BaseERC20Wrapper} instance.
+ *
+ * @dev Implementation of the {IBaseFungibleItem} interface.
  */
-contract BaseFungibleItem is Ownable, IBaseFungibleItem {
+contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     // =============================================== Storage ========================================================
 
-    /** @dev Name of the item. **/
+    /** @notice Constant for the name of the item. */
     string public name;
 
-    /** @dev Url pointing an image of the item. **/
+    /** @notice Constant the url pointing to the image of the item. */
     string public image;
 
-    /** @dev Symbol of the item. **/
+    /** @notice Constant for the symbol of the item. */
     string public symbol;
 
-    /** @dev Address of the `Civilizations` instance. **/
+    /** @notice Constant for the address of the {Civilizations} instance. */
     address public civilizations;
 
-    /** @dev Balances. **/
+    /** @notice Map to track the balances of characters. */
     mapping(bytes => uint256) balances;
 
-    /** @dev ERC20 token for the fungible item. **/
+    /** @notice Constant for the address of the {BaseERC20Wrapper} instance. */
     address public wrapper;
 
     // =============================================== Modifiers ======================================================
 
     /**
-     * @dev Checks if `msg.sender` is owner or allowed to manipulate a composed ID.
+     * @notice Checks against the {Civilizations} instance if the {msg.sender} is the owner or
+     * has allowance to access a composed ID.
+     *
+     * Requirements:
+     * @param _id    Composed ID of the token.
      */
-    modifier onlyAllowed(bytes memory id) {
+    modifier onlyAllowed(bytes memory _id) {
         require(
-            ICivilizations(civilizations).isAllowed(msg.sender, id),
+            ICivilizations(civilizations).isAllowed(msg.sender, _id),
             "BaseFungibleItem: require consumer to be owner or have allowance"
         );
         _;
     }
 
     // =============================================== Setters ========================================================
+
     /**
-     * @dev Constructor.
-     * @param _name             The name of fungible token.
-     * @param _symbol           The symbol of the fungible token.
-     * @param _image            Url of the token image.
-     * @param _civilizations    The address of the `Civilizations` instance.
+     * @notice Constructor.
+     *
+     * Requirements:
+     * @param _name             Name of the ERC20 token.
+     * @param _symbol           Symbol of the ERC20 token.
+     * @param _image            Url of the item image.
+     * @param _civilizations    Address of the {Civilizations} instance.
      */
     constructor(
         string memory _name,
@@ -66,61 +80,87 @@ contract BaseFungibleItem is Ownable, IBaseFungibleItem {
         wrapper = address(new BaseERC20Wrapper(_name, _symbol));
     }
 
-    /** @dev Mints an specific amount of items to a character balance.
-     *  @param id       Composed ID of the token.
-     *  @param amount   Amount to be minted.
+    /**
+     * @notice Creates tokens to the character composed ID provided.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _amount   Amount of tokens to create.
      */
-    function mintTo(bytes memory id, uint256 amount) public onlyOwner {
-        _mint(id, amount);
+    function mintTo(bytes memory _id, uint256 _amount) public onlyOwner {
+        _mint(_id, _amount);
     }
 
-    /** @dev Mints an specific amount of items to a character balance.
-     *  @param id       Composed ID of the token.
-     *  @param amount   Amount to be consumed.
+    /**
+     * @notice Reduces tokens to the character composed ID provided.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _amount   Amount of tokens to create.
      */
-    function consume(bytes memory id, uint256 amount) public onlyAllowed(id) {
+    function consume(bytes memory _id, uint256 _amount)
+        public
+        onlyAllowed(_id)
+    {
         require(
-            balances[id] >= amount,
+            balances[_id] >= _amount,
             "BaseFungibleItem: not enough balance to consume"
         );
-        balances[id] -= amount;
+        balances[_id] -= _amount;
     }
 
-    /** @dev Converts the internal fungible item to an ERC20 standard token.
-     *  @param id       Composed ID of the token.
-     *  @param amount   Amount to be wrapped.
+    /**
+     * @notice Converts the internal item to an ERC20 through the {BaseERC20Wrapper}.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _amount   Amount of tokens to create.
      */
-    function wrap(bytes memory id, uint256 amount) public onlyAllowed(id) {
-        consume(id, amount);
+    function wrap(bytes memory _id, uint256 _amount) public onlyAllowed(_id) {
+        consume(_id, _amount);
         IBaseERC20Wrapper(wrapper).mint(
-            ICivilizations(civilizations).ownerOf(id),
-            amount
+            ICivilizations(civilizations).ownerOf(_id),
+            _amount
         );
     }
 
-    /** @dev Converts the standard ERC20 token to an internable fungible item.
-     *  @param id       Composed ID of the token to transfer the item.
-     *  @param amount   Amount to be unwrapped.
+    /**
+     * @notice Converts the wrapped ERC20 token to an internal fungible item.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _amount   Amount of tokens to create.
      */
-    function unwrap(bytes memory id, uint256 amount) public onlyAllowed(id) {
-        ERC20Burnable(wrapper).burn(amount);
-        _mint(id, amount);
+    function unwrap(bytes memory _id, uint256 _amount) public onlyAllowed(_id) {
+        ERC20Burnable(wrapper).burn(_amount);
+        _mint(_id, _amount);
     }
 
     // =============================================== Getters ========================================================
-    /** @dev Returns the balance of the item owned by a character.
-     *  @param id   Composed ID of the token.
+
+    /**
+     * @notice External function to get the balance of the character composed ID provided.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     *
+     * @return uint256  Amount of tokens the character has.
      */
-    function balanceOf(bytes memory id) public view returns (uint256) {
-        return balances[id];
+    function balanceOf(bytes memory _id) public view returns (uint256) {
+        return balances[_id];
     }
 
     // =============================================== Internal ========================================================
-    /** @dev Internal function to mint fungible tokens without owner check.
-     *  @param id       Composed ID of the token.
-     *  @param amount   Amount to be minted.
+
+    /**
+     * @notice Internal function to create tokens to the character composed ID provided without
+     * without owner check.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _amount   Amount of tokens to create.
      */
-    function _mint(bytes memory id, uint256 amount) internal {
-        balances[id] += amount;
+    function _mint(bytes memory _id, uint256 _amount) internal {
+        balances[_id] += _amount;
     }
 }

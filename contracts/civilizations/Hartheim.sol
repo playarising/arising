@@ -4,13 +4,14 @@ pragma solidity 0.8.17;
 import "../base/BaseERC721.sol";
 
 /**
- * @dev `Hartheim` is the `BaseERC721` instance for the Hartheim.
+ * @title Hartheim
+ * @notice Implementation of the {BaseERC721} contract for the Hartheim civilization.
  */
 contract Hartheim is BaseERC721 {
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
+     * @notice Constructor.
      */
     constructor()
         BaseERC721(
