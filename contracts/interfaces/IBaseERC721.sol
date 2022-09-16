@@ -13,8 +13,8 @@ interface IBaseERC721 {
     function isApprovedOrOwner(address _spender, uint256 _id)
         external
         view
-        returns (bool);
+        returns (bool _approved);
 
     /** @notice See {BaseERC721.exists} */
-    function exists(uint256 _id) external view returns (bool);
+    function exists(uint256 _id) external view returns (bool _exist);
 }

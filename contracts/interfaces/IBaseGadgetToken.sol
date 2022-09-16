@@ -28,5 +28,5 @@ interface IBaseGadgetToken {
     function withdraw() external;
 
     /** @notice See {BaseGadgetToken.getTotalCost} */
-    function getTotalCost(uint256 _amount) external returns (uint256);
+    function getTotalCost(uint256 _amount) external returns (uint256 _cost);
 }

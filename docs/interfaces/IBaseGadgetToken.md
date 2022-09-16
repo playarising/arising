@@ -63,7 +63,7 @@ See {BaseGadgetToken.withdraw}
 ### getTotalCost
 
 ```solidity
-function getTotalCost(uint256 _amount) external returns (uint256)
+function getTotalCost(uint256 _amount) external returns (uint256 _cost)
 ```
 
 See {BaseGadgetToken.getTotalCost}

@@ -151,7 +151,7 @@ Requirements:
 ### balanceOf
 
 ```solidity
-function balanceOf(bytes _id) public view returns (uint256)
+function balanceOf(bytes _id) public view returns (uint256 _balance)
 ```
 
 External function to get the balance of the character composed ID provided.
@@ -162,9 +162,9 @@ Requirements:
 | ---- | ----- | ----------------------------- |
 | \_id | bytes | Composed ID of the character. |
 
-| Name | Type    | Description |
-| ---- | ------- | ----------- |
-| [0]  | uint256 | uint256     |
+| Name      | Type    | Description                                             |
+| --------- | ------- | ------------------------------------------------------- |
+| \_balance | uint256 | Amount of tokens of the character from the composed ID. |
 
 ### \_mint
 

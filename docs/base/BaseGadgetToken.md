@@ -124,7 +124,7 @@ Transfers the total amount of tokens stored in the contract to the owner .
 ### getTotalCost
 
 ```solidity
-function getTotalCost(uint256 _amount) public view returns (uint256)
+function getTotalCost(uint256 _amount) public view returns (uint256 _cost)
 ```
 
 External function to get the total amount of tokens required to purchase an amount of tokens.
@@ -135,18 +135,18 @@ Requirements:
 | -------- | ------- | ----------------------------- |
 | \_amount | uint256 | Amount of tokens to purchase. |
 
-| Name | Type    | Description |
-| ---- | ------- | ----------- |
-| [0]  | uint256 | uint256     |
+| Name   | Type    | Description                    |
+| ------ | ------- | ------------------------------ |
+| \_cost | uint256 | Total cost to purchase tokens. |
 
 ### decimals
 
 ```solidity
-function decimals() public view virtual returns (uint8)
+function decimals() public view virtual returns (uint8 _decimals)
 ```
 
 Overrides the {ERC20.decimals} function to return 0 decimals.
 
-| Name | Type  | Description |
-| ---- | ----- | ----------- |
-| [0]  | uint8 | uint8       |
+| Name       | Type  | Description                      |
+| ---------- | ----- | -------------------------------- |
+| \_decimals | uint8 | Amount of decimals of the token. |

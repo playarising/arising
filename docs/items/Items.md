@@ -94,10 +94,10 @@ Requirements:
 ### getItem
 
 ```solidity
-function getItem(uint256 _id) public view returns (struct IItems.Item)
+function getItem(uint256 _id) public view returns (struct IItems.Item _item)
 ```
 
-Returns the full information of an Item.
+Returns the full information of an item.
 
 Requirements:
 
@@ -105,6 +105,6 @@ Requirements:
 | ---- | ------- | --------------- |
 | \_id | uint256 | ID of the item. |
 
-| Name | Type               | Description |
-| ---- | ------------------ | ----------- |
-| [0]  | struct IItems.Item | IItem.Item  |
+| Name   | Type               | Description            |
+| ------ | ------------------ | ---------------------- |
+| \_item | struct IItems.Item | Full item information. |

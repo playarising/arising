@@ -142,11 +142,15 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
      * @notice External function to get the balance of the character composed ID provided.
      *
      * Requirements:
-     * @param _id       Composed ID of the character.
+     * @param _id           Composed ID of the character.
      *
-     * @return uint256
+     * @return _balance     Amount of tokens of the character from the composed ID.
      */
-    function balanceOf(bytes memory _id) public view returns (uint256) {
+    function balanceOf(bytes memory _id)
+        public
+        view
+        returns (uint256 _balance)
+    {
         return balances[_id];
     }
 

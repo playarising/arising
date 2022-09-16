@@ -184,9 +184,13 @@ contract Levels is ILevels {
      * Requirements:
      * @param _experience   Amount of experience to check.
      *
-     * @return uint256
+     * @return _level       Level number of the provided experience.
      */
-    function getLevel(uint256 _experience) public view returns (uint256) {
+    function getLevel(uint256 _experience)
+        public
+        view
+        returns (uint256 _level)
+    {
         uint256 i = 0;
 
         if (_experience < levels[25].min) {
@@ -229,11 +233,15 @@ contract Levels is ILevels {
      * @notice External function to return the total amount of experience required to reach a level.
      *
      * Requirements:
-     * @param _level    Amount of experience to check.
+     * @param _level        Amount of experience to check.
      *
-     * @return uint256
+     * @return _experience  Experience required to reach the level provided.
      */
-    function getExperience(uint256 _level) public view returns (uint256) {
+    function getExperience(uint256 _level)
+        public
+        view
+        returns (uint256 _experience)
+    {
         return levels[_level].max;
     }
 }

@@ -98,14 +98,14 @@ contract Items is IItems, Ownable, ERC1155 {
     // =============================================== Getters ========================================================
 
     /**
-     * @notice Returns the full information of an Item.
+     * @notice Returns the full information of an item.
      *
      * Requirements:
-     * @param _id   ID of the item.
+     * @param _id       ID of the item.
      *
-     * @return IItem.Item
+     * @return _item    Full item information.
      */
-    function getItem(uint256 _id) public view returns (Item memory) {
+    function getItem(uint256 _id) public view returns (Item memory _item) {
         return items[_id];
     }
 }

@@ -39,7 +39,7 @@ See {BaseFungibleItem.unwrap}
 ### balanceOf
 
 ```solidity
-function balanceOf(bytes _id) external view returns (uint256)
+function balanceOf(bytes _id) external view returns (uint256 _balance)
 ```
 
 See {BaseFungibleItem.balanceOf}

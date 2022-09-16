@@ -15,7 +15,7 @@ See {BaseERC721.mint}
 ### isApprovedOrOwner
 
 ```solidity
-function isApprovedOrOwner(address _spender, uint256 _id) external view returns (bool)
+function isApprovedOrOwner(address _spender, uint256 _id) external view returns (bool _approved)
 ```
 
 See {BaseERC721.isApprovedOrOwner}
@@ -23,7 +23,7 @@ See {BaseERC721.isApprovedOrOwner}
 ### exists
 
 ```solidity
-function exists(uint256 _id) external view returns (bool)
+function exists(uint256 _id) external view returns (bool _exist)
 ```
 
 See {BaseERC721.exists}

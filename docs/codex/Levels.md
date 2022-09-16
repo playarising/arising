@@ -28,7 +28,7 @@ _Initializes the lable table._
 ### getLevel
 
 ```solidity
-function getLevel(uint256 _experience) public view returns (uint256)
+function getLevel(uint256 _experience) public view returns (uint256 _level)
 ```
 
 External function to return the level number from an experience amount.
@@ -39,14 +39,14 @@ Requirements:
 | ------------ | ------- | ------------------------------ |
 | \_experience | uint256 | Amount of experience to check. |
 
-| Name | Type    | Description |
-| ---- | ------- | ----------- |
-| [0]  | uint256 | uint256     |
+| Name    | Type    | Description                              |
+| ------- | ------- | ---------------------------------------- |
+| \_level | uint256 | Level number of the provided experience. |
 
 ### getExperience
 
 ```solidity
-function getExperience(uint256 _level) public view returns (uint256)
+function getExperience(uint256 _level) public view returns (uint256 _experience)
 ```
 
 External function to return the total amount of experience required to reach a level.
@@ -57,6 +57,6 @@ Requirements:
 | ------- | ------- | ------------------------------ |
 | \_level | uint256 | Amount of experience to check. |
 
-| Name | Type    | Description |
-| ---- | ------- | ----------- |
-| [0]  | uint256 | uint256     |
+| Name         | Type    | Description                                      |
+| ------------ | ------- | ------------------------------------------------ |
+| \_experience | uint256 | Experience required to reach the level provided. |

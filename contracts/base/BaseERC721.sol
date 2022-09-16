@@ -53,16 +53,16 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
      * @notice External function to check if an address is allowed to access a token.
      *
      * Requirements:
-     * @param spender   Address that will access the token.
-     * @param id        ID of the token to be accessed.
+     * @param spender       Address that will access the token.
+     * @param id            ID of the token to be accessed.
      *
-     * @return bool
+     * @return _approved    Boolean to return if the address is allowed to access the token.
      */
     function isApprovedOrOwner(address spender, uint256 id)
         public
         view
         virtual
-        returns (bool)
+        returns (bool _approved)
     {
         address owner = ownerOf(id);
         return (spender == owner ||
@@ -74,11 +74,11 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
      * @notice External function to check if a token id is minted.
      *
      * Requirements:
-     * @param id    ID of the token to be checked.
+     * @param id            ID of the token to be checked.
      *
-     * @return bool
+     * @return _exist       Boolean to check if the token is already minted.
      */
-    function exists(uint256 id) public view returns (bool) {
+    function exists(uint256 id) public view returns (bool _exist) {
         return _exists(id);
     }
 
@@ -88,9 +88,15 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
      * @notice Internal function that overrides the {ERC721_baseURI} function
      * with an URI specified over the constructor.
      *
-     * @return string
+     * @return _uri Base URL from the constructor
      */
-    function _baseURI() internal view virtual override returns (string memory) {
+    function _baseURI()
+        internal
+        view
+        virtual
+        override
+        returns (string memory _uri)
+    {
         return baseURI;
     }
 }

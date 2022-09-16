@@ -48,7 +48,7 @@ Requirements:
 ### isApprovedOrOwner
 
 ```solidity
-function isApprovedOrOwner(address spender, uint256 id) public view virtual returns (bool)
+function isApprovedOrOwner(address spender, uint256 id) public view virtual returns (bool _approved)
 ```
 
 External function to check if an address is allowed to access a token.
@@ -60,14 +60,14 @@ Requirements:
 | spender | address | Address that will access the token. |
 | id      | uint256 | ID of the token to be accessed.     |
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0]  | bool | bool        |
+| Name       | Type | Description                                                      |
+| ---------- | ---- | ---------------------------------------------------------------- |
+| \_approved | bool | Boolean to return if the address is allowed to access the token. |
 
 ### exists
 
 ```solidity
-function exists(uint256 id) public view returns (bool)
+function exists(uint256 id) public view returns (bool _exist)
 ```
 
 External function to check if a token id is minted.
@@ -78,19 +78,19 @@ Requirements:
 | ---- | ------- | ------------------------------ |
 | id   | uint256 | ID of the token to be checked. |
 
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| [0]  | bool | bool        |
+| Name    | Type | Description                                      |
+| ------- | ---- | ------------------------------------------------ |
+| \_exist | bool | Boolean to check if the token is already minted. |
 
 ### \_baseURI
 
 ```solidity
-function _baseURI() internal view virtual returns (string)
+function _baseURI() internal view virtual returns (string _uri)
 ```
 
 Internal function that overrides the {ERC721_baseURI} function
 with an URI specified over the constructor.
 
-| Name | Type   | Description |
-| ---- | ------ | ----------- |
-| [0]  | string | string      |
+| Name  | Type   | Description                   |
+| ----- | ------ | ----------------------------- |
+| \_uri | string | Base URL from the constructor |
