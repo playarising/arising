@@ -19,7 +19,7 @@ interface ICivilizations {
         bool upgrade_3;
     }
 
-    function setInitialized() external;
+    function setInitialized(bool _init) external;
 
     function setInitializeUpgrade(uint256 upgrade, bool available) external;
 
@@ -55,4 +55,6 @@ interface ICivilizations {
         returns (bool);
 
     function exists(bytes memory _id) external view returns (bool);
+
+    function ownerOf(bytes memory _id) external view returns (address);
 }

@@ -60,12 +60,15 @@ contract Civilizations is Ownable, ICivilizations {
         upgrades[3] = Upgrade(0, false);
     }
 
-    /** @dev Enables the `Civilizations` implementation. */
-    function setInitialized() public onlyOwner {
-        initialized = true;
+    /**
+     * @dev Enables or disables the `Civilizations` implementation.
+     * @param _init       Enable or disable the instance
+     */
+    function setInitialized(bool _init) public onlyOwner {
+        initialized = _init;
     }
 
-    /** @dev Adds a civilization to the contract.
+    /** @dev Marks an upgrade to available.
      *  @param upgrade      The ID of the upgrade.
      *  @param available    The availability of the upgrade.
      */

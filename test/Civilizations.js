@@ -147,14 +147,17 @@ describe("Civilizations", () => {
 
   it("should not be able to initialize by a non owner", async () => {
     await expect(
-      this.civ.connect(this.receiver).setInitialized()
+      this.civ.connect(this.receiver).setInitialized(true)
     ).to.revertedWith("Ownable: caller is not the owner");
   });
 
   it("should initialize correctly", async () => {
     expect(await this.civ.initialized()).to.be.eq(false);
-    await this.civ.setInitialized();
+    await this.civ.setInitialized(true);
     expect(await this.civ.initialized()).to.be.eq(true);
+    await this.civ.setInitialized(false);
+    expect(await this.civ.initialized()).to.be.eq(false);
+    await this.civ.setInitialized(true);
   });
 
   it("should try to mint to an empty instance", async () => {
