@@ -14,7 +14,6 @@ import "../interfaces/IItems.sol";
  * @dev `Equipment` is the contract to equip gear for Arising characters.
  */
 
-// TODO
 contract Equipment is Ownable, ERC1155Holder, IEquipment, Pausable {
     // =============================================== Storage ========================================================
 
@@ -29,6 +28,9 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment, Pausable {
 
     /** @dev Map to track the equipment of characters. **/
     mapping(bytes => mapping(EquipmentSlot => ItemEquiped)) character_equipments;
+
+    /** @dev Map to track the slots that can be used by an item type. **/
+    mapping(EquipmentSlot => mapping(ItemType => bool)) slots_types;
 
     // =============================================== Modifiers ======================================================
 
@@ -63,6 +65,23 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment, Pausable {
         civilizations = _civilizations;
         experience = _experience;
         items = _items;
+
+        slots_types[EquipmentSlot.HELMET][IItems.HELMET] = true;
+        slots_types[EquipmentSlot.SHOULDER_GUARDS][
+            IItems.SHOULDER_GUARDS
+        ] = true;
+        slots_types[EquipmentSlot.ARM_GUARDS][IItems.ARM_GUARDS] = true;
+        slots_types[EquipmentSlot.HANDS][IItems.HANDS] = true;
+        slots_types[EquipmentSlot.RING][IItems.RING] = true;
+        slots_types[EquipmentSlot.NECKLACE][IItems.NECKLACE] = true;
+        slots_types[EquipmentSlot.CHEST][IItems.CHEST] = true;
+        slots_types[EquipmentSlot.LEGS][IItems.LEGS] = true;
+        slots_types[EquipmentSlot.BELT][IItems.BELT] = true;
+        slots_types[EquipmentSlot.FEET][IItems.FEET] = true;
+        slots_types[EquipmentSlot.CAPE][IItems.CAPE] = true;
+        slots_types[EquipmentSlot.LEFT_HAND][IItems.ONE_HANDED] = true;
+        slots_types[EquipmentSlot.LEFT_HAND][IItems.TWO_HANDED] = true;
+        slots_types[EquipmentSlot.RIGHT_HAND][IItems.ONE_HANDED] = true;
     }
 
     /** @dev Pauses the contract */
@@ -88,7 +107,19 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment, Pausable {
     ) public whenNotPaused onlyAllowed(id) {
         IItems.Item memory item_data = IItems(items).getItem(item_id);
 
-        // TODO check item type to match the item slot
+        require(
+            slots_types[item_slot][item_data.item_type],
+            "Equipment: item can't be assigned to that slot"
+        );
+
+        if (item_data.item_type == IItems.TWO_HANDED) {
+            ItemEquiped memory right_hand = character_equipments[id][
+                EquipmentSlot.RIGHT_HAND
+            ];
+            if (right_hand.equiped) {
+                unequip(right_hand.id, EquipmentSlot.RIGHT_HAND);
+            }
+        }
 
         if (character_equipments[id][item_slot].equiped) {
             unequip(id, item_slot);
