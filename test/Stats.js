@@ -74,6 +74,27 @@ describe("Stats", () => {
     expect(await this.stats.owner()).to.eq(this.owner.address);
   });
 
+  it("should not be able to assign points when paused", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 1);
+    expect(await this.stats.paused()).to.eq(false);
+    await this.stats.pause();
+    expect(await this.stats.paused()).to.eq(true);
+    await expect(this.stats.assignPoints(id, 1, 1, 1)).to.revertedWith(
+      "Pausable: paused"
+    );
+    await this.stats.unpause();
+    expect(await this.stats.paused()).to.eq(false);
+  });
+
+  it("should not be able pause when not owner", async () => {
+    await expect(this.stats.connect(this.receiver).pause()).to.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+    await expect(this.stats.connect(this.receiver).unpause()).to.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+  });
+
   it("should return base and pool stats correctly", async () => {
     const id = await this.civ.getTokenID(this.ard.address, 1);
     const pool = await this.stats.getPoolStats(id);

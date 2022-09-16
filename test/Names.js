@@ -36,6 +36,27 @@ describe("Names", () => {
     await this.names.deployed();
   });
 
+  it("should not be able to claim a name when paused", async () => {
+    const id = this.civ.getTokenID(this.ard.address, 1);
+    expect(await this.names.paused()).to.eq(false);
+    await this.names.pause();
+    expect(await this.names.paused()).to.eq(true);
+    await expect(this.names.claimName(id, "Hello")).to.revertedWith(
+      "Pausable: paused"
+    );
+    await this.names.unpause();
+    expect(await this.names.paused()).to.eq(false);
+  });
+
+  it("should not be able pause when not owner", async () => {
+    await expect(this.names.connect(this.minter1).pause()).to.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+    await expect(this.names.connect(this.minter1).unpause()).to.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+  });
+
   it("should validate names correctly", async () => {
     expect(await this.names.isNameValid("conan")).to.eq(true);
     expect(await this.names.isNameValid("Conan")).to.eq(true);

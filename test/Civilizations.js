@@ -139,6 +139,26 @@ describe("Civilizations", () => {
     await this.shinkari.transferOwnership(this.civ.address);
   });
 
+  it("should not be able to mint when paused", async () => {
+    expect(await this.civ.paused()).to.eq(false);
+    await this.civ.pause();
+    expect(await this.civ.paused()).to.eq(true);
+    await expect(this.civ.mint(this.ard.address)).to.revertedWith(
+      "Pausable: paused"
+    );
+    await this.civ.unpause();
+    expect(await this.civ.paused()).to.eq(false);
+  });
+
+  it("should not be able pause when not owner", async () => {
+    await expect(this.civ.connect(this.receiver).pause()).to.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+    await expect(this.civ.connect(this.receiver).unpause()).to.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+  });
+
   it("should try to mint to an empty instance", async () => {
     await expect(
       this.civ.mint("0x0000000000000000000000000000000000000000")

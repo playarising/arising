@@ -164,6 +164,27 @@ describe("Forge", () => {
     await this.wool_fabric.deployed();
   });
 
+  it("should not be able to forge when paused", async () => {
+    const id = await this.civ.getTokenID(this.ard.address, 2);
+    expect(await this.forge.paused()).to.eq(false);
+    await this.forge.pause();
+    expect(await this.forge.paused()).to.eq(true);
+    await expect(this.forge.forge(id, 1, 1)).to.revertedWith(
+      "Pausable: paused"
+    );
+    await this.forge.unpause();
+    expect(await this.forge.paused()).to.eq(false);
+  });
+
+  it("should not be able pause when not owner", async () => {
+    await expect(this.forge.connect(this.receiver).pause()).to.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+    await expect(this.forge.connect(this.receiver).unpause()).to.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+  });
+
   it("should fail adding a recipe when no owner", async () => {
     await expect(
       this.forge
