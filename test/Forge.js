@@ -646,7 +646,9 @@ describe("Forge", () => {
 
   it("should forge an item correctly", async () => {
     const id = await this.civ.getTokenID(this.ard.address, 2);
-    await this.stats.connect(this.receiver).assignPoints(id, 0, 2, 0);
+    await this.stats
+      .connect(this.receiver)
+      .assignPoints(id, { might: 0, speed: 2, intellect: 0 });
     await this.forge.connect(this.receiver).forge(id, 1, 1);
     const forge1 = await this.forge.getCharacterForge(id, 1);
     expect(forge1.available).to.eq(true);
@@ -673,7 +675,7 @@ describe("Forge", () => {
     const id = await this.civ.getTokenID(this.ard.address, 1);
     await this.experience.assignExperience(id, 50000);
     await this.ard.setApprovalForAll(this.forge.address, true);
-    await this.stats.assignPoints(id, 0, 10, 0);
+    await this.stats.assignPoints(id, { might: 0, speed: 10, intellect: 0 });
     await this.gold.mintTo(id, 6);
     await this.wood.mintTo(id, 3);
 
