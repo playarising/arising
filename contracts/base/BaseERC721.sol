@@ -17,7 +17,7 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
     // =============================================== Storage ========================================================
 
     /** @notice Constant for the base url of the token metadata. */
-    string public baseURI;
+    string internal baseURI;
 
     // =============================================== Setters ========================================================
 
@@ -56,7 +56,7 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
      * @param spender   Address that will access the token.
      * @param id        ID of the token to be accessed.
      *
-     * @return bool     Boolean to determine if is allowed or the owner.
+     * @return bool
      */
     function isApprovedOrOwner(address spender, uint256 id)
         public
@@ -76,7 +76,7 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
      * Requirements:
      * @param id    ID of the token to be checked.
      *
-     * @return bool Boolean to determine if is minted.
+     * @return bool
      */
     function exists(uint256 id) public view returns (bool) {
         return _exists(id);
@@ -88,7 +88,7 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
      * @notice Internal function that overrides the {ERC721_baseURI} function
      * with an URI specified over the constructor.
      *
-     * @return string Base url provided on constructor.
+     * @return string
      */
     function _baseURI() internal view virtual override returns (string memory) {
         return baseURI;

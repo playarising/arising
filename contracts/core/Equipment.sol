@@ -10,6 +10,7 @@ import "../interfaces/ICivilizations.sol";
 import "../interfaces/IExperience.sol";
 import "../interfaces/IEquipment.sol";
 import "../interfaces/IItems.sol";
+import "../interfaces/IStats.sol";
 
 /**
  * @dev `Equipment` is the contract to equip gear for Arising characters.
@@ -201,10 +202,10 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment, Pausable {
     function getCharacterTotalStatsModifiers(bytes memory id)
         public
         view
-        returns (IItems.Stats memory, IItems.Stats memory)
+        returns (IStats.BasicStats memory, IStats.BasicStats memory)
     {
-        IItems.Stats memory additions = IItems.Stats(0, 0, 0);
-        IItems.Stats memory reductions = IItems.Stats(0, 0, 0);
+        IStats.BasicStats memory additions = IStats.BasicStats(0, 0, 0);
+        IStats.BasicStats memory reductions = IStats.BasicStats(0, 0, 0);
 
         for (uint256 i = 0; i < 13; i++) {
             ItemEquiped memory e = character_equipments[id][EquipmentSlot(i)];

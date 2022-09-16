@@ -6,6 +6,18 @@ pragma solidity 0.8.17;
  * @notice Interface for the {Levels} contract.
  */
 interface ILevels {
+    /**
+     * @notice Internal struct to define the level ranges.
+     *
+     * Requirements:
+     * @param min   The minimum amount of experience to achieve the level.
+     * @param max   The maximum amount of experience for this level (non inclusive).
+     */
+    struct Level {
+        uint256 min;
+        uint256 max;
+    }
+
     /** @notice See {Levels.getLevel} */
     function getLevel(uint256 _experience) external view returns (uint256);
 

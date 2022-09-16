@@ -6,6 +6,13 @@ pragma solidity 0.8.17;
  * @notice Interface for the {Items} contract.
  */
 interface IItems {
+    /**
+     * @notice Internal struct to store the item properties.
+     *
+     * Requirements:
+     * @param min   The minimum amount of experience to achieve the level.
+     * @param max   The maximum amount of experience for this level (non inclusive).
+     */
     struct Item {
         uint256 id;
         uint256 level_required;
@@ -29,12 +36,6 @@ interface IItems {
         CAPE,
         ONE_HANDED,
         TWO_HANDED
-    }
-
-    struct Stats {
-        uint256 might;
-        uint256 speed;
-        uint256 intellect;
     }
 
     struct StatsModifiers {

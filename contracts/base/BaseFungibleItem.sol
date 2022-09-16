@@ -144,7 +144,7 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
      * Requirements:
      * @param _id       Composed ID of the character.
      *
-     * @return uint256  Amount of tokens the character has.
+     * @return uint256
      */
     function balanceOf(bytes memory _id) public view returns (uint256) {
         return balances[_id];

@@ -7,90 +7,105 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "../interfaces/IItems.sol";
 
 /**
- * @dev `Items` is the base ERC1155 token for Arising civilizations gear and equipable items.
+ * @title Items
+ * @notice This contract is an standard {ERC1155} implementation with internal mappings to store items additional
+ * information for the characters usage.
+ *
+ * @dev Implementation of the {IItems} interface.
  */
-
-contract Items is Ownable, IItems, ERC1155 {
+contract Items is IItems, Ownable, ERC1155 {
     // =============================================== Storage ========================================================
 
-    /** @dev Map to track all the available items. **/
+    /** @notice Map to track the extra items data. */
     mapping(uint256 => Item) items;
 
-    /** @dev Array to track all the available items. **/
+    /** @notice Array to track a full list of item IDs. */
     uint256[] _items;
 
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
+     * @notice Constructor.
      */
     constructor() ERC1155("https://items.playarising.com/{id}/") {}
 
     /**
-     * @dev Creates a new item.
-     * @param to       The address of the receiver
-     * @param id       The token and item ID
+     * @notice Creates tokens to the address provided.
+     *
+     * Requirements:
+     * @param _to    Address that receives the tokens.
+     * @param _id    ID of the item to be created.
      */
-    function mint(address to, uint256 id) public onlyOwner {
-        _mint(to, id, 1, "");
+    function mint(address _to, uint256 _id) public onlyOwner {
+        _mint(_to, _id, 1, "");
     }
 
     /**
-     * @dev Adds a new recipe to the forge.
-     * @param level_required    Minimum level required to equip.
-     * @param item_type         Enum number of the item type.
-     * @param stat_modifiers    Stats modifiers with reducers.
-     * @param attributes        Item attributes with reducers.
+     * @notice Adds the item data to relate with a specific token ID.
+     *
+     * Requirements:
+     * @param _level_required   Minimum level for a character to use the item.
+     * @param _item_type        Type of the item defined by the enum {ItemType}.
+     * @param _stats_modifiers  Item modifiers for the character stats.
+     * @param _attributes       Specific item attributes.
      */
     function addItem(
-        uint256 level_required,
-        ItemType item_type,
-        StatsModifiers memory stat_modifiers,
-        Attributes memory attributes
+        uint256 _level_required,
+        ItemType _item_type,
+        StatsModifiers memory _stats_modifiers,
+        Attributes memory _attributes
     ) public onlyOwner {
-        uint256 id = _items.length + 1;
-        items[id] = Item(
-            id,
-            level_required,
-            item_type,
-            stat_modifiers,
-            attributes,
+        uint256 new_id = _items.length + 1;
+        items[new_id] = Item(
+            new_id,
+            _level_required,
+            _item_type,
+            _stats_modifiers,
+            _attributes,
             true
         );
-        _items.push(id);
+        _items.push(new_id);
     }
 
     /**
-     * @dev Disables an item to be equiped recipe.
-     * @param id  ID of the item.
+     * @notice Disables an item from beign equiped.
+     *
+     * Requirements:
+     * @param _id   ID of the item.
      */
-    function disableItem(uint256 id) public onlyOwner {
+    function disableItem(uint256 _id) public onlyOwner {
         require(
-            id != 0 && id <= _items.length,
-            "Equipment: item id doesn't exist."
+            _id != 0 && _id <= _items.length,
+            "Items: item id doesn't exist."
         );
-        items[id].available = false;
+        items[_id].available = false;
     }
 
     /**
-     * @dev Enables an item to be equiped recipe.
-     * @param id  ID of the item.
+     * @notice Enables an item to be equiped.
+     *
+     * Requirements:
+     * @param _id   ID of the item.
      */
-    function enableItem(uint256 id) public onlyOwner {
+    function enableItem(uint256 _id) public onlyOwner {
         require(
-            id != 0 && id <= _items.length,
+            _id != 0 && _id <= _items.length,
             "Equipment: item id doesn't exist."
         );
-        items[id].available = true;
+        items[_id].available = true;
     }
 
     // =============================================== Getters ========================================================
 
-    /** @dev Returns the information of an item.
-     *  @param id  ID of the item.
+    /**
+     * @notice Returns the full information of an Item.
+     *
+     * Requirements:
+     * @param _id   ID of the item.
+     *
+     * @return IItem.Item 
      */
-    function getItem(uint256 id) public view returns (Item memory) {
-        return items[id];
+    function getItem(uint256 _id) public view returns (Item memory) {
+        return items[_id];
     }
-    // =============================================== Internal =======================================================
 }

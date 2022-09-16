@@ -11,19 +11,6 @@ import "../interfaces/ILevels.sol";
  * @dev Implementation of the {ILevels} interface.
  */
 contract Levels is ILevels {
-    // =============================================== Struct ========================================================
-    /**
-     * @dev Internal struct to define the level ranges.
-     *
-     * Requirements:
-     * @param min   The minimum amount of experience to achieve the level.
-     * @param max   The maximum amount of experience for this level (non inclusive).
-     */
-    struct Level {
-        uint256 min;
-        uint256 max;
-    }
-
     // =============================================== Storage ========================================================
 
     /** @notice Map to track the levels. */
@@ -197,7 +184,7 @@ contract Levels is ILevels {
      * Requirements:
      * @param _experience   Amount of experience to check.
      *
-     * @return uint256      Level number from experience provided.
+     * @return uint256
      */
     function getLevel(uint256 _experience) public view returns (uint256) {
         uint256 i = 0;
@@ -244,7 +231,7 @@ contract Levels is ILevels {
      * Requirements:
      * @param _level    Amount of experience to check.
      *
-     * @return uint256  Total amount of experience required to reach the level provided.
+     * @return uint256
      */
     function getExperience(uint256 _level) public view returns (uint256) {
         return levels[_level].max;

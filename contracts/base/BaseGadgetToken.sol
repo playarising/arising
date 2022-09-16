@@ -127,7 +127,7 @@ contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
      * Requirements:
      * @param _amount   Amount of tokens to purchase.
      *
-     * @return uint256  Total amount of tokens.
+     * @return uint256
      */
     function getTotalCost(uint256 _amount) public view returns (uint256) {
         return _amount * price;
@@ -136,7 +136,7 @@ contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
     /**
      * @notice Overrides the {ERC20.decimals} function to return 0 decimals.
      *
-     * @return uint8    Zero decimals.
+     * @return uint8
      */
     function decimals() public view virtual override returns (uint8) {
         return 0;
