@@ -116,7 +116,7 @@ contract Civilizations is Ownable, ICivilizations, Pausable {
     /** @dev Mints a token.
      *  @param _instance  Address of the `BaseERC721` instance to mint.
      */
-    function mint(address _instance) public {
+    function mint(address _instance) public whenNotPaused {
         require(
             _instance != address(0),
             "Civilizations: instance address is null."
@@ -138,7 +138,7 @@ contract Civilizations is Ownable, ICivilizations, Pausable {
      * @param id         Composed ID of the token.
      * @param upgrade    Upgrade id.
      */
-    function buyUpgrade(bytes memory id, uint256 upgrade) public {
+    function buyUpgrade(bytes memory id, uint256 upgrade) public whenNotPaused {
         require(
             upgrade > 0 && upgrade <= 3,
             "Civilizations: upgrade id doesn't exist."

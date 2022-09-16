@@ -81,11 +81,11 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment, Pausable {
      * @param item_slot     Slot from the equipment to remove.
      * @param item_id       ID of the item to assign.
      */
-    function unequip(
+    function equip(
         bytes memory id,
         EquipmentSlot item_slot,
         uint256 item_id
-    ) public onlyAllowed(id) {
+    ) public whenNotPaused onlyAllowed(id) {
         IItems.Item memory item_data = IItems(items).getItem(item_id);
 
         // TODO check item type to match the item slot
@@ -113,6 +113,7 @@ contract Equipment is Ownable, ERC1155Holder, IEquipment, Pausable {
      */
     function unequip(bytes memory id, EquipmentSlot item_slot)
         public
+        whenNotPaused
         onlyAllowed(id)
     {
         require(

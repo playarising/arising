@@ -171,7 +171,7 @@ contract Forge is Ownable, IForge, Pausable {
      * @dev Upgrades character to use another forge slot.
      * @param id  Composed ID of the token.
      */
-    function buyUpgrade(bytes memory id) public onlyAllowed(id) {
+    function buyUpgrade(bytes memory id) public whenNotPaused onlyAllowed(id) {
         require(
             IERC20(token).balanceOf(msg.sender) >= price,
             "Forge: not enough balance of payment tokens to mint tokens."
@@ -212,7 +212,7 @@ contract Forge is Ownable, IForge, Pausable {
         bytes memory id,
         uint256 recipe,
         uint256 _forge
-    ) public onlyAllowed(id) {
+    ) public whenNotPaused onlyAllowed(id) {
         if (_forge == 2) {
             require(
                 forges[id].forge_2.available,
@@ -268,7 +268,11 @@ contract Forge is Ownable, IForge, Pausable {
      * @param id        Composed ID of the character.
      * @param _forge    Number of the forge to use.
      */
-    function claim(bytes memory id, uint256 _forge) public onlyAllowed(id) {
+    function claim(bytes memory id, uint256 _forge)
+        public
+        whenNotPaused
+        onlyAllowed(id)
+    {
         if (_forge == 2) {
             require(
                 forges[id].forge_2.available,

@@ -109,7 +109,7 @@ contract Stats is Ownable, IStats, Pausable {
         uint256 might,
         uint256 speed,
         uint256 intellect
-    ) public onlyAllowed(id) {
+    ) public whenNotPaused onlyAllowed(id) {
         CharacterStats storage currPool = pool[id];
         require(
             might <= currPool.might,
@@ -140,7 +140,7 @@ contract Stats is Ownable, IStats, Pausable {
         uint256 might,
         uint256 speed,
         uint256 intellect
-    ) public onlyAllowed(id) {
+    ) public whenNotPaused onlyAllowed(id) {
         CharacterStats storage currBase = base[id];
         require(
             might <= currBase.might,
@@ -179,7 +179,7 @@ contract Stats is Ownable, IStats, Pausable {
     /** @dev Performs a refresh filling the pool stats from the base stats.
      *  @param id   Composed ID of the token.
      */
-    function refresh(bytes memory id) public onlyAllowed(id) {
+    function refresh(bytes memory id) public whenNotPaused onlyAllowed(id) {
         uint256 last = last_refresh[id];
         require(
             last == 0 || getNextRefreshTime(id) <= block.timestamp,
@@ -194,7 +194,11 @@ contract Stats is Ownable, IStats, Pausable {
     /** @dev Performs a refresh filling the pool stats from the base stats without cooldown spending `RefreshToken` (max 20 points per stat).
      *  @param id   Composed ID of the token.
      */
-    function refreshWithToken(bytes memory id) public onlyAllowed(id) {
+    function refreshWithToken(bytes memory id)
+        public
+        whenNotPaused
+        onlyAllowed(id)
+    {
         require(
             IERC20(refresher).balanceOf(msg.sender) >= 1,
             "Stats: not enough refresh tokens balance to perform a refresh."
@@ -243,7 +247,7 @@ contract Stats is Ownable, IStats, Pausable {
         uint256 might,
         uint256 speed,
         uint256 intellect
-    ) public onlyAllowed(id) {
+    ) public whenNotPaused onlyAllowed(id) {
         require(
             sacrifices[id] > 0,
             "Stats: user doesn't have sacrificed points to recover"
@@ -285,7 +289,7 @@ contract Stats is Ownable, IStats, Pausable {
         uint256 might,
         uint256 speed,
         uint256 intellect
-    ) public onlyAllowed(id) {
+    ) public whenNotPaused onlyAllowed(id) {
         uint256 sum = might + speed + intellect;
         uint256 available = getAvailablePoints(id);
         require(

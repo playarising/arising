@@ -73,6 +73,7 @@ contract Names is INames, Pausable, Ownable {
      */
     function claimName(bytes memory id, string memory name)
         public
+        whenNotPaused
         onlyAllowed(id)
     {
         require(
@@ -99,6 +100,7 @@ contract Names is INames, Pausable, Ownable {
      */
     function replaceName(bytes memory id, string memory newName)
         public
+        whenNotPaused
         onlyAllowed(id)
     {
         require(
@@ -128,7 +130,7 @@ contract Names is INames, Pausable, Ownable {
      * @dev Removes the name of the character.
      *  @param id    Composed ID of the token.
      */
-    function clearName(bytes memory id) public onlyAllowed(id) {
+    function clearName(bytes memory id) public whenNotPaused onlyAllowed(id) {
         string memory oldName = names[id];
         require(
             bytes(oldName).length != 0,
