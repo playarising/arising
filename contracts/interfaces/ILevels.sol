@@ -18,9 +18,9 @@ interface ILevels {
         uint256 max;
     }
 
-    /** @notice See [Levels](/docs/codex/Levels.md#getLevel) */
+    /** @notice See [Levels#getLevel](/docs/codex/Levels.md#getLevel) */
     function getLevel(uint256 _experience) external view returns (uint256);
 
-    /** @notice See [Levels](/docs/codex/Levels.md#getExperience) */
+    /** @notice See [Levels#getExperience](/docs/codex/Levels.md#getExperience) */
     function getExperience(uint256 _level) external view returns (uint256);
 }

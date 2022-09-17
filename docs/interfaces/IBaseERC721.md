@@ -10,7 +10,7 @@ Interface for the [BaseERC721](/docs/base/BaseERC721.md) contract.
 function mint(address _to) external
 ```
 
-See {BaseERC721.mint}
+See [BaseERC721#mint](/docs/base/BaseERC721.md#mint)
 
 ### isApprovedOrOwner
 
@@ -18,7 +18,7 @@ See {BaseERC721.mint}
 function isApprovedOrOwner(address _spender, uint256 _id) external view returns (bool _approved)
 ```
 
-See [BaseERC721](/docs/base/BaseERC721.md#isApprovedOrOwner)
+See [BaseERC721#isApprovedOrOwner](/docs/base/BaseERC721.md#isApprovedOrOwner)
 
 ### exists
 
@@ -26,4 +26,4 @@ See [BaseERC721](/docs/base/BaseERC721.md#isApprovedOrOwner)
 function exists(uint256 _id) external view returns (bool _exist)
 ```
 
-See [BaseERC721](/docs/base/BaseERC721.md#exists)
+See [BaseERC721#exists](/docs/base/BaseERC721.md#exists)

@@ -10,7 +10,7 @@ Interface for the [BaseGadgetToken](/docs/base/BaseGadgetToken.md) contract.
 function pause() external
 ```
 
-See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#pause)
+See [BaseGadgetToken#pause](/docs/base/BaseGadgetToken.md#pause)
 
 ### unpause
 
@@ -18,7 +18,7 @@ See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#pause)
 function unpause() external
 ```
 
-See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#unpause)
+See [BaseGadgetToken#unpause](/docs/base/BaseGadgetToken.md#unpause)
 
 ### setPrice
 
@@ -26,7 +26,7 @@ See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#unpause)
 function setPrice(uint256 _price) external
 ```
 
-See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#setPrice)
+See [BaseGadgetToken#setPrice](/docs/base/BaseGadgetToken.md#setPrice)
 
 ### setToken
 
@@ -34,7 +34,7 @@ See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#setPrice)
 function setToken(address _token) external
 ```
 
-See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#setToken)
+See [BaseGadgetToken#setToken](/docs/base/BaseGadgetToken.md#setToken)
 
 ### mint
 
@@ -42,7 +42,7 @@ See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#setToken)
 function mint(uint256 _amount) external
 ```
 
-See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#mint)
+See [BaseGadgetToken#mint](/docs/base/BaseGadgetToken.md#mint)
 
 ### mintFree
 
@@ -50,7 +50,7 @@ See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#mint)
 function mintFree(address _receiver, uint256 _amount) external
 ```
 
-See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#mintFree)
+See [BaseGadgetToken#mintFree](/docs/base/BaseGadgetToken.md#mintFree)
 
 ### withdraw
 
@@ -58,7 +58,7 @@ See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#mintFree)
 function withdraw() external
 ```
 
-See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#withdraw)
+See [BaseGadgetToken#withdraw](/docs/base/BaseGadgetToken.md#withdraw)
 
 ### getTotalCost
 
@@ -66,4 +66,4 @@ See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#withdraw)
 function getTotalCost(uint256 _amount) external returns (uint256 _cost)
 ```
 
-See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#getTotalCost)
+See [BaseGadgetToken#getTotalCost](/docs/base/BaseGadgetToken.md#getTotalCost)

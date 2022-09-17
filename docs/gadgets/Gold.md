@@ -14,6 +14,6 @@ Constructor.
 
 Requirements:
 
-| Name            | Type    | Description                              |
-| --------------- | ------- | ---------------------------------------- |
-| \_civilizations | address | Address of the {Civilizations} instance. |
+| Name            | Type    | Description                                                           |
+| --------------- | ------- | --------------------------------------------------------------------- |
+| \_civilizations | address | Address of the [Civilizations](/docs/core/Civilizations.md) instance. |

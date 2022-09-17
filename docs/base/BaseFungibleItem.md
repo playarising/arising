@@ -38,7 +38,7 @@ Constant for the symbol of the item.
 address civilizations
 ```
 
-Constant for the address of the {Civilizations} instance.
+Constant for the address of the [Civilizations](/docs/core/Civilizations.md) instance.
 
 ### balances
 
@@ -62,7 +62,7 @@ Constant for the address of the [BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.m
 modifier onlyAllowed(bytes _id)
 ```
 
-Checks against the {Civilizations} instance if the {msg.sender} is the owner or
+Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the {msg.sender} is the owner or
 has allowance to access a composed ID.
 
 Requirements:
@@ -81,12 +81,12 @@ Constructor.
 
 Requirements:
 
-| Name            | Type    | Description                              |
-| --------------- | ------- | ---------------------------------------- |
-| \_name          | string  | Name of the `ERC20` token.               |
-| \_symbol        | string  | Symbol of the `ERC20` token.             |
-| \_image         | string  | Url of the item image.                   |
-| \_civilizations | address | Address of the {Civilizations} instance. |
+| Name            | Type    | Description                                                           |
+| --------------- | ------- | --------------------------------------------------------------------- |
+| \_name          | string  | Name of the `ERC20` token.                                            |
+| \_symbol        | string  | Symbol of the `ERC20` token.                                          |
+| \_image         | string  | Url of the item image.                                                |
+| \_civilizations | address | Address of the [Civilizations](/docs/core/Civilizations.md) instance. |
 
 ### mintTo
 

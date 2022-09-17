@@ -10,7 +10,7 @@ Interface for the [BaseFungibleItem](/docs/base/BaseFungibleItem.md) contract.
 function mintTo(bytes _id, uint256 _amount) external
 ```
 
-See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#mintTo)
+See [BaseFungibleItem#mintTo](/docs/base/BaseFungibleItem.md#mintTo)
 
 ### consume
 
@@ -18,7 +18,7 @@ See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#mintTo)
 function consume(bytes _id, uint256 _amount) external
 ```
 
-See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#consume)
+See [BaseFungibleItem#consume](/docs/base/BaseFungibleItem.md#consume)
 
 ### wrap
 
@@ -26,7 +26,7 @@ See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#consume)
 function wrap(bytes _id, uint256 _amount) external
 ```
 
-See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#wrap)
+See [BaseFungibleItem#wrap](/docs/base/BaseFungibleItem.md#wrap)
 
 ### unwrap
 
@@ -34,7 +34,7 @@ See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#wrap)
 function unwrap(bytes _id, uint256 _amount) external
 ```
 
-See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#unwrap)
+See [BaseFungibleItem#unwrap](/docs/base/BaseFungibleItem.md#unwrap)
 
 ### balanceOf
 
@@ -42,4 +42,4 @@ See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#unwrap)
 function balanceOf(bytes _id) external view returns (uint256 _balance)
 ```
 
-See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#balanceOf)
+See [BaseFungibleItem#balanceOf](/docs/base/BaseFungibleItem.md#balanceOf)

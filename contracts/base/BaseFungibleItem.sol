@@ -30,7 +30,7 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     /** @notice Constant for the symbol of the item. */
     string public symbol;
 
-    /** @notice Constant for the address of the {Civilizations} instance. */
+    /** @notice Constant for the address of the [Civilizations](/docs/core/Civilizations.md) instance. */
     address public civilizations;
 
     /** @notice Map to track the balances of characters. */
@@ -42,7 +42,7 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     // =============================================== Modifiers ======================================================
 
     /**
-     * @notice Checks against the {Civilizations} instance if the {msg.sender} is the owner or
+     * @notice Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the {msg.sender} is the owner or
      * has allowance to access a composed ID.
      *
      * Requirements:
@@ -65,7 +65,7 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
      * @param _name             Name of the `ERC20` token.
      * @param _symbol           Symbol of the `ERC20` token.
      * @param _image            Url of the item image.
-     * @param _civilizations    Address of the {Civilizations} instance.
+     * @param _civilizations    Address of the [Civilizations](/docs/core/Civilizations.md) instance.
      */
     constructor(
         string memory _name,

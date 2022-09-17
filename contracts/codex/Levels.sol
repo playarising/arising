@@ -6,7 +6,7 @@ import "../interfaces/ILevels.sol";
 /**
  * @title Levels
  * @notice This contract is a static storage with utility functions to determine the level
- * table for the {Experience} contract.
+ * table for the [Experience](/docs/core/Experience.md) contract.
  *
  * @dev Implementation of the {ILevels} interface.
  */

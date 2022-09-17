@@ -13,7 +13,7 @@ contract Cobalt is BaseFungibleItem {
      * @notice Constructor.
      *
      * Requirements:
-     * @param _civilizations    Address of the {Civilizations} instance.
+     * @param _civilizations    Address of the [Civilizations](/docs/core/Civilizations.md) instance.
      */
     constructor(address _civilizations)
         BaseFungibleItem(

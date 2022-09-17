@@ -2,7 +2,7 @@
 
 ## Vitalizer
 
-This contract is an instance of {BaseGadgetToken} to reclaim sacrificed points on the {Stats} contract.
+This contract is an instance of {BaseGadgetToken} to reclaim sacrificed points on the [Stats](/docs/core/Stats.md) contract.
 
 ### constructor
 

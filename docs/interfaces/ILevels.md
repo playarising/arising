@@ -20,7 +20,7 @@ struct Level {
 function getLevel(uint256 _experience) external view returns (uint256)
 ```
 
-See [Levels](/docs/codex/Levels.md#getLevel)
+See [Levels#getLevel](/docs/codex/Levels.md#getLevel)
 
 ### getExperience
 
@@ -28,4 +28,4 @@ See [Levels](/docs/codex/Levels.md#getLevel)
 function getExperience(uint256 _level) external view returns (uint256)
 ```
 
-See [Levels](/docs/codex/Levels.md#getExperience)
+See [Levels#getExperience](/docs/codex/Levels.md#getExperience)

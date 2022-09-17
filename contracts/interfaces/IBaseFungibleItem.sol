@@ -6,19 +6,19 @@ pragma solidity 0.8.17;
  * @notice Interface for the [BaseFungibleItem](/docs/base/BaseFungibleItem.md) contract.
  */
 interface IBaseFungibleItem {
-    /** @notice See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#mintTo) */
+    /** @notice See [BaseFungibleItem#mintTo](/docs/base/BaseFungibleItem.md#mintTo) */
     function mintTo(bytes memory _id, uint256 _amount) external;
 
-    /** @notice See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#consume) */
+    /** @notice See [BaseFungibleItem#consume](/docs/base/BaseFungibleItem.md#consume) */
     function consume(bytes memory _id, uint256 _amount) external;
 
-    /** @notice See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#wrap) */
+    /** @notice See [BaseFungibleItem#wrap](/docs/base/BaseFungibleItem.md#wrap) */
     function wrap(bytes memory _id, uint256 _amount) external;
 
-    /** @notice See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#unwrap) */
+    /** @notice See [BaseFungibleItem#unwrap](/docs/base/BaseFungibleItem.md#unwrap) */
     function unwrap(bytes memory _id, uint256 _amount) external;
 
-    /** @notice See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#balanceOf) */
+    /** @notice See [BaseFungibleItem#balanceOf](/docs/base/BaseFungibleItem.md#balanceOf) */
     function balanceOf(bytes memory _id)
         external
         view
