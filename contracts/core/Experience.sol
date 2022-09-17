@@ -36,7 +36,7 @@ contract Experience is IExperience, Ownable {
     modifier onlyAuthorized() {
         require(
             authorized[msg.sender],
-            "Experience: msg.sender is not authorized to assign experience"
+            "Experience: onlyAuthorized() msg.sender not authorized."
         );
         _;
     }
@@ -65,7 +65,7 @@ contract Experience is IExperience, Ownable {
     {
         require(
             ICivilizations(civilizations).exists(id),
-            "Experience: can't assign experience to non minted token."
+            "Experience: assignExperience() token not minted."
         );
         experience[id] += amount;
     }

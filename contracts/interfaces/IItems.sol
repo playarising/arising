@@ -112,22 +112,25 @@ interface IItems {
     }
 
     /** @notice See [Items#mint](/docs/items/Items.md#mint) */
-    function mint(address _to, uint256 _id) external;
+    function mint(address _to, uint256 _item_id) external;
 
     /** @notice See [Items#addItem](/docs/items/Items.md#addItem) */
     function addItem(
-        uint256 level_required,
-        ItemType item_type,
-        StatsModifiers memory stat_modifiers,
-        Attributes memory attributes
+        uint256 _level_required,
+        ItemType _item_type,
+        StatsModifiers memory _stats_modifiers,
+        Attributes memory _attributes
     ) external;
 
     /** @notice See [Items#disableItem](/docs/items/Items.md#disableItem) */
-    function disableItem(uint256 id) external;
+    function disableItem(uint256 _item_id) external;
 
     /** @notice See [Items#enableItem](/docs/items/Items.md#enableItem) */
-    function enableItem(uint256 id) external;
+    function enableItem(uint256 _item_id) external;
 
     /** @notice See [Items#getItem](/docs/items/Items.md#getItem) */
-    function getItem(uint256 id) external view returns (Item memory);
+    function getItem(uint256 _item_id)
+        external
+        view
+        returns (Item memory _item);
 }

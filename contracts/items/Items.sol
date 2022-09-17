@@ -33,11 +33,11 @@ contract Items is IItems, Ownable, ERC1155 {
      * @notice Creates tokens to the address provided.
      *
      * Requirements:
-     * @param _to    Address that receives the tokens.
-     * @param _id    ID of the item to be created.
+     * @param _to           Address that receives the tokens.
+     * @param _item_id      ID of the item to be created.
      */
-    function mint(address _to, uint256 _id) public onlyOwner {
-        _mint(_to, _id, 1, "");
+    function mint(address _to, uint256 _item_id) public onlyOwner {
+        _mint(_to, _item_id, 1, "");
     }
 
     /**
@@ -55,44 +55,44 @@ contract Items is IItems, Ownable, ERC1155 {
         StatsModifiers memory _stats_modifiers,
         Attributes memory _attributes
     ) public onlyOwner {
-        uint256 new_id = _items.length + 1;
-        items[new_id] = Item(
-            new_id,
+        uint256 _item_id = _items.length + 1;
+        items[_item_id] = Item(
+            _item_id,
             _level_required,
             _item_type,
             _stats_modifiers,
             _attributes,
             true
         );
-        _items.push(new_id);
+        _items.push(_item_id);
     }
 
     /**
      * @notice Disables an item from beign equiped.
      *
      * Requirements:
-     * @param _id   ID of the item.
+     * @param _item_id   ID of the item.
      */
-    function disableItem(uint256 _id) public onlyOwner {
+    function disableItem(uint256 _item_id) public onlyOwner {
         require(
-            _id != 0 && _id <= _items.length,
-            "Items: item id doesn't exist."
+            _item_id != 0 && _item_id <= _items.length,
+            "Items: disableItem() invalid item it."
         );
-        items[_id].available = false;
+        items[_item_id].available = false;
     }
 
     /**
      * @notice Enables an item to be equiped.
      *
      * Requirements:
-     * @param _id   ID of the item.
+     * @param _item_id   ID of the item.
      */
-    function enableItem(uint256 _id) public onlyOwner {
+    function enableItem(uint256 _item_id) public onlyOwner {
         require(
-            _id != 0 && _id <= _items.length,
-            "Equipment: item id doesn't exist."
+            _item_id != 0 && _item_id <= _items.length,
+            "Items: enableItem() invalid item it."
         );
-        items[_id].available = true;
+        items[_item_id].available = true;
     }
 
     // =============================================== Getters ========================================================
@@ -101,11 +101,11 @@ contract Items is IItems, Ownable, ERC1155 {
      * @notice Returns the full information of an item.
      *
      * Requirements:
-     * @param _id       ID of the item.
+     * @param _item_id       ID of the item.
      *
      * @return _item    Full item information.
      */
-    function getItem(uint256 _id) public view returns (Item memory _item) {
-        return items[_id];
+    function getItem(uint256 _item_id) public view returns (Item memory _item) {
+        return items[_item_id];
     }
 }

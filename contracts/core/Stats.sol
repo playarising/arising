@@ -51,16 +51,16 @@ contract Stats is IStats, Ownable, Pausable {
     // =============================================== Modifiers ======================================================
 
     /**
-     * @dev Checks if `msg.sender` is owner or allowed to manipulate a composed ID.
+     * @notice Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the `msg.sender` is the owner or
+     * has allowance to access a composed ID.
+     *
+     * Requirements:
+     * @param _id    Composed ID of the token.
      */
-    modifier onlyAllowed(bytes memory id) {
+    modifier onlyAllowed(bytes memory _id) {
         require(
-            ICivilizations(civilizations).exists(id),
-            "Stats: can't get access to a non minted token."
-        );
-        require(
-            ICivilizations(civilizations).isAllowed(msg.sender, id),
-            "Stats: msg.sender is not allowed to access this token."
+            ICivilizations(civilizations).isAllowed(msg.sender, _id),
+            "Stats: onlyAllowed() msg.sender is not allowed to access this token."
         );
         _;
     }
@@ -115,15 +115,15 @@ contract Stats is IStats, Ownable, Pausable {
         BasicStats storage currPool = pool[id];
         require(
             stats.might <= currPool.might,
-            "Stats: cannot consume more might than currently available."
+            "Stats: consume() not enough might."
         );
         require(
             stats.speed <= currPool.speed,
-            "Stats: cannot consume more speed than currently available."
+            "Stats: consume() not enough speed."
         );
         require(
             stats.intellect <= currPool.intellect,
-            "Stats: cannot consume more intellect than currently available."
+            "Stats: consume() not enough intellect."
         );
 
         pool[id].might -= stats.might;
@@ -143,15 +143,15 @@ contract Stats is IStats, Ownable, Pausable {
         BasicStats storage currBase = base[id];
         require(
             stats.might <= currBase.might,
-            "Stats: cannot sacrifice more might than currently available."
+            "Stats: sacrifice() not enough might."
         );
         require(
             stats.speed <= currBase.speed,
-            "Stats: cannot sacrifice more speed than currently available."
+            "Stats: sacrifice() not enough speed."
         );
         require(
             stats.intellect <= currBase.intellect,
-            "Stats: cannot sacrifice more intellect than currently available."
+            "Stats: sacrifice() not enough intellect."
         );
 
         base[id].might -= stats.might;
@@ -182,7 +182,7 @@ contract Stats is IStats, Ownable, Pausable {
         uint256 last = last_refresh[id];
         require(
             last == 0 || getNextRefreshTime(id) <= block.timestamp,
-            "Stats: not enough time has passed to refresh pool"
+            "Stats: refresh() not enough time has passed to refresh pool."
         );
         pool[id].might = base[id].might;
         pool[id].speed = base[id].speed;
@@ -200,16 +200,16 @@ contract Stats is IStats, Ownable, Pausable {
     {
         require(
             IERC20(refresher).balanceOf(msg.sender) >= 1,
-            "Stats: not enough refresh tokens balance to perform a refresh."
+            "Stats: refreshWithToken() not enough refresh tokens balance."
         );
         require(
             IERC20(refresher).allowance(msg.sender, address(this)) >= 1,
-            "Stats: not enough refresh tokens allowance to perform a refresh."
+            "Stats: refreshWithToken() not enough refresh tokens allowance."
         );
 
         require(
             getNextRefreshWithTokenTime(id) <= block.timestamp,
-            "Stats: already used a refresher for this day."
+            "Stats: refreshWithToken() no more refresh with tokens available."
         );
 
         ERC20Burnable(refresher).burnFrom(msg.sender, 1);
@@ -246,20 +246,20 @@ contract Stats is IStats, Ownable, Pausable {
     {
         require(
             sacrifices[id] > 0,
-            "Stats: user doesn't have sacrificed points to recover"
+            "Stats: consumeVitalizer() not enough sacrificed points."
         );
         uint256 sum = stats.might + stats.speed + stats.intellect;
         require(
             sum == 1,
-            "Stats: vitalizer should increase one point for a single stat."
+            "Stats: consumeVitalizer() too many points to recover."
         );
         require(
             IERC20(vitalizer).balanceOf(msg.sender) >= 1,
-            "Stats: not enough vitalizer tokens balance to perform a vitalize."
+            "Stats: consumeVitalizer() not enough vitalizer tokens balance."
         );
         require(
             IERC20(vitalizer).allowance(msg.sender, address(this)) >= 1,
-            "Stats: not enough vitalizer tokens allowance to perform a vitalize."
+            "Stats:consumeVitalizer() not enough vitalizer tokens allowance."
         );
 
         ERC20Burnable(vitalizer).burnFrom(msg.sender, 1);
@@ -287,7 +287,7 @@ contract Stats is IStats, Ownable, Pausable {
         uint256 available = getAvailablePoints(id);
         require(
             sum <= available,
-            "Stats: can't assign more points than available."
+            "Stats: assignPoints() too many points selected."
         );
         base[id].might += stats.might;
         base[id].speed += stats.speed;

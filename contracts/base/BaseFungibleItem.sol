@@ -46,12 +46,12 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
      * has allowance to access a composed ID.
      *
      * Requirements:
-     * @param _id    Composed ID of the token.
+     * @param _id   Composed ID of the character.
      */
     modifier onlyAllowed(bytes memory _id) {
         require(
             ICivilizations(civilizations).isAllowed(msg.sender, _id),
-            "BaseFungibleItem: require consumer to be owner or have allowance"
+            "BaseFungibleItem: onlyAllowed() msg.sender is not allowed to access this token."
         );
         _;
     }
@@ -104,7 +104,7 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     {
         require(
             balances[_id] >= _amount,
-            "BaseFungibleItem: not enough balance to consume"
+            "BaseFungibleItem: consume() not enough balance."
         );
         balances[_id] -= _amount;
     }

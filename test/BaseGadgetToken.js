@@ -37,7 +37,7 @@ describe("BaseGadgetToken", () => {
 
   it("should not be able to mint tokens with no balance of payment token", async () => {
     await expect(this.token.connect(this.minter).mint(5)).to.revertedWith(
-      "BaseGadgetToken: not enough balance of payment tokens to mint tokens."
+      "BaseGadgetToken: mint() not enough balance to mint tokens."
     );
   });
 
@@ -63,7 +63,7 @@ describe("BaseGadgetToken", () => {
       ethers.utils.parseEther("5")
     );
     await expect(this.token.connect(this.minter).mint(5)).to.revertedWith(
-      "BaseGadgetToken: not enough allowance to mint tokens."
+      "BaseGadgetToken: mint() not enough allowance to mint tokens."
     );
   });
 

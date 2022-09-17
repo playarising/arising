@@ -162,12 +162,12 @@ describe("Civilizations", () => {
   it("should try to mint to an empty instance", async () => {
     await expect(
       this.civ.mint("0x0000000000000000000000000000000000000000")
-    ).to.revertedWith("Civilizations: instance address is null.");
+    ).to.revertedWith("Civilizations: mint() civilization address is empty.");
   });
 
   it("should try to mint to a non arising civilization", async () => {
     await expect(this.civ.mint(this.receiver.address)).to.revertedWith(
-      "Civilizations: instance is not an Arising civilization."
+      "Civilizations: mint() invalid civilization address."
     );
   });
 
@@ -187,7 +187,7 @@ describe("Civilizations", () => {
     this.mock = await MockMinter.deploy(this.civ.address);
     await this.mock.deployed();
     await expect(this.mock.mintMock(this.ard.address)).to.revertedWith(
-      "Civilizations: cannot mint from a contract"
+      "Civilizations: _canMint() contract cannot mint."
     );
   });
 
@@ -214,9 +214,9 @@ describe("Civilizations", () => {
   it("should error when request civilizations doesnt exist or are not from arising", async () => {
     await expect(
       this.civ.getID("0x0000000000000000000000000000000000000000")
-    ).to.revertedWith("Civilizations: instance address is null.");
+    ).to.revertedWith("Civilizations: getID() instance address is empty.");
     await expect(this.civ.getID(this.receiver.address)).to.revertedWith(
-      "Civilizations: instance is not an Arising civilization."
+      "Civilizations: getID() invalid instance address."
     );
   });
 
@@ -244,15 +244,17 @@ describe("Civilizations", () => {
   it("should fail when try to get the civilization token ids from an invalid instance", async () => {
     await expect(
       this.civ.getTokenID("0x0000000000000000000000000000000000000000", 1)
-    ).to.revertedWith("Civilizations: instance address is null.");
+    ).to.revertedWith(
+      "Civilizations: getTokenID() civilization address is empty."
+    );
     await expect(this.civ.getTokenID(this.receiver.address, 1)).to.revertedWith(
-      "Civilizations: instance is not an Arising civilization."
+      "Civilizations: getTokenID() invalid civilization address."
     );
   });
 
   it("should fail when try to get the civilization token ids from a non minted token", async () => {
     await expect(this.civ.getTokenID(this.ard.address, 3)).to.revertedWith(
-      "Civilizations: token id is not minted."
+      "Civilizations: getTokenID() token not minted."
     );
   });
 

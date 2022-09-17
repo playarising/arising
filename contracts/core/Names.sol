@@ -33,16 +33,16 @@ contract Names is INames, Pausable, Ownable {
     // =============================================== Modifiers ======================================================
 
     /**
-     * @dev Checks if `msg.sender` is owner or allowed to manipulate a composed ID.
+     * @notice Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the `msg.sender` is the owner or
+     * has allowance to access a composed ID.
+     *
+     * Requirements:
+     * @param _id    Composed ID of the token.
      */
-    modifier onlyAllowed(bytes memory id) {
+    modifier onlyAllowed(bytes memory _id) {
         require(
-            ICivilizations(civilizations).exists(id),
-            "Names: can't get access to a non minted token."
-        );
-        require(
-            ICivilizations(civilizations).isAllowed(msg.sender, id),
-            "Names: msg.sender is not allowed to access this token."
+            ICivilizations(civilizations).isAllowed(msg.sender, _id),
+            "Names: onlyAllowed() msg.sender is not allowed to access this token."
         );
         _;
     }
@@ -83,17 +83,14 @@ contract Names is INames, Pausable, Ownable {
     {
         require(
             IExperience(experience).getLevel(id) >= 5,
-            "Name: claim name requires level 5."
+            "Name: claimName() not enough level."
         );
         require(
             bytes(names[id]).length == 0,
-            "Name: token already have a name."
+            "Name: claimName() already named."
         );
-        require(isNameValid(name), "Name: name trying to claim is not valid.");
-        require(
-            isNameAvailable(name),
-            "Name: name trying to claim is already claimed."
-        );
+        require(isNameValid(name), "Name: claimName() invalid name.");
+        require(isNameAvailable(name), "Name: claimName() name not available.");
         claimed_names[toLowerCase(name)] = true;
         names[id] = name;
     }
@@ -110,20 +107,17 @@ contract Names is INames, Pausable, Ownable {
     {
         require(
             IExperience(experience).getLevel(id) >= 5,
-            "Name: replace a name requires level 5."
+            "Name: replaceName() not enough level."
         );
-        require(
-            isNameValid(newName),
-            "Name: name trying to replace with is not valid."
-        );
+        require(isNameValid(newName), "Name: replaceName() invalid name.");
         require(
             isNameAvailable(newName),
-            "Name: name trying to replace with is already claimed."
+            "Name: replaceName() name not available."
         );
         string memory oldName = names[id];
         require(
             bytes(oldName).length != 0,
-            "Name: can't replace name of token without a name."
+            "Name: replaceName() no name assigned."
         );
         claimed_names[toLowerCase(oldName)] = false;
         claimed_names[toLowerCase(newName)] = false;
@@ -139,7 +133,7 @@ contract Names is INames, Pausable, Ownable {
         string memory oldName = names[id];
         require(
             bytes(oldName).length != 0,
-            "Name: can't clear name of token without a name."
+            "Name: clearName() no name assigned."
         );
         claimed_names[toLowerCase(oldName)] = false;
         names[id] = "";
@@ -170,22 +164,22 @@ contract Names is INames, Pausable, Ownable {
     function isNameValid(string memory str) public pure returns (bool) {
         bytes memory b = bytes(str);
         if (b.length < 1) return false;
-        if (b.length > 25) return false; // Cannot be longer than 25 characters
-        if (b[0] == 0x20) return false; // Leading space
-        if (b[b.length - 1] == 0x20) return false; // Trailing space
+        if (b.length > 25) return false;
+        if (b[0] == 0x20) return false;
+        if (b[b.length - 1] == 0x20) return false;
 
         bytes1 last_char = b[0];
 
         for (uint256 i; i < b.length; i++) {
             bytes1 char = b[i];
 
-            if (char == 0x20 && last_char == 0x20) return false; // Cannot contain continous spaces
+            if (char == 0x20 && last_char == 0x20) return false;
 
             if (
-                !(char >= 0x30 && char <= 0x39) && //9-0
-                !(char >= 0x41 && char <= 0x5A) && //A-Z
-                !(char >= 0x61 && char <= 0x7A) && //a-z
-                !(char == 0x20) //space
+                !(char >= 0x30 && char <= 0x39) &&
+                !(char >= 0x41 && char <= 0x5A) &&
+                !(char >= 0x61 && char <= 0x7A) &&
+                !(char == 0x20)
             ) return false;
 
             last_char = char;

@@ -41,10 +41,10 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
      * @notice Creates tokens to the address provided.
      *
      * Requirements:
-     * @param to    Address that receives the tokens.
+     * @param _to    Address that receives the tokens.
      */
-    function mint(address to) public onlyOwner {
-        _safeMint(to, totalSupply() + 1);
+    function mint(address _to) public onlyOwner {
+        _safeMint(_to, totalSupply() + 1);
     }
 
     // =============================================== Getters ========================================================
@@ -53,33 +53,33 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
      * @notice External function to check if an address is allowed to access a token.
      *
      * Requirements:
-     * @param spender       Address that will access the token.
-     * @param id            ID of the token to be accessed.
+     * @param _spender      Address that will access the token.
+     * @param _token_id     ID of the token to be accessed.
      *
      * @return _approved    Boolean to return if the address is allowed to access the token.
      */
-    function isApprovedOrOwner(address spender, uint256 id)
+    function isApprovedOrOwner(address _spender, uint256 _token_id)
         public
         view
         virtual
         returns (bool _approved)
     {
-        address owner = ownerOf(id);
-        return (spender == owner ||
-            isApprovedForAll(owner, spender) ||
-            getApproved(id) == spender);
+        address owner = ownerOf(_token_id);
+        return (_spender == owner ||
+            isApprovedForAll(owner, _spender) ||
+            getApproved(_token_id) == _spender);
     }
 
     /**
      * @notice External function to check if a token id is minted.
      *
      * Requirements:
-     * @param id            ID of the token to be checked.
+     * @param _token_id     ID of the token to be checked.
      *
      * @return _exist       Boolean to check if the token is already minted.
      */
-    function exists(uint256 id) public view returns (bool _exist) {
-        return _exists(id);
+    function exists(uint256 _token_id) public view returns (bool _exist) {
+        return _exists(_token_id);
     }
 
     // =============================================== Internal =======================================================

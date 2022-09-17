@@ -51,16 +51,16 @@ contract Forge is IForge, Ownable, Pausable {
     // =============================================== Modifiers ======================================================
 
     /**
-     * @dev Checks if `msg.sender` is owner or allowed to manipulate a composed ID.
+     * @notice Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the `msg.sender` is the owner or
+     * has allowance to access a composed ID.
+     *
+     * Requirements:
+     * @param _id    Composed ID of the token.
      */
-    modifier onlyAllowed(bytes memory id) {
+    modifier onlyAllowed(bytes memory _id) {
         require(
-            ICivilizations(civilizations).exists(id),
-            "Forge: can't get access to a non minted token."
-        );
-        require(
-            ICivilizations(civilizations).isAllowed(msg.sender, id),
-            "Forge: msg.sender is not allowed to access this token."
+            ICivilizations(civilizations).isAllowed(msg.sender, _id),
+            "Forge: onlyAllowed() msg.sender is not allowed to access this token."
         );
         _;
     }
@@ -111,7 +111,7 @@ contract Forge is IForge, Ownable, Pausable {
     function disableRecipe(uint256 id) public onlyOwner {
         require(
             id != 0 && id <= _recipes.length,
-            "Forge: recipe id doesn't exist."
+            "Forge: disableRecipe() invalid recipe id."
         );
         recipes[id].available = false;
     }
@@ -123,7 +123,7 @@ contract Forge is IForge, Ownable, Pausable {
     function enableRecipe(uint256 id) public onlyOwner {
         require(
             id != 0 && id <= _recipes.length,
-            "Forge: recipe id doesn't exist."
+            "Forge: enableRecipe() invalid recipe id."
         );
         recipes[id].available = true;
     }
@@ -152,7 +152,7 @@ contract Forge is IForge, Ownable, Pausable {
         uint256 id = _recipes.length + 1;
         require(
             materials.length == amounts.length,
-            "Forge: materials and amounts arrays should be the same length"
+            "Forge: addRecipe() materials and amounts not match."
         );
         recipes[id] = Recipe(
             id,
@@ -176,11 +176,11 @@ contract Forge is IForge, Ownable, Pausable {
     function buyUpgrade(bytes memory id) public whenNotPaused onlyAllowed(id) {
         require(
             IERC20(token).balanceOf(msg.sender) >= price,
-            "Forge: not enough balance of payment tokens to mint tokens."
+            "Forge: buyUpgrade() not enough balance to buy upgrade."
         );
         require(
             IERC20(token).allowance(msg.sender, address(this)) >= price,
-            "Forge: not enough allowance to mint tokens."
+            "Forge: buyUpgrade() not enough allowance to buy upgrade."
         );
         bool canUpgrade = false;
         if (!forges[id].forge_2.available) {
@@ -190,7 +190,7 @@ contract Forge is IForge, Ownable, Pausable {
             canUpgrade = true;
         }
 
-        require(canUpgrade, "Forge: user doesn't have buyable spots");
+        require(canUpgrade, "Forge: buyUpgrade() no spot available.");
         IERC20(token).transferFrom(msg.sender, address(this), price);
 
         if (!forges[id].forge_2.available) {
@@ -218,33 +218,30 @@ contract Forge is IForge, Ownable, Pausable {
         if (_forge == 2) {
             require(
                 forges[id].forge_2.available,
-                "Forge: forge 2 is not upgraded"
+                "Forge: forge() forge_2 is not available."
             );
         }
         if (_forge == 3) {
             require(
                 forges[id].forge_3.available,
-                "Forge: forge 3 is not upgraded"
+                "Forge: forge() forge_3 is not available."
             );
         }
         require(
             recipe != 0 && recipe <= _recipes.length,
-            "Forge: recipe id doesn't exist."
+            "Forge: forge() invalid recipe id."
         );
         require(
             _isForgeAvailable(id, _forge),
-            "Forge: the forge trying to use is not available for use."
+            "Forge: forge() forge not available."
         );
 
         Recipe memory r = recipes[recipe];
-        require(
-            r.available,
-            "Forge: the recipe trying to forge is not available at the moment."
-        );
+        require(r.available, "Forge: forge() recipe not available.");
 
         require(
             IExperience(experience).getLevel(id) >= r.level_required,
-            "Forge: the character doesn't have the level required to forge the material."
+            "Forge: forge() not enough level."
         );
 
         if (r.cost > 0) {
@@ -276,19 +273,19 @@ contract Forge is IForge, Ownable, Pausable {
         if (_forge == 2) {
             require(
                 forges[id].forge_2.available,
-                "Forge: forge 2 is not upgraded"
+                "Forge: claim() forge_2 is not available."
             );
         }
         if (_forge == 3) {
             require(
                 forges[id].forge_3.available,
-                "Forge: forge 3 is not upgraded"
+                "Forge: claim() forge_3 is not available."
             );
         }
 
         require(
             _isForgeClaimable(id, _forge),
-            "Forge: the forge trying to use is not available for claim."
+            "Forge: claim() forge not claimable."
         );
 
         uint256 reward = _claimForge(id, _forge);
@@ -312,7 +309,7 @@ contract Forge is IForge, Ownable, Pausable {
     function getRecipe(uint256 id) public view returns (Recipe memory) {
         require(
             id != 0 && id <= _recipes.length,
-            "Forge: recipe id doesn't exist."
+            "Forge: getRecipe() invalid recipe id."
         );
         return recipes[id];
     }
@@ -328,7 +325,7 @@ contract Forge is IForge, Ownable, Pausable {
         returns (Forge memory)
     {
         (bool valid, Forge memory f) = _getForgeFromID(id, _forge);
-        require(valid, "Forge: selected forge is invalid");
+        require(valid, "Forge: getCharacterForge() invalid forge id.");
         return f;
     }
 
@@ -378,7 +375,7 @@ contract Forge is IForge, Ownable, Pausable {
         returns (bool)
     {
         (bool valid, Forge memory f) = _getForgeFromID(id, _forge);
-        require(valid, "Forge: selected forge is invalid");
+        require(valid, "Forge: _isForgeAvailable() invalid forge id.");
 
         if (f.cooldown == 0) {
             return true;
@@ -398,7 +395,7 @@ contract Forge is IForge, Ownable, Pausable {
         returns (bool)
     {
         (bool valid, Forge memory f) = _getForgeFromID(id, _forge);
-        require(valid, "Forge: selected forge is invalid");
+        require(valid, "Forge: _isForgeClaimable() invalid forge id.");
         return
             f.cooldown <= block.timestamp &&
             !f.last_recipe_claimed &&

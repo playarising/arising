@@ -48,16 +48,16 @@ contract Craft is ICraft, Ownable, Pausable {
     // =============================================== Modifiers ======================================================
 
     /**
-     * @dev Checks if `msg.sender` is owner or allowed to manipulate a composed ID.
+     * @notice Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the `msg.sender` is the owner or
+     * has allowance to access a composed ID.
+     *
+     * Requirements:
+     * @param _id    Composed ID of the token.
      */
-    modifier onlyAllowed(bytes memory id) {
+    modifier onlyAllowed(bytes memory _id) {
         require(
-            ICivilizations(civilizations).exists(id),
-            "Craft: can't get access to a non minted token."
-        );
-        require(
-            ICivilizations(civilizations).isAllowed(msg.sender, id),
-            "Craft: msg.sender is not allowed to access this token."
+            ICivilizations(civilizations).isAllowed(msg.sender, _id),
+            "Craft: onlyAllowed() msg.sender is not allowed to access this token."
         );
         _;
     }
@@ -99,123 +99,145 @@ contract Craft is ICraft, Ownable, Pausable {
     }
 
     /**
-     * @dev Disables a craft recipe.
-     * @param id  ID of the recipe.
+     * @notice Disables a recipe from beign crafted.
+     *
+     * Requirements:
+     * @param _recipe_id   ID of the recipe.
      */
-    function disableRecipe(uint256 id) public onlyOwner {
+    function disableRecipe(uint256 _recipe_id) public onlyOwner {
         require(
-            id != 0 && id <= _recipes.length,
-            "Craft: recipe id doesn't exist."
+            _recipe_id != 0 && _recipe_id <= _recipes.length,
+            "Craft: disableRecipe() invalid recipe id."
         );
-        recipes[id].available = false;
+        recipes[_recipe_id].available = false;
     }
 
     /**
-     * @dev Enables a craft recipe.
-     * @param id  ID of the recipe.
+     * @notice Enables a recipe to be crafted.
+     *
+     * Requirements:
+     * @param _recipe_id   ID of the recipe.
      */
-    function enableRecipe(uint256 id) public onlyOwner {
+    function enableRecipe(uint256 _recipe_id) public onlyOwner {
         require(
-            id != 0 && id <= _recipes.length,
-            "Craft: recipe id doesn't exist."
+            _recipe_id != 0 && _recipe_id <= _recipes.length,
+            "Craft: enableRecipe() invalid recipe id."
         );
-        recipes[id].available = true;
+        recipes[_recipe_id].available = true;
     }
 
     /**
-     * @dev Craft a recipe.
-     * @param id        Composed ID of the character.
-     * @param recipe    ID of the recipe to craft.
+     * @notice Initializes a recipe to be crafted.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     * @param _recipe_id    ID of the recipe.
      */
-    function craft(bytes memory id, uint256 recipe)
+    function craft(bytes memory _id, uint256 _recipe_id)
         public
         whenNotPaused
-        onlyAllowed(id)
+        onlyAllowed(_id)
     {
         require(
-            recipe != 0 && recipe <= _recipes.length,
-            "Craft: recipe id doesn't exist."
+            _recipe_id != 0 && _recipe_id <= _recipes.length,
+            "Craft: enableRecipe() invalid recipe id."
         );
         require(
-            _isSlotAvailable(id),
-            "Craft: the slot is not available to craft."
-        );
-
-        Recipe memory r = recipes[recipe];
-        require(
-            r.available,
-            "Craft: the recipe trying to craft is not available at the moment."
+            _isSlotAvailable(_id),
+            "Craft: craft() slot not available to craft."
         );
 
+        Recipe memory r = recipes[_recipe_id];
+        require(r.available, "Craft: craft() recipe is not available.");
+
         require(
-            IExperience(experience).getLevel(id) >= r.level_required,
-            "Craft: the character doesn't have the level required to forge the material."
+            IExperience(experience).getLevel(_id) >= r.level_required,
+            "Craft: craft() not enough level."
         );
 
         if (r.cost > 0) {
-            IBaseFungibleItem(gold).consume(id, r.cost);
+            IBaseFungibleItem(gold).consume(_id, r.cost);
         }
 
         for (uint256 i = 0; i < r.materials.length; i++) {
             IBaseFungibleItem(r.materials[i]).consume(
-                id,
+                _id,
                 r.material_amounts[i]
             );
         }
 
-        IStats(stats).consume(id, r.stats_required);
+        IStats(stats).consume(_id, r.stats_required);
 
-        _assignRecipeToSlot(id, r);
+        _assignRecipeToSlot(_id, r);
     }
 
     /**
-     * @dev Claims a recipe already crafted.
-     * @param id        Composed ID of the character.
+     * @notice Claims a recipe already crafted.
+     *
+     * Requirements:
+     * @param _id   Composed ID of the character.
      */
-    function claim(bytes memory id) public whenNotPaused onlyAllowed(id) {
-        require(
-            _isSlotClaimable(id),
-            "Craft: the slot is not available for claim."
-        );
+    function claim(bytes memory _id) public whenNotPaused onlyAllowed(_id) {
+        require(_isSlotClaimable(_id), "Craft: claim() slot is not claimable.");
 
-        uint256 reward = _claim(id);
-        IExperience(experience).assignExperience(id, reward);
+        uint256 reward = _claim(_id);
+        IExperience(experience).assignExperience(_id, reward);
     }
 
     // =============================================== Getters ========================================================
 
     /**
-     * @dev Reurns the recipe information of a recipe id.
-     * @param id  ID of the recipe.
+     * @notice Returns the full information of a recipe.
+     *
+     * Requirements:
+     * @param _recipe_id   ID of the recipe.
+     *
+     * @return _recipe     Full information of the recipe
      */
-    function getRecipe(uint256 id) public view returns (Recipe memory) {
+    function getRecipe(uint256 _recipe_id)
+        public
+        view
+        returns (Recipe memory _recipe)
+    {
         require(
-            id != 0 && id <= _recipes.length,
-            "Craft: recipe id doesn't exist."
+            _recipe_id != 0 && _recipe_id <= _recipes.length,
+            "Craft: getRecipe() invalid recipe id."
         );
-        return recipes[id];
+        return recipes[_recipe_id];
     }
 
     /**
-     * @dev Reurns the craft slot information of a composed ID.
-     * @param id    Composed ID of the character.
+     * @notice Returns character craft slot information.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     *
+     * @return _slot    Full information of character crafting slot.
      */
-    function getCharacterSlot(bytes memory id)
+    function getCharacterSlot(bytes memory _id)
         public
         view
-        returns (CraftSlot memory)
+        returns (CraftSlot memory _slot)
     {
-        return slots[id];
+        return slots[_id];
     }
 
     // =============================================== Internal =======================================================
 
     /**
-     * @dev Internal function to check if the craft slot is available to craft.
-     * @param id    Composed ID of the character.
+     * @notice Internal check if the crafting slot is available to be used.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _available   Boolean to know if the slot is available.
      */
-    function _isSlotAvailable(bytes memory id) internal view returns (bool) {
-        CraftSlot memory s = slots[id];
+    function _isSlotAvailable(bytes memory _id)
+        internal
+        view
+        returns (bool _available)
+    {
+        CraftSlot memory s = slots[_id];
 
         if (s.cooldown == 0) {
             return true;
@@ -225,33 +247,48 @@ contract Craft is ICraft, Ownable, Pausable {
     }
 
     /**
-     * @dev Internal function to check if a craft slot is ready to claim.
-     * @param id    Composed ID of the character.
+     * @notice Internal check if the crafting slot is claimable.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _available   Boolean to know if the slot is claimable.
      */
-    function _isSlotClaimable(bytes memory id) internal view returns (bool) {
-        CraftSlot memory s = slots[id];
+    function _isSlotClaimable(bytes memory _id) internal view returns (bool) {
+        CraftSlot memory s = slots[_id];
         return
             s.cooldown <= block.timestamp && !s.claimed && s.last_recipe != 0;
     }
 
     /**
-     * @dev Internal function to assign a recipe to a slot for craft
-     * @param id        Composed ID of the character.
-     * @param r         Recipe to be assigned.
+     * @notice Internal function that assigns a recipe to the crafting slot.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *      * @param _recipe           Recipe to assign.
      */
-    function _assignRecipeToSlot(bytes memory id, Recipe memory r) internal {
-        slots[id] = CraftSlot(block.timestamp + r.cooldown, r.id, false);
+    function _assignRecipeToSlot(bytes memory _id, Recipe memory _recipe)
+        internal
+    {
+        slots[_id] = CraftSlot(
+            block.timestamp + _recipe.cooldown,
+            _recipe.id,
+            false
+        );
     }
 
     /**
-     * @dev Internal function claim a reward from the slot and return the reward experience.
-     *      This function assumes the slot is claimable
-     * @param id    Composed ID of the character.
+     * @notice Internal function to claim the reward from the slot.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _experience  Amount of experience rewarded.
      */
-    function _claim(bytes memory id) internal returns (uint256) {
-        Recipe memory r = recipes[slots[id].last_recipe];
+    function _claim(bytes memory _id) internal returns (uint256 _experience) {
+        Recipe memory r = recipes[slots[_id].last_recipe];
         IItems(items).mint(
-            ICivilizations(civilizations).ownerOf(id),
+            ICivilizations(civilizations).ownerOf(_id),
             r.item_reward
         );
 

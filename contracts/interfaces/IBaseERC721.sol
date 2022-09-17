@@ -10,11 +10,11 @@ interface IBaseERC721 {
     function mint(address _to) external;
 
     /** @notice See [BaseERC721#isApprovedOrOwner](/docs/base/BaseERC721.md#isApprovedOrOwner) */
-    function isApprovedOrOwner(address _spender, uint256 _id)
+    function isApprovedOrOwner(address _spender, uint256 _token_id)
         external
         view
         returns (bool _approved);
 
     /** @notice See [BaseERC721#exists](/docs/base/BaseERC721.md#exists) */
-    function exists(uint256 _id) external view returns (bool _exist);
+    function exists(uint256 _token_id) external view returns (bool _exist);
 }

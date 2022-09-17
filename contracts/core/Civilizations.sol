@@ -21,22 +21,22 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     using Address for address;
 
     // =============================================== Storage ========================================================
-    /** @dev Map to store the civilizations implemented. **/
-    mapping(address => uint256) _civilizations;
+    /** @notice Map to track the supported [BaseERC721](/docs/base/BaseERC721.md) instances. */
+    mapping(address => uint256) civilizations;
 
-    /** @dev Array to store the civilizations implemented. **/
-    address[] civilizations;
+    /** @notice Array to track the [BaseERC721](/docs/base/BaseERC721.md) IDs. */
+    address[] _civilizations;
 
-    /** @dev Map to track the amount of tokens minted by address. **/
+    /** @notice Map to track the count of address mints. */
     mapping(address => uint256) private _minters;
 
-    /** @dev Address of the token used to charge the mint. **/
+    /** @notice Constant for address of the `ERC20` token used to purchase. */
     address public token;
 
-    /** @dev Map to track the character upgrades. **/
-    UpgradedCharacters private _upgrades;
+    /** @notice Map to track the character upgrades. **/
+    UpgradedCharacters private character_upgrades;
 
-    /** @dev Map to track upgrades information. **/
+    /** @notice Map to track the upgrades information. **/
     mapping(uint256 => Upgrade) public upgrades;
 
     // =============================================== Setters ========================================================
@@ -64,124 +64,145 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
         _unpause();
     }
 
-    /** @dev Marks an upgrade to available.
-     *  @param upgrade      The ID of the upgrade.
-     *  @param available    The availability of the upgrade.
+    /**
+     * @notice Activates or deactivates an upgrade purchase.
+     *
+     * Requirements:
+     * @param _upgrade_id   ID of the upgrade to change.
+     * @param _available     Boolean to activate/deactivate.
      */
-    function setInitializeUpgrade(uint256 upgrade, bool available)
+    function setInitializeUpgrade(uint256 _upgrade_id, bool _available)
         public
         onlyOwner
     {
         require(
-            upgrade > 0 && upgrade <= 3,
-            "Civilizations: upgrade id doesn't exist."
+            _upgrade_id > 0 && _upgrade_id <= 3,
+            "Civilizations: setInitializeUpgrade() invalid upgrade id."
         );
         require(
-            upgrades[upgrade].price != 0,
-            "Civilizations: to initialize an upgrade set the price first."
+            upgrades[_upgrade_id].price != 0,
+            "Civilizations: setInitializeUpgrade() no price set."
         );
-        upgrades[upgrade].available = available;
+        upgrades[_upgrade_id].available = _available;
     }
 
-    /** @dev Adds a civilization to the contract.
-     *  @param upgrade  The ID of the upgrade.
-     *  @param price    The amount of tokens to charge for the upgrade.
+    /**
+     * @notice Sets the price to purchase an upgrade.
+     *
+     * Requirements:
+     * @param _upgrade_id   ID of the upgrade to change.
+     * @param _price     Amount of tokens to pay for the upgrade.
      */
-    function setUpgradePrice(uint256 upgrade, uint256 price) public onlyOwner {
+    function setUpgradePrice(uint256 _upgrade_id, uint256 _price)
+        public
+        onlyOwner
+    {
         require(
-            upgrade > 0 && upgrade <= 3,
-            "Civilizations: upgrade id doesn't exist."
+            _upgrade_id > 0 && _upgrade_id <= 3,
+            "Civilizations: setUpgradePrice() invalid upgrade id."
         );
-        upgrades[upgrade].price = price;
+        upgrades[_upgrade_id].price = _price;
     }
 
-    /** @dev Sets the `token` address.
-     *  @param _token   address of the token to use for charge.
+    /**
+     * @notice Changes the token address to charge.
+     *
+     * Requirements:
+     * @param _token    Address of the new token to charge.
      */
     function setToken(address _token) public onlyOwner {
         token = _token;
     }
 
-    /** @dev Adds a civilization to the contract.
-     *  @param _instance  Address of the `BaseERC721` instance.
+    /**
+     * @notice Adds a new [BaseERC721](/docs/base/BaseERC721.md) instance to the valid civilizations.
+     *
+     * Requirements:
+     * @param _civilization     Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add.
      */
-    function addCivilization(address _instance) public onlyOwner {
+    function addCivilization(address _civilization) public onlyOwner {
         require(
-            _instance != address(0),
-            "Civilizations: instance address is null."
+            _civilization != address(0),
+            "Civilizations: addCivilization() civilization address is empty."
         );
         require(
-            msg.sender == Ownable(_instance).owner(),
-            "Civilizations: msg.sender must be the owner of the instance added."
+            msg.sender == Ownable(_civilization).owner(),
+            "Civilizations: addCivilization() missing civilization ownership."
         );
-        uint256 newId = civilizations.length + 1;
-        _civilizations[_instance] = newId;
-        civilizations.push(_instance);
+        uint256 id = _civilizations.length + 1;
+        civilizations[_civilization] = id;
+        _civilizations.push(_civilization);
     }
 
-    /** @dev Mints a token.
-     *  @param _instance  Address of the `BaseERC721` instance to mint.
+    /**
+     * @notice Creates a new token of the valid civilizations list to the `msg.sender`.
+     *
+     * Requirements:
+     * @param _civilization     Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add.
      */
-    function mint(address _instance) public whenNotPaused {
+    function mint(address _civilization) public whenNotPaused {
         require(
-            _instance != address(0),
-            "Civilizations: instance address is null."
+            _civilization != address(0),
+            "Civilizations: mint() civilization address is empty."
         );
         require(
-            _civilizations[_instance] != 0,
-            "Civilizations: instance is not an Arising civilization."
+            civilizations[_civilization] != 0,
+            "Civilizations: mint() invalid civilization address."
         );
         require(
             _canMint(msg.sender),
-            "Civilizations: address used already minted 5 characters."
+            "Civilizations: mint() address already minted."
         );
-        IBaseERC721(_instance).mint(msg.sender);
-        _addMinted(msg.sender);
+        IBaseERC721(_civilization).mint(msg.sender);
+        _addMint(msg.sender);
     }
 
     /**
-     * @dev Marks a character upgrade as purchased.
-     * @param id         Composed ID of the token.
-     * @param upgrade    Upgrade id.
+     * @notice Purchase an upgrade and marks it as available for the provided composed ID.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     * @param _upgrade_id   ID of the upgrade to purchase.
      */
-    function buyUpgrade(bytes memory id, uint256 upgrade) public whenNotPaused {
+    function buyUpgrade(bytes memory _id, uint256 _upgrade_id)
+        public
+        whenNotPaused
+    {
         require(
-            upgrade > 0 && upgrade <= 3,
-            "Civilizations: upgrade id doesn't exist."
+            _upgrade_id > 0 && _upgrade_id <= 3,
+            "Civilizations: buyUpgrade() invalid upgrade id."
         );
         require(
-            isAllowed(msg.sender, id),
-            "Civilizations: can't purchase for a non owned token."
+            isAllowed(msg.sender, _id),
+            "Civilizations: buyUpgrade() msg.sender is not allowed to access this token."
         );
         require(
-            upgrades[upgrade].available,
-            "Civilizations: can't purchase an upgrade not initialized."
+            upgrades[_upgrade_id].available,
+            "Civilizations: buyUpgrade() upgrade is not initialized."
         );
-        uint256 price = upgrades[upgrade].price;
+        uint256 price = upgrades[_upgrade_id].price;
         require(
             IERC20(token).balanceOf(msg.sender) >= price,
-            "Civilizations: not enough balance of payment tokens to mint tokens."
+            "Civilizations: buyUpgrade() not enough balance to mint tokens."
         );
         require(
             IERC20(token).allowance(msg.sender, address(this)) >=
-                upgrades[upgrade].price,
-            "Civilizations: not enough allowance to mint tokens."
+                upgrades[_upgrade_id].price,
+            "Civilizations: buyUpgrade() not enough allowance to mint tokens."
         );
         IERC20(token).transferFrom(msg.sender, address(this), price);
-        if (upgrade == 1) {
-            _upgrades.upgrade_1[id] = true;
+        if (_upgrade_id == 1) {
+            character_upgrades.upgrade_1[_id] = true;
         }
-        if (upgrade == 2) {
-            _upgrades.upgrade_2[id] = true;
+        if (_upgrade_id == 2) {
+            character_upgrades.upgrade_2[_id] = true;
         }
-        if (upgrade == 3) {
-            _upgrades.upgrade_3[id] = true;
+        if (_upgrade_id == 3) {
+            character_upgrades.upgrade_3[_id] = true;
         }
     }
 
-    /**
-     * @dev Transfers the total amount of `token` stored in the contract to `owner`.
-     */
+    /** @notice Transfers the total amount of tokens stored in the contract to the owner .*/
     function withdraw() public onlyOwner {
         uint256 balance = IERC20(token).balanceOf(address(this));
         IERC20(token).transfer(owner(), balance);
@@ -189,158 +210,213 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
 
     // =============================================== Getters ========================================================
 
-    /** @dev Returns the internal ID for a civilization.
-     *  @param _instance  Address of the `BaseERC721` instance.
-     */
-    function getID(address _instance) public view returns (uint256) {
-        require(
-            _instance != address(0),
-            "Civilizations: instance address is null."
-        );
-        require(
-            _civilizations[_instance] != 0,
-            "Civilizations: instance is not an Arising civilization."
-        );
-        return _civilizations[_instance];
-    }
-
-    /** @dev Returns the upgrades for a composed ID.
-     *  @param id Composed token id.
-     */
-    function getTokenUpgrades(bytes memory id)
+    /**
+     * @notice External function to return the internal ID of a valid civilization.
+     *
+     * Requirements:
+     * @param _civilization     Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add.
+     * 
+     * @return _civilization_id Internal ID of the civilization.
+]     */
+    function getID(address _civilization)
         public
         view
-        returns (TokenUpgrades memory)
+        returns (uint256 _civilization_id)
+    {
+        require(
+            _civilization != address(0),
+            "Civilizations: getID() instance address is empty."
+        );
+        require(
+            civilizations[_civilization] != 0,
+            "Civilizations: getID() invalid instance address."
+        );
+        return civilizations[_civilization];
+    }
+
+    /**
+     * @notice External function to return the upgrades for a composed ID.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _upgrades    Struct of the character upgrades.
+     */
+    function getTokenUpgrades(bytes memory _id)
+        public
+        view
+        returns (CharacterUpgrades memory _upgrades)
     {
         return
-            TokenUpgrades(
-                _upgrades.upgrade_1[id],
-                _upgrades.upgrade_2[id],
-                _upgrades.upgrade_3[id]
+            CharacterUpgrades(
+                character_upgrades.upgrade_1[_id],
+                character_upgrades.upgrade_2[_id],
+                character_upgrades.upgrade_3[_id]
             );
     }
 
-    /** @dev Returns the upgrades for a composed ID.
-     *  @param upgrade ID of the upgrade.
+    /**
+     * @notice External function to return global status of an upgrade.
+     *
+     * Requirements:
+     * @param _upgrade_id   ID of the upgrade.
+     *
+     * @return _upgrade     Upgrade information.
      */
-    function getUpgradeInformation(uint256 upgrade)
+    function getUpgradeInformation(uint256 _upgrade_id)
         public
         view
-        returns (Upgrade memory)
+        returns (Upgrade memory _upgrade)
     {
         require(
-            upgrade > 0 && upgrade <= 3,
-            "Civilizations: upgrade id doesn't exist."
+            _upgrade_id > 0 && _upgrade_id <= 3,
+            "Civilizations: getUpgradeInformation() invalid upgrade id."
         );
-        return upgrades[upgrade];
+        return upgrades[_upgrade_id];
     }
 
-    /** @dev Returns the list of civilizations.
+    /**
+     * @notice Returns the list of valid civilizations instances.
+     *
+     * @return _valid_civilizations     Array of valid civilizations intances.
      */
-    function getCivilizations() public view returns (address[] memory) {
-        return civilizations;
-    }
-
-    /** @dev Returns a composed ID from a collection.
-     *  @param _instance  Address of the `BaseERC721` instance.
-     *  @param _id        The ID of the token inside the collection.
-     */
-    function getTokenID(address _instance, uint256 _id)
+    function getCivilizations()
         public
         view
-        returns (bytes memory)
+        returns (address[] memory _valid_civilizations)
     {
-        require(
-            _instance != address(0),
-            "Civilizations: instance address is null."
-        );
-        uint256 civilizationID = _civilizations[_instance];
-        require(
-            civilizationID != 0,
-            "Civilizations: instance is not an Arising civilization."
-        );
-        require(
-            IBaseERC721(_instance).exists(_id),
-            "Civilizations: token id is not minted."
-        );
-        return abi.encode(civilizationID, _id);
+        return _civilizations;
     }
 
-    /** @dev Function to check if an address has allowance to a composed ID.
-     *  @param spender   Address to check ownership or allowance.
-     *  @param _id       Composed token id.
+    /**
+     * @notice Returns the composed ID of a token from a valid civilization.
+     *
+     * Requirements:
+     * @param _civilization     Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add.
+     * @param _token_id         ID of the token to get the composed ID.
+     *
+     * @return _id              Composed ID of the token.
      */
-    function isAllowed(address spender, bytes memory _id)
+    function getTokenID(address _civilization, uint256 _token_id)
         public
         view
-        returns (bool)
+        returns (bytes memory _id)
     {
-        (uint256 civilizationID, uint256 tokenID) = _decomposeTokenID(_id);
         require(
-            civilizationID <= civilizations.length,
-            "Civilizations: id of the civilization is not valid."
+            _civilization != address(0),
+            "Civilizations: getTokenID() civilization address is empty."
         );
-        address instance = civilizations[civilizationID - 1];
-        return IBaseERC721(instance).isApprovedOrOwner(spender, tokenID);
+        uint256 _civilization_id = civilizations[_civilization];
+        require(
+            _civilization_id != 0,
+            "Civilizations: getTokenID() invalid civilization address."
+        );
+        require(
+            IBaseERC721(_civilization).exists(_token_id),
+            "Civilizations: getTokenID() token not minted."
+        );
+        return abi.encode(_civilization_id, _id);
     }
 
-    /** @dev Function to check if a composed ID is already minted.
-     *  @param _id Composed token id.
+    /**
+     * @notice External function to check if the `msg.sender` can access a token.
+     *
+     * Requirements:
+     *  @param _spender     Address to check ownership or allowance.
+     * @param _id           Composed ID of the character.
+     *
+     * @return _allowed     Boolean to check if access is valid.
      */
-    function exists(bytes memory _id) public view returns (bool) {
-        (uint256 civilizationID, uint256 tokenID) = _decomposeTokenID(_id);
+    function isAllowed(address _spender, bytes memory _id)
+        public
+        view
+        returns (bool _allowed)
+    {
+        (uint256 _civilization_id, uint256 _token_id) = _decodeID(_id);
         require(
-            civilizationID <= civilizations.length,
-            "Civilizations: id of the civilization is not valid."
+            _civilization_id <= _civilizations.length,
+            "Civilizations: isAllowed() id of the civilization is not valid."
         );
-        address instance = civilizations[civilizationID - 1];
-        return IBaseERC721(instance).exists(tokenID);
+        address instance = _civilizations[_civilization_id - 1];
+        return IBaseERC721(instance).isApprovedOrOwner(_spender, _token_id);
     }
 
-    /** @dev Function to returns the actual owner of a composed ID.
-     *  @param _id Composed token id.
+    /**
+     * @notice External function to check a composed ID is already minted.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _exist       Boolean to check if the token is minted.
      */
-    function ownerOf(bytes memory _id) public view returns (address) {
-        (uint256 civilizationID, uint256 tokenID) = _decomposeTokenID(_id);
+    function exists(bytes memory _id) public view returns (bool _exist) {
+        (uint256 _civilization_id, uint256 _token_id) = _decodeID(_id);
         require(
-            civilizationID <= civilizations.length,
-            "Civilizations: id of the civilization is not valid."
+            _civilization_id <= _civilizations.length,
+            "Civilizations: exists() id of the civilization is not valid."
         );
-        address instance = civilizations[civilizationID - 1];
-        return IERC721(instance).ownerOf(tokenID);
+        address instance = _civilizations[_civilization_id - 1];
+        return IBaseERC721(instance).exists(_token_id);
+    }
+
+    /**
+     * @notice External function to return the owner a composed ID.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _owner       Address of the owner of the token.
+     */
+    function ownerOf(bytes memory _id) public view returns (address _owner) {
+        (uint256 _civilization_id, uint256 _token_id) = _decodeID(_id);
+        require(
+            _civilization_id <= _civilizations.length,
+            "Civilizations: ownerOf() id of the civilization is not valid."
+        );
+        address instance = _civilizations[_civilization_id - 1];
+        return IERC721(instance).ownerOf(_token_id);
     }
 
     // =============================================== Internal ========================================================
 
     /**
-     * @dev Adds a mint to the mint counter for the address.
-     * @param _minter The minter address.
+     * @notice Internal function to add a mint count for the `msg.sender`.
+     *
+     * Requirements:
+     * @param _minter       Address of the minter.
      */
-    function _addMinted(address _minter) internal {
+    function _addMint(address _minter) internal {
         _minters[_minter] += 1;
     }
 
     /**
-     * @dev Checks if an address is able to mint more tokens.
-     * @param _minter The minter address.
+     * @notice Internal function check if the `msg.sender` can mint a token.
+     *
+     * Requirements:
+     * @param _minter       Address of the minter.
      */
     function _canMint(address _minter) internal view returns (bool) {
         require(
             !Address.isContract(_minter),
-            "Civilizations: cannot mint from a contract"
+            "Civilizations: _canMint() contract cannot mint."
         );
         return _minters[_minter] < 5;
     }
 
     /**
-     * @dev Decompose a byte encoded token ID.
-     * @param id The composed token id.
+     * @notice Internal function to decode a composed ID to a civilization instance and token ID.
+     *
+     * Requirements:
+     * @param _id           Composed ID.
+     *
+     * @return _civilization    The internal ID of the civilization.
+     * @return _token_id        The token id of the composed ID.
      */
-    function _decomposeTokenID(bytes memory id)
+    function _decodeID(bytes memory _id)
         internal
         pure
-        returns (uint256, uint256)
+        returns (uint256 _civilization, uint256 _token_id)
     {
-        return abi.decode(id, (uint256, uint256));
+        return abi.decode(_id, (uint256, uint256));
     }
 }

@@ -83,12 +83,12 @@ contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
     function mint(uint256 _amount) public whenNotPaused {
         require(
             IERC20(token).balanceOf(msg.sender) >= getTotalCost(_amount),
-            "BaseGadgetToken: not enough balance of payment tokens to mint tokens."
+            "BaseGadgetToken: mint() not enough balance to mint tokens."
         );
         require(
             IERC20(token).allowance(msg.sender, address(this)) >=
                 getTotalCost(_amount),
-            "BaseGadgetToken: not enough allowance to mint tokens."
+            "BaseGadgetToken: mint() not enough allowance to mint tokens."
         );
         IERC20(token).transferFrom(
             msg.sender,

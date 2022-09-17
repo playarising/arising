@@ -39,16 +39,16 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
     // =============================================== Modifiers ======================================================
 
     /**
-     * @dev Checks if `msg.sender` is owner or allowed to manipulate a composed ID.
+     * @notice Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the `msg.sender` is the owner or
+     * has allowance to access a composed ID.
+     *
+     * Requirements:
+     * @param _id    Composed ID of the token.
      */
-    modifier onlyAllowed(bytes memory id) {
+    modifier onlyAllowed(bytes memory _id) {
         require(
-            ICivilizations(civilizations).exists(id),
-            "Equipment: can't get access to a non minted token."
-        );
-        require(
-            ICivilizations(civilizations).isAllowed(msg.sender, id),
-            "Equipment: msg.sender is not allowed to access this token."
+            ICivilizations(civilizations).isAllowed(msg.sender, _id),
+            "Equipment: onlyAllowed() msg.sender is not allowed to access this token."
         );
         _;
     }
@@ -119,7 +119,7 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
 
         require(
             slots_types[item_slot][item_data.item_type],
-            "Equipment: item can't be assigned to that slot"
+            "Equipment: equip() item type not for this slot."
         );
 
         if (item_data.item_type == IItems.ItemType.TWO_HANDED) {
@@ -156,7 +156,7 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
     {
         require(
             character_equipments[id][item_slot].equiped,
-            "Equipment: item slot doesn't have any equiped item"
+            "Equipment: unequip() item slot not equiped."
         );
 
         uint256 item_id = character_equipments[id][item_slot].id;
@@ -274,6 +274,4 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
 
         return (additions, reductions);
     }
-
-    // =============================================== Internal =======================================================
 }
