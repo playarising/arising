@@ -18,10 +18,10 @@ import "../interfaces/IExperience.sol";
  */
 contract Names is INames, Pausable, Ownable {
     // =============================================== Storage ========================================================
-    /** @dev Address of the `Civilizations` implementation. **/
+    /** @dev Address of the [Civilizations](/docs/core/Civilizations.md) implementation. **/
     address public civilizations;
 
-    /** @dev Address of the `Experience` implementation. **/
+    /** @dev Address of the [Experience](/docs/core/Experience.md) implementation. **/
     address public experience;
 
     /** @dev Map storing the names for each character. **/

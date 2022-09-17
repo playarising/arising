@@ -22,7 +22,7 @@ contract Experience is IExperience, Ownable {
     /** @dev Address of the `Levels` implementation. **/
     address public levels;
 
-    /** @dev Address of the `Civilizations` implementation. **/
+    /** @dev Address of the [Civilizations](/docs/core/Civilizations.md) implementation. **/
     address public civilizations;
 
     /** @dev Map to store the list of authorized addresses to assign experience. **/

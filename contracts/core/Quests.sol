@@ -17,10 +17,10 @@ contract Quests is IQuests, Ownable, Pausable {
     // =============================================== Structs ========================================================
     // =============================================== Storage ========================================================
 
-    /** @dev Address of the `Civilizations` instance. **/
+    /** @dev Address of the [Civilizations](/docs/core/Civilizations.md) instance. **/
     address public civilizations;
 
-    /** @dev Address of the `Experience` instance. **/
+    /** @dev Address of the [Experience](/docs/core/Experience.md) instance. **/
     address public experience;
 
     // =============================================== Modifiers ======================================================

@@ -12,7 +12,7 @@ Implementation of the [IEquipment](/docs/interfaces/IEquipment.md) interface.
 address civilizations
 ```
 
-_Address of the `Civilizations` instance. \*_
+_Address of the [Civilizations](/docs/core/Civilizations.md) instance. \*_
 
 ### experience
 
@@ -20,7 +20,7 @@ _Address of the `Civilizations` instance. \*_
 address experience
 ```
 
-_Address of the `Experience` instance. \*_
+_Address of the [Experience](/docs/core/Experience.md) instance. \*_
 
 ### items
 
@@ -28,7 +28,7 @@ _Address of the `Experience` instance. \*_
 address items
 ```
 
-_Address of the `Items` instance. \*_
+_Address of the [Items](/docs/items/Items.md) instance. \*_
 
 ### character_equipments
 

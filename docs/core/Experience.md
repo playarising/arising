@@ -28,7 +28,7 @@ _Address of the `Levels` implementation. \*_
 address civilizations
 ```
 
-_Address of the `Civilizations` implementation. \*_
+_Address of the [Civilizations](/docs/core/Civilizations.md) implementation. \*_
 
 ### authorized
 

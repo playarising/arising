@@ -14,7 +14,7 @@ Implementation of the [INames](/docs/interfaces/INames.md) interface.
 address civilizations
 ```
 
-_Address of the `Civilizations` implementation. \*_
+_Address of the [Civilizations](/docs/core/Civilizations.md) implementation. \*_
 
 ### experience
 
@@ -22,7 +22,7 @@ _Address of the `Civilizations` implementation. \*_
 address experience
 ```
 
-_Address of the `Experience` implementation. \*_
+_Address of the [Experience](/docs/core/Experience.md) implementation. \*_
 
 ### names
 

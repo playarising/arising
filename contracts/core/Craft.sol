@@ -27,19 +27,19 @@ contract Craft is ICraft, Ownable, Pausable {
     /** @dev Array to track all the recipes ids. **/
     uint256[] private _recipes;
 
-    /** @dev The address of the `Gold` instance. **/
+    /** @dev The address of the [Gold](/docs/gadgets/Gold.md) instance. **/
     address public gold;
 
-    /** @dev Address of the `Civilizations` instance. **/
+    /** @dev Address of the [Civilizations](/docs/core/Civilizations.md) instance. **/
     address public civilizations;
 
-    /** @dev Address of the `Experience` instance. **/
+    /** @dev Address of the [Experience](/docs/core/Experience.md) instance. **/
     address public experience;
 
-    /** @dev Address of the `Stats` instance. **/
+    /** @dev Address of the [Stats](/docs/core/Stats.md) instance. **/
     address public stats;
 
-    /** @dev Address of the `Items` instance. **/
+    /** @dev Address of the [Items](/docs/items/Items.md) instance. **/
     address public items;
 
     /** @dev Map to track craft slots and cooldowns for each character. **/

@@ -36,10 +36,10 @@ contract Stats is IStats, Ownable, Pausable {
     /** @dev Implementation of the `Vitalizer` **/
     address public vitalizer;
 
-    /** @dev Address of the `Civilizations` instance. **/
+    /** @dev Address of the [Civilizations](/docs/core/Civilizations.md) instance. **/
     address public civilizations;
 
-    /** @dev Address of the `Experience` instance. **/
+    /** @dev Address of the [Experience](/docs/core/Experience.md) instance. **/
     address public experience;
 
     /** @dev Map to track the amount of points sacrificed by a character. **/

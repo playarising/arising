@@ -13,7 +13,7 @@ Implementation of the [IForge](/docs/interfaces/IForge.md) interface.
 address civilizations
 ```
 
-_Address of the `Civilizations` instance. \*_
+_Address of the [Civilizations](/docs/core/Civilizations.md) instance. \*_
 
 ### experience
 
@@ -21,7 +21,7 @@ _Address of the `Civilizations` instance. \*_
 address experience
 ```
 
-_Address of the `Experience` instance. \*_
+_Address of the [Experience](/docs/core/Experience.md) instance. \*_
 
 ### stats
 
@@ -29,7 +29,7 @@ _Address of the `Experience` instance. \*_
 address stats
 ```
 
-_Address of the `Stats` instance. \*_
+_Address of the [Stats](/docs/core/Stats.md) instance. \*_
 
 ### recipes
 
@@ -77,7 +77,7 @@ _Price of forge upgrades. \*_
 address gold
 ```
 
-_The address of the `Gold` instance. \*_
+_The address of the [Gold](/docs/gadgets/Gold.md) instance. \*_
 
 ### onlyAllowed
 

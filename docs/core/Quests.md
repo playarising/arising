@@ -13,7 +13,7 @@ Implementation of the [IQuests](/docs/interfaces/IQuests.md) interface.
 address civilizations
 ```
 
-_Address of the `Civilizations` instance. \*_
+_Address of the [Civilizations](/docs/core/Civilizations.md) instance. \*_
 
 ### experience
 
@@ -21,7 +21,7 @@ _Address of the `Civilizations` instance. \*_
 address experience
 ```
 
-_Address of the `Experience` instance. \*_
+_Address of the [Experience](/docs/core/Experience.md) instance. \*_
 
 ### constructor
 

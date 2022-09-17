@@ -21,13 +21,13 @@ import "../interfaces/IBaseFungibleItem.sol";
 contract Forge is IForge, Ownable, Pausable {
     // =============================================== Storage ========================================================
 
-    /** @dev Address of the `Civilizations` instance. **/
+    /** @dev Address of the [Civilizations](/docs/core/Civilizations.md) instance. **/
     address public civilizations;
 
-    /** @dev Address of the `Experience` instance. **/
+    /** @dev Address of the [Experience](/docs/core/Experience.md) instance. **/
     address public experience;
 
-    /** @dev Address of the `Stats` instance. **/
+    /** @dev Address of the [Stats](/docs/core/Stats.md) instance. **/
     address public stats;
 
     /** @dev Map to track available recipes on the forge. **/
@@ -45,7 +45,7 @@ contract Forge is IForge, Ownable, Pausable {
     /** @dev Price of forge upgrades. **/
     uint256 public price;
 
-    /** @dev The address of the `Gold` instance. **/
+    /** @dev The address of the [Gold](/docs/gadgets/Gold.md) instance. **/
     address public gold;
 
     // =============================================== Modifiers ======================================================

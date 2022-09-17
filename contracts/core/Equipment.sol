@@ -21,13 +21,13 @@ import "../interfaces/IStats.sol";
 contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
     // =============================================== Storage ========================================================
 
-    /** @dev Address of the `Civilizations` instance. **/
+    /** @dev Address of the [Civilizations](/docs/core/Civilizations.md) instance. **/
     address public civilizations;
 
-    /** @dev Address of the `Experience` instance. **/
+    /** @dev Address of the [Experience](/docs/core/Experience.md) instance. **/
     address public experience;
 
-    /** @dev Address of the `Items` instance. **/
+    /** @dev Address of the [Items](/docs/items/Items.md) instance. **/
     address public items;
 
     /** @dev Map to track the equipment of characters. **/
