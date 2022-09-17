@@ -61,10 +61,10 @@ Requirements:
 | \_levels        | address | The address of the [Levels](/docs/codex/Levels.md) instance.              |
 | \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
 
-### setLevel
+### setLevels
 
 ```solidity
-function setLevel(address _levels) public
+function setLevels(address _levels) public
 ```
 
 Replaces the address of the [Levels](/docs/codex/Levels.md) instance to determine character levels.

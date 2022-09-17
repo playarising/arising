@@ -60,7 +60,7 @@ contract Experience is IExperience, Ownable {
      * Requirements:
      * @param _levels    Address of the [Levels](/docs/codex/Levels.md) instance.
      */
-    function setLevel(address _levels) public onlyOwner {
+    function setLevels(address _levels) public onlyOwner {
         levels = _levels;
     }
 

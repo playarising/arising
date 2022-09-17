@@ -7,7 +7,7 @@ pragma solidity 0.8.17;
  */
 interface IExperience {
     /** @notice See [Experience#setLevel](/docs/core/Experience.md#setLevel) */
-    function setLevel(address _levels) external;
+    function setLevels(address _levels) external;
 
     /** @notice See [Experience#assignExperience](/docs/core/Experience.md#assignExperience) */
     function assignExperience(bytes memory _id, uint256 _amount) external;

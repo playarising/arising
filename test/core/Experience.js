@@ -10,8 +10,8 @@ describe("Experience", () => {
     this.authority = authority;
 
     const Levels = await ethers.getContractFactory("Levels");
-    const levels = await Levels.deploy();
-    await levels.deployed();
+    this.levels = await Levels.deploy();
+    await this.levels.deployed();
 
     const BaseERC721 = await ethers.getContractFactory("BaseERC721");
     this.collection = await BaseERC721.deploy(
@@ -29,12 +29,28 @@ describe("Experience", () => {
     await this.collection.transferOwnership(this.civ.address);
     await this.civ.mint(1);
     const Experience = await ethers.getContractFactory("Experience");
-    this.experience = await Experience.deploy(levels.address, this.civ.address);
+    this.experience = await Experience.deploy(
+      this.levels.address,
+      this.civ.address
+    );
     await this.experience.deployed();
   });
 
   it("should deploy everything correctly", async () => {
     expect(await this.experience.owner()).to.eq(this.owner.address);
+  });
+
+  it("should change the level address correctly", async () => {
+    expect(await this.experience.levels()).to.eq(this.levels.address);
+    await this.experience.setLevels(this.owner.address);
+    expect(await this.experience.levels()).to.eq(this.owner.address);
+    await this.experience.setLevels(this.levels.address);
+  });
+
+  it("should fail when trying to change the level address without owner", async () => {
+    await expect(
+      this.experience.connect(this.receiver).setLevels(this.owner.address)
+    ).to.revertedWith("Ownable: caller is not the owner");
   });
 
   it("should assign the experience correctly", async () => {

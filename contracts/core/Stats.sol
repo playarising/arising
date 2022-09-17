@@ -20,7 +20,7 @@ contract Stats is IStats, Ownable, Pausable {
     // =============================================== Storage ========================================================
 
     /** @notice Constant amount of seconds for refresh cooldown.  **/
-    uint256 REFRESH_COOLDOWN_SECONDS;
+    uint256 public REFRESH_COOLDOWN_SECONDS;
 
     /** @notice Map track the base stats for characters. */
     mapping(bytes => BasicStats) base;

@@ -81,6 +81,19 @@ describe("Stats", () => {
     expect(await this.stats.owner()).to.eq(this.owner.address);
   });
 
+  it("should change the refresh cooldown", async () => {
+    expect(await this.stats.REFRESH_COOLDOWN_SECONDS()).to.eq(86400);
+    await this.stats.setRefreshCooldown(1);
+    expect(await this.stats.REFRESH_COOLDOWN_SECONDS()).to.eq(1);
+    await this.stats.setRefreshCooldown(86400);
+  });
+
+  it("should fail when trying to set the refresh cooldown from non owner", async () => {
+    await expect(
+      this.stats.connect(this.receiver).setRefreshCooldown(1)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
   it("should not be able to assign points when paused", async () => {
     const id = await this.civ.getTokenID(1, 1);
     expect(await this.stats.paused()).to.eq(false);
