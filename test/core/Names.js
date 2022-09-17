@@ -9,16 +9,20 @@ describe("Names", () => {
     this.minter1 = minter1;
     this.minter2 = minter2;
 
-    const Ard = await ethers.getContractFactory("Ard");
-    this.ard = await Ard.deploy();
-    await this.ard.deployed();
+    const BaseERC721 = await ethers.getContractFactory("BaseERC721");
+    this.collection = await BaseERC721.deploy(
+      "Test Collection",
+      "TEST",
+      "https://test.uri/"
+    );
+    await this.collection.deployed();
 
     const Civilizations = await ethers.getContractFactory("Civilizations");
     this.civ = await Civilizations.deploy(receiver.address);
     await this.civ.deployed();
-    await this.civ.addCivilization(this.ard.address);
+    await this.civ.addCivilization(this.collection.address);
 
-    await this.ard.transferOwnership(this.civ.address);
+    await this.collection.transferOwnership(this.civ.address);
     await this.civ.mint(1);
     await this.civ.mint(1);
     await this.civ.mint(1);
@@ -186,8 +190,8 @@ describe("Names", () => {
 
   it("should be able to replace a name with approval and allowance", async () => {
     const id = this.civ.getTokenID(1, 1);
-    await this.ard.approve(this.minter1.address, 1);
-    await this.ard.setApprovalForAll(this.minter2.address, true);
+    await this.collection.approve(this.minter1.address, 1);
+    await this.collection.setApprovalForAll(this.minter2.address, true);
     expect(await this.names.getCharacterName(id)).to.eq("");
     await this.names.connect(this.minter1).claimName(id, "Conan The Barb");
     expect(await this.names.getCharacterName(id)).to.eq("Conan The Barb");

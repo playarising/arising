@@ -24,9 +24,6 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     /** @notice Constant for the name of the item. */
     string public name;
 
-    /** @notice Constant the url pointing to the image of the item. */
-    string public image;
-
     /** @notice Constant for the symbol of the item. */
     string public symbol;
 
@@ -64,18 +61,15 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
      * Requirements:
      * @param _name             Name of the `ERC20` token.
      * @param _symbol           Symbol of the `ERC20` token.
-     * @param _image            Url of the item image.
      * @param _civilizations    Address of the [Civilizations](/docs/core/Civilizations.md) instance.
      */
     constructor(
         string memory _name,
         string memory _symbol,
-        string memory _image,
         address _civilizations
     ) {
         name = _name;
         symbol = _symbol;
-        image = _image;
         civilizations = _civilizations;
         wrapper = address(new BaseERC20Wrapper(_name, _symbol));
     }
