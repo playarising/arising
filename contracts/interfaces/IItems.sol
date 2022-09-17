@@ -22,6 +22,7 @@ interface IItems {
         bool available;
     }
 
+    /** @notice Enum to define different item types. */
     enum ItemType {
         HELMET,
         SHOULDER_GUARDS,
@@ -38,6 +39,17 @@ interface IItems {
         TWO_HANDED
     }
 
+    /**
+     * @notice Internal struct to store the item [IStats.BasicStats](/docs/interfaces/IStats.md#BasicStats) modifiers.
+     *
+     * Requirements:
+     * @param might             The amount of might points added to the stats pool.
+     * @param might_reducer     The amount of might points reduced to the stats pool.
+     * @param speed             The amount of speed points added to the stats pool.
+     * @param speed_reducer     The amount of speed points reduced to the stats pool.
+     * @param intellect         The amount of intellect points added to the stats pool.
+     * @param intellect_reducer The amount of intellect points reduced to the stats pool.
+     */
     struct StatsModifiers {
         uint256 might;
         uint256 might_reducer;
@@ -47,6 +59,17 @@ interface IItems {
         uint256 intellect_reducer;
     }
 
+    /**
+     * @notice Internal struct to store the base combat attributes of an item.
+     *
+     * Requirements:
+     * @param atk       The amount of attack points of the item.
+     * @param def       The amount of defence points of the item.
+     * @param range     The amount of range points of the item.
+     * @param mag_atk   The amount of magical attack points of the item.
+     * @param mag_def   The amount of magical defence points of the item.
+     * @param rate      The rate speed points of the item.
+     */
     struct BaseAttributes {
         uint256 atk;
         uint256 def;
@@ -56,6 +79,23 @@ interface IItems {
         uint256 rate;
     }
 
+    /**
+     * @notice Internal struct to store the base combat attributes with reducers of an item.
+     *
+     * Requirements:
+     * @param atk               The amount of attack points the item adds to the total combat points.
+     * @param atk_reducer       The amount of attack points the item reduces to the total combat points.
+     * @param def               The amount of defence points the item adds to the total combat points.
+     * @param def_reducer       The amount of defence points the item reduces to the total combat points.
+     * @param range             The amount of range points the item adds to the total combat points.
+     * @param range_reducer     The amount of range points the item reduces to the total combat points.
+     * @param mag_atk           The amount of magical attack points the item adds to the total combat points.
+     * @param mag_atk_reducer   The amount of magical attack points the item reduces to the total combat points.
+     * @param mag_def           The amount of magical defence points the item adds to the total combat points.
+     * @param mag_def_reducer   The amount of magical defence points the item reduces to the total combat points.
+     * @param rate              The amount of rate speed points the item adds to the total combat points.
+     * @param rate_reducer      The amount of rate speed points the item reduces to the total combat points.
+     */
     struct Attributes {
         uint256 atk;
         uint256 atk_reducer;
@@ -71,6 +111,10 @@ interface IItems {
         uint256 rate_reducer;
     }
 
+    /** @notice See [Items#mint](/docs/items/Items.md#mint) */
+    function mint(address _to, uint256 _id) external;
+
+    /** @notice See [Items#addItem](/docs/items/Items.md#addItem) */
     function addItem(
         uint256 level_required,
         ItemType item_type,
@@ -78,11 +122,12 @@ interface IItems {
         Attributes memory attributes
     ) external;
 
+    /** @notice See [Items#disableItem](/docs/items/Items.md#disableItem) */
     function disableItem(uint256 id) external;
 
+    /** @notice See [Items#enableItem](/docs/items/Items.md#enableItem) */
     function enableItem(uint256 id) external;
 
+    /** @notice See [Items#getItem](/docs/items/Items.md#getItem) */
     function getItem(uint256 id) external view returns (Item memory);
-
-    function mint(address to, uint256 id) external;
 }

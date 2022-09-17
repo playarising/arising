@@ -86,11 +86,21 @@ struct Attributes {
 
 ```
 
+### mint
+
+```solidity
+function mint(address _to, uint256 _id) external
+```
+
+See [Items#mint](/docs/items/Items.md#mint)
+
 ### addItem
 
 ```solidity
 function addItem(uint256 level_required, enum IItems.ItemType item_type, struct IItems.StatsModifiers stat_modifiers, struct IItems.Attributes attributes) external
 ```
+
+See [Items#addItem](/docs/items/Items.md#addItem)
 
 ### disableItem
 
@@ -98,11 +108,15 @@ function addItem(uint256 level_required, enum IItems.ItemType item_type, struct 
 function disableItem(uint256 id) external
 ```
 
+See [Items#disableItem](/docs/items/Items.md#disableItem)
+
 ### enableItem
 
 ```solidity
 function enableItem(uint256 id) external
 ```
+
+See [Items#enableItem](/docs/items/Items.md#enableItem)
 
 ### getItem
 
@@ -110,8 +124,4 @@ function enableItem(uint256 id) external
 function getItem(uint256 id) external view returns (struct IItems.Item)
 ```
 
-### mint
-
-```solidity
-function mint(address to, uint256 id) external
-```
+See [Items#getItem](/docs/items/Items.md#getItem)
