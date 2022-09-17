@@ -8,7 +8,7 @@ import "../interfaces/IBaseERC721.sol";
 
 /**
  * @title BaseERC721
- * @notice This contract is a {ERC721Enumerable} implementation for the different civilizations.
+ * @notice This contract is a `ERC721Enumerable` implementation for the different civilizations.
  * Exposes the mint function to the owner and some check functions.
  *
  * @dev Implementation of the {IBaseERC721} interface.
@@ -25,8 +25,8 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
      * @notice Constructor.
      *
      * Requirements:
-     * @param _name     Name of the ERC20 token.
-     * @param _symbol   Symbol of the ERC20 token.
+     * @param _name     Name of the `ERC721` token.
+     * @param _symbol   Symbol of the `ERC721` token.
      * @param _uri      Base url for the tokens metadata.
      */
     constructor(
@@ -85,7 +85,7 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
     // =============================================== Internal =======================================================
 
     /**
-     * @notice Internal function that overrides the {ERC721_baseURI} function
+     * @notice Internal function that overrides the `ERC721_baseURI` function
      * with an URI specified over the constructor.
      *
      * @return _uri Base URL from the constructor

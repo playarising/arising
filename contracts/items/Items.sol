@@ -8,7 +8,7 @@ import "../interfaces/IItems.sol";
 
 /**
  * @title Items
- * @notice This contract is an standard {ERC1155} implementation with internal mappings to store items additional
+ * @notice This contract is an standard `ERC1155` implementation with internal mappings to store items additional
  * information for the characters usage.
  *
  * @dev Implementation of the {IItems} interface.

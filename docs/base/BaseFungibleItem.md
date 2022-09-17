@@ -2,7 +2,7 @@
 
 ## BaseFungibleItem
 
-This contract an imitation of the ERC20 standard to work around the character context.
+This contract an imitation of the `ERC20` standard to work around the character context.
 It tracks balances of characters tokens. This also includes functions to wrap and unwrap to a
 {BaseERC20Wrapper} instance.
 
@@ -83,8 +83,8 @@ Requirements:
 
 | Name            | Type    | Description                              |
 | --------------- | ------- | ---------------------------------------- |
-| \_name          | string  | Name of the ERC20 token.                 |
-| \_symbol        | string  | Symbol of the ERC20 token.               |
+| \_name          | string  | Name of the `ERC20` token.               |
+| \_symbol        | string  | Symbol of the `ERC20` token.             |
 | \_image         | string  | Url of the item image.                   |
 | \_civilizations | address | Address of the {Civilizations} instance. |
 
@@ -124,7 +124,7 @@ Requirements:
 function wrap(bytes _id, uint256 _amount) public
 ```
 
-Converts the internal item to an ERC20 through the {BaseERC20Wrapper}.
+Converts the internal item to an `ERC20` through the {BaseERC20Wrapper}.
 
 Requirements:
 
@@ -139,7 +139,7 @@ Requirements:
 function unwrap(bytes _id, uint256 _amount) public
 ```
 
-Converts the wrapped ERC20 token to an internal fungible item.
+Converts the wrapped `ERC20` token to an internal fungible item.
 
 Requirements:
 

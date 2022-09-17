@@ -2,7 +2,7 @@
 
 ## BaseERC721
 
-This contract is a {ERC721Enumerable} implementation for the different civilizations.
+This contract is a `ERC721Enumerable` implementation for the different civilizations.
 Exposes the mint function to the owner and some check functions.
 
 _Implementation of the {IBaseERC721} interface._
@@ -27,8 +27,8 @@ Requirements:
 
 | Name     | Type   | Description                       |
 | -------- | ------ | --------------------------------- |
-| \_name   | string | Name of the ERC20 token.          |
-| \_symbol | string | Symbol of the ERC20 token.        |
+| \_name   | string | Name of the `ERC721` token.       |
+| \_symbol | string | Symbol of the `ERC721` token.     |
 | \_uri    | string | Base url for the tokens metadata. |
 
 ### mint
@@ -88,7 +88,7 @@ Requirements:
 function _baseURI() internal view virtual returns (string _uri)
 ```
 
-Internal function that overrides the {ERC721_baseURI} function
+Internal function that overrides the `ERC721_baseURI` function
 with an URI specified over the constructor.
 
 | Name  | Type   | Description                   |

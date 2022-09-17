@@ -10,14 +10,14 @@ import "../interfaces/IBaseGadgetToken.sol";
 
 /**
  * @title BaseGadgetToken
- * @notice This contract implements an {ERC20Burnable} token to serve as utility tokens that
+ * @notice This contract implements an `ERC20Burnable` token to serve as utility tokens that
  * can be purchased by themselves.
  *
  * @dev Implementation of the {IBaseGadgetToken} interface.
  */
 contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
     // =============================================== Storage ========================================================
-    /** @notice Constant for address of the {ERC20} token used to purchase. */
+    /** @notice Constant for address of the `ERC20` token used to purchase. */
     address public token;
 
     /** @notice Constant for the price of each token (in wei). */
@@ -29,8 +29,8 @@ contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
      * @notice Constructor.
      *
      * Requirements:
-     * @param _name     Name of the ERC20 token.
-     * @param _symbol   Symbol of the ERC20 token.
+     * @param _name     Name of the `ERC20` token.
+     * @param _symbol   Symbol of the `ERC20` token.
      * @param _token    Address of the token used to purchase.
      * @param _price    Price for each token.
      */
@@ -134,7 +134,7 @@ contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
     }
 
     /**
-     * @notice Overrides the {ERC20.decimals} function to return 0 decimals.
+     * @notice Overrides the `ERC20.decimals` function to return 0 decimals.
      *
      * @return _decimals    Amount of decimals of the token.
      */

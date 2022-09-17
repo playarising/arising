@@ -12,7 +12,7 @@ import "./BaseERC20Wrapper.sol";
 
 /**
  * @title BaseERC721
- * @notice This contract an imitation of the ERC20 standard to work around the character context.
+ * @notice This contract an imitation of the `ERC20` standard to work around the character context.
  * It tracks balances of characters tokens. This also includes functions to wrap and unwrap to a
  * {BaseERC20Wrapper} instance.
  *
@@ -62,8 +62,8 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
      * @notice Constructor.
      *
      * Requirements:
-     * @param _name             Name of the ERC20 token.
-     * @param _symbol           Symbol of the ERC20 token.
+     * @param _name             Name of the `ERC20` token.
+     * @param _symbol           Symbol of the `ERC20` token.
      * @param _image            Url of the item image.
      * @param _civilizations    Address of the {Civilizations} instance.
      */
@@ -110,7 +110,7 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     }
 
     /**
-     * @notice Converts the internal item to an ERC20 through the {BaseERC20Wrapper}.
+     * @notice Converts the internal item to an `ERC20` through the {BaseERC20Wrapper}.
      *
      * Requirements:
      * @param _id       Composed ID of the character.
@@ -125,7 +125,7 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     }
 
     /**
-     * @notice Converts the wrapped ERC20 token to an internal fungible item.
+     * @notice Converts the wrapped `ERC20` token to an internal fungible item.
      *
      * Requirements:
      * @param _id       Composed ID of the character.

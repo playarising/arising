@@ -2,7 +2,7 @@
 
 ## BaseGadgetToken
 
-This contract implements an {ERC20Burnable} token to serve as utility tokens that
+This contract implements an `ERC20Burnable` token to serve as utility tokens that
 can be purchased by themselves.
 
 _Implementation of the {IBaseGadgetToken} interface._
@@ -13,7 +13,7 @@ _Implementation of the {IBaseGadgetToken} interface._
 address token
 ```
 
-Constant for address of the {ERC20} token used to purchase.
+Constant for address of the `ERC20` token used to purchase.
 
 ### price
 
@@ -35,8 +35,8 @@ Requirements:
 
 | Name     | Type    | Description                            |
 | -------- | ------- | -------------------------------------- |
-| \_name   | string  | Name of the ERC20 token.               |
-| \_symbol | string  | Symbol of the ERC20 token.             |
+| \_name   | string  | Name of the `ERC20` token.             |
+| \_symbol | string  | Symbol of the `ERC20` token.           |
 | \_token  | address | Address of the token used to purchase. |
 | \_price  | uint256 | Price for each token.                  |
 
@@ -145,7 +145,7 @@ Requirements:
 function decimals() public view virtual returns (uint8 _decimals)
 ```
 
-Overrides the {ERC20.decimals} function to return 0 decimals.
+Overrides the `ERC20.decimals` function to return 0 decimals.
 
 | Name       | Type  | Description                      |
 | ---------- | ----- | -------------------------------- |

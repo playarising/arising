@@ -57,7 +57,7 @@ module.exports = {
     clear: true,
     runOnCompile: true,
     pages: "files",
-    exclude: ["mocks/"],
+    exclude: ["mocks/", "materials/", "civilizations/"],
   },
 };
 

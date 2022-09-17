@@ -9,9 +9,9 @@ import "../interfaces/IBaseERC20Wrapper.sol";
 
 /**
  * @title BaseERC20Wrapper
- * @notice This contract is a standard {ERC20} implementation with burnable and mintable
+ * @notice This contract is a standard `ERC20` implementation with burnable and mintable
  * functions exposed to the contract owner. This contract is a wrapper for the {BaseFungibleItem} instance to convert
- * an internal fungible token to the ERC20 standard.
+ * an internal fungible token to the `ERC20` standard.
  *
  * @dev Implementation of the {IBaseERC20Wrapper} interface.
  */
@@ -22,8 +22,8 @@ contract BaseERC20Wrapper is IBaseERC20Wrapper, Ownable, ERC20Burnable {
      * @notice Constructor.
      *
      * Requirements:
-     * @param _name     Name of the ERC20 token.
-     * @param _symbol   Symbol of the ERC20 token.
+     * @param _name     Name of the `ERC20` token.
+     * @param _symbol   Symbol of the `ERC20` token.
      */
     constructor(string memory _name, string memory _symbol)
         ERC20(_name, _symbol)
