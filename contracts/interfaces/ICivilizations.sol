@@ -18,34 +18,6 @@ interface ICivilizations {
         bool available;
     }
 
-    /**
-     * @notice Internal struct to store the maps for the character upgrades.
-     *
-     * Requirements:
-     * @param upgrade_1     Map to store the upgrade 1 purchases.
-     * @param upgrade_2     Map to store the upgrade 2 purchases.
-     * @param upgrade_3     Map to store the upgrade 3 purchases.
-     */
-    struct UpgradedCharacters {
-        mapping(bytes => bool) upgrade_1;
-        mapping(bytes => bool) upgrade_2;
-        mapping(bytes => bool) upgrade_3;
-    }
-
-    /**
-     * @notice Internal struct to return the status of the character upgrades.
-     *
-     * Requirements:
-     * @param upgrade_1     Boolean to return if is purchased for the character.
-     * @param upgrade_2     Boolean to return if is purchased for the character.
-     * @param upgrade_3     Boolean to return if is purchased for the character.
-     */
-    struct CharacterUpgrades {
-        bool upgrade_1;
-        bool upgrade_2;
-        bool upgrade_3;
-    }
-
     /** @notice See [Civilizations#pause](/docs/core/Civilizations.md#pause) */
     function pause() external;
 
@@ -77,11 +49,11 @@ interface ICivilizations {
     /** @notice See [Civilizations#getID](/docs/core/Civilizations.md#getID) */
     function getID(address _civilization) external view returns (uint256);
 
-    /** @notice See [Civilizations#getTokenUpgrades](/docs/core/Civilizations.md#getTokenUpgrades) */
-    function getTokenUpgrades(bytes memory _id)
+    /** @notice See [Civilizations#getCharacterUpgrades](/docs/core/Civilizations.md#getCharacterUpgrades) */
+    function getCharacterUpgrades(bytes memory _id)
         external
         view
-        returns (CharacterUpgrades memory);
+        returns (bool[3] memory);
 
     /** @notice See [Civilizations#getUpgradeInformation](/docs/core/Civilizations.md#getUpgradeInformation) */
     function getUpgradeInformation(uint256 _upgrade_id)

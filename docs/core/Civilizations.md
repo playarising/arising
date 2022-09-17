@@ -42,7 +42,7 @@ Constant for address of the `ERC20` token used to purchase.
 ### character_upgrades
 
 ```solidity
-struct ICivilizations.UpgradedCharacters character_upgrades
+mapping(bytes => mapping(uint256 => bool)) character_upgrades
 ```
 
 Map to track the character upgrades.
@@ -198,10 +198,10 @@ Requirements:
 | ----------------- | ------- | ---------------------------------- |
 | \_civilization_id | uint256 | Internal ID of the civilization. ] |
 
-### getTokenUpgrades
+### getCharacterUpgrades
 
 ```solidity
-function getTokenUpgrades(bytes _id) public view returns (struct ICivilizations.CharacterUpgrades _upgrades)
+function getCharacterUpgrades(bytes _id) public view returns (bool[3] _upgrades)
 ```
 
 External function to return the upgrades for a composed ID.
@@ -212,9 +212,9 @@ Requirements:
 | ---- | ----- | ----------------------------- |
 | \_id | bytes | Composed ID of the character. |
 
-| Name       | Type                                    | Description                       |
-| ---------- | --------------------------------------- | --------------------------------- |
-| \_upgrades | struct ICivilizations.CharacterUpgrades | Struct of the character upgrades. |
+| Name       | Type    | Description                         |
+| ---------- | ------- | ----------------------------------- |
+| \_upgrades | bool[3] | Array of booleans for each upgrade. |
 
 ### getUpgradeInformation
 

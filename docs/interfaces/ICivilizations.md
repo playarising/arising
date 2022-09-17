@@ -14,28 +14,6 @@ struct Upgrade {
 
 ```
 
-### UpgradedCharacters
-
-```solidity
-struct UpgradedCharacters {
-  mapping(bytes => bool) upgrade_1;
-  mapping(bytes => bool) upgrade_2;
-  mapping(bytes => bool) upgrade_3;
-}
-
-```
-
-### CharacterUpgrades
-
-```solidity
-struct CharacterUpgrades {
-  bool upgrade_1;
-  bool upgrade_2;
-  bool upgrade_3;
-}
-
-```
-
 ### pause
 
 ```solidity
@@ -116,13 +94,13 @@ function getID(address _civilization) external view returns (uint256)
 
 See [Civilizations#getID](/docs/core/Civilizations.md#getID)
 
-### getTokenUpgrades
+### getCharacterUpgrades
 
 ```solidity
-function getTokenUpgrades(bytes _id) external view returns (struct ICivilizations.CharacterUpgrades)
+function getCharacterUpgrades(bytes _id) external view returns (bool[3])
 ```
 
-See [Civilizations#getTokenUpgrades](/docs/core/Civilizations.md#getTokenUpgrades)
+See [Civilizations#getCharacterUpgrades](/docs/core/Civilizations.md#getCharacterUpgrades)
 
 ### getUpgradeInformation
 

@@ -35,7 +35,7 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     address public token;
 
     /** @notice Map to track the character upgrades. */
-    UpgradedCharacters private character_upgrades;
+    mapping(bytes => mapping(uint256 => bool)) private character_upgrades;
 
     /** @notice Map to track the upgrades information. */
     mapping(uint256 => Upgrade) public upgrades;
@@ -192,15 +192,7 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
             "Civilizations: buyUpgrade() not enough allowance to mint tokens."
         );
         IERC20(token).transferFrom(msg.sender, address(this), _price);
-        if (_upgrade_id == 1) {
-            character_upgrades.upgrade_1[_id] = true;
-        }
-        if (_upgrade_id == 2) {
-            character_upgrades.upgrade_2[_id] = true;
-        }
-        if (_upgrade_id == 3) {
-            character_upgrades.upgrade_3[_id] = true;
-        }
+        character_upgrades[_id][_upgrade_id] = true;
     }
 
     /** @notice Transfers the total amount of tokens stored in the contract to the owner .*/
@@ -241,19 +233,20 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
      * Requirements:
      * @param _id           Composed ID of the character.
      *
-     * @return _upgrades    Struct of the character upgrades.
+     * @return _upgrades    Array of booleans for each upgrade.
      */
-    function getTokenUpgrades(bytes memory _id)
+    function getCharacterUpgrades(bytes memory _id)
         public
         view
-        returns (CharacterUpgrades memory _upgrades)
+        returns (bool[3] memory _upgrades)
     {
-        return
-            CharacterUpgrades(
-                character_upgrades.upgrade_1[_id],
-                character_upgrades.upgrade_2[_id],
-                character_upgrades.upgrade_3[_id]
-            );
+        return (
+            [
+                character_upgrades[_id][1],
+                character_upgrades[_id][2],
+                character_upgrades[_id][3]
+            ]
+        );
     }
 
     /**
