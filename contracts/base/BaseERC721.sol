@@ -64,9 +64,9 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
         virtual
         returns (bool _approved)
     {
-        address owner = ownerOf(_token_id);
-        return (_spender == owner ||
-            isApprovedForAll(owner, _spender) ||
+        address _owner = ownerOf(_token_id);
+        return (_spender == _owner ||
+            isApprovedForAll(_owner, _spender) ||
             getApproved(_token_id) == _spender);
     }
 

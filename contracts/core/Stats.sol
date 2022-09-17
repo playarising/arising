@@ -18,34 +18,35 @@ import "../interfaces/IStats.sol";
  */
 contract Stats is IStats, Ownable, Pausable {
     // =============================================== Storage ========================================================
-    /** @dev Amount of seconds for refresh cooldown.  **/
-    uint256 REFRESH_COOLDOWN_SECONDS = 86400; // 1 day.
 
-    /** @dev Map to store the base stats from composed IDs. **/
+    /** @notice Constant amount of seconds for refresh cooldown.  **/
+    uint256 REFRESH_COOLDOWN_SECONDS;
+
+    /** @notice Map track the base stats for characters. */
     mapping(bytes => BasicStats) base;
 
-    /** @dev Map to store the pool stats from composed ID. **/
+    /** @notice Map track the pool stats for characters. */
     mapping(bytes => BasicStats) pool;
 
-    /** @dev Map to store the the last refresh from composed ID. **/
+    /** @notice Map track the last refresh timestamps of the characters. */
     mapping(bytes => uint256) last_refresh;
 
-    /** @dev Implementation of the `Refresher` **/
+    /** @notice Address of the [Refresher](/docs/gadgets/Refresher.md) instance. */
     address public refresher;
 
-    /** @dev Implementation of the `Vitalizer` **/
+    /** @notice Address of the [Vitalizer](/docs/gadgets/Vitalizer.md) instance. */
     address public vitalizer;
 
-    /** @dev Address of the [Civilizations](/docs/core/Civilizations.md) instance. **/
+    /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
     address public civilizations;
 
-    /** @dev Address of the [Experience](/docs/core/Experience.md) instance. **/
+    /** @notice Address of the [Experience](/docs/core/Experience.md) instance. */
     address public experience;
 
-    /** @dev Map to track the amount of points sacrificed by a character. **/
+    /** @notice Map to track the amount of points sacrificed by a character. */
     mapping(bytes => uint256) public sacrifices;
 
-    /** @dev Map to track the first refresher usage timestamp. **/
+    /** @notice Map to track the first refresher token usage timestamps. */
     mapping(bytes => uint256) public refresher_usage_time;
 
     // =============================================== Modifiers ======================================================
@@ -55,7 +56,7 @@ contract Stats is IStats, Ownable, Pausable {
      * has allowance to access a composed ID.
      *
      * Requirements:
-     * @param _id    Composed ID of the token.
+     * @param _id   Composed ID of the character.
      */
     modifier onlyAllowed(bytes memory _id) {
         require(
@@ -77,6 +78,7 @@ contract Stats is IStats, Ownable, Pausable {
     constructor(address _civilizations, address _experience) {
         civilizations = _civilizations;
         experience = _experience;
+        REFRESH_COOLDOWN_SECONDS = 86400; // 1 day
     }
 
     /** @notice Pauses the contract */
@@ -89,114 +91,142 @@ contract Stats is IStats, Ownable, Pausable {
         _unpause();
     }
 
-    /** @dev Sets the `Refresher` instance.
-     *  @param _token   address of the `Refresher` instance.
+    /**
+     * @notice Changes the amount of seconds of cooldown between refreshes.
+     *
+     * Requirements:
+     * @param _cooldown     Amount of seconds to wait between refreshes.
      */
-    function setRefreshToken(address _token) public onlyOwner {
-        refresher = _token;
+    function setRefreshCooldown(uint256 _cooldown) public onlyOwner {
+        REFRESH_COOLDOWN_SECONDS = _cooldown;
     }
 
-    /** @dev Sets the `Vitalizer` instance.
-     *  @param _token   address of the `Vitalizer` instance.
+    /**
+     * @notice Changes the [Refresher](/docs/gadgets/Refresher.md) instance to use for paid refreshes.
+     *
+     * Requirements:
+     * @param _refresher    Address of the new [Refresher](/docs/gadgets/Refresher.md) instance.
      */
-    function setVitalizerToken(address _token) public onlyOwner {
-        vitalizer = _token;
+    function setRefreshToken(address _refresher) public onlyOwner {
+        refresher = _refresher;
     }
 
-    /** @dev Reduces stats points from the pool.
-     *  @param id         Composed ID of the token.
-     *  @param stats      Amount of points reducing.
+    /**
+     * @notice Changes the [Vitalizer](/docs/gadgets/Vitalizer.md) instance to use for sacrifice points recover.
+     *
+     * Requirements:
+     * @param _vitalizer    Address of the new [Vitalizer](/docs/gadgets/Vitalizer.md) instance.
      */
-    function consume(bytes memory id, BasicStats memory stats)
+    function setVitalizerToken(address _vitalizer) public onlyOwner {
+        vitalizer = _vitalizer;
+    }
+
+    /**
+     * @notice Removes the amount of points available on the character pool stats.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _stats    Stats to consume.
+     */
+    function consume(bytes memory _id, BasicStats memory _stats)
         public
         whenNotPaused
-        onlyAllowed(id)
+        onlyAllowed(_id)
     {
-        BasicStats storage currPool = pool[id];
+        BasicStats storage _pool = pool[_id];
         require(
-            stats.might <= currPool.might,
+            _stats.might <= _pool.might,
             "Stats: consume() not enough might."
         );
         require(
-            stats.speed <= currPool.speed,
+            _stats.speed <= _pool.speed,
             "Stats: consume() not enough speed."
         );
         require(
-            stats.intellect <= currPool.intellect,
+            _stats.intellect <= _pool.intellect,
             "Stats: consume() not enough intellect."
         );
 
-        pool[id].might -= stats.might;
-        pool[id].speed -= stats.speed;
-        pool[id].intellect -= stats.intellect;
+        pool[_id].might -= _stats.might;
+        pool[_id].speed -= _stats.speed;
+        pool[_id].intellect -= _stats.intellect;
     }
 
-    /** @dev Reduces points to the base stats forever.
-     *  @param id         Composed ID of the token.
-     *  @param stats      Amount of points sacrificing.
+    /**
+     * @notice Removes the amount of points available on the character base stats.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _stats    Stats to consume.
      */
-    function sacrifice(bytes memory id, BasicStats memory stats)
+    function sacrifice(bytes memory _id, BasicStats memory _stats)
         public
         whenNotPaused
-        onlyAllowed(id)
+        onlyAllowed(_id)
     {
-        BasicStats storage currBase = base[id];
+        BasicStats storage _base = base[_id];
         require(
-            stats.might <= currBase.might,
+            _stats.might <= _base.might,
             "Stats: sacrifice() not enough might."
         );
         require(
-            stats.speed <= currBase.speed,
+            _stats.speed <= _base.speed,
             "Stats: sacrifice() not enough speed."
         );
         require(
-            stats.intellect <= currBase.intellect,
+            _stats.intellect <= _base.intellect,
             "Stats: sacrifice() not enough intellect."
         );
 
-        base[id].might -= stats.might;
-        base[id].speed -= stats.speed;
-        base[id].intellect -= stats.intellect;
+        base[_id].might -= _stats.might;
+        base[_id].speed -= _stats.speed;
+        base[_id].intellect -= _stats.intellect;
 
-        if (pool[id].might > base[id].might) {
-            pool[id].might = base[id].might;
+        if (pool[_id].might > base[_id].might) {
+            pool[_id].might = base[_id].might;
         }
 
-        if (pool[id].speed > base[id].speed) {
-            pool[id].speed = base[id].speed;
+        if (pool[_id].speed > base[_id].speed) {
+            pool[_id].speed = base[_id].speed;
         }
 
-        if (pool[id].intellect > base[id].intellect) {
-            pool[id].intellect = base[id].intellect;
+        if (pool[_id].intellect > base[_id].intellect) {
+            pool[_id].intellect = base[_id].intellect;
         }
 
-        sacrifices[id] += stats.might;
-        sacrifices[id] += stats.speed;
-        sacrifices[id] += stats.intellect;
+        sacrifices[_id] += _stats.might;
+        sacrifices[_id] += _stats.speed;
+        sacrifices[_id] += _stats.intellect;
     }
 
-    /** @dev Performs a refresh filling the pool stats from the base stats.
-     *  @param id   Composed ID of the token.
+    /**
+     * @notice Refills the pool stats for the character.
+     *
+     * Requirements:
+     * @param _id   Composed ID of the character.
      */
-    function refresh(bytes memory id) public whenNotPaused onlyAllowed(id) {
-        uint256 last = last_refresh[id];
+    function refresh(bytes memory _id) public whenNotPaused onlyAllowed(_id) {
+        uint256 _last = last_refresh[_id];
         require(
-            last == 0 || getNextRefreshTime(id) <= block.timestamp,
+            _last == 0 || getNextRefreshTime(_id) <= block.timestamp,
             "Stats: refresh() not enough time has passed to refresh pool."
         );
-        pool[id].might = base[id].might;
-        pool[id].speed = base[id].speed;
-        pool[id].intellect = base[id].intellect;
-        last_refresh[id] = block.timestamp;
+        pool[_id].might = base[_id].might;
+        pool[_id].speed = base[_id].speed;
+        pool[_id].intellect = base[_id].intellect;
+        last_refresh[_id] = block.timestamp;
     }
 
-    /** @dev Performs a refresh filling the pool stats from the base stats without cooldown spending `RefreshToken` (max 20 points per stat).
-     *  @param id   Composed ID of the token.
+    /**
+     * @notice Refills the pool stats for the character spending a [Refresher](/docs/gadgets/Refresher.md) token.
+     *
+     * Requirements:
+     * @param _id   Composed ID of the character.
      */
-    function refreshWithToken(bytes memory id)
+    function refreshWithToken(bytes memory _id)
         public
         whenNotPaused
-        onlyAllowed(id)
+        onlyAllowed(_id)
     {
         require(
             IERC20(refresher).balanceOf(msg.sender) >= 1,
@@ -208,47 +238,50 @@ contract Stats is IStats, Ownable, Pausable {
         );
 
         require(
-            getNextRefreshWithTokenTime(id) <= block.timestamp,
+            getNextRefreshWithTokenTime(_id) <= block.timestamp,
             "Stats: refreshWithToken() no more refresh with tokens available."
         );
 
         ERC20Burnable(refresher).burnFrom(msg.sender, 1);
 
-        if ((base[id].might - pool[id].might) > 20) {
-            pool[id].might += 20;
+        if ((base[_id].might - pool[_id].might) > 20) {
+            pool[_id].might += 20;
         } else {
-            pool[id].might = base[id].might;
+            pool[_id].might = base[_id].might;
         }
 
-        if ((base[id].speed - pool[id].speed) > 20) {
-            pool[id].speed += 20;
+        if ((base[_id].speed - pool[_id].speed) > 20) {
+            pool[_id].speed += 20;
         } else {
-            pool[id].speed = base[id].speed;
+            pool[_id].speed = base[_id].speed;
         }
 
-        if ((base[id].intellect - pool[id].intellect) > 20) {
-            pool[id].intellect += 20;
+        if ((base[_id].intellect - pool[_id].intellect) > 20) {
+            pool[_id].intellect += 20;
         } else {
-            pool[id].intellect = base[id].intellect;
+            pool[_id].intellect = base[_id].intellect;
         }
 
-        refresher_usage_time[id] = block.timestamp;
+        refresher_usage_time[_id] = block.timestamp;
     }
 
-    /** @dev Consumes a vitalizer token to increase one point of a base stat.
-     *  @param id         Composed ID of the token.
-     *  @param stats      Amount of points increasing.
+    /**
+     * @notice Recovers a sacrificed point spending a [Vitalizer](/docs/gadgets/Vitalizer.md) token.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _stats    Stats to sacrifice.
      */
-    function consumeVitalizer(bytes memory id, BasicStats memory stats)
+    function consumeVitalizer(bytes memory _id, BasicStats memory _stats)
         public
         whenNotPaused
-        onlyAllowed(id)
+        onlyAllowed(_id)
     {
         require(
-            sacrifices[id] > 0,
+            sacrifices[_id] > 0,
             "Stats: consumeVitalizer() not enough sacrificed points."
         );
-        uint256 sum = stats.might + stats.speed + stats.intellect;
+        uint256 sum = _stats.might + _stats.speed + _stats.intellect;
         require(
             sum == 1,
             "Stats: consumeVitalizer() too many points to recover."
@@ -264,102 +297,144 @@ contract Stats is IStats, Ownable, Pausable {
 
         ERC20Burnable(vitalizer).burnFrom(msg.sender, 1);
 
-        base[id].might += stats.might;
-        base[id].speed += stats.speed;
-        base[id].intellect += stats.intellect;
-        pool[id].might += stats.might;
-        pool[id].speed += stats.speed;
-        pool[id].intellect += stats.intellect;
+        base[_id].might += _stats.might;
+        base[_id].speed += _stats.speed;
+        base[_id].intellect += _stats.intellect;
+        pool[_id].might += _stats.might;
+        pool[_id].speed += _stats.speed;
+        pool[_id].intellect += _stats.intellect;
 
-        sacrifices[id] -= 1;
+        sacrifices[_id] -= 1;
     }
 
-    /** @dev Assigns the points to the base pool.
-     *  @param id         Composed ID of the token.
-     *  @param stats     Amount of points to assign.
+    /**
+     * @notice Increases points of the base pool based on new levels.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _stats    Stats to increase.
      */
-    function assignPoints(bytes memory id, BasicStats memory stats)
+    function assignPoints(bytes memory _id, BasicStats memory _stats)
         public
         whenNotPaused
-        onlyAllowed(id)
+        onlyAllowed(_id)
     {
-        uint256 sum = stats.might + stats.speed + stats.intellect;
-        uint256 available = getAvailablePoints(id);
+        uint256 sum = _stats.might + _stats.speed + _stats.intellect;
+        uint256 available = getAvailablePoints(_id);
         require(
             sum <= available,
             "Stats: assignPoints() too many points selected."
         );
-        base[id].might += stats.might;
-        base[id].speed += stats.speed;
-        base[id].intellect += stats.intellect;
-        pool[id].might += stats.might;
-        pool[id].speed += stats.speed;
-        pool[id].intellect += stats.intellect;
+        base[_id].might += _stats.might;
+        base[_id].speed += _stats.speed;
+        base[_id].intellect += _stats.intellect;
+        pool[_id].might += _stats.might;
+        pool[_id].speed += _stats.speed;
+        pool[_id].intellect += _stats.intellect;
     }
 
     // =============================================== Getters ========================================================
 
-    /** @dev Returns the base stats of the composed ID.
-     *  @param id   Composed ID of the token.
+    /**
+     * @notice External function that returns the base points of a character.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     *
+     * @return _stats   Base stats of the character.
      */
-    function getBaseStats(bytes memory id)
+    function getBaseStats(bytes memory _id)
         public
         view
-        returns (BasicStats memory)
+        returns (BasicStats memory _stats)
     {
-        return base[id];
+        return base[_id];
     }
 
-    /** @dev Returns the available pool stats of the composed ID.
-     *  @param id   Composed ID of the token.
+    /**
+     * @notice External function that returns the available pool points of a character.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     *
+     * @return _stats   Available pool stats of the character.
      */
-    function getPoolStats(bytes memory id)
+    function getPoolStats(bytes memory _id)
         public
         view
-        returns (BasicStats memory)
+        returns (BasicStats memory _stats)
     {
-        return pool[id];
+        return pool[_id];
     }
 
-    /** @dev Returns the amount of points available to assign.
-     *  @param id   Composed ID of the token.
+    /**
+     * @notice External function that returns the assignable points of a character.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _points      Number of points available to assign.
      */
-    function getAvailablePoints(bytes memory id) public view returns (uint256) {
-        BasicStats memory p = base[id];
-        uint256 sum = p.intellect + p.might + p.speed;
-        uint256 level = IExperience(experience).getLevel(id);
+    function getAvailablePoints(bytes memory _id)
+        public
+        view
+        returns (uint256 _points)
+    {
+        BasicStats memory _base = base[_id];
+        uint256 _sum = _base.intellect + _base.might + _base.speed;
+        uint256 level = IExperience(experience).getLevel(_id);
         uint256 assignableByLevel = _assignablePointsByLevel(level);
-        return assignableByLevel - sum;
+        return assignableByLevel - _sum;
     }
 
-    /** @dev Returns the time for the next free refresh.
-     *  @param id   Composed ID of the token.
+    /**
+     * @notice External function that returns the next refresher timestamp for a character.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _timestamp   Timestamp when the next refresh is available.
      */
-    function getNextRefreshTime(bytes memory id) public view returns (uint256) {
-        return last_refresh[id] + REFRESH_COOLDOWN_SECONDS;
-    }
-
-    /** @dev Returns the time of the refresh with tokens reset.
-     *  @param id   Composed ID of the token.
-     */
-    function getNextRefreshWithTokenTime(bytes memory id)
+    function getNextRefreshTime(bytes memory _id)
         public
         view
-        returns (uint256)
+        returns (uint256 _timestamp)
     {
-        return refresher_usage_time[id] + REFRESH_COOLDOWN_SECONDS;
+        return last_refresh[_id] + REFRESH_COOLDOWN_SECONDS;
+    }
+
+    /**
+     * @notice External function that returns the next refresher timestamp for a character when using a [Refresher](/docs/gadgets/Refresher.md) token.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _timestamp   Timestamp when the next refresh is available.
+     */
+    function getNextRefreshWithTokenTime(bytes memory _id)
+        public
+        view
+        returns (uint256 _timestamp)
+    {
+        return refresher_usage_time[_id] + REFRESH_COOLDOWN_SECONDS;
     }
 
     // =============================================== Internal ========================================================
-    /** @dev Returns the amount of total asignable points by level.
-     *  @param level   Level number to check points.
+
+    /**
+     * @notice Internal function to get the amount of points assignable by a provided level.
+     *
+     * Requirements:
+     * @param _level     Level to get the assignable points.
+     *
+     * @return _points   Amount of points spendable for this level.
      */
-    function _assignablePointsByLevel(uint256 level)
+    function _assignablePointsByLevel(uint256 _level)
         internal
         pure
-        returns (uint256)
+        returns (uint256 _points)
     {
         uint256 points = 6;
-        return points + level;
+        return points + _level;
     }
 }

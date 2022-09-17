@@ -6,23 +6,42 @@ pragma solidity 0.8.17;
  * @notice Interface for the [Names](/docs/core/Names.md) contract.
  */
 interface INames {
-    function claimName(bytes memory id, string memory name) external;
+    /** @notice See [Names#pause](/docs/codex/Names.md#pause) */
+    function pause() external;
 
-    function replaceName(bytes memory id, string memory newName) external;
+    /** @notice See [Names#unpause](/docs/codex/Names.md#unpause) */
+    function unpause() external;
 
-    function clearName(bytes memory id) external;
+    /** @notice See [Names#claimName](/docs/codex/Names.md#claimName) */
+    function claimName(bytes memory _id, string memory _name) external;
 
-    function getTokenName(bytes memory id)
+    /** @notice See [Names#replaceName](/docs/codex/Names.md#replaceName) */
+    function replaceName(bytes memory _id, string memory _new_name) external;
+
+    /** @notice See [Names#clearName](/docs/codex/Names.md#clearName) */
+    function clearName(bytes memory _id) external;
+
+    /** @notice See [Names#getCharacterName](/docs/codex/Names.md#getCharacterName) */
+    function getCharacterName(bytes memory _id)
         external
         view
-        returns (string memory);
+        returns (string memory _name);
 
-    function isNameAvailable(string memory str) external view returns (bool);
+    /** @notice See [Names#isNameAvailable](/docs/codex/Names.md#isNameAvailable) */
+    function isNameAvailable(string memory _name)
+        external
+        view
+        returns (bool _available);
 
-    function isNameValid(string memory str) external pure returns (bool);
-
-    function toLowerCase(string memory str)
+    /** @notice See [Names#isNameValid](/docs/codex/Names.md#isNameValid) */
+    function isNameValid(string memory _name)
         external
         pure
-        returns (string memory);
+        returns (bool _available);
+
+    /** @notice See [Names#toLowerCase](/docs/codex/Names.md#toLowerCase) */
+    function toLowerCase(string memory _name)
+        external
+        pure
+        returns (string memory _lower_case);
 }

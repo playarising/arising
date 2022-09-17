@@ -30,10 +30,10 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
     /** @notice Address of the [Items](/docs/items/Items.md) instance. */
     address public items;
 
-    /** @dev Map to track the equipment of characters. */
+    /** @notice Map to track the equipment of characters. */
     mapping(bytes => mapping(EquipmentSlot => ItemEquiped)) character_equipments;
 
-    /** @dev Map to track the equipment slots and its attachable items. */
+    /** @notice Map to track the equipment slots and its attachable items. */
     mapping(EquipmentSlot => mapping(IItems.ItemType => bool)) slots_types;
 
     // =============================================== Modifiers ======================================================
@@ -43,7 +43,7 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
      * has allowance to access a composed ID.
      *
      * Requirements:
-     * @param _id    Composed ID of the token.
+     * @param _id   Composed ID of the character.
      */
     modifier onlyAllowed(bytes memory _id) {
         require(
@@ -242,9 +242,6 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
         return (_additions, _reductions);
     }
 
-    /** @dev Returns the total attributes from the equipment.
-     *  @param id  Composed ID of the token.
-     */
     /**
      * @notice External function to return the character total attributes counting additions
      * and reducers counting the full equipment set.

@@ -52,7 +52,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * has allowance to access a composed ID.
      *
      * Requirements:
-     * @param _id    Composed ID of the token.
+     * @param _id   Composed ID of the character.
      */
     modifier onlyAllowed(bytes memory _id) {
         require(
@@ -264,8 +264,8 @@ contract Craft is ICraft, Ownable, Pausable {
      * @notice Internal function that assigns a recipe to the crafting slot.
      *
      * Requirements:
-     * @param _id           Composed ID of the character.
-     *      * @param _recipe           Recipe to assign.
+     * @param _id       Composed ID of the character.
+     * @param _recipe   Recipe to assign.
      */
     function _assignRecipeToSlot(bytes memory _id, Recipe memory _recipe)
         internal

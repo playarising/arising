@@ -22,7 +22,7 @@ contract Experience is IExperience, Ownable {
     /** @notice Address of the [Levels](/docs/codex/Levels.md) instance. */
     address public levels;
 
-    /** @dev Map to store the list of authorized addresses to assign experience. */
+    /** @notice Map to store the list of authorized addresses to assign experience. */
     mapping(address => bool) authorized;
 
     /** @notice Map to track the experience of composed IDs. */

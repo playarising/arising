@@ -20,7 +20,7 @@ contract Levels is ILevels {
 
     /**
      * @notice Constructor.
-     * @dev Initializes the lable table.
+     * @notice Initializes the lable table.
      */
     constructor() {
         levels[0] = Level(0, 1000);

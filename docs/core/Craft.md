@@ -82,9 +82,9 @@ has allowance to access a composed ID.
 
 Requirements:
 
-| Name | Type  | Description               |
-| ---- | ----- | ------------------------- |
-| \_id | bytes | Composed ID of the token. |
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
 
 ### constructor
 
@@ -259,10 +259,10 @@ Internal function that assigns a recipe to the crafting slot.
 
 Requirements:
 
-| Name     | Type                 | Description                                                        |
-| -------- | -------------------- | ------------------------------------------------------------------ |
-| \_id     | bytes                | Composed ID of the character. \* @param \_recipe Recipe to assign. |
-| \_recipe | struct ICraft.Recipe |                                                                    |
+| Name     | Type                 | Description                   |
+| -------- | -------------------- | ----------------------------- |
+| \_id     | bytes                | Composed ID of the character. |
+| \_recipe | struct ICraft.Recipe | Recipe to assign.             |
 
 ### \_claim
 

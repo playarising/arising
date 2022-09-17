@@ -17,6 +17,7 @@ import "../interfaces/ICivilizations.sol";
  *
  * @notice Implementation of the [ICivilizations](/docs/interfaces/ICivilizations.md) interface.
  */
+
 contract Civilizations is ICivilizations, Ownable, Pausable {
     using Address for address;
 
@@ -129,8 +130,8 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
             msg.sender == Ownable(_civilization).owner(),
             "Civilizations: addCivilization() missing civilization ownership."
         );
-        uint256 id = _civilizations.length + 1;
-        civilizations[_civilization] = id;
+        uint256 _civilization_id = _civilizations.length + 1;
+        civilizations[_civilization] = _civilization_id;
         _civilizations.push(_civilization);
     }
 
@@ -180,9 +181,9 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
             upgrades[_upgrade_id].available,
             "Civilizations: buyUpgrade() upgrade is not initialized."
         );
-        uint256 price = upgrades[_upgrade_id].price;
+        uint256 _price = upgrades[_upgrade_id].price;
         require(
-            IERC20(token).balanceOf(msg.sender) >= price,
+            IERC20(token).balanceOf(msg.sender) >= _price,
             "Civilizations: buyUpgrade() not enough balance to mint tokens."
         );
         require(
@@ -190,7 +191,7 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
                 upgrades[_upgrade_id].price,
             "Civilizations: buyUpgrade() not enough allowance to mint tokens."
         );
-        IERC20(token).transferFrom(msg.sender, address(this), price);
+        IERC20(token).transferFrom(msg.sender, address(this), _price);
         if (_upgrade_id == 1) {
             character_upgrades.upgrade_1[_id] = true;
         }

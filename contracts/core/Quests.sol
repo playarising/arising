@@ -46,7 +46,7 @@ contract Quests is IQuests, Ownable, Pausable {
      * has allowance to access a composed ID.
      *
      * Requirements:
-     * @param _id    Composed ID of the token.
+     * @param _id   Composed ID of the character.
      */
     modifier onlyAllowed(bytes memory _id) {
         require(
@@ -119,7 +119,7 @@ contract Quests is IQuests, Ownable, Pausable {
 
     /**
      * @dev Claims a recipe already crafted.
-     * @param id        Composed ID of the character.
+     * @param id    Composed ID of the character.
      */
     function startQuest(bytes memory id, uint256 quest)
         public
@@ -134,7 +134,7 @@ contract Quests is IQuests, Ownable, Pausable {
 
     /**
      * @dev Claims a recipe already crafted.
-     * @param id        Composed ID of the character.
+     * @param id    Composed ID of the character.
      */
     function claimQuest(bytes memory id) public whenNotPaused onlyAllowed(id) {
         require(

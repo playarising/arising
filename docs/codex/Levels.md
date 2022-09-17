@@ -22,8 +22,7 @@ constructor() public
 ```
 
 Constructor.
-
-_Initializes the lable table._
+Initializes the lable table.
 
 ### getLevel
 

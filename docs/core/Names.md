@@ -14,7 +14,7 @@ Implementation of the [INames](/docs/interfaces/INames.md) interface.
 address civilizations
 ```
 
-_Address of the [Civilizations](/docs/core/Civilizations.md) implementation. \*_
+Address of the [Civilizations](/docs/core/Civilizations.md) instance.
 
 ### experience
 
@@ -22,7 +22,7 @@ _Address of the [Civilizations](/docs/core/Civilizations.md) implementation. \*_
 address experience
 ```
 
-_Address of the [Experience](/docs/core/Experience.md) implementation. \*_
+Address of the [Experience](/docs/core/Experience.md) instance.
 
 ### names
 
@@ -30,7 +30,7 @@ _Address of the [Experience](/docs/core/Experience.md) implementation. \*_
 mapping(bytes => string) names
 ```
 
-_Map storing the names for each character. \*_
+Map to track the names of the characters.
 
 ### claimed_names
 
@@ -38,7 +38,7 @@ _Map storing the names for each character. \*_
 mapping(string => bool) claimed_names
 ```
 
-_Names claimed. \*_
+Map to track the names availability.
 
 ### onlyAllowed
 
@@ -51,9 +51,9 @@ has allowance to access a composed ID.
 
 Requirements:
 
-| Name | Type  | Description               |
-| ---- | ----- | ------------------------- |
-| \_id | bytes | Composed ID of the token. |
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
 
 ### constructor
 
@@ -89,84 +89,115 @@ Resumes the contract
 ### claimName
 
 ```solidity
-function claimName(bytes id, string name) public
+function claimName(bytes _id, string _name) public
 ```
 
-_Assigns a name to a character and stores to prevent duplicates.
-@param id Composed ID of the token._
+Assigns a name to a character and marks it as claimed.
 
-| Name | Type   | Description    |
-| ---- | ------ | -------------- |
-| id   | bytes  |                |
-| name | string | Name to claim. |
+Requirements:
+
+| Name   | Type   | Description                   |
+| ------ | ------ | ----------------------------- |
+| \_id   | bytes  | Composed ID of the character. |
+| \_name | string | Name to assign and claim.     |
 
 ### replaceName
 
 ```solidity
-function replaceName(bytes id, string newName) public
+function replaceName(bytes _id, string _new_name) public
 ```
 
-_Changes a name for a character.
-@param id Composed ID of the token._
+Replaces the name of a character with a name already assigned.
 
-| Name    | Type   | Description           |
-| ------- | ------ | --------------------- |
-| id      | bytes  |                       |
-| newName | string | Name to replace with. |
+Requirements:
+
+| Name       | Type   | Description                        |
+| ---------- | ------ | ---------------------------------- |
+| \_id       | bytes  | Composed ID of the character.      |
+| \_new_name | string | Name to replace for the character. |
 
 ### clearName
 
 ```solidity
-function clearName(bytes id) public
+function clearName(bytes _id) public
 ```
 
-_Removes the name of the character.
-@param id Composed ID of the token._
+Removes the assigned name to the character.
 
-### getTokenName
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+### getCharacterName
 
 ```solidity
-function getTokenName(bytes id) public view returns (string)
+function getCharacterName(bytes _id) public view returns (string _name)
 ```
 
-_Returns the name of the composed ID._
+External function to get the assigned name of a character.
 
-| Name | Type  | Description               |
-| ---- | ----- | ------------------------- |
-| id   | bytes | Composed ID of the token. |
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name   | Type   | Description                         |
+| ------ | ------ | ----------------------------------- |
+| \_name | string | The assigned name of the character. |
 
 ### isNameAvailable
 
 ```solidity
-function isNameAvailable(string str) public view returns (bool)
+function isNameAvailable(string _name) public view returns (bool _available)
 ```
 
-_Checks if a given name is available to use._
+External function to check if a name is available to assign.
 
-| Name | Type   | Description        |
-| ---- | ------ | ------------------ |
-| str  | string | String to checked. |
+Requirements:
+
+| Name   | Type   | Description        |
+| ------ | ------ | ------------------ |
+| \_name | string | The name to check. |
+
+| Name        | Type | Description                               |
+| ----------- | ---- | ----------------------------------------- |
+| \_available | bool | Boolean to know if the name is available. |
 
 ### isNameValid
 
 ```solidity
-function isNameValid(string str) public pure returns (bool)
+function isNameValid(string _name) public pure returns (bool _available)
 ```
 
-_Checks if a given name is valid (Alphanumeric and spaces without leading or trailing space)._
+External function to check if a name is valid to assign.
 
-| Name | Type   | Description        |
-| ---- | ------ | ------------------ |
-| str  | string | String to checked. |
+Requirements:
+
+| Name   | Type   | Description        |
+| ------ | ------ | ------------------ |
+| \_name | string | The name to check. |
+
+| Name        | Type | Description                           |
+| ----------- | ---- | ------------------------------------- |
+| \_available | bool | Boolean to know if the name is valid. |
 
 ### toLowerCase
 
 ```solidity
-function toLowerCase(string str) public pure returns (string)
+function toLowerCase(string _name) public pure returns (string _lower_case)
 ```
 
-_Converts a string to lowercase._
+External function to convert a name to lower case.
 
-| Name | Type   | Description        |
-| ---- | ------ | ------------------ |
-| str  | string | String to convert. |
+Requirements:
+
+| Name   | Type   | Description          |
+| ------ | ------ | -------------------- |
+| \_name | string | The name to convert. |
+
+| Name         | Type   | Description                               |
+| ------------ | ------ | ----------------------------------------- |
+| \_lower_case | string | The provided name as a lower case string. |

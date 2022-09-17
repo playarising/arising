@@ -28,7 +28,7 @@ Address of the [Levels](/docs/codex/Levels.md) instance.
 mapping(address => bool) authorized
 ```
 
-_Map to store the list of authorized addresses to assign experience._
+Map to store the list of authorized addresses to assign experience.
 
 ### experience
 

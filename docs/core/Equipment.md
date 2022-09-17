@@ -36,7 +36,7 @@ Address of the [Items](/docs/items/Items.md) instance.
 mapping(bytes => mapping(enum IEquipment.EquipmentSlot => struct IEquipment.ItemEquiped)) character_equipments
 ```
 
-_Map to track the equipment of characters._
+Map to track the equipment of characters.
 
 ### slots_types
 
@@ -44,7 +44,7 @@ _Map to track the equipment of characters._
 mapping(enum IEquipment.EquipmentSlot => mapping(enum IItems.ItemType => bool)) slots_types
 ```
 
-_Map to track the equipment slots and its attachable items._
+Map to track the equipment slots and its attachable items.
 
 ### onlyAllowed
 
@@ -57,9 +57,9 @@ has allowance to access a composed ID.
 
 Requirements:
 
-| Name | Type  | Description               |
-| ---- | ----- | ------------------------- |
-| \_id | bytes | Composed ID of the token. |
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
 
 ### constructor
 

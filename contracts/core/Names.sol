@@ -18,16 +18,16 @@ import "../interfaces/IExperience.sol";
  */
 contract Names is INames, Pausable, Ownable {
     // =============================================== Storage ========================================================
-    /** @dev Address of the [Civilizations](/docs/core/Civilizations.md) implementation. **/
+    /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
     address public civilizations;
 
-    /** @dev Address of the [Experience](/docs/core/Experience.md) implementation. **/
+    /** @notice Address of the [Experience](/docs/core/Experience.md) instance. */
     address public experience;
 
-    /** @dev Map storing the names for each character. **/
+    /** @notice Map to track the names of the characters. */
     mapping(bytes => string) public names;
 
-    /** @dev Names claimed. **/
+    /** @notice Map to track the names availability. */
     mapping(string => bool) public claimed_names;
 
     // =============================================== Modifiers ======================================================
@@ -37,7 +37,7 @@ contract Names is INames, Pausable, Ownable {
      * has allowance to access a composed ID.
      *
      * Requirements:
-     * @param _id    Composed ID of the token.
+     * @param _id   Composed ID of the character.
      */
     modifier onlyAllowed(bytes memory _id) {
         require(
@@ -72,97 +72,130 @@ contract Names is INames, Pausable, Ownable {
     }
 
     /**
-     * @dev Assigns a name to a character and stores to prevent duplicates.
-     *  @param id         Composed ID of the token.
-     * @param name   Name to claim.
+     * @notice Assigns a name to a character and marks it as claimed.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _name     Name to assign and claim.
      */
-    function claimName(bytes memory id, string memory name)
+    function claimName(bytes memory _id, string memory _name)
         public
         whenNotPaused
-        onlyAllowed(id)
+        onlyAllowed(_id)
     {
         require(
-            IExperience(experience).getLevel(id) >= 5,
+            IExperience(experience).getLevel(_id) >= 5,
             "Name: claimName() not enough level."
         );
         require(
-            bytes(names[id]).length == 0,
+            bytes(names[_id]).length == 0,
             "Name: claimName() already named."
         );
-        require(isNameValid(name), "Name: claimName() invalid name.");
-        require(isNameAvailable(name), "Name: claimName() name not available.");
-        claimed_names[toLowerCase(name)] = true;
-        names[id] = name;
+        require(isNameValid(_name), "Name: claimName() invalid name.");
+        require(
+            isNameAvailable(_name),
+            "Name: claimName() name not available."
+        );
+        claimed_names[toLowerCase(_name)] = true;
+        names[_id] = _name;
     }
 
     /**
-     * @dev Changes a name for a character.
-     *  @param id    Composed ID of the token.
-     * @param newName   Name to replace with.
+     * @notice Replaces the name of a character with a name already assigned.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     * @param _new_name     Name to replace for the character.
      */
-    function replaceName(bytes memory id, string memory newName)
+    function replaceName(bytes memory _id, string memory _new_name)
         public
         whenNotPaused
-        onlyAllowed(id)
+        onlyAllowed(_id)
     {
         require(
-            IExperience(experience).getLevel(id) >= 5,
+            IExperience(experience).getLevel(_id) >= 5,
             "Name: replaceName() not enough level."
         );
-        require(isNameValid(newName), "Name: replaceName() invalid name.");
+        require(isNameValid(_new_name), "Name: replaceName() invalid name.");
         require(
-            isNameAvailable(newName),
+            isNameAvailable(_new_name),
             "Name: replaceName() name not available."
         );
-        string memory oldName = names[id];
+        string memory old_name = names[_id];
         require(
-            bytes(oldName).length != 0,
+            bytes(old_name).length != 0,
             "Name: replaceName() no name assigned."
         );
-        claimed_names[toLowerCase(oldName)] = false;
-        claimed_names[toLowerCase(newName)] = false;
+        claimed_names[toLowerCase(old_name)] = false;
+        claimed_names[toLowerCase(_new_name)] = false;
 
-        names[id] = newName;
+        names[_id] = _new_name;
     }
 
     /**
-     * @dev Removes the name of the character.
-     *  @param id    Composed ID of the token.
+     * @notice Removes the assigned name to the character.
+     *
+     * Requirements:
+     * @param _id   Composed ID of the character.
      */
-    function clearName(bytes memory id) public whenNotPaused onlyAllowed(id) {
-        string memory oldName = names[id];
+    function clearName(bytes memory _id) public whenNotPaused onlyAllowed(_id) {
+        string memory old_name = names[_id];
         require(
-            bytes(oldName).length != 0,
+            bytes(old_name).length != 0,
             "Name: clearName() no name assigned."
         );
-        claimed_names[toLowerCase(oldName)] = false;
-        names[id] = "";
+        claimed_names[toLowerCase(old_name)] = false;
+        names[_id] = "";
     }
 
     // =============================================== Getters ========================================================
 
     /**
-     * @dev Returns the name of the composed ID.
-     * @param id   Composed ID of the token.
+     * @notice External function to get the assigned name of a character.
+     *
+     * Requirements:
+     * @param _id   Composed ID of the character.
+     *
+     * @return _name    The assigned name of the character.
      */
-    function getTokenName(bytes memory id) public view returns (string memory) {
-        return names[id];
+    function getCharacterName(bytes memory _id)
+        public
+        view
+        returns (string memory _name)
+    {
+        return names[_id];
     }
 
     /**
-     * @dev Checks if a given name is available to use.
-     * @param str   String to checked.
+     * @notice External function to check if a name is available to assign.
+     *
+     * Requirements:
+     * @param _name         The name to check.
+     *
+     * @return _available   Boolean to know if the name is available.
      */
-    function isNameAvailable(string memory str) public view returns (bool) {
-        return !claimed_names[toLowerCase(str)];
+    function isNameAvailable(string memory _name)
+        public
+        view
+        returns (bool _available)
+    {
+        return !claimed_names[toLowerCase(_name)];
     }
 
     /**
-     * @dev Checks if a given name is valid (Alphanumeric and spaces without leading or trailing space).
-     * @param str   String to checked.
+     * @notice External function to check if a name is valid to assign.
+     *
+     * Requirements:
+     * @param _name         The name to check.
+     *
+     * @return _available   Boolean to know if the name is valid.
      */
-    function isNameValid(string memory str) public pure returns (bool) {
-        bytes memory b = bytes(str);
+    function isNameValid(string memory _name)
+        public
+        pure
+        returns (bool _available)
+    {
+        bytes memory b = bytes(_name);
         if (b.length < 1) return false;
         if (b.length > 25) return false;
         if (b[0] == 0x20) return false;
@@ -189,15 +222,19 @@ contract Names is INames, Pausable, Ownable {
     }
 
     /**
-     * @dev Converts a string to lowercase.
-     * @param str   String to convert.
+     * @notice External function to convert a name to lower case.
+     *
+     * Requirements:
+     * @param _name         The name to convert.
+     *
+     * @return _lower_case   The provided name as a lower case string.
      */
-    function toLowerCase(string memory str)
+    function toLowerCase(string memory _name)
         public
         pure
-        returns (string memory)
+        returns (string memory _lower_case)
     {
-        bytes memory b_str = bytes(str);
+        bytes memory b_str = bytes(_name);
         bytes memory b_lower = new bytes(b_str.length);
         for (uint256 i = 0; i < b_str.length; i++) {
             if ((uint8(b_str[i]) >= 65) && (uint8(b_str[i]) <= 90)) {

@@ -6,51 +6,81 @@ pragma solidity 0.8.17;
  * @notice Interface for the [Stats](/docs/core/Stats.md) contract.
  */
 interface IStats {
+    /**
+     * @notice Internal struct for the character stats.
+     *
+     * Requirements:
+     * @param might     The amount of points for the might stat.
+     * @param speed     The amount of points for the speed stat.
+     * @param intellect The amount of points for the intellect stat.
+     */
     struct BasicStats {
         uint256 might;
         uint256 speed;
         uint256 intellect;
     }
 
-    function setRefreshToken(address _token) external;
+    /** @notice See [Stats#pause](/docs/codex/Stats.md#pause) */
+    function pause() external;
 
-    function setVitalizerToken(address _token) external;
+    /** @notice See [Stats#unpause](/docs/codex/Stats.md#unpause) */
+    function unpause() external;
 
-    function consume(bytes memory id, BasicStats memory stats) external;
+    /** @notice See [Stats#setRefreshCooldown](/docs/codex/Stats.md#setRefreshCooldown) */
+    function setRefreshCooldown(uint256 _cooldown) external;
 
-    function sacrifice(bytes memory id, BasicStats memory stats) external;
+    /** @notice See [Stats#setRefreshToken](/docs/codex/Stats.md#setRefreshToken) */
+    function setRefreshToken(address _refresher) external;
 
-    function refresh(bytes memory id) external;
+    /** @notice See [Stats#setVitalizerToken](/docs/codex/Stats.md#setVitalizerToken) */
+    function setVitalizerToken(address _vitalizer) external;
 
-    function refreshWithToken(bytes memory id) external;
+    /** @notice See [Stats#consume](/docs/codex/Stats.md#consume) */
+    function consume(bytes memory _id, BasicStats memory _stats) external;
 
-    function consumeVitalizer(bytes memory id, BasicStats memory stats)
+    /** @notice See [Stats#sacrifice](/docs/codex/Stats.md#sacrifice) */
+    function sacrifice(bytes memory _id, BasicStats memory _stats) external;
+
+    /** @notice See [Stats#refresh](/docs/codex/Stats.md#refresh) */
+    function refresh(bytes memory _id) external;
+
+    /** @notice See [Stats#refreshWithToken](/docs/codex/Stats.md#refreshWithToken) */
+    function refreshWithToken(bytes memory _id) external;
+
+    /** @notice See [Stats#consumeVitalizer](/docs/codex/Stats.md#consumeVitalizer) */
+    function consumeVitalizer(bytes memory _id, BasicStats memory _stats)
         external;
 
-    function assignPoints(bytes memory id, BasicStats memory stats) external;
+    /** @notice See [Stats#assignPoints](/docs/codex/Stats.md#assignPoints) */
+    function assignPoints(bytes memory _id, BasicStats memory _stats) external;
 
-    function getBaseStats(bytes memory id)
+    /** @notice See [Stats#getBaseStats](/docs/codex/Stats.md#getBaseStats) */
+    function getBaseStats(bytes memory _id)
         external
         view
-        returns (BasicStats memory);
+        returns (BasicStats memory _stats);
 
-    function getPoolStats(bytes memory id)
+    /** @notice See [Stats#getPoolStats](/docs/codex/Stats.md#getPoolStats) */
+    function getPoolStats(bytes memory _id)
         external
         view
-        returns (BasicStats memory);
+        returns (BasicStats memory _stats);
 
-    function getAvailablePoints(bytes memory id)
+    /** @notice See [Stats#getAvailablePoints](/docs/codex/Stats.md#getAvailablePoints) */
+    function getAvailablePoints(bytes memory _id)
         external
         view
-        returns (uint256);
+        returns (uint256 _points);
 
-    function getNextRefreshTime(bytes memory id)
+    /** @notice See [Stats#getNextRefreshTime](/docs/codex/Stats.md#getNextRefreshTime) */
+    function getNextRefreshTime(bytes memory _id)
         external
         view
-        returns (uint256);
+        returns (uint256 _timestamp);
 
-    function getNextRefreshWithTokenTime(bytes memory id)
+    /** @notice See [Stats#getNextRefreshWithTokenTime](/docs/codex/Stats.md#getNextRefreshWithTokenTime) */
+    function getNextRefreshWithTokenTime(bytes memory _id)
         external
         view
-        returns (uint256);
+        returns (uint256 _timestamp);
 }

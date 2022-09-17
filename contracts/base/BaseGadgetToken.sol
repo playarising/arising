@@ -115,8 +115,8 @@ contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
 
     /** @notice Transfers the total amount of tokens stored in the contract to the owner .*/
     function withdraw() public onlyOwner {
-        uint256 balance = IERC20(token).balanceOf(address(this));
-        IERC20(token).transfer(owner(), balance);
+        uint256 _balance = IERC20(token).balanceOf(address(this));
+        IERC20(token).transfer(owner(), _balance);
     }
 
     // =============================================== Getters ========================================================

@@ -15,80 +15,130 @@ struct BasicStats {
 
 ```
 
+### pause
+
+```solidity
+function pause() external
+```
+
+See [Stats#pause](/docs/codex/Stats.md#pause)
+
+### unpause
+
+```solidity
+function unpause() external
+```
+
+See [Stats#unpause](/docs/codex/Stats.md#unpause)
+
+### setRefreshCooldown
+
+```solidity
+function setRefreshCooldown(uint256 _cooldown) external
+```
+
+See [Stats#setRefreshCooldown](/docs/codex/Stats.md#setRefreshCooldown)
+
 ### setRefreshToken
 
 ```solidity
-function setRefreshToken(address _token) external
+function setRefreshToken(address _refresher) external
 ```
+
+See [Stats#setRefreshToken](/docs/codex/Stats.md#setRefreshToken)
 
 ### setVitalizerToken
 
 ```solidity
-function setVitalizerToken(address _token) external
+function setVitalizerToken(address _vitalizer) external
 ```
+
+See [Stats#setVitalizerToken](/docs/codex/Stats.md#setVitalizerToken)
 
 ### consume
 
 ```solidity
-function consume(bytes id, struct IStats.BasicStats stats) external
+function consume(bytes _id, struct IStats.BasicStats _stats) external
 ```
+
+See [Stats#consume](/docs/codex/Stats.md#consume)
 
 ### sacrifice
 
 ```solidity
-function sacrifice(bytes id, struct IStats.BasicStats stats) external
+function sacrifice(bytes _id, struct IStats.BasicStats _stats) external
 ```
+
+See [Stats#sacrifice](/docs/codex/Stats.md#sacrifice)
 
 ### refresh
 
 ```solidity
-function refresh(bytes id) external
+function refresh(bytes _id) external
 ```
+
+See [Stats#refresh](/docs/codex/Stats.md#refresh)
 
 ### refreshWithToken
 
 ```solidity
-function refreshWithToken(bytes id) external
+function refreshWithToken(bytes _id) external
 ```
+
+See [Stats#refreshWithToken](/docs/codex/Stats.md#refreshWithToken)
 
 ### consumeVitalizer
 
 ```solidity
-function consumeVitalizer(bytes id, struct IStats.BasicStats stats) external
+function consumeVitalizer(bytes _id, struct IStats.BasicStats _stats) external
 ```
+
+See [Stats#consumeVitalizer](/docs/codex/Stats.md#consumeVitalizer)
 
 ### assignPoints
 
 ```solidity
-function assignPoints(bytes id, struct IStats.BasicStats stats) external
+function assignPoints(bytes _id, struct IStats.BasicStats _stats) external
 ```
+
+See [Stats#assignPoints](/docs/codex/Stats.md#assignPoints)
 
 ### getBaseStats
 
 ```solidity
-function getBaseStats(bytes id) external view returns (struct IStats.BasicStats)
+function getBaseStats(bytes _id) external view returns (struct IStats.BasicStats _stats)
 ```
+
+See [Stats#getBaseStats](/docs/codex/Stats.md#getBaseStats)
 
 ### getPoolStats
 
 ```solidity
-function getPoolStats(bytes id) external view returns (struct IStats.BasicStats)
+function getPoolStats(bytes _id) external view returns (struct IStats.BasicStats _stats)
 ```
+
+See [Stats#getPoolStats](/docs/codex/Stats.md#getPoolStats)
 
 ### getAvailablePoints
 
 ```solidity
-function getAvailablePoints(bytes id) external view returns (uint256)
+function getAvailablePoints(bytes _id) external view returns (uint256 _points)
 ```
+
+See [Stats#getAvailablePoints](/docs/codex/Stats.md#getAvailablePoints)
 
 ### getNextRefreshTime
 
 ```solidity
-function getNextRefreshTime(bytes id) external view returns (uint256)
+function getNextRefreshTime(bytes _id) external view returns (uint256 _timestamp)
 ```
+
+See [Stats#getNextRefreshTime](/docs/codex/Stats.md#getNextRefreshTime)
 
 ### getNextRefreshWithTokenTime
 
 ```solidity
-function getNextRefreshWithTokenTime(bytes id) external view returns (uint256)
+function getNextRefreshWithTokenTime(bytes _id) external view returns (uint256 _timestamp)
 ```
+
+See [Stats#getNextRefreshWithTokenTime](/docs/codex/Stats.md#getNextRefreshWithTokenTime)

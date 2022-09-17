@@ -4,44 +4,74 @@
 
 Interface for the [Names](/docs/core/Names.md) contract.
 
+### pause
+
+```solidity
+function pause() external
+```
+
+See [Names#pause](/docs/codex/Names.md#pause)
+
+### unpause
+
+```solidity
+function unpause() external
+```
+
+See [Names#unpause](/docs/codex/Names.md#unpause)
+
 ### claimName
 
 ```solidity
-function claimName(bytes id, string name) external
+function claimName(bytes _id, string _name) external
 ```
+
+See [Names#claimName](/docs/codex/Names.md#claimName)
 
 ### replaceName
 
 ```solidity
-function replaceName(bytes id, string newName) external
+function replaceName(bytes _id, string _new_name) external
 ```
+
+See [Names#replaceName](/docs/codex/Names.md#replaceName)
 
 ### clearName
 
 ```solidity
-function clearName(bytes id) external
+function clearName(bytes _id) external
 ```
 
-### getTokenName
+See [Names#clearName](/docs/codex/Names.md#clearName)
+
+### getCharacterName
 
 ```solidity
-function getTokenName(bytes id) external view returns (string)
+function getCharacterName(bytes _id) external view returns (string _name)
 ```
+
+See [Names#getCharacterName](/docs/codex/Names.md#getCharacterName)
 
 ### isNameAvailable
 
 ```solidity
-function isNameAvailable(string str) external view returns (bool)
+function isNameAvailable(string _name) external view returns (bool _available)
 ```
+
+See [Names#isNameAvailable](/docs/codex/Names.md#isNameAvailable)
 
 ### isNameValid
 
 ```solidity
-function isNameValid(string str) external pure returns (bool)
+function isNameValid(string _name) external pure returns (bool _available)
 ```
+
+See [Names#isNameValid](/docs/codex/Names.md#isNameValid)
 
 ### toLowerCase
 
 ```solidity
-function toLowerCase(string str) external pure returns (string)
+function toLowerCase(string _name) external pure returns (string _lower_case)
 ```
+
+See [Names#toLowerCase](/docs/codex/Names.md#toLowerCase)

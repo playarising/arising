@@ -13,7 +13,7 @@ Implementation of the [IStats](/docs/interfaces/IStats.md) interface.
 uint256 REFRESH_COOLDOWN_SECONDS
 ```
 
-_Amount of seconds for refresh cooldown. \*_
+Constant amount of seconds for refresh cooldown. \*
 
 ### base
 
@@ -21,7 +21,7 @@ _Amount of seconds for refresh cooldown. \*_
 mapping(bytes => struct IStats.BasicStats) base
 ```
 
-_Map to store the base stats from composed IDs. \*_
+Map track the base stats for characters.
 
 ### pool
 
@@ -29,7 +29,7 @@ _Map to store the base stats from composed IDs. \*_
 mapping(bytes => struct IStats.BasicStats) pool
 ```
 
-_Map to store the pool stats from composed ID. \*_
+Map track the pool stats for characters.
 
 ### last_refresh
 
@@ -37,7 +37,7 @@ _Map to store the pool stats from composed ID. \*_
 mapping(bytes => uint256) last_refresh
 ```
 
-_Map to store the the last refresh from composed ID. \*_
+Map track the last refresh timestamps of the characters.
 
 ### refresher
 
@@ -45,7 +45,7 @@ _Map to store the the last refresh from composed ID. \*_
 address refresher
 ```
 
-_Implementation of the `Refresher` \*_
+Address of the [Refresher](/docs/gadgets/Refresher.md) instance.
 
 ### vitalizer
 
@@ -53,7 +53,7 @@ _Implementation of the `Refresher` \*_
 address vitalizer
 ```
 
-_Implementation of the `Vitalizer` \*_
+Address of the [Vitalizer](/docs/gadgets/Vitalizer.md) instance.
 
 ### civilizations
 
@@ -61,7 +61,7 @@ _Implementation of the `Vitalizer` \*_
 address civilizations
 ```
 
-_Address of the [Civilizations](/docs/core/Civilizations.md) instance. \*_
+Address of the [Civilizations](/docs/core/Civilizations.md) instance.
 
 ### experience
 
@@ -69,7 +69,7 @@ _Address of the [Civilizations](/docs/core/Civilizations.md) instance. \*_
 address experience
 ```
 
-_Address of the [Experience](/docs/core/Experience.md) instance. \*_
+Address of the [Experience](/docs/core/Experience.md) instance.
 
 ### sacrifices
 
@@ -77,7 +77,7 @@ _Address of the [Experience](/docs/core/Experience.md) instance. \*_
 mapping(bytes => uint256) sacrifices
 ```
 
-_Map to track the amount of points sacrificed by a character. \*_
+Map to track the amount of points sacrificed by a character.
 
 ### refresher_usage_time
 
@@ -85,7 +85,7 @@ _Map to track the amount of points sacrificed by a character. \*_
 mapping(bytes => uint256) refresher_usage_time
 ```
 
-_Map to track the first refresher usage timestamp. \*_
+Map to track the first refresher token usage timestamps.
 
 ### onlyAllowed
 
@@ -98,9 +98,9 @@ has allowance to access a composed ID.
 
 Requirements:
 
-| Name | Type  | Description               |
-| ---- | ----- | ------------------------- |
-| \_id | bytes | Composed ID of the token. |
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
 
 ### constructor
 
@@ -133,132 +133,240 @@ function unpause() public
 
 Resumes the contract
 
+### setRefreshCooldown
+
+```solidity
+function setRefreshCooldown(uint256 _cooldown) public
+```
+
+Changes the amount of seconds of cooldown between refreshes.
+
+Requirements:
+
+| Name       | Type    | Description                                  |
+| ---------- | ------- | -------------------------------------------- |
+| \_cooldown | uint256 | Amount of seconds to wait between refreshes. |
+
 ### setRefreshToken
 
 ```solidity
-function setRefreshToken(address _token) public
+function setRefreshToken(address _refresher) public
 ```
 
-_Sets the `Refresher` instance.
-@param \_token address of the `Refresher` instance._
+Changes the [Refresher](/docs/gadgets/Refresher.md) instance to use for paid refreshes.
+
+Requirements:
+
+| Name        | Type    | Description                                                          |
+| ----------- | ------- | -------------------------------------------------------------------- |
+| \_refresher | address | Address of the new [Refresher](/docs/gadgets/Refresher.md) instance. |
 
 ### setVitalizerToken
 
 ```solidity
-function setVitalizerToken(address _token) public
+function setVitalizerToken(address _vitalizer) public
 ```
 
-_Sets the `Vitalizer` instance.
-@param \_token address of the `Vitalizer` instance._
+Changes the [Vitalizer](/docs/gadgets/Vitalizer.md) instance to use for sacrifice points recover.
+
+Requirements:
+
+| Name        | Type    | Description                                                          |
+| ----------- | ------- | -------------------------------------------------------------------- |
+| \_vitalizer | address | Address of the new [Vitalizer](/docs/gadgets/Vitalizer.md) instance. |
 
 ### consume
 
 ```solidity
-function consume(bytes id, struct IStats.BasicStats stats) public
+function consume(bytes _id, struct IStats.BasicStats _stats) public
 ```
 
-_Reduces stats points from the pool.
-@param id Composed ID of the token.
-@param stats Amount of points reducing._
+Removes the amount of points available on the character pool stats.
+
+Requirements:
+
+| Name    | Type                     | Description                   |
+| ------- | ------------------------ | ----------------------------- |
+| \_id    | bytes                    | Composed ID of the character. |
+| \_stats | struct IStats.BasicStats | Stats to consume.             |
 
 ### sacrifice
 
 ```solidity
-function sacrifice(bytes id, struct IStats.BasicStats stats) public
+function sacrifice(bytes _id, struct IStats.BasicStats _stats) public
 ```
 
-_Reduces points to the base stats forever.
-@param id Composed ID of the token.
-@param stats Amount of points sacrificing._
+Removes the amount of points available on the character base stats.
+
+Requirements:
+
+| Name    | Type                     | Description                   |
+| ------- | ------------------------ | ----------------------------- |
+| \_id    | bytes                    | Composed ID of the character. |
+| \_stats | struct IStats.BasicStats | Stats to consume.             |
 
 ### refresh
 
 ```solidity
-function refresh(bytes id) public
+function refresh(bytes _id) public
 ```
 
-_Performs a refresh filling the pool stats from the base stats.
-@param id Composed ID of the token._
+Refills the pool stats for the character.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
 
 ### refreshWithToken
 
 ```solidity
-function refreshWithToken(bytes id) public
+function refreshWithToken(bytes _id) public
 ```
 
-_Performs a refresh filling the pool stats from the base stats without cooldown spending `RefreshToken` (max 20 points per stat).
-@param id Composed ID of the token._
+Refills the pool stats for the character spending a [Refresher](/docs/gadgets/Refresher.md) token.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
 
 ### consumeVitalizer
 
 ```solidity
-function consumeVitalizer(bytes id, struct IStats.BasicStats stats) public
+function consumeVitalizer(bytes _id, struct IStats.BasicStats _stats) public
 ```
 
-_Consumes a vitalizer token to increase one point of a base stat.
-@param id Composed ID of the token.
-@param stats Amount of points increasing._
+Recovers a sacrificed point spending a [Vitalizer](/docs/gadgets/Vitalizer.md) token.
+
+Requirements:
+
+| Name    | Type                     | Description                   |
+| ------- | ------------------------ | ----------------------------- |
+| \_id    | bytes                    | Composed ID of the character. |
+| \_stats | struct IStats.BasicStats | Stats to sacrifice.           |
 
 ### assignPoints
 
 ```solidity
-function assignPoints(bytes id, struct IStats.BasicStats stats) public
+function assignPoints(bytes _id, struct IStats.BasicStats _stats) public
 ```
 
-_Assigns the points to the base pool.
-@param id Composed ID of the token.
-@param stats Amount of points to assign._
+Increases points of the base pool based on new levels.
+
+Requirements:
+
+| Name    | Type                     | Description                   |
+| ------- | ------------------------ | ----------------------------- |
+| \_id    | bytes                    | Composed ID of the character. |
+| \_stats | struct IStats.BasicStats | Stats to increase.            |
 
 ### getBaseStats
 
 ```solidity
-function getBaseStats(bytes id) public view returns (struct IStats.BasicStats)
+function getBaseStats(bytes _id) public view returns (struct IStats.BasicStats _stats)
 ```
 
-_Returns the base stats of the composed ID.
-@param id Composed ID of the token._
+External function that returns the base points of a character.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name    | Type                     | Description                  |
+| ------- | ------------------------ | ---------------------------- |
+| \_stats | struct IStats.BasicStats | Base stats of the character. |
 
 ### getPoolStats
 
 ```solidity
-function getPoolStats(bytes id) public view returns (struct IStats.BasicStats)
+function getPoolStats(bytes _id) public view returns (struct IStats.BasicStats _stats)
 ```
 
-_Returns the available pool stats of the composed ID.
-@param id Composed ID of the token._
+External function that returns the available pool points of a character.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name    | Type                     | Description                            |
+| ------- | ------------------------ | -------------------------------------- |
+| \_stats | struct IStats.BasicStats | Available pool stats of the character. |
 
 ### getAvailablePoints
 
 ```solidity
-function getAvailablePoints(bytes id) public view returns (uint256)
+function getAvailablePoints(bytes _id) public view returns (uint256 _points)
 ```
 
-_Returns the amount of points available to assign.
-@param id Composed ID of the token._
+External function that returns the assignable points of a character.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name     | Type    | Description                           |
+| -------- | ------- | ------------------------------------- |
+| \_points | uint256 | Number of points available to assign. |
 
 ### getNextRefreshTime
 
 ```solidity
-function getNextRefreshTime(bytes id) public view returns (uint256)
+function getNextRefreshTime(bytes _id) public view returns (uint256 _timestamp)
 ```
 
-_Returns the time for the next free refresh.
-@param id Composed ID of the token._
+External function that returns the next refresher timestamp for a character.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name        | Type    | Description                                   |
+| ----------- | ------- | --------------------------------------------- |
+| \_timestamp | uint256 | Timestamp when the next refresh is available. |
 
 ### getNextRefreshWithTokenTime
 
 ```solidity
-function getNextRefreshWithTokenTime(bytes id) public view returns (uint256)
+function getNextRefreshWithTokenTime(bytes _id) public view returns (uint256 _timestamp)
 ```
 
-_Returns the time of the refresh with tokens reset.
-@param id Composed ID of the token._
+External function that returns the next refresher timestamp for a character when using a [Refresher](/docs/gadgets/Refresher.md) token.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name        | Type    | Description                                   |
+| ----------- | ------- | --------------------------------------------- |
+| \_timestamp | uint256 | Timestamp when the next refresh is available. |
 
 ### \_assignablePointsByLevel
 
 ```solidity
-function _assignablePointsByLevel(uint256 level) internal pure returns (uint256)
+function _assignablePointsByLevel(uint256 _level) internal pure returns (uint256 _points)
 ```
 
-_Returns the amount of total asignable points by level.
-@param level Level number to check points._
+Internal function to get the amount of points assignable by a provided level.
+
+Requirements:
+
+| Name    | Type    | Description                         |
+| ------- | ------- | ----------------------------------- |
+| \_level | uint256 | Level to get the assignable points. |
+
+| Name     | Type    | Description                                |
+| -------- | ------- | ------------------------------------------ |
+| \_points | uint256 | Amount of points spendable for this level. |
