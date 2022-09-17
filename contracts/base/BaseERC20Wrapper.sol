@@ -13,7 +13,7 @@ import "../interfaces/IBaseERC20Wrapper.sol";
  * functions exposed to the contract owner. This contract is a wrapper for the {BaseFungibleItem} instance to convert
  * an internal fungible token to the `ERC20` standard.
  *
- * @dev Implementation of the {IBaseERC20Wrapper} interface.
+ * @dev Implementation of the [IBaseERC20Wrapper](/doc/interfaces/IBaseERC20Wrapper.md) interface.
  */
 contract BaseERC20Wrapper is IBaseERC20Wrapper, Ownable, ERC20Burnable {
     // =============================================== Setters ========================================================

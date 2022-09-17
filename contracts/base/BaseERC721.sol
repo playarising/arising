@@ -17,7 +17,7 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
     // =============================================== Storage ========================================================
 
     /** @notice Constant for the base url of the token metadata. */
-    string internal baseURI;
+    string public baseURI;
 
     // =============================================== Setters ========================================================
 

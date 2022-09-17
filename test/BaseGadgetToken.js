@@ -42,10 +42,18 @@ describe("BaseGadgetToken", () => {
   });
 
   it("should return the total cost correctly", async () => {
-    expect(await this.token.totalCost(1)).to.eq(ethers.utils.parseEther("1"));
-    expect(await this.token.totalCost(2)).to.eq(ethers.utils.parseEther("2"));
-    expect(await this.token.totalCost(4)).to.eq(ethers.utils.parseEther("4"));
-    expect(await this.token.totalCost(10)).to.eq(ethers.utils.parseEther("10"));
+    expect(await this.token.getTotalCost(1)).to.eq(
+      ethers.utils.parseEther("1")
+    );
+    expect(await this.token.getTotalCost(2)).to.eq(
+      ethers.utils.parseEther("2")
+    );
+    expect(await this.token.getTotalCost(4)).to.eq(
+      ethers.utils.parseEther("4")
+    );
+    expect(await this.token.getTotalCost(10)).to.eq(
+      ethers.utils.parseEther("10")
+    );
   });
 
   it("should not be able to mint tokens for not enough allowance", async () => {
