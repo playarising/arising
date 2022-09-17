@@ -13,7 +13,7 @@ Implementation of the [IQuests](/docs/interfaces/IQuests.md) interface.
 address civilizations
 ```
 
-_Address of the [Civilizations](/docs/core/Civilizations.md) instance. \*_
+Address of the [Civilizations](/docs/core/Civilizations.md) instance.
 
 ### experience
 
@@ -21,7 +21,7 @@ _Address of the [Civilizations](/docs/core/Civilizations.md) instance. \*_
 address experience
 ```
 
-_Address of the [Experience](/docs/core/Experience.md) instance. \*_
+Address of the [Experience](/docs/core/Experience.md) instance.
 
 ### stats
 
@@ -29,7 +29,7 @@ _Address of the [Experience](/docs/core/Experience.md) instance. \*_
 address stats
 ```
 
-_Address of the [Stats](/docs/core/Stats.md) instance. \*_
+Address of the [Stats](/docs/core/Stats.md) instance.
 
 ### gold
 
@@ -37,7 +37,7 @@ _Address of the [Stats](/docs/core/Stats.md) instance. \*_
 address gold
 ```
 
-_The address of the [Gold](/docs/gadgets/Gold.md) instance. \*_
+Address of the [Gold](/docs/gadgets/Gold.md) instance.
 
 ### quests
 
@@ -45,7 +45,7 @@ _The address of the [Gold](/docs/gadgets/Gold.md) instance. \*_
 mapping(uint256 => struct IQuests.Quest) quests
 ```
 
-Map to track all the quests.
+Map to track all the available quests.
 
 ### \_quests
 
@@ -61,7 +61,7 @@ Array to track a full list of quests IDs.
 mapping(bytes => struct IQuests.CurrentQuest) character_quests
 ```
 
-_Map to track quests cooldowns for each character. \*_
+Map to track current quests for all characters. \*
 
 ### onlyAllowed
 
@@ -111,97 +111,153 @@ function unpause() public
 
 Resumes the contract
 
-### disableItem
+### disableQuest
 
 ```solidity
-function disableItem(uint256 _id) public
+function disableQuest(uint256 _quest_id) public
 ```
 
-Disables a quest.
+Disables a quest for characters.
 
 Requirements:
 
-| Name | Type    | Description      |
-| ---- | ------- | ---------------- |
-| \_id | uint256 | ID of the quest. |
+| Name       | Type    | Description      |
+| ---------- | ------- | ---------------- |
+| \_quest_id | uint256 | ID of the quest. |
 
-### enableItem
+### enableQuest
 
 ```solidity
-function enableItem(uint256 _id) public
+function enableQuest(uint256 _quest_id) public
 ```
 
-Enables a quest.
+Enables a quest for characters.
 
 Requirements:
 
-| Name | Type    | Description      |
-| ---- | ------- | ---------------- |
-| \_id | uint256 | ID of the quest. |
+| Name       | Type    | Description      |
+| ---------- | ------- | ---------------- |
+| \_quest_id | uint256 | ID of the quest. |
+
+### addQuest
+
+```solidity
+function addQuest(enum IQuests.QuestType _quest_type, uint256 _gold_reward, address[] _resources_reward, uint256[] _resources_amounts, uint256 _experience_reward, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required) public
+```
+
+Adds a new quest for characters.
+
+Requirements:
+
+| Name                | Type                     | Description                                                                                    |
+| ------------------- | ------------------------ | ---------------------------------------------------------------------------------------------- |
+| \_quest_type        | enum IQuests.QuestType   | Type of the added quest.                                                                       |
+| \_gold_reward       | uint256                  | Amount of [Gold](/docs/gadgets/Gold.md) tokens to reward.                                      |
+| \_resources_reward  | address[]                | Array of [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to reward for the quest. |
+| \_resources_amounts | uint256[]                | Array of amounts for each resource reward.                                                     |
+| \_experience_reward | uint256                  | Amount of experience rewarded for the quest.                                                   |
+| \_stats             | struct IStats.BasicStats | Stats to consume from the pool for the quest.                                                  |
+| \_cooldown          | uint256                  | Number of seconds for the quest cooldown.                                                      |
+| \_level_required    | uint256                  | Minimum level required to start the quest.                                                     |
 
 ### startQuest
 
 ```solidity
-function startQuest(bytes id, uint256 quest) public
+function startQuest(bytes _id, uint256 _quest_id, struct IStats.BasicStats _stats_consumed) public
 ```
 
-_Claims a recipe already crafted._
+Starts a quest for the character provided.
 
-| Name  | Type    | Description                   |
-| ----- | ------- | ----------------------------- |
-| id    | bytes   | Composed ID of the character. |
-| quest | uint256 |                               |
+Requirements:
+
+| Name             | Type                     | Description                               |
+| ---------------- | ------------------------ | ----------------------------------------- |
+| \_id             | bytes                    | Composed ID of the character.             |
+| \_quest_id       | uint256                  | ID of the quest.                          |
+| \_stats_consumed | struct IStats.BasicStats | Amount of stats to consume for the quest. |
 
 ### claimQuest
 
 ```solidity
-function claimQuest(bytes id) public
+function claimQuest(bytes _id) public
 ```
 
-_Claims a recipe already crafted._
+Claims a finished quest for the character.
+
+Requirements:
 
 | Name | Type  | Description                   |
 | ---- | ----- | ----------------------------- |
-| id   | bytes | Composed ID of the character. |
+| \_id | bytes | Composed ID of the character. |
 
-### getItem
+### getQuest
 
 ```solidity
-function getItem(uint256 _id) public view returns (struct IQuests.Quest _quest)
+function getQuest(uint256 _quest_id) public view returns (struct IQuests.Quest _quest)
 ```
 
 Returns the full information of a quest.
 
 Requirements:
 
-| Name | Type    | Description      |
-| ---- | ------- | ---------------- |
-| \_id | uint256 | ID of the quest. |
+| Name       | Type    | Description      |
+| ---------- | ------- | ---------------- |
+| \_quest_id | uint256 | ID of the quest. |
 
 | Name    | Type                 | Description             |
 | ------- | -------------------- | ----------------------- |
 | \_quest | struct IQuests.Quest | Full quest information. |
 
-### \_isAvailableForQuest
+### getCharacterCurrentQuest
 
 ```solidity
-function _isAvailableForQuest(bytes id) internal view returns (bool)
+function getCharacterCurrentQuest(bytes _id) public view returns (struct IQuests.CurrentQuest _quest)
 ```
 
-_Internal function to check if the craft slot is available to craft._
+Returns the character current quest information.
+
+Requirements:
 
 | Name | Type  | Description                   |
 | ---- | ----- | ----------------------------- |
-| id   | bytes | Composed ID of the character. |
+| \_id | bytes | Composed ID of the character. |
+
+| Name    | Type                        | Description                          |
+| ------- | --------------------------- | ------------------------------------ |
+| \_quest | struct IQuests.CurrentQuest | Current character quest information. |
+
+### \_isAvailableForQuest
+
+```solidity
+function _isAvailableForQuest(bytes _id) internal view returns (bool _available)
+```
+
+Internal function to check if the character is able to start a quest.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name        | Type | Description                                                     |
+| ----------- | ---- | --------------------------------------------------------------- |
+| \_available | bool | Boolean to know if the character is available to start a quest. |
 
 ### \_isQuestClaimable
 
 ```solidity
-function _isQuestClaimable(bytes id) internal view returns (bool)
+function _isQuestClaimable(bytes _id) internal view returns (bool _claimable)
 ```
 
-_Internal function to check if a craft slot is ready to claim._
+Internal function to check if the last character quest is claimable.
+
+Requirements:
 
 | Name | Type  | Description                   |
 | ---- | ----- | ----------------------------- |
-| id   | bytes | Composed ID of the character. |
+| \_id | bytes | Composed ID of the character. |
+
+| Name        | Type | Description                                     |
+| ----------- | ---- | ----------------------------------------------- |
+| \_claimable | bool | Boolean to know if the last quest is claimable. |

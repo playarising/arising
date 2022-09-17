@@ -24,7 +24,7 @@ contract Craft is ICraft, Ownable, Pausable {
     /** @notice Map to track available recipes for craft. */
     mapping(uint256 => Recipe) public recipes;
 
-    /** @notice Array to track all the recipes ids. */
+    /** @notice Array to track all the recipes IDs. */
     uint256[] private _recipes;
 
     /** @notice The address of the [Gold](/docs/gadgets/Gold.md) instance. */
@@ -149,13 +149,13 @@ contract Craft is ICraft, Ownable, Pausable {
         uint256 _reward,
         uint256 _experience_reward
     ) public onlyOwner {
-        uint256 id = _recipes.length + 1;
+        uint256 _recipe_id = _recipes.length + 1;
         require(
             _materials.length == _amounts.length,
             "Craft: addRecipe() materials and amounts not match."
         );
-        recipes[id] = Recipe(
-            id,
+        recipes[_recipe_id] = Recipe(
+            _recipe_id,
             _materials,
             _amounts,
             _stats,
@@ -166,7 +166,7 @@ contract Craft is ICraft, Ownable, Pausable {
             _experience_reward,
             true
         );
-        _recipes.push(id);
+        _recipes.push(_recipe_id);
     }
 
     /**
@@ -227,8 +227,18 @@ contract Craft is ICraft, Ownable, Pausable {
     function claim(bytes memory _id) public whenNotPaused onlyAllowed(_id) {
         require(_isSlotClaimable(_id), "Craft: claim() slot is not claimable.");
 
-        uint256 reward = _claim(_id);
-        IExperience(experience).assignExperience(_id, reward);
+        craft_slots[_id].claimed = true;
+
+        Recipe memory _recipe = recipes[craft_slots[_id].last_recipe];
+        IItems(items).mint(
+            ICivilizations(civilizations).ownerOf(_id),
+            _recipe.reward
+        );
+
+        IExperience(experience).assignExperience(
+            _id,
+            _recipe.experience_reward
+        );
     }
 
     // =============================================== Getters ========================================================
@@ -305,23 +315,5 @@ contract Craft is ICraft, Ownable, Pausable {
         CraftSlot memory s = craft_slots[_id];
         return
             s.cooldown <= block.timestamp && !s.claimed && s.last_recipe != 0;
-    }
-
-    /**
-     * @notice Internal function to claim the reward from the slot.
-     *
-     * Requirements:
-     * @param _id           Composed ID of the character.
-     *
-     * @return _experience  Amount of experience rewarded.
-     */
-    function _claim(bytes memory _id) internal returns (uint256 _experience) {
-        Recipe memory _recipe = recipes[craft_slots[_id].last_recipe];
-        IItems(items).mint(
-            ICivilizations(civilizations).ownerOf(_id),
-            _recipe.reward
-        );
-
-        return _recipe.experience_reward;
     }
 }

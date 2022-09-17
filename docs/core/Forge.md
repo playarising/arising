@@ -31,6 +31,14 @@ address stats
 
 Address of the [Stats](/docs/core/Stats.md) instance.
 
+### gold
+
+```solidity
+address gold
+```
+
+Address of the [Gold](/docs/gadgets/Gold.md) instance.
+
 ### recipes
 
 ```solidity
@@ -45,7 +53,7 @@ Map to track available recipes on the forge.
 uint256[] _recipes
 ```
 
-Array to track all the forge recipes ids.
+Array to track all the forge recipes IDs.
 
 ### forges
 
@@ -70,14 +78,6 @@ uint256 price
 ```
 
 Constant for the price of each forge upgrade (in wei).
-
-### gold
-
-```solidity
-address gold
-```
-
-Address of the [Gold](/docs/gadgets/Gold.md) instance.
 
 ### onlyAllowed
 
@@ -171,10 +171,10 @@ Requirements:
 | ------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------- |
 | \_materials         | address[]                | Array of material [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances address.                    |
 | \_amounts           | uint256[]                | Array of amounts for each material.                                                                        |
-| \_stats             | struct IStats.BasicStats | Stats to consume from the pool for craft.                                                                  |
+| \_stats             | struct IStats.BasicStats | Stats to consume from the pool for recipe.                                                                 |
 | \_cooldown          | uint256                  | Number of seconds for the recipe cooldown.                                                                 |
-| \_level_required    | uint256                  | Minimum level required to craft the recipe.                                                                |
-| \_gold_cost         | uint256                  | Cost of [Gold](/docs/gadgets/Gold.md) required to craft the recipe.                                        |
+| \_level_required    | uint256                  | Minimum level required to forge the recipe.                                                                |
+| \_gold_cost         | uint256                  | Cost of [Gold](/docs/gadgets/Gold.md) required to forge the recipe.                                        |
 | \_reward            | address                  | Address of the [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to be rewarded for the recipe. |
 | \_experience_reward | uint256                  | Amount of experience rewarded for the recipe.                                                              |
 
@@ -341,22 +341,3 @@ Requirements:
 | Name        | Type | Description                                |
 | ----------- | ---- | ------------------------------------------ |
 | \_claimable | bool | Boolean to know if the forge is claimable. |
-
-### \_claim
-
-```solidity
-function _claim(bytes _id, uint256 _forge_id) internal returns (uint256 _experience)
-```
-
-Internal function to claim a finished recipe on a character forge.
-
-Requirements:
-
-| Name       | Type    | Description                   |
-| ---------- | ------- | ----------------------------- |
-| \_id       | bytes   | Composed ID of the character. |
-| \_forge_id | uint256 | ID of the forge.              |
-
-| Name         | Type    | Description                                    |
-| ------------ | ------- | ---------------------------------------------- |
-| \_experience | uint256 | Amount of experience rewarded from the recipe. |

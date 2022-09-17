@@ -30,10 +30,13 @@ contract Forge is IForge, Ownable, Pausable {
     /** @notice Address of the [Stats](/docs/core/Stats.md) instance. */
     address public stats;
 
+    /** @notice Address of the [Gold](/docs/gadgets/Gold.md) instance. */
+    address public gold;
+
     /** @notice Map to track available recipes on the forge. */
     mapping(uint256 => Recipe) public recipes;
 
-    /** @notice Array to track all the forge recipes ids. */
+    /** @notice Array to track all the forge recipes IDs. */
     uint256[] private _recipes;
 
     /** @notice Map to track forges and cooldowns for characters. */
@@ -44,9 +47,6 @@ contract Forge is IForge, Ownable, Pausable {
 
     /** @notice Constant for the price of each forge upgrade (in wei). */
     uint256 public price;
-
-    /** @notice Address of the [Gold](/docs/gadgets/Gold.md) instance. */
-    address public gold;
 
     // =============================================== Modifiers ======================================================
 
@@ -138,10 +138,10 @@ contract Forge is IForge, Ownable, Pausable {
      * Requirements:
      * @param _materials            Array of material [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances address.
      * @param _amounts              Array of amounts for each material.
-     * @param _stats                Stats to consume from the pool for craft.
+     * @param _stats                Stats to consume from the pool for recipe.
      * @param _cooldown             Number of seconds for the recipe cooldown.
-     * @param _level_required       Minimum level required to craft the recipe.
-     * @param _gold_cost            Cost of [Gold](/docs/gadgets/Gold.md) required to craft the recipe.
+     * @param _level_required       Minimum level required to forge the recipe.
+     * @param _gold_cost            Cost of [Gold](/docs/gadgets/Gold.md) required to forge the recipe.
      * @param _reward               Address of the [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to be rewarded for the recipe.
      * @param _experience_reward    Amount of experience rewarded for the recipe.
      */
@@ -155,13 +155,13 @@ contract Forge is IForge, Ownable, Pausable {
         address _reward,
         uint256 _experience_reward
     ) public onlyOwner {
-        uint256 id = _recipes.length + 1;
+        uint256 _recipe_id = _recipes.length + 1;
         require(
             _materials.length == _amounts.length,
             "Forge: addRecipe() materials and amounts not match."
         );
-        recipes[id] = Recipe(
-            id,
+        recipes[_recipe_id] = Recipe(
+            _recipe_id,
             _materials,
             _amounts,
             _stats,
@@ -172,7 +172,7 @@ contract Forge is IForge, Ownable, Pausable {
             _experience_reward,
             true
         );
-        _recipes.push(id);
+        _recipes.push(_recipe_id);
     }
 
     /**
@@ -305,8 +305,16 @@ contract Forge is IForge, Ownable, Pausable {
             "Forge: claim() forge not claimable."
         );
 
-        uint256 reward = _claim(_id, _forge_id);
-        IExperience(experience).assignExperience(_id, reward);
+        forges[_id][_forge_id].last_recipe_claimed = true;
+
+        Recipe memory _recipe = recipes[forges[_id][_forge_id].last_recipe];
+
+        IBaseFungibleItem(_recipe.reward).mintTo(_id, 1);
+
+        IExperience(experience).assignExperience(
+            _id,
+            _recipe.experience_reward
+        );
     }
 
     /** @notice Transfers the total amount of tokens stored in the contract to the owner .*/
@@ -446,25 +454,5 @@ contract Forge is IForge, Ownable, Pausable {
             forges[_id][_forge_id].cooldown <= block.timestamp &&
             !forges[_id][_forge_id].last_recipe_claimed &&
             forges[_id][_forge_id].last_recipe != 0;
-    }
-
-    /**
-     * @notice Internal function to claim a finished recipe on a character forge.
-     *
-     * Requirements:
-     * @param _id           Composed ID of the character.
-     * @param _forge_id     ID of the forge.
-     *
-     * @return _experience  Amount of experience rewarded from the recipe.
-     */
-    function _claim(bytes memory _id, uint256 _forge_id)
-        internal
-        returns (uint256 _experience)
-    {
-        Recipe memory _recipe = recipes[forges[_id][_forge_id].last_recipe];
-
-        IBaseFungibleItem(_recipe.reward).mintTo(_id, 1);
-
-        return _recipe.experience_reward;
     }
 }

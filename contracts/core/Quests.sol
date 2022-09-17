@@ -7,6 +7,8 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "../interfaces/IQuests.sol";
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/IExperience.sol";
+import "../interfaces/IStats.sol";
+import "../interfaces/IBaseFungibleItem.sol";
 
 /**
  * @title Quests
@@ -18,25 +20,25 @@ import "../interfaces/IExperience.sol";
 contract Quests is IQuests, Ownable, Pausable {
     // =============================================== Storage ========================================================
 
-    /** @dev Address of the [Civilizations](/docs/core/Civilizations.md) instance. **/
+    /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
     address public civilizations;
 
-    /** @dev Address of the [Experience](/docs/core/Experience.md) instance. **/
+    /** @notice Address of the [Experience](/docs/core/Experience.md) instance. */
     address public experience;
 
-    /** @dev Address of the [Stats](/docs/core/Stats.md) instance. **/
+    /** @notice Address of the [Stats](/docs/core/Stats.md) instance. */
     address public stats;
 
-    /** @dev The address of the [Gold](/docs/gadgets/Gold.md) instance. **/
+    /** @notice Address of the [Gold](/docs/gadgets/Gold.md) instance. */
     address public gold;
 
-    /** @notice Map to track all the quests. */
+    /** @notice Map to track all the available quests. */
     mapping(uint256 => Quest) quests;
 
     /** @notice Array to track a full list of quests IDs. */
     uint256[] _quests;
 
-    /** @dev Map to track quests cooldowns for each character. **/
+    /** @notice Map to track current quests for all characters. **/
     mapping(bytes => CurrentQuest) public character_quests;
 
     // =============================================== Modifiers ======================================================
@@ -90,57 +92,158 @@ contract Quests is IQuests, Ownable, Pausable {
     }
 
     /**
-     * @notice Disables a quest.
+     * @notice Disables a quest for characters.
      *
      * Requirements:
-     * @param _id   ID of the quest.
+     * @param _quest_id   ID of the quest.
      */
-    function disableItem(uint256 _id) public onlyOwner {
+    function disableQuest(uint256 _quest_id) public onlyOwner {
         require(
-            _id != 0 && _id <= _quests.length,
-            "Quests: disableItem() invalid quest id."
+            _quest_id != 0 && _quest_id <= _quests.length,
+            "Quests: disableQuest() invalid quest id."
         );
-        quests[_id].available = false;
+        quests[_quest_id].available = false;
     }
 
     /**
-     * @notice Enables a quest.
+     * @notice Enables a quest for characters.
      *
      * Requirements:
-     * @param _id   ID of the quest.
+     * @param _quest_id   ID of the quest.
      */
-    function enableItem(uint256 _id) public onlyOwner {
+    function enableQuest(uint256 _quest_id) public onlyOwner {
         require(
-            _id != 0 && _id <= _quests.length,
-            "Quests: enableItem() invalid quest id."
+            _quest_id != 0 && _quest_id <= _quests.length,
+            "Quests: enableQuest() invalid quest id."
         );
-        quests[_id].available = true;
+        quests[_quest_id].available = true;
     }
 
     /**
-     * @dev Claims a recipe already crafted.
-     * @param id    Composed ID of the character.
+     * @notice Adds a new quest for characters.
+     *
+     * Requirements:
+     * @param _quest_type           Type of the added quest.
+     * @param _gold_reward          Amount of [Gold](/docs/gadgets/Gold.md) tokens to reward.
+     * @param _resources_reward     Array of [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to reward for the quest.
+     * @param _resources_amounts    Array of amounts for each resource reward.
+     * @param _experience_reward    Amount of experience rewarded for the quest.
+     * @param _stats                Stats to consume from the pool for the quest.
+     * @param _cooldown             Number of seconds for the quest cooldown.
+     * @param _level_required       Minimum level required to start the quest.
      */
-    function startQuest(bytes memory id, uint256 quest)
-        public
-        whenNotPaused
-        onlyAllowed(id)
-    {
+    function addQuest(
+        QuestType _quest_type,
+        uint256 _gold_reward,
+        address[] memory _resources_reward,
+        uint256[] memory _resources_amounts,
+        uint256 _experience_reward,
+        IStats.BasicStats memory _stats,
+        uint256 _cooldown,
+        uint256 _level_required
+    ) public onlyOwner {
+        uint256 _quest_id = _quests.length + 1;
         require(
-            _isAvailableForQuest(id),
+            _resources_reward.length == _resources_amounts.length,
+            "Quest: addQuest() materials and amounts not match."
+        );
+        quests[_quest_id] = Quest(
+            _quest_id,
+            _quest_type,
+            _gold_reward,
+            _resources_reward,
+            _resources_amounts,
+            _experience_reward,
+            _stats,
+            _cooldown,
+            _level_required,
+            true
+        );
+        _quests.push(_quest_id);
+    }
+
+    /**
+     * @notice Starts a quest for the character provided.
+     *
+     * Requirements:
+     * @param _id               Composed ID of the character.
+     * @param _quest_id         ID of the quest.
+     * @param _stats_consumed   Amount of stats to consume for the quest.
+     */
+    function startQuest(
+        bytes memory _id,
+        uint256 _quest_id,
+        IStats.BasicStats memory _stats_consumed
+    ) public whenNotPaused onlyAllowed(_id) {
+        require(
+            _quest_id != 0 && _quest_id <= _quests.length,
+            "Quests: startQuest() invalid quest id."
+        );
+        require(
+            _isAvailableForQuest(_id),
             "Quest: startQuest() not available for quest."
         );
+        Quest memory _quest = quests[_quest_id];
+        require(
+            _quest.available,
+            "Quests: startQuest() quest is not available."
+        );
+        require(
+            IExperience(experience).getLevel(_id) >= _quest.level_required,
+            "Quests: startQuest() not enough level."
+        );
+        IStats(stats).consume(_id, _stats_consumed);
+        uint256 _total_stats_consumed = _stats_consumed.might +
+            _stats_consumed.speed +
+            _stats_consumed.intellect;
+        uint256 _max_quest_stats = _quest.stats_cost.might +
+            _quest.stats_cost.speed +
+            _quest.stats_cost.intellect;
+        uint256 _fullfilment = _total_stats_consumed >= _max_quest_stats
+            ? 100
+            : (_total_stats_consumed / _max_quest_stats) * 100;
+        character_quests[_id] = CurrentQuest(
+            _quest_id,
+            false,
+            block.timestamp + _quest.cooldown,
+            _fullfilment
+        );
     }
 
     /**
-     * @dev Claims a recipe already crafted.
-     * @param id    Composed ID of the character.
+     * @notice Claims a finished quest for the character.
+     *
+     * Requirements:
+     * @param _id   Composed ID of the character.
      */
-    function claimQuest(bytes memory id) public whenNotPaused onlyAllowed(id) {
+    function claimQuest(bytes memory _id)
+        public
+        whenNotPaused
+        onlyAllowed(_id)
+    {
         require(
-            _isQuestClaimable(id),
+            _isQuestClaimable(_id),
             "Quest: claimQuest() not available to claim."
         );
+
+        character_quests[_id].claimed_reward = true;
+
+        Quest memory _quest = quests[character_quests[_id].last_quest_id];
+        IExperience(experience).assignExperience(
+            _id,
+            (_quest.experience_reward * character_quests[_id].fullfilment) / 100
+        );
+        IBaseFungibleItem(gold).mintTo(
+            _id,
+            (_quest.gold_reward * character_quests[_id].fullfilment) / 100
+        );
+        for (uint256 i = 0; i < _quest.resources_reward.length; i++) {
+            IBaseFungibleItem(_quest.resources_reward[i]).mintTo(
+                _id,
+                (_quest.resources_amounts[i] *
+                    character_quests[_id].fullfilment) / 100
+            );
+        }
     }
 
     // =============================================== Getters ========================================================
@@ -149,43 +252,74 @@ contract Quests is IQuests, Ownable, Pausable {
      * @notice Returns the full information of a quest.
      *
      * Requirements:
-     * @param _id       ID of the quest.
+     * @param _quest_id       ID of the quest.
      *
      * @return _quest    Full quest information.
      */
-    function getItem(uint256 _id) public view returns (Quest memory _quest) {
-        return quests[_id];
+    function getQuest(uint256 _quest_id)
+        public
+        view
+        returns (Quest memory _quest)
+    {
+        return quests[_quest_id];
+    }
+
+    /**
+     * @notice Returns the character current quest information.
+     *
+     * Requirements:
+     * @param _id   Composed ID of the character.
+     *
+     * @return _quest    Current character quest information.
+     */
+    function getCharacterCurrentQuest(bytes memory _id)
+        public
+        view
+        returns (CurrentQuest memory _quest)
+    {
+        return character_quests[_id];
     }
 
     // =============================================== Internal =======================================================
 
     /**
-     * @dev Internal function to check if the craft slot is available to craft.
-     * @param id    Composed ID of the character.
+     * @notice Internal function to check if the character is able to start a quest.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _available   Boolean to know if the character is available to start a quest.
      */
-    function _isAvailableForQuest(bytes memory id)
+    function _isAvailableForQuest(bytes memory _id)
         internal
         view
-        returns (bool)
+        returns (bool _available)
     {
-        CurrentQuest memory q = character_quests[id];
-
-        if (q.cooldown == 0) {
+        if (character_quests[_id].cooldown == 0) {
             return true;
         }
 
-        return q.cooldown <= block.timestamp && q.claimed_reward;
+        return
+            character_quests[_id].cooldown <= block.timestamp &&
+            character_quests[_id].claimed_reward;
     }
 
     /**
-     * @dev Internal function to check if a craft slot is ready to claim.
-     * @param id    Composed ID of the character.
+     * @notice Internal function to check if the last character quest is claimable.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _claimable   Boolean to know if the last quest is claimable.
      */
-    function _isQuestClaimable(bytes memory id) internal view returns (bool) {
-        CurrentQuest memory q = character_quests[id];
+    function _isQuestClaimable(bytes memory _id)
+        internal
+        view
+        returns (bool _claimable)
+    {
         return
-            q.cooldown <= block.timestamp &&
-            !q.claimed_reward &&
-            q.last_quest_id != 0;
+            character_quests[_id].cooldown <= block.timestamp &&
+            !character_quests[_id].claimed_reward &&
+            character_quests[_id].last_quest_id != 0;
     }
 }

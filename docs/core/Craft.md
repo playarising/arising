@@ -21,7 +21,7 @@ Map to track available recipes for craft.
 uint256[] _recipes
 ```
 
-Array to track all the recipes ids.
+Array to track all the recipes IDs.
 
 ### gold
 
@@ -269,21 +269,3 @@ Requirements:
 | Name | Type | Description                                           |
 | ---- | ---- | ----------------------------------------------------- |
 | [0]  | bool | \_available Boolean to know if the slot is claimable. |
-
-### \_claim
-
-```solidity
-function _claim(bytes _id) internal returns (uint256 _experience)
-```
-
-Internal function to claim the reward from the slot.
-
-Requirements:
-
-| Name | Type  | Description                   |
-| ---- | ----- | ----------------------------- |
-| \_id | bytes | Composed ID of the character. |
-
-| Name         | Type    | Description                    |
-| ------------ | ------- | ------------------------------ |
-| \_experience | uint256 | Amount of experience rewarded. |
