@@ -2,7 +2,7 @@
 
 ## Gold
 
-This contract is an instance of {BaseFungibleItem} to serve as the main currency of the whole internal ecosystem.
+This contract is an instance of [BaseFungibleItem](/docs/base/BaseFungibleItem.md) to serve as the main currency of the whole internal ecosystem.
 
 ### constructor
 

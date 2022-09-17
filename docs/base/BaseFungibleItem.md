@@ -4,9 +4,9 @@
 
 This contract an imitation of the `ERC20` standard to work around the character context.
 It tracks balances of characters tokens. This also includes functions to wrap and unwrap to a
-{BaseERC20Wrapper} instance.
+[BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.md) instance.
 
-_Implementation of the {IBaseFungibleItem} interface._
+_Implementation of the [IBaseFungibleItem](/docs/interfaces/IBaseFungibleItem.md) interface._
 
 ### name
 
@@ -54,7 +54,7 @@ Map to track the balances of characters.
 address wrapper
 ```
 
-Constant for the address of the {BaseERC20Wrapper} instance.
+Constant for the address of the [BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.md) instance.
 
 ### onlyAllowed
 
@@ -124,7 +124,7 @@ Requirements:
 function wrap(bytes _id, uint256 _amount) public
 ```
 
-Converts the internal item to an `ERC20` through the {BaseERC20Wrapper}.
+Converts the internal item to an `ERC20` through the [BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.md).
 
 Requirements:
 

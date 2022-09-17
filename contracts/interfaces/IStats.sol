@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 /**
  * @title IStats
- * @notice Interface for the {Stats} contract.
+ * @notice Interface for the [Stats](/docs/core/Stats.md) contract.
  */
 interface IStats {
     struct BasicStats {

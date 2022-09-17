@@ -3,30 +3,30 @@ pragma solidity 0.8.17;
 
 /**
  * @title IBaseGadgetToken
- * @notice Interface for the {BaseGadgetToken} contract.
+ * @notice Interface for the [BaseGadgetToken](/docs/base/BaseGadgetToken.md) contract.
  */
 interface IBaseGadgetToken {
-    /** @notice See {BaseGadgetToken.pause} */
+    /** @notice See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#pause) */
     function pause() external;
 
-    /** @notice See {BaseGadgetToken.unpause} */
+    /** @notice See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#unpause)*/
     function unpause() external;
 
-    /** @notice See {BaseGadgetToken.setPrice} */
+    /** @notice See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#setPrice) */
     function setPrice(uint256 _price) external;
 
-    /** @notice See {BaseGadgetToken.setToken} */
+    /** @notice See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#setToken) */
     function setToken(address _token) external;
 
-    /** @notice See {BaseGadgetToken.mint} */
+    /** @notice See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#mint) */
     function mint(uint256 _amount) external;
 
-    /** @notice See {BaseGadgetToken.mintFree} */
+    /** @notice See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#mintFree) */
     function mintFree(address _receiver, uint256 _amount) external;
 
-    /** @notice See {BaseGadgetToken.withdraw} */
+    /** @notice See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#withdraw) */
     function withdraw() external;
 
-    /** @notice See {BaseGadgetToken.getTotalCost} */
+    /** @notice See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#getTotalCost) */
     function getTotalCost(uint256 _amount) external returns (uint256 _cost);
 }

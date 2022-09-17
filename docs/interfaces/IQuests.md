@@ -2,4 +2,4 @@
 
 ## IQuests
 
-Interface for the {Quests} contract.
+Interface for the [Quests](/docs/core/Quests.md) contract.

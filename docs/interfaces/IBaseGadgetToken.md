@@ -2,7 +2,7 @@
 
 ## IBaseGadgetToken
 
-Interface for the {BaseGadgetToken} contract.
+Interface for the [BaseGadgetToken](/docs/base/BaseGadgetToken.md) contract.
 
 ### pause
 
@@ -10,7 +10,7 @@ Interface for the {BaseGadgetToken} contract.
 function pause() external
 ```
 
-See {BaseGadgetToken.pause}
+See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#pause)
 
 ### unpause
 
@@ -18,7 +18,7 @@ See {BaseGadgetToken.pause}
 function unpause() external
 ```
 
-See {BaseGadgetToken.unpause}
+See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#unpause)
 
 ### setPrice
 
@@ -26,7 +26,7 @@ See {BaseGadgetToken.unpause}
 function setPrice(uint256 _price) external
 ```
 
-See {BaseGadgetToken.setPrice}
+See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#setPrice)
 
 ### setToken
 
@@ -34,7 +34,7 @@ See {BaseGadgetToken.setPrice}
 function setToken(address _token) external
 ```
 
-See {BaseGadgetToken.setToken}
+See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#setToken)
 
 ### mint
 
@@ -42,7 +42,7 @@ See {BaseGadgetToken.setToken}
 function mint(uint256 _amount) external
 ```
 
-See {BaseGadgetToken.mint}
+See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#mint)
 
 ### mintFree
 
@@ -50,7 +50,7 @@ See {BaseGadgetToken.mint}
 function mintFree(address _receiver, uint256 _amount) external
 ```
 
-See {BaseGadgetToken.mintFree}
+See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#mintFree)
 
 ### withdraw
 
@@ -58,7 +58,7 @@ See {BaseGadgetToken.mintFree}
 function withdraw() external
 ```
 
-See {BaseGadgetToken.withdraw}
+See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#withdraw)
 
 ### getTotalCost
 
@@ -66,4 +66,4 @@ See {BaseGadgetToken.withdraw}
 function getTotalCost(uint256 _amount) external returns (uint256 _cost)
 ```
 
-See {BaseGadgetToken.getTotalCost}
+See [BaseGadgetToken](/docs/base/BaseGadgetToken.md#getTotalCost)

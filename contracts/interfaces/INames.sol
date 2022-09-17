@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 /**
  * @title INames
- * @notice Interface for the {Names} contract.
+ * @notice Interface for the [Names](/docs/core/Names.md) contract.
  */
 interface INames {
     function claimName(bytes memory id, string memory name) external;

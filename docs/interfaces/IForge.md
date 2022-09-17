@@ -2,7 +2,7 @@
 
 ## IForge
 
-Interface for the {Forge} contract.
+Interface for the [Forge](/docs/core/Forge.md) contract.
 
 ### Recipe
 

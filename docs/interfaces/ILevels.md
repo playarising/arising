@@ -2,7 +2,7 @@
 
 ## ILevels
 
-Interface for the {Levels} contract.
+Interface for the [Levels](/docs/codex/Levels.md) contract.
 
 ### Level
 
@@ -20,7 +20,7 @@ struct Level {
 function getLevel(uint256 _experience) external view returns (uint256)
 ```
 
-See {Levels.getLevel}
+See [Levels](/docs/codex/Levels.md#getLevel)
 
 ### getExperience
 
@@ -28,4 +28,4 @@ See {Levels.getLevel}
 function getExperience(uint256 _level) external view returns (uint256)
 ```
 
-See {Levels.getExperience}
+See [Levels](/docs/codex/Levels.md#getExperience)

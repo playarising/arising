@@ -3,22 +3,22 @@ pragma solidity 0.8.17;
 
 /**
  * @title IBaseFungibleItem
- * @notice Interface for the {BaseFungibleItem} contract.
+ * @notice Interface for the [BaseFungibleItem](/docs/base/BaseFungibleItem.md) contract.
  */
 interface IBaseFungibleItem {
-    /** @notice See {BaseFungibleItem.mintTo} */
+    /** @notice See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#mintTo) */
     function mintTo(bytes memory _id, uint256 _amount) external;
 
-    /** @notice See {BaseFungibleItem.consume} */
+    /** @notice See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#consume) */
     function consume(bytes memory _id, uint256 _amount) external;
 
-    /** @notice See {BaseFungibleItem.wrap} */
+    /** @notice See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#wrap) */
     function wrap(bytes memory _id, uint256 _amount) external;
 
-    /** @notice See {BaseFungibleItem.unwrap} */
+    /** @notice See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#unwrap) */
     function unwrap(bytes memory _id, uint256 _amount) external;
 
-    /** @notice See {BaseFungibleItem.balanceOf} */
+    /** @notice See [BaseFungibleItem](/docs/base/BaseFungibleItem.md#balanceOf) */
     function balanceOf(bytes memory _id)
         external
         view

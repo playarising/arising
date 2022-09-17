@@ -2,7 +2,7 @@
 
 ## IBaseERC721
 
-Interface for the {BaseERC721} contract.
+Interface for the [BaseERC721](/docs/base/BaseERC721.md) contract.
 
 ### mint
 
@@ -18,7 +18,7 @@ See {BaseERC721.mint}
 function isApprovedOrOwner(address _spender, uint256 _id) external view returns (bool _approved)
 ```
 
-See {BaseERC721.isApprovedOrOwner}
+See [BaseERC721](/docs/base/BaseERC721.md#isApprovedOrOwner)
 
 ### exists
 
@@ -26,4 +26,4 @@ See {BaseERC721.isApprovedOrOwner}
 function exists(uint256 _id) external view returns (bool _exist)
 ```
 
-See {BaseERC721.exists}
+See [BaseERC721](/docs/base/BaseERC721.md#exists)

@@ -5,7 +5,7 @@ import "../interfaces/IStats.sol";
 
 /**
  * @title IForge
- * @notice Interface for the {Forge} contract.
+ * @notice Interface for the [Forge](/docs/core/Forge.md) contract.
  */
 interface IForge {
     struct Recipe {

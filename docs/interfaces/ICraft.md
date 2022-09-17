@@ -2,7 +2,7 @@
 
 ## ICraft
 
-Interface for the {Craft} contract.
+Interface for the [Craft](/docs/core/Craft.md) contract.
 
 ### Recipe
 

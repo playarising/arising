@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 /**
  * @title IItems
- * @notice Interface for the {Items} contract.
+ * @notice Interface for the [Items](/docs/items/Items.md) contract.
  */
 interface IItems {
     /**

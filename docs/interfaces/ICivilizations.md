@@ -2,7 +2,7 @@
 
 ## ICivilizations
 
-Interface for the {Civilizations} contract.
+Interface for the [Civilizations](/docs/core/Civilizations.md) contract.
 
 ### Upgrade
 

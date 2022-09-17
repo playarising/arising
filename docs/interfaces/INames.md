@@ -2,7 +2,7 @@
 
 ## INames
 
-Interface for the {Names} contract.
+Interface for the [Names](/docs/core/Names.md) contract.
 
 ### claimName
 

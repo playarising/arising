@@ -2,7 +2,7 @@
 
 ## IEquipment
 
-Interface for the {Equipment} contract.
+Interface for the [Equipment](/docs/core/Equipment.md) contract.
 
 ### ItemEquiped
 

@@ -14,9 +14,9 @@ import "./BaseERC20Wrapper.sol";
  * @title BaseERC721
  * @notice This contract an imitation of the `ERC20` standard to work around the character context.
  * It tracks balances of characters tokens. This also includes functions to wrap and unwrap to a
- * {BaseERC20Wrapper} instance.
+ * [BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.md) instance.
  *
- * @dev Implementation of the {IBaseFungibleItem} interface.
+ * @dev Implementation of the [IBaseFungibleItem](/docs/interfaces/IBaseFungibleItem.md) interface.
  */
 contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     // =============================================== Storage ========================================================
@@ -36,7 +36,7 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     /** @notice Map to track the balances of characters. */
     mapping(bytes => uint256) balances;
 
-    /** @notice Constant for the address of the {BaseERC20Wrapper} instance. */
+    /** @notice Constant for the address of the [BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.md) instance. */
     address public wrapper;
 
     // =============================================== Modifiers ======================================================
@@ -110,7 +110,7 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     }
 
     /**
-     * @notice Converts the internal item to an `ERC20` through the {BaseERC20Wrapper}.
+     * @notice Converts the internal item to an `ERC20` through the [BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.md).
      *
      * Requirements:
      * @param _id       Composed ID of the character.

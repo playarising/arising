@@ -2,7 +2,7 @@
 
 ## IStats
 
-Interface for the {Stats} contract.
+Interface for the [Stats](/docs/core/Stats.md) contract.
 
 ### BasicStats
 

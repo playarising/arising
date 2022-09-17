@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 /**
  * @title ILevels
- * @notice Interface for the {Levels} contract.
+ * @notice Interface for the [Levels](/docs/codex/Levels.md) contract.
  */
 interface ILevels {
     /**
@@ -18,9 +18,9 @@ interface ILevels {
         uint256 max;
     }
 
-    /** @notice See {Levels.getLevel} */
+    /** @notice See [Levels](/docs/codex/Levels.md#getLevel) */
     function getLevel(uint256 _experience) external view returns (uint256);
 
-    /** @notice See {Levels.getExperience} */
+    /** @notice See [Levels](/docs/codex/Levels.md#getExperience) */
     function getExperience(uint256 _level) external view returns (uint256);
 }

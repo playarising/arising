@@ -2,7 +2,7 @@
 
 ## IItems
 
-Interface for the {Items} contract.
+Interface for the [Items](/docs/items/Items.md) contract.
 
 ### Item
 

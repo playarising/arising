@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 /**
  * @title IEquipment
- * @notice Interface for the {Equipment} contract.
+ * @notice Interface for the [Equipment](/docs/core/Equipment.md) contract.
  */
 interface IEquipment {
     struct ItemEquiped {

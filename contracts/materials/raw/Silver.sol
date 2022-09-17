@@ -5,7 +5,7 @@ import "../../base/BaseFungibleItem.sol";
 
 /**
  * @title Silver
- * @notice This contract is an instance of {BaseFungibleItem} to serve as an asset for the ecosystem.
+ * @notice This contract is an instance of [BaseFungibleItem](/docs/base/BaseFungibleItem.md) to serve as an asset for the ecosystem.
  */
 contract Silver is BaseFungibleItem {
     // =============================================== Setters ========================================================

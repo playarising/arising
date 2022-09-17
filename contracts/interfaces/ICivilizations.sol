@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 /**
  * @title ICivilizations
- * @notice Interface for the {Civilizations} contract.
+ * @notice Interface for the [Civilizations](/docs/core/Civilizations.md) contract.
  */
 interface ICivilizations {
     struct Upgrade {

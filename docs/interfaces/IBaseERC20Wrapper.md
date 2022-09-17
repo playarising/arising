@@ -2,7 +2,7 @@
 
 ## IBaseERC20Wrapper
 
-Interface for the {BaseERC20Wrapper} contract.
+Interface for the [BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.md) contract.
 
 ### mint
 
@@ -10,4 +10,4 @@ Interface for the {BaseERC20Wrapper} contract.
 function mint(address _to, uint256 _amount) external
 ```
 
-See {BaseERC20Wrapper.mint}
+See [BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.md#mint)

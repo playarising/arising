@@ -11,7 +11,7 @@ import "../interfaces/IBaseERC721.sol";
  * @notice This contract is a `ERC721Enumerable` implementation for the different civilizations.
  * Exposes the mint function to the owner and some check functions.
  *
- * @dev Implementation of the {IBaseERC721} interface.
+ * @dev Implementation of the [IBaseERC721](/docs/interfaces/IBaseERC721.md) interface.
  */
 contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
     // =============================================== Storage ========================================================

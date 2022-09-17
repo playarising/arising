@@ -3,10 +3,10 @@
 ## BaseERC20Wrapper
 
 This contract is a standard `ERC20` implementation with burnable and mintable
-functions exposed to the contract owner. This contract is a wrapper for the {BaseFungibleItem} instance to convert
+functions exposed to the contract owner. This contract is a wrapper for the [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance to convert
 an internal fungible token to the `ERC20` standard.
 
-_Implementation of the [IBaseERC20Wrapper](/doc/interfaces/IBaseERC20Wrapper.md) interface._
+_Implementation of the [IBaseERC20Wrapper](/docs/interfaces/IBaseERC20Wrapper.md) interface._
 
 ### constructor
 

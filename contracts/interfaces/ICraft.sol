@@ -4,7 +4,7 @@ import "../interfaces/IStats.sol";
 
 /**
  * @title ICraft
- * @notice Interface for the {Craft} contract.
+ * @notice Interface for the [Craft](/docs/core/Craft.md) contract.
  */
 interface ICraft {
     struct Recipe {

@@ -2,7 +2,7 @@
 
 ## IExperience
 
-Interface for the {Experience} contract.
+Interface for the [Experience](/docs/core/Experience.md) contract.
 
 ### assignExperience
 
