@@ -120,7 +120,7 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
         consume(_id, _amount);
         IBaseERC20Wrapper(wrapper).mint(
             ICivilizations(civilizations).ownerOf(_id),
-            _amount
+            _amount * 1 ether
         );
     }
 
@@ -132,7 +132,7 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
      * @param _amount   Amount of tokens to create.
      */
     function unwrap(bytes memory _id, uint256 _amount) public onlyAllowed(_id) {
-        ERC20Burnable(wrapper).burn(_amount);
+        ERC20Burnable(wrapper).burnFrom(msg.sender, _amount * 1 ether);
         _mint(_id, _amount);
     }
 

@@ -31,6 +31,11 @@ describe("BaseFungibleItems", () => {
       this.civ.address
     );
     await this.token.deployed();
+
+    const BaseERC20Wrapper = await ethers.getContractFactory(
+      "BaseERC20Wrapper"
+    );
+    this.wrapped_token = BaseERC20Wrapper.attach(await this.token.wrapper());
   });
 
   it("should deploy everything correctly", async () => {
@@ -80,5 +85,24 @@ describe("BaseFungibleItems", () => {
     await expect(this.token.consume(id, 1)).to.revertedWith(
       "BaseFungibleItem: consume() not enough balance."
     );
+  });
+
+  it("should wrap and unwrap tokens correctly", async () => {
+    const id = await this.civ.getTokenID(1, 1);
+    expect(await this.wrapped_token.balanceOf(this.owner.address)).to.eq(0);
+    await this.token.mintTo(id, 10);
+    expect(await this.token.balanceOf(id)).to.eq(10);
+    await this.token.wrap(id, 5);
+    expect(await this.wrapped_token.balanceOf(this.owner.address)).to.eq(
+      ethers.utils.parseEther("5")
+    );
+    expect(await this.token.balanceOf(id)).to.eq(5);
+    await this.wrapped_token.approve(
+      this.token.address,
+      ethers.utils.parseEther("10")
+    );
+    await this.token.unwrap(id, 5);
+    expect(await this.wrapped_token.balanceOf(this.owner.address)).to.eq(0);
+    expect(await this.token.balanceOf(id)).to.eq(10);
   });
 });
