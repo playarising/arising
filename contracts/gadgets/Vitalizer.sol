@@ -11,7 +11,7 @@ contract Vitalizer is BaseGadgetToken {
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
+     * @notice Constructor.
      *
      * Requirements:
      * @param _token   Address of the token used to purchase.

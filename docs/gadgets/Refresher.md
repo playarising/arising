@@ -10,9 +10,9 @@ This contract is an instance of [BaseGadgetToken](/docs/base/BaseGadgetToken.md)
 constructor(address _token, uint256 _price) public
 ```
 
-\_Constructor.
+Constructor.
 
-Requirements:\_
+Requirements:
 
 | Name    | Type    | Description                            |
 | ------- | ------- | -------------------------------------- |

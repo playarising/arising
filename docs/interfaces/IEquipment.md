@@ -54,3 +54,59 @@ struct CharacterEquipment {
   struct IEquipment.ItemEquiped right_hand;
 }
 ```
+
+### pause
+
+```solidity
+function pause() external
+```
+
+See [Equipment#pause](/docs/core/Equipment.md#pause)
+
+### unpause
+
+```solidity
+function unpause() external
+```
+
+See [Equipment#unpause](/docs/core/Equipment.md#unpause)
+
+### equip
+
+```solidity
+function equip(bytes _id, enum IEquipment.EquipmentSlot _slot, uint256 _item_id) external
+```
+
+See [Equipment#equip](/docs/core/Equipment.md#equip)
+
+### unequip
+
+```solidity
+function unequip(bytes _id, enum IEquipment.EquipmentSlot _slot) external
+```
+
+See [Equipment#unequip](/docs/core/Equipment.md#unequip)
+
+### getCharacterEquipment
+
+```solidity
+function getCharacterEquipment(bytes _id) external view returns (struct IEquipment.CharacterEquipment)
+```
+
+See [Equipment#getCharacterEquipment](/docs/core/Equipment.md#getCharacterEquipment)
+
+### getCharacterTotalStatsModifiers
+
+```solidity
+function getCharacterTotalStatsModifiers(bytes _id) external view returns (struct IStats.BasicStats _additions, struct IStats.BasicStats _reductions)
+```
+
+See [Equipment#getCharacterTotalStatsModifiers](/docs/core/Equipment.md#getCharacterTotalStatsModifiers)
+
+### getCharacterTotalAttributes
+
+```solidity
+function getCharacterTotalAttributes(bytes _id) external view returns (struct IItems.BaseAttributes _additions, struct IItems.BaseAttributes _reductions)
+```
+
+See [Equipment#getCharacterTotalAttributes](/docs/core/Equipment.md#getCharacterTotalAttributes)

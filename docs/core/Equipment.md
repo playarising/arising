@@ -12,7 +12,7 @@ Implementation of the [IEquipment](/docs/interfaces/IEquipment.md) interface.
 address civilizations
 ```
 
-_Address of the [Civilizations](/docs/core/Civilizations.md) instance. \*_
+Address of the [Civilizations](/docs/core/Civilizations.md) instance.
 
 ### experience
 
@@ -20,7 +20,7 @@ _Address of the [Civilizations](/docs/core/Civilizations.md) instance. \*_
 address experience
 ```
 
-_Address of the [Experience](/docs/core/Experience.md) instance. \*_
+Address of the [Experience](/docs/core/Experience.md) instance.
 
 ### items
 
@@ -28,7 +28,7 @@ _Address of the [Experience](/docs/core/Experience.md) instance. \*_
 address items
 ```
 
-_Address of the [Items](/docs/items/Items.md) instance. \*_
+Address of the [Items](/docs/items/Items.md) instance.
 
 ### character_equipments
 
@@ -36,7 +36,7 @@ _Address of the [Items](/docs/items/Items.md) instance. \*_
 mapping(bytes => mapping(enum IEquipment.EquipmentSlot => struct IEquipment.ItemEquiped)) character_equipments
 ```
 
-_Map to track the equipment of characters. \*_
+_Map to track the equipment of characters._
 
 ### slots_types
 
@@ -44,15 +44,22 @@ _Map to track the equipment of characters. \*_
 mapping(enum IEquipment.EquipmentSlot => mapping(enum IItems.ItemType => bool)) slots_types
 ```
 
-_Map to track the slots that can be used by an item type. \*_
+_Map to track the equipment slots and its attachable items._
 
 ### onlyAllowed
 
 ```solidity
-modifier onlyAllowed(bytes id)
+modifier onlyAllowed(bytes _id)
 ```
 
-_Checks if `msg.sender` is owner or allowed to manipulate a composed ID._
+Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the `msg.sender` is the owner or
+has allowance to access a composed ID.
+
+Requirements:
+
+| Name | Type  | Description               |
+| ---- | ----- | ------------------------- |
+| \_id | bytes | Composed ID of the token. |
 
 ### constructor
 
@@ -89,53 +96,85 @@ Resumes the contract
 ### equip
 
 ```solidity
-function equip(bytes id, enum IEquipment.EquipmentSlot item_slot, uint256 item_id) public
+function equip(bytes _id, enum IEquipment.EquipmentSlot _slot, uint256 _item_id) public
 ```
 
-_Assigns an item to an item slot. If it is already used, it replaces it._
+Assigns an item to a character equipment slot. If the slot already has an equiped item
+it is replaced by the item being equiped.
 
-| Name      | Type                          | Description                        |
-| --------- | ----------------------------- | ---------------------------------- |
-| id        | bytes                         | Composed ID of the character.      |
-| item_slot | enum IEquipment.EquipmentSlot | Slot from the equipment to remove. |
-| item_id   | uint256                       | ID of the item to assign.          |
+Requirements:
+
+| Name      | Type                          | Description                   |
+| --------- | ----------------------------- | ----------------------------- |
+| \_id      | bytes                         | Composed ID of the character. |
+| \_slot    | enum IEquipment.EquipmentSlot | Slot to equip the item.       |
+| \_item_id | uint256                       | ID of the item to equip.      |
 
 ### unequip
 
 ```solidity
-function unequip(bytes id, enum IEquipment.EquipmentSlot item_slot) public
+function unequip(bytes _id, enum IEquipment.EquipmentSlot _slot) public
 ```
 
-_Removes an item from the character equipment and transfers de ERC1155 token._
+Removes an item from a character equipment slot.
 
-| Name      | Type                          | Description                        |
-| --------- | ----------------------------- | ---------------------------------- |
-| id        | bytes                         | Composed ID of the character.      |
-| item_slot | enum IEquipment.EquipmentSlot | Slot from the equipment to remove. |
+Requirements:
+
+| Name   | Type                          | Description                   |
+| ------ | ----------------------------- | ----------------------------- |
+| \_id   | bytes                         | Composed ID of the character. |
+| \_slot | enum IEquipment.EquipmentSlot | Slot to equip the item.       |
 
 ### getCharacterEquipment
 
 ```solidity
-function getCharacterEquipment(bytes id) public view returns (struct IEquipment.CharacterEquipment)
+function getCharacterEquipment(bytes _id) public view returns (struct IEquipment.CharacterEquipment)
 ```
 
-_Returns the full requipment of a character.
-@param id Composed ID of the token._
+External function to return the character slots and items attached.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
 
 ### getCharacterTotalStatsModifiers
 
 ```solidity
-function getCharacterTotalStatsModifiers(bytes id) public view returns (struct IStats.BasicStats, struct IStats.BasicStats)
+function getCharacterTotalStatsModifiers(bytes _id) public view returns (struct IStats.BasicStats _additions, struct IStats.BasicStats _reductions)
 ```
 
-_Returns the total modifiers from the equipment.
-@param id Composed ID of the token._
+External function to return the character state modifiers with additions
+and reducers counting the full equipment set.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name         | Type                     | Description                     |
+| ------------ | ------------------------ | ------------------------------- |
+| \_additions  | struct IStats.BasicStats | The amount of points increased. |
+| \_reductions | struct IStats.BasicStats | The amount of points reduced.   |
 
 ### getCharacterTotalAttributes
 
 ```solidity
-function getCharacterTotalAttributes(bytes id) public view returns (struct IItems.BaseAttributes, struct IItems.BaseAttributes)
+function getCharacterTotalAttributes(bytes _id) public view returns (struct IItems.BaseAttributes _additions, struct IItems.BaseAttributes _reductions)
 ```
 
-_Returns the total attributes from the equipment.
-@param id Composed ID of the token._
+External function to return the character total attributes counting additions
+and reducers counting the full equipment set.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name         | Type                         | Description                     |
+| ------------ | ---------------------------- | ------------------------------- |
+| \_additions  | struct IItems.BaseAttributes | The amount of points increased. |
+| \_reductions | struct IItems.BaseAttributes | The amount of points reduced.   |

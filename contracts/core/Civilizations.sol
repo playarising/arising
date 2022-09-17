@@ -33,10 +33,10 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     /** @notice Constant for address of the `ERC20` token used to purchase. */
     address public token;
 
-    /** @notice Map to track the character upgrades. **/
+    /** @notice Map to track the character upgrades. */
     UpgradedCharacters private character_upgrades;
 
-    /** @notice Map to track the upgrades information. **/
+    /** @notice Map to track the upgrades information. */
     mapping(uint256 => Upgrade) public upgrades;
 
     // =============================================== Setters ========================================================

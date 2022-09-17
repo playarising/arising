@@ -21,29 +21,29 @@ import "../interfaces/IBaseFungibleItem.sol";
 contract Craft is ICraft, Ownable, Pausable {
     // =============================================== Storage ========================================================
 
-    /** @dev Map to track available recipes on the forge. **/
+    /** @notice Map to track available recipes for craft. */
     mapping(uint256 => Recipe) public recipes;
 
-    /** @dev Array to track all the recipes ids. **/
+    /** @notice Array to track all the recipes ids. */
     uint256[] private _recipes;
 
-    /** @dev The address of the [Gold](/docs/gadgets/Gold.md) instance. **/
+    /** @notice The address of the [Gold](/docs/gadgets/Gold.md) instance. */
     address public gold;
 
-    /** @dev Address of the [Civilizations](/docs/core/Civilizations.md) instance. **/
+    /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
     address public civilizations;
 
-    /** @dev Address of the [Experience](/docs/core/Experience.md) instance. **/
+    /** @notice Address of the [Experience](/docs/core/Experience.md) instance. */
     address public experience;
 
-    /** @dev Address of the [Stats](/docs/core/Stats.md) instance. **/
+    /** @notice Address of the [Stats](/docs/core/Stats.md) instance. */
     address public stats;
 
-    /** @dev Address of the [Items](/docs/items/Items.md) instance. **/
+    /** @notice Address of the [Items](/docs/items/Items.md) instance. */
     address public items;
 
-    /** @dev Map to track craft slots and cooldowns for each character. **/
-    mapping(bytes => CraftSlot) public slots;
+    /** @notice Map to track craft slots and cooldowns for each character. */
+    mapping(bytes => CraftSlot) public craft_slots;
 
     // =============================================== Modifiers ======================================================
 
@@ -219,7 +219,7 @@ contract Craft is ICraft, Ownable, Pausable {
         view
         returns (CraftSlot memory _slot)
     {
-        return slots[_id];
+        return craft_slots[_id];
     }
 
     // =============================================== Internal =======================================================
@@ -237,7 +237,7 @@ contract Craft is ICraft, Ownable, Pausable {
         view
         returns (bool _available)
     {
-        CraftSlot memory s = slots[_id];
+        CraftSlot memory s = craft_slots[_id];
 
         if (s.cooldown == 0) {
             return true;
@@ -255,7 +255,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * @return _available   Boolean to know if the slot is claimable.
      */
     function _isSlotClaimable(bytes memory _id) internal view returns (bool) {
-        CraftSlot memory s = slots[_id];
+        CraftSlot memory s = craft_slots[_id];
         return
             s.cooldown <= block.timestamp && !s.claimed && s.last_recipe != 0;
     }
@@ -270,7 +270,7 @@ contract Craft is ICraft, Ownable, Pausable {
     function _assignRecipeToSlot(bytes memory _id, Recipe memory _recipe)
         internal
     {
-        slots[_id] = CraftSlot(
+        craft_slots[_id] = CraftSlot(
             block.timestamp + _recipe.cooldown,
             _recipe.id,
             false
@@ -286,7 +286,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * @return _experience  Amount of experience rewarded.
      */
     function _claim(bytes memory _id) internal returns (uint256 _experience) {
-        Recipe memory r = recipes[slots[_id].last_recipe];
+        Recipe memory r = recipes[craft_slots[_id].last_recipe];
         IItems(items).mint(
             ICivilizations(civilizations).ownerOf(_id),
             r.item_reward

@@ -90,10 +90,17 @@ _Map to track the first refresher usage timestamp. \*_
 ### onlyAllowed
 
 ```solidity
-modifier onlyAllowed(bytes id)
+modifier onlyAllowed(bytes _id)
 ```
 
-_Checks if `msg.sender` is owner or allowed to manipulate a composed ID._
+Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the `msg.sender` is the owner or
+has allowance to access a composed ID.
+
+Requirements:
+
+| Name | Type  | Description               |
+| ---- | ----- | ------------------------- |
+| \_id | bytes | Composed ID of the token. |
 
 ### constructor
 

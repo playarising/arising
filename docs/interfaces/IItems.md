@@ -89,7 +89,7 @@ struct Attributes {
 ### mint
 
 ```solidity
-function mint(address _to, uint256 _id) external
+function mint(address _to, uint256 _item_id) external
 ```
 
 See [Items#mint](/docs/items/Items.md#mint)
@@ -97,7 +97,7 @@ See [Items#mint](/docs/items/Items.md#mint)
 ### addItem
 
 ```solidity
-function addItem(uint256 level_required, enum IItems.ItemType item_type, struct IItems.StatsModifiers stat_modifiers, struct IItems.Attributes attributes) external
+function addItem(uint256 _level_required, enum IItems.ItemType _item_type, struct IItems.StatsModifiers _stats_modifiers, struct IItems.Attributes _attributes) external
 ```
 
 See [Items#addItem](/docs/items/Items.md#addItem)
@@ -105,7 +105,7 @@ See [Items#addItem](/docs/items/Items.md#addItem)
 ### disableItem
 
 ```solidity
-function disableItem(uint256 id) external
+function disableItem(uint256 _item_id) external
 ```
 
 See [Items#disableItem](/docs/items/Items.md#disableItem)
@@ -113,7 +113,7 @@ See [Items#disableItem](/docs/items/Items.md#disableItem)
 ### enableItem
 
 ```solidity
-function enableItem(uint256 id) external
+function enableItem(uint256 _item_id) external
 ```
 
 See [Items#enableItem](/docs/items/Items.md#enableItem)
@@ -121,7 +121,7 @@ See [Items#enableItem](/docs/items/Items.md#enableItem)
 ### getItem
 
 ```solidity
-function getItem(uint256 id) external view returns (struct IItems.Item)
+function getItem(uint256 _item_id) external view returns (struct IItems.Item _item)
 ```
 
 See [Items#getItem](/docs/items/Items.md#getItem)

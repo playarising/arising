@@ -67,9 +67,9 @@ has allowance to access a composed ID.
 
 Requirements:
 
-| Name | Type  | Description               |
-| ---- | ----- | ------------------------- |
-| \_id | bytes | Composed ID of the token. |
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
 
 ### constructor
 

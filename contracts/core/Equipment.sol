@@ -21,19 +21,19 @@ import "../interfaces/IStats.sol";
 contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
     // =============================================== Storage ========================================================
 
-    /** @dev Address of the [Civilizations](/docs/core/Civilizations.md) instance. **/
+    /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
     address public civilizations;
 
-    /** @dev Address of the [Experience](/docs/core/Experience.md) instance. **/
+    /** @notice Address of the [Experience](/docs/core/Experience.md) instance. */
     address public experience;
 
-    /** @dev Address of the [Items](/docs/items/Items.md) instance. **/
+    /** @notice Address of the [Items](/docs/items/Items.md) instance. */
     address public items;
 
-    /** @dev Map to track the equipment of characters. **/
+    /** @dev Map to track the equipment of characters. */
     mapping(bytes => mapping(EquipmentSlot => ItemEquiped)) character_equipments;
 
-    /** @dev Map to track the slots that can be used by an item type. **/
+    /** @dev Map to track the equipment slots and its attachable items. */
     mapping(EquipmentSlot => mapping(IItems.ItemType => bool)) slots_types;
 
     // =============================================== Modifiers ======================================================
@@ -105,67 +105,72 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
     }
 
     /**
-     * @dev Assigns an item to an item slot. If it is already used, it replaces it.
-     * @param id            Composed ID of the character.
-     * @param item_slot     Slot from the equipment to remove.
-     * @param item_id       ID of the item to assign.
+     * @notice Assigns an item to a character equipment slot. If the slot already has an equiped item
+     * it is replaced by the item being equiped.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _slot     Slot to equip the item.
+     * @param _item_id  ID of the item to equip.
      */
     function equip(
-        bytes memory id,
-        EquipmentSlot item_slot,
-        uint256 item_id
-    ) public whenNotPaused onlyAllowed(id) {
-        IItems.Item memory item_data = IItems(items).getItem(item_id);
+        bytes memory _id,
+        EquipmentSlot _slot,
+        uint256 _item_id
+    ) public whenNotPaused onlyAllowed(_id) {
+        IItems.Item memory item_data = IItems(items).getItem(_item_id);
 
         require(
-            slots_types[item_slot][item_data.item_type],
+            slots_types[_slot][item_data.item_type],
             "Equipment: equip() item type not for this slot."
         );
 
         if (item_data.item_type == IItems.ItemType.TWO_HANDED) {
-            if (character_equipments[id][EquipmentSlot.RIGHT_HAND].equiped) {
-                unequip(id, EquipmentSlot.RIGHT_HAND);
+            if (character_equipments[_id][EquipmentSlot.RIGHT_HAND].equiped) {
+                unequip(_id, EquipmentSlot.RIGHT_HAND);
             }
         }
 
-        if (character_equipments[id][item_slot].equiped) {
-            unequip(id, item_slot);
+        if (character_equipments[_id][_slot].equiped) {
+            unequip(_id, _slot);
         }
 
         IERC1155(items).safeTransferFrom(
             msg.sender,
             address(this),
-            item_id,
+            _item_id,
             1,
             ""
         );
 
-        character_equipments[id][item_slot].equiped = true;
-        character_equipments[id][item_slot].id = item_id;
+        character_equipments[_id][_slot].equiped = true;
+        character_equipments[_id][_slot].id = _item_id;
     }
 
     /**
-     * @dev Removes an item from the character equipment and transfers de ERC1155 token.
-     * @param id            Composed ID of the character.
-     * @param item_slot     Slot from the equipment to remove.
+     * @notice Removes an item from a character equipment slot.
+     *
+     * Requirements:
+     * @param _id   Composed ID of the character.
+     * @param _slot Slot to equip the item.
      */
-    function unequip(bytes memory id, EquipmentSlot item_slot)
+    function unequip(bytes memory _id, EquipmentSlot _slot)
         public
         whenNotPaused
-        onlyAllowed(id)
+        onlyAllowed(_id)
     {
         require(
-            character_equipments[id][item_slot].equiped,
+            character_equipments[_id][_slot].equiped,
             "Equipment: unequip() item slot not equiped."
         );
 
-        uint256 item_id = character_equipments[id][item_slot].id;
-        character_equipments[id][item_slot].equiped = false;
-        character_equipments[id][item_slot].id = 0;
+        uint256 item_id = character_equipments[_id][_slot].id;
+        character_equipments[_id][_slot].equiped = false;
+        character_equipments[_id][_slot].id = 0;
 
         IERC1155(items).safeTransferFrom(
             address(this),
-            ICivilizations(civilizations).ownerOf(id),
+            ICivilizations(civilizations).ownerOf(_id),
             item_id,
             1,
             ""
@@ -174,104 +179,110 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
 
     // =============================================== Getters ========================================================
 
-    /** @dev Returns the full requipment of a character.
-     *  @param id  Composed ID of the token.
+    /**
+     * @notice External function to return the character slots and items attached.
+     *
+     * Requirements:
+     * @param _id   Composed ID of the character.
      */
-    function getCharacterEquipment(bytes memory id)
+    function getCharacterEquipment(bytes memory _id)
         public
         view
         returns (CharacterEquipment memory)
     {
         return
             CharacterEquipment(
-                character_equipments[id][EquipmentSlot.HELMET],
-                character_equipments[id][EquipmentSlot.SHOULDER_GUARDS],
-                character_equipments[id][EquipmentSlot.ARM_GUARDS],
-                character_equipments[id][EquipmentSlot.HANDS],
-                character_equipments[id][EquipmentSlot.RING],
-                character_equipments[id][EquipmentSlot.NECKLACE],
-                character_equipments[id][EquipmentSlot.CHEST],
-                character_equipments[id][EquipmentSlot.LEGS],
-                character_equipments[id][EquipmentSlot.BELT],
-                character_equipments[id][EquipmentSlot.FEET],
-                character_equipments[id][EquipmentSlot.CAPE],
-                character_equipments[id][EquipmentSlot.LEFT_HAND],
-                character_equipments[id][EquipmentSlot.RIGHT_HAND]
+                character_equipments[_id][EquipmentSlot.HELMET],
+                character_equipments[_id][EquipmentSlot.SHOULDER_GUARDS],
+                character_equipments[_id][EquipmentSlot.ARM_GUARDS],
+                character_equipments[_id][EquipmentSlot.HANDS],
+                character_equipments[_id][EquipmentSlot.RING],
+                character_equipments[_id][EquipmentSlot.NECKLACE],
+                character_equipments[_id][EquipmentSlot.CHEST],
+                character_equipments[_id][EquipmentSlot.LEGS],
+                character_equipments[_id][EquipmentSlot.BELT],
+                character_equipments[_id][EquipmentSlot.FEET],
+                character_equipments[_id][EquipmentSlot.CAPE],
+                character_equipments[_id][EquipmentSlot.LEFT_HAND],
+                character_equipments[_id][EquipmentSlot.RIGHT_HAND]
             );
     }
 
-    /** @dev Returns the total modifiers from the equipment.
-     *  @param id  Composed ID of the token.
+    /**
+     * @notice External function to return the character state modifiers with additions
+     * and reducers counting the full equipment set.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _additions   The amount of points increased.
+     * @return _reductions  The amount of points reduced.
      */
-    function getCharacterTotalStatsModifiers(bytes memory id)
+    function getCharacterTotalStatsModifiers(bytes memory _id)
         public
         view
-        returns (IStats.BasicStats memory, IStats.BasicStats memory)
+        returns (
+            IStats.BasicStats memory _additions,
+            IStats.BasicStats memory _reductions
+        )
     {
-        IStats.BasicStats memory additions = IStats.BasicStats(0, 0, 0);
-        IStats.BasicStats memory reductions = IStats.BasicStats(0, 0, 0);
-
         for (uint256 i = 0; i < 13; i++) {
-            ItemEquiped memory e = character_equipments[id][EquipmentSlot(i)];
+            ItemEquiped memory e = character_equipments[_id][EquipmentSlot(i)];
             if (e.equiped) {
                 IItems.Item memory item = IItems(items).getItem(e.id);
-                additions.might += item.stat_modifiers.might;
-                additions.speed += item.stat_modifiers.speed;
-                additions.intellect += item.stat_modifiers.intellect;
-                reductions.might += item.stat_modifiers.might_reducer;
-                reductions.speed += item.stat_modifiers.speed_reducer;
-                reductions.intellect += item.stat_modifiers.intellect_reducer;
+                _additions.might += item.stat_modifiers.might;
+                _additions.speed += item.stat_modifiers.speed;
+                _additions.intellect += item.stat_modifiers.intellect;
+                _reductions.might += item.stat_modifiers.might_reducer;
+                _reductions.speed += item.stat_modifiers.speed_reducer;
+                _reductions.intellect += item.stat_modifiers.intellect_reducer;
             }
         }
 
-        return (additions, reductions);
+        return (_additions, _reductions);
     }
 
     /** @dev Returns the total attributes from the equipment.
      *  @param id  Composed ID of the token.
      */
-    function getCharacterTotalAttributes(bytes memory id)
+    /**
+     * @notice External function to return the character total attributes counting additions
+     * and reducers counting the full equipment set.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _additions   The amount of points increased.
+     * @return _reductions  The amount of points reduced.
+     */
+    function getCharacterTotalAttributes(bytes memory _id)
         public
         view
-        returns (IItems.BaseAttributes memory, IItems.BaseAttributes memory)
+        returns (
+            IItems.BaseAttributes memory _additions,
+            IItems.BaseAttributes memory _reductions
+        )
     {
-        IItems.BaseAttributes memory additions = IItems.BaseAttributes(
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-        );
-        IItems.BaseAttributes memory reductions = IItems.BaseAttributes(
-            0,
-            0,
-            0,
-            0,
-            0,
-            0
-        );
-
         for (uint256 i = 0; i < 13; i++) {
-            ItemEquiped memory e = character_equipments[id][EquipmentSlot(i)];
+            ItemEquiped memory e = character_equipments[_id][EquipmentSlot(i)];
             if (e.equiped) {
                 IItems.Item memory item = IItems(items).getItem(e.id);
-                additions.atk += item.attributes.atk;
-                additions.def += item.attributes.def;
-                additions.range += item.attributes.range;
-                additions.mag_atk += item.attributes.mag_atk;
-                additions.mag_def += item.attributes.mag_def;
-                additions.rate += item.attributes.rate;
+                _additions.atk += item.attributes.atk;
+                _additions.def += item.attributes.def;
+                _additions.range += item.attributes.range;
+                _additions.mag_atk += item.attributes.mag_atk;
+                _additions.mag_def += item.attributes.mag_def;
+                _additions.rate += item.attributes.rate;
 
-                reductions.atk += item.attributes.atk_reducer;
-                reductions.def += item.attributes.def_reducer;
-                reductions.range += item.attributes.range_reducer;
-                reductions.mag_atk += item.attributes.mag_atk_reducer;
-                reductions.mag_def += item.attributes.mag_def_reducer;
-                reductions.rate += item.attributes.rate_reducer;
+                _reductions.atk += item.attributes.atk_reducer;
+                _reductions.def += item.attributes.def_reducer;
+                _reductions.range += item.attributes.range_reducer;
+                _reductions.mag_atk += item.attributes.mag_atk_reducer;
+                _reductions.mag_def += item.attributes.mag_def_reducer;
+                _reductions.rate += item.attributes.rate_reducer;
             }
         }
 
-        return (additions, reductions);
+        return (_additions, _reductions);
     }
 }

@@ -13,7 +13,7 @@ Implementation of the [ICraft](/docs/interfaces/ICraft.md) interface.
 mapping(uint256 => struct ICraft.Recipe) recipes
 ```
 
-_Map to track available recipes on the forge. \*_
+Map to track available recipes for craft.
 
 ### \_recipes
 
@@ -21,7 +21,7 @@ _Map to track available recipes on the forge. \*_
 uint256[] _recipes
 ```
 
-_Array to track all the recipes ids. \*_
+Array to track all the recipes ids.
 
 ### gold
 
@@ -29,7 +29,7 @@ _Array to track all the recipes ids. \*_
 address gold
 ```
 
-_The address of the [Gold](/docs/gadgets/Gold.md) instance. \*_
+The address of the [Gold](/docs/gadgets/Gold.md) instance.
 
 ### civilizations
 
@@ -37,7 +37,7 @@ _The address of the [Gold](/docs/gadgets/Gold.md) instance. \*_
 address civilizations
 ```
 
-_Address of the [Civilizations](/docs/core/Civilizations.md) instance. \*_
+Address of the [Civilizations](/docs/core/Civilizations.md) instance.
 
 ### experience
 
@@ -45,7 +45,7 @@ _Address of the [Civilizations](/docs/core/Civilizations.md) instance. \*_
 address experience
 ```
 
-_Address of the [Experience](/docs/core/Experience.md) instance. \*_
+Address of the [Experience](/docs/core/Experience.md) instance.
 
 ### stats
 
@@ -53,7 +53,7 @@ _Address of the [Experience](/docs/core/Experience.md) instance. \*_
 address stats
 ```
 
-_Address of the [Stats](/docs/core/Stats.md) instance. \*_
+Address of the [Stats](/docs/core/Stats.md) instance.
 
 ### items
 
@@ -61,23 +61,30 @@ _Address of the [Stats](/docs/core/Stats.md) instance. \*_
 address items
 ```
 
-_Address of the [Items](/docs/items/Items.md) instance. \*_
+Address of the [Items](/docs/items/Items.md) instance.
 
-### slots
+### craft_slots
 
 ```solidity
-mapping(bytes => struct ICraft.CraftSlot) slots
+mapping(bytes => struct ICraft.CraftSlot) craft_slots
 ```
 
-_Map to track craft slots and cooldowns for each character. \*_
+Map to track craft slots and cooldowns for each character.
 
 ### onlyAllowed
 
 ```solidity
-modifier onlyAllowed(bytes id)
+modifier onlyAllowed(bytes _id)
 ```
 
-_Checks if `msg.sender` is owner or allowed to manipulate a composed ID._
+Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the `msg.sender` is the owner or
+has allowance to access a composed ID.
+
+Requirements:
+
+| Name | Type  | Description               |
+| ---- | ----- | ------------------------- |
+| \_id | bytes | Composed ID of the token. |
 
 ### constructor
 
@@ -116,122 +123,161 @@ Resumes the contract
 ### disableRecipe
 
 ```solidity
-function disableRecipe(uint256 id) public
+function disableRecipe(uint256 _recipe_id) public
 ```
 
-_Disables a craft recipe._
+Disables a recipe from beign crafted.
 
-| Name | Type    | Description       |
-| ---- | ------- | ----------------- |
-| id   | uint256 | ID of the recipe. |
+Requirements:
+
+| Name        | Type    | Description       |
+| ----------- | ------- | ----------------- |
+| \_recipe_id | uint256 | ID of the recipe. |
 
 ### enableRecipe
 
 ```solidity
-function enableRecipe(uint256 id) public
+function enableRecipe(uint256 _recipe_id) public
 ```
 
-_Enables a craft recipe._
+Enables a recipe to be crafted.
 
-| Name | Type    | Description       |
-| ---- | ------- | ----------------- |
-| id   | uint256 | ID of the recipe. |
+Requirements:
+
+| Name        | Type    | Description       |
+| ----------- | ------- | ----------------- |
+| \_recipe_id | uint256 | ID of the recipe. |
 
 ### craft
 
 ```solidity
-function craft(bytes id, uint256 recipe) public
+function craft(bytes _id, uint256 _recipe_id) public
 ```
 
-_Craft a recipe._
+Initializes a recipe to be crafted.
 
-| Name   | Type    | Description                   |
-| ------ | ------- | ----------------------------- |
-| id     | bytes   | Composed ID of the character. |
-| recipe | uint256 | ID of the recipe to craft.    |
+Requirements:
+
+| Name        | Type    | Description                   |
+| ----------- | ------- | ----------------------------- |
+| \_id        | bytes   | Composed ID of the character. |
+| \_recipe_id | uint256 | ID of the recipe.             |
 
 ### claim
 
 ```solidity
-function claim(bytes id) public
+function claim(bytes _id) public
 ```
 
-_Claims a recipe already crafted._
+Claims a recipe already crafted.
+
+Requirements:
 
 | Name | Type  | Description                   |
 | ---- | ----- | ----------------------------- |
-| id   | bytes | Composed ID of the character. |
+| \_id | bytes | Composed ID of the character. |
 
 ### getRecipe
 
 ```solidity
-function getRecipe(uint256 id) public view returns (struct ICraft.Recipe)
+function getRecipe(uint256 _recipe_id) public view returns (struct ICraft.Recipe _recipe)
 ```
 
-_Reurns the recipe information of a recipe id._
+Returns the full information of a recipe.
 
-| Name | Type    | Description       |
-| ---- | ------- | ----------------- |
-| id   | uint256 | ID of the recipe. |
+Requirements:
+
+| Name        | Type    | Description       |
+| ----------- | ------- | ----------------- |
+| \_recipe_id | uint256 | ID of the recipe. |
+
+| Name     | Type                 | Description                    |
+| -------- | -------------------- | ------------------------------ |
+| \_recipe | struct ICraft.Recipe | Full information of the recipe |
 
 ### getCharacterSlot
 
 ```solidity
-function getCharacterSlot(bytes id) public view returns (struct ICraft.CraftSlot)
+function getCharacterSlot(bytes _id) public view returns (struct ICraft.CraftSlot _slot)
 ```
 
-_Reurns the craft slot information of a composed ID._
+Returns character craft slot information.
+
+Requirements:
 
 | Name | Type  | Description                   |
 | ---- | ----- | ----------------------------- |
-| id   | bytes | Composed ID of the character. |
+| \_id | bytes | Composed ID of the character. |
+
+| Name   | Type                    | Description                                  |
+| ------ | ----------------------- | -------------------------------------------- |
+| \_slot | struct ICraft.CraftSlot | Full information of character crafting slot. |
 
 ### \_isSlotAvailable
 
 ```solidity
-function _isSlotAvailable(bytes id) internal view returns (bool)
+function _isSlotAvailable(bytes _id) internal view returns (bool _available)
 ```
 
-_Internal function to check if the craft slot is available to craft._
+Internal check if the crafting slot is available to be used.
+
+Requirements:
 
 | Name | Type  | Description                   |
 | ---- | ----- | ----------------------------- |
-| id   | bytes | Composed ID of the character. |
+| \_id | bytes | Composed ID of the character. |
+
+| Name        | Type | Description                               |
+| ----------- | ---- | ----------------------------------------- |
+| \_available | bool | Boolean to know if the slot is available. |
 
 ### \_isSlotClaimable
 
 ```solidity
-function _isSlotClaimable(bytes id) internal view returns (bool)
+function _isSlotClaimable(bytes _id) internal view returns (bool)
 ```
 
-_Internal function to check if a craft slot is ready to claim._
+Internal check if the crafting slot is claimable.
+
+Requirements:
 
 | Name | Type  | Description                   |
 | ---- | ----- | ----------------------------- |
-| id   | bytes | Composed ID of the character. |
+| \_id | bytes | Composed ID of the character. |
+
+| Name | Type | Description                                           |
+| ---- | ---- | ----------------------------------------------------- |
+| [0]  | bool | \_available Boolean to know if the slot is claimable. |
 
 ### \_assignRecipeToSlot
 
 ```solidity
-function _assignRecipeToSlot(bytes id, struct ICraft.Recipe r) internal
+function _assignRecipeToSlot(bytes _id, struct ICraft.Recipe _recipe) internal
 ```
 
-_Internal function to assign a recipe to a slot for craft_
+Internal function that assigns a recipe to the crafting slot.
 
-| Name | Type                 | Description                   |
-| ---- | -------------------- | ----------------------------- |
-| id   | bytes                | Composed ID of the character. |
-| r    | struct ICraft.Recipe | Recipe to be assigned.        |
+Requirements:
+
+| Name     | Type                 | Description                                                        |
+| -------- | -------------------- | ------------------------------------------------------------------ |
+| \_id     | bytes                | Composed ID of the character. \* @param \_recipe Recipe to assign. |
+| \_recipe | struct ICraft.Recipe |                                                                    |
 
 ### \_claim
 
 ```solidity
-function _claim(bytes id) internal returns (uint256)
+function _claim(bytes _id) internal returns (uint256 _experience)
 ```
 
-_Internal function claim a reward from the slot and return the reward experience.
-This function assumes the slot is claimable_
+Internal function to claim the reward from the slot.
+
+Requirements:
 
 | Name | Type  | Description                   |
 | ---- | ----- | ----------------------------- |
-| id   | bytes | Composed ID of the character. |
+| \_id | bytes | Composed ID of the character. |
+
+| Name         | Type    | Description                    |
+| ------------ | ------- | ------------------------------ |
+| \_experience | uint256 | Amount of experience rewarded. |

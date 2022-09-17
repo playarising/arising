@@ -6,13 +6,13 @@ This contract tracks and assigns experience of all the characters stored on the 
 
 Implementation of the [IExperience](/docs/interfaces/IExperience.md) interface.
 
-### experience
+### civilizations
 
 ```solidity
-mapping(bytes => uint256) experience
+address civilizations
 ```
 
-_Map to store the experience from composed ID. \*_
+Address of the [Civilizations](/docs/core/Civilizations.md) instance.
 
 ### levels
 
@@ -20,15 +20,7 @@ _Map to store the experience from composed ID. \*_
 address levels
 ```
 
-_Address of the `Levels` implementation. \*_
-
-### civilizations
-
-```solidity
-address civilizations
-```
-
-_Address of the [Civilizations](/docs/core/Civilizations.md) implementation. \*_
+Address of the [Levels](/docs/codex/Levels.md) instance.
 
 ### authorized
 
@@ -36,7 +28,15 @@ _Address of the [Civilizations](/docs/core/Civilizations.md) implementation. \*_
 mapping(address => bool) authorized
 ```
 
-_Map to store the list of authorized addresses to assign experience. \*_
+_Map to store the list of authorized addresses to assign experience._
+
+### experience
+
+```solidity
+mapping(bytes => uint256) experience
+```
+
+Map to track the experience of composed IDs.
 
 ### onlyAuthorized
 
@@ -44,7 +44,7 @@ _Map to store the list of authorized addresses to assign experience. \*_
 modifier onlyAuthorized()
 ```
 
-_Checks if `msg.sender` is authorized to assign experience._
+Checks against if the `msg.sender` is authorized to assign experience.
 
 ### constructor
 
@@ -61,56 +61,113 @@ Requirements:
 | \_levels        | address | The address of the [Levels](/docs/codex/Levels.md) instance.              |
 | \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
 
+### setLevel
+
+```solidity
+function setLevel(address _levels) public
+```
+
+Replaces the address of the [Levels](/docs/codex/Levels.md) instance to determine character levels.
+
+Requirements:
+
+| Name     | Type    | Description                                              |
+| -------- | ------- | -------------------------------------------------------- |
+| \_levels | address | Address of the [Levels](/docs/codex/Levels.md) instance. |
+
 ### assignExperience
 
 ```solidity
-function assignExperience(bytes id, uint256 amount) public
+function assignExperience(bytes _id, uint256 _amount) public
 ```
 
-_Adds experience to the character from a composed ID.
-@param id Composed ID of the token._
+Assigns new experience to the composed ID provided.
+
+Requirements:
+
+| Name     | Type    | Description                      |
+| -------- | ------- | -------------------------------- |
+| \_id     | bytes   | Composed ID of the character.    |
+| \_amount | uint256 | The amount of experience to add. |
 
 ### addAuthority
 
 ```solidity
-function addAuthority(address authority) public
+function addAuthority(address _authority) public
 ```
 
-_Adds an authority to assign experience.
-@param authority Address of the authority to assign._
+Assigns a new address as an authority to assign experience.
+
+Requirements:
+
+| Name        | Type    | Description                |
+| ----------- | ------- | -------------------------- |
+| \_authority | address | Address to give authority. |
 
 ### removeAuthority
 
 ```solidity
-function removeAuthority(address authority) public
+function removeAuthority(address _authority) public
 ```
 
-_Removes an authority to assign experience.
-@param authority Address of the authority to remove._
+Removes an authority to assign experience.
+
+Requirements:
+
+| Name        | Type    | Description                |
+| ----------- | ------- | -------------------------- |
+| \_authority | address | Address to give authority. |
 
 ### getExperience
 
 ```solidity
-function getExperience(bytes id) public view returns (uint256)
+function getExperience(bytes _id) public view returns (uint256 _experience)
 ```
 
-_Returns the experience points of the token from a composed ID.
-@param id Composed ID of the token._
+External function to return the total experience of a composed ID.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name         | Type    | Description                        |
+| ------------ | ------- | ---------------------------------- |
+| \_experience | uint256 | Total experience of the character. |
 
 ### getLevel
 
 ```solidity
-function getLevel(bytes id) public view returns (uint256)
+function getLevel(bytes _id) public view returns (uint256 _level)
 ```
 
-_Returns the level of a token from a composed ID.
-@param id Composed ID of the token._
+External function to return the level of a composed ID.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name    | Type    | Description                    |
+| ------- | ------- | ------------------------------ |
+| \_level | uint256 | Level number of the character. |
 
 ### getExperienceForNextLevel
 
 ```solidity
-function getExperienceForNextLevel(bytes id) public view returns (uint256)
+function getExperienceForNextLevel(bytes _id) public view returns (uint256 _experience)
 ```
 
-_Returns the amount of experience required to reach the next level.
-@param id Composed ID of the token._
+External function to return the total experience required to reach the next level a composed ID.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name         | Type    | Description                                        |
+| ------------ | ------- | -------------------------------------------------- |
+| \_experience | uint256 | Total experience required to reach the next level. |

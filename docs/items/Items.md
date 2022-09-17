@@ -34,17 +34,17 @@ Constructor.
 ### mint
 
 ```solidity
-function mint(address _to, uint256 _id) public
+function mint(address _to, uint256 _item_id) public
 ```
 
 Creates tokens to the address provided.
 
 Requirements:
 
-| Name | Type    | Description                       |
-| ---- | ------- | --------------------------------- |
-| \_to | address | Address that receives the tokens. |
-| \_id | uint256 | ID of the item to be created.     |
+| Name      | Type    | Description                       |
+| --------- | ------- | --------------------------------- |
+| \_to      | address | Address that receives the tokens. |
+| \_item_id | uint256 | ID of the item to be created.     |
 
 ### addItem
 
@@ -66,44 +66,44 @@ Requirements:
 ### disableItem
 
 ```solidity
-function disableItem(uint256 _id) public
+function disableItem(uint256 _item_id) public
 ```
 
 Disables an item from beign equiped.
 
 Requirements:
 
-| Name | Type    | Description     |
-| ---- | ------- | --------------- |
-| \_id | uint256 | ID of the item. |
+| Name      | Type    | Description     |
+| --------- | ------- | --------------- |
+| \_item_id | uint256 | ID of the item. |
 
 ### enableItem
 
 ```solidity
-function enableItem(uint256 _id) public
+function enableItem(uint256 _item_id) public
 ```
 
 Enables an item to be equiped.
 
 Requirements:
 
-| Name | Type    | Description     |
-| ---- | ------- | --------------- |
-| \_id | uint256 | ID of the item. |
+| Name      | Type    | Description     |
+| --------- | ------- | --------------- |
+| \_item_id | uint256 | ID of the item. |
 
 ### getItem
 
 ```solidity
-function getItem(uint256 _id) public view returns (struct IItems.Item _item)
+function getItem(uint256 _item_id) public view returns (struct IItems.Item _item)
 ```
 
 Returns the full information of an item.
 
 Requirements:
 
-| Name | Type    | Description     |
-| ---- | ------- | --------------- |
-| \_id | uint256 | ID of the item. |
+| Name      | Type    | Description     |
+| --------- | ------- | --------------- |
+| \_item_id | uint256 | ID of the item. |
 
 | Name   | Type               | Description            |
 | ------ | ------------------ | ---------------------- |

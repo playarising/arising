@@ -16,23 +16,21 @@ import "../interfaces/ICivilizations.sol";
 contract Experience is IExperience, Ownable {
     // =============================================== Storage ========================================================
 
-    /** @dev Map to store the experience from composed ID. **/
-    mapping(bytes => uint256) experience;
-
-    /** @dev Address of the `Levels` implementation. **/
-    address public levels;
-
-    /** @dev Address of the [Civilizations](/docs/core/Civilizations.md) implementation. **/
+    /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
     address public civilizations;
 
-    /** @dev Map to store the list of authorized addresses to assign experience. **/
+    /** @notice Address of the [Levels](/docs/codex/Levels.md) instance. */
+    address public levels;
+
+    /** @dev Map to store the list of authorized addresses to assign experience. */
     mapping(address => bool) authorized;
+
+    /** @notice Map to track the experience of composed IDs. */
+    mapping(bytes => uint256) public experience;
 
     // ============================================== Modifiers =======================================================
 
-    /**
-     * @dev Checks if `msg.sender` is authorized to assign experience.
-     */
+    /** @notice Checks against if the `msg.sender` is authorized to assign experience. */
     modifier onlyAuthorized() {
         require(
             authorized[msg.sender],
@@ -56,58 +54,101 @@ contract Experience is IExperience, Ownable {
         authorized[msg.sender] = true;
     }
 
-    /** @dev Adds experience to the character from a composed ID.
-     *  @param id   Composed ID of the token.
+    /**
+     * @notice Replaces the address of the [Levels](/docs/codex/Levels.md) instance to determine character levels.
+     *
+     * Requirements:
+     * @param _levels    Address of the [Levels](/docs/codex/Levels.md) instance.
      */
-    function assignExperience(bytes memory id, uint256 amount)
+    function setLevel(address _levels) public onlyOwner {
+        levels = _levels;
+    }
+
+    /**
+     * @notice Assigns new experience to the composed ID provided.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _amount   The amount of experience to add.
+     */
+    function assignExperience(bytes memory _id, uint256 _amount)
         public
         onlyAuthorized
     {
         require(
-            ICivilizations(civilizations).exists(id),
+            ICivilizations(civilizations).exists(_id),
             "Experience: assignExperience() token not minted."
         );
-        experience[id] += amount;
+        experience[_id] += _amount;
     }
 
-    /** @dev Adds an authority to assign experience.
-     *  @param authority   Address of the authority to assign.
+    /**
+     * @notice Assigns a new address as an authority to assign experience.
+     *
+     * Requirements:
+     * @param _authority    Address to give authority.
      */
-    function addAuthority(address authority) public onlyOwner {
-        authorized[authority] = true;
+    function addAuthority(address _authority) public onlyOwner {
+        authorized[_authority] = true;
     }
 
-    /** @dev Removes an authority to assign experience.
-     *  @param authority   Address of the authority to remove.
+    /**
+     * @notice Removes an authority to assign experience.
+     *
+     * Requirements:
+     * @param _authority    Address to give authority.
      */
-    function removeAuthority(address authority) public onlyOwner {
-        authorized[authority] = false;
+    function removeAuthority(address _authority) public onlyOwner {
+        require(
+            authorized[_authority],
+            "Experience: removeAuthority() address is not authorized."
+        );
+        authorized[_authority] = false;
     }
 
     // =============================================== Getters ========================================================
 
-    /** @dev Returns the experience points of the token from a composed ID.
-     *  @param id   Composed ID of the token.
+    /**
+     * @notice External function to return the total experience of a composed ID.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _experience  Total experience of the character.
      */
-    function getExperience(bytes memory id) public view returns (uint256) {
-        return experience[id];
-    }
-
-    /** @dev Returns the level of a token from a composed ID.
-     *  @param id   Composed ID of the token.
-     */
-    function getLevel(bytes memory id) public view returns (uint256) {
-        return ILevels(levels).getLevel(experience[id]);
-    }
-
-    /** @dev Returns the amount of experience required to reach the next level.
-     *  @param id   Composed ID of the token.
-     */
-    function getExperienceForNextLevel(bytes memory id)
+    function getExperience(bytes memory _id)
         public
         view
-        returns (uint256)
+        returns (uint256 _experience)
     {
-        return ILevels(levels).getExperience(getLevel(id)) - experience[id];
+        return experience[_id];
+    }
+
+    /**
+     * @notice External function to return the level of a composed ID.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     *
+     * @return _level   Level number of the character.
+     */
+    function getLevel(bytes memory _id) public view returns (uint256 _level) {
+        return ILevels(levels).getLevel(experience[_id]);
+    }
+
+    /**
+     * @notice External function to return the total experience required to reach the next level a composed ID.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     *
+     * @return _experience  Total experience required to reach the next level.
+     */
+    function getExperienceForNextLevel(bytes memory _id)
+        public
+        view
+        returns (uint256 _experience)
+    {
+        return ILevels(levels).getExperience(getLevel(_id)) - experience[_id];
     }
 }

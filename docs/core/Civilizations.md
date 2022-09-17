@@ -7,21 +7,21 @@ is in charge of token ownership verifications and generating/storing composable 
 
 Implementation of the [ICivilizations](/docs/interfaces/ICivilizations.md) interface.
 
-### \_civilizations
-
-```solidity
-mapping(address => uint256) _civilizations
-```
-
-_Map to store the civilizations implemented. \*_
-
 ### civilizations
 
 ```solidity
-address[] civilizations
+mapping(address => uint256) civilizations
 ```
 
-_Array to store the civilizations implemented. \*_
+Map to track the supported [BaseERC721](/docs/base/BaseERC721.md) instances.
+
+### \_civilizations
+
+```solidity
+address[] _civilizations
+```
+
+Array to track the [BaseERC721](/docs/base/BaseERC721.md) IDs.
 
 ### \_minters
 
@@ -29,7 +29,7 @@ _Array to store the civilizations implemented. \*_
 mapping(address => uint256) _minters
 ```
 
-_Map to track the amount of tokens minted by address. \*_
+Map to track the count of address mints.
 
 ### token
 
@@ -37,15 +37,15 @@ _Map to track the amount of tokens minted by address. \*_
 address token
 ```
 
-_Address of the token used to charge the mint. \*_
+Constant for address of the `ERC20` token used to purchase.
 
-### \_upgrades
+### character_upgrades
 
 ```solidity
-struct ICivilizations.UpgradedCharacters _upgrades
+struct ICivilizations.UpgradedCharacters character_upgrades
 ```
 
-_Map to track the character upgrades. \*_
+Map to track the character upgrades.
 
 ### upgrades
 
@@ -53,7 +53,7 @@ _Map to track the character upgrades. \*_
 mapping(uint256 => struct ICivilizations.Upgrade) upgrades
 ```
 
-_Map to track upgrades information. \*_
+Map to track the upgrades information.
 
 ### constructor
 
@@ -88,22 +88,32 @@ Resumes the contract
 ### setInitializeUpgrade
 
 ```solidity
-function setInitializeUpgrade(uint256 upgrade, bool available) public
+function setInitializeUpgrade(uint256 _upgrade_id, bool _available) public
 ```
 
-_Marks an upgrade to available.
-@param upgrade The ID of the upgrade.
-@param available The availability of the upgrade._
+Activates or deactivates an upgrade purchase.
+
+Requirements:
+
+| Name         | Type    | Description                     |
+| ------------ | ------- | ------------------------------- |
+| \_upgrade_id | uint256 | ID of the upgrade to change.    |
+| \_available  | bool    | Boolean to activate/deactivate. |
 
 ### setUpgradePrice
 
 ```solidity
-function setUpgradePrice(uint256 upgrade, uint256 price) public
+function setUpgradePrice(uint256 _upgrade_id, uint256 _price) public
 ```
 
-_Adds a civilization to the contract.
-@param upgrade The ID of the upgrade.
-@param price The amount of tokens to charge for the upgrade._
+Sets the price to purchase an upgrade.
+
+Requirements:
+
+| Name         | Type    | Description                              |
+| ------------ | ------- | ---------------------------------------- |
+| \_upgrade_id | uint256 | ID of the upgrade to change.             |
+| \_price      | uint256 | Amount of tokens to pay for the upgrade. |
 
 ### setToken
 
@@ -111,39 +121,56 @@ _Adds a civilization to the contract.
 function setToken(address _token) public
 ```
 
-_Sets the `token` address.
-@param \_token address of the token to use for charge._
+Changes the token address to charge.
+
+Requirements:
+
+| Name    | Type    | Description                         |
+| ------- | ------- | ----------------------------------- |
+| \_token | address | Address of the new token to charge. |
 
 ### addCivilization
 
 ```solidity
-function addCivilization(address _instance) public
+function addCivilization(address _civilization) public
 ```
 
-_Adds a civilization to the contract.
-@param \_instance Address of the `BaseERC721` instance._
+Adds a new [BaseERC721](/docs/base/BaseERC721.md) instance to the valid civilizations.
+
+Requirements:
+
+| Name           | Type    | Description                                                            |
+| -------------- | ------- | ---------------------------------------------------------------------- |
+| \_civilization | address | Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add. |
 
 ### mint
 
 ```solidity
-function mint(address _instance) public
+function mint(address _civilization) public
 ```
 
-_Mints a token.
-@param \_instance Address of the `BaseERC721` instance to mint._
+Creates a new token of the valid civilizations list to the `msg.sender`.
+
+Requirements:
+
+| Name           | Type    | Description                                                            |
+| -------------- | ------- | ---------------------------------------------------------------------- |
+| \_civilization | address | Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add. |
 
 ### buyUpgrade
 
 ```solidity
-function buyUpgrade(bytes id, uint256 upgrade) public
+function buyUpgrade(bytes _id, uint256 _upgrade_id) public
 ```
 
-_Marks a character upgrade as purchased._
+Purchase an upgrade and marks it as available for the provided composed ID.
 
-| Name    | Type    | Description               |
-| ------- | ------- | ------------------------- |
-| id      | bytes   | Composed ID of the token. |
-| upgrade | uint256 | Upgrade id.               |
+Requirements:
+
+| Name         | Type    | Description                    |
+| ------------ | ------- | ------------------------------ |
+| \_id         | bytes   | Composed ID of the character.  |
+| \_upgrade_id | uint256 | ID of the upgrade to purchase. |
 
 ### withdraw
 
@@ -151,92 +178,162 @@ _Marks a character upgrade as purchased._
 function withdraw() public
 ```
 
-_Transfers the total amount of `token` stored in the contract to `owner`._
+Transfers the total amount of tokens stored in the contract to the owner .
 
 ### getID
 
 ```solidity
-function getID(address _instance) public view returns (uint256)
+function getID(address _civilization) public view returns (uint256 _civilization_id)
 ```
 
-_Returns the internal ID for a civilization.
-@param \_instance Address of the `BaseERC721` instance._
+External function to return the internal ID of a valid civilization.
+
+Requirements:
+
+| Name           | Type    | Description                                                            |
+| -------------- | ------- | ---------------------------------------------------------------------- |
+| \_civilization | address | Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add. |
+
+| Name              | Type    | Description                        |
+| ----------------- | ------- | ---------------------------------- |
+| \_civilization_id | uint256 | Internal ID of the civilization. ] |
 
 ### getTokenUpgrades
 
 ```solidity
-function getTokenUpgrades(bytes id) public view returns (struct ICivilizations.TokenUpgrades)
+function getTokenUpgrades(bytes _id) public view returns (struct ICivilizations.CharacterUpgrades _upgrades)
 ```
 
-_Returns the upgrades for a composed ID.
-@param id Composed token id._
+External function to return the upgrades for a composed ID.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name       | Type                                    | Description                       |
+| ---------- | --------------------------------------- | --------------------------------- |
+| \_upgrades | struct ICivilizations.CharacterUpgrades | Struct of the character upgrades. |
 
 ### getUpgradeInformation
 
 ```solidity
-function getUpgradeInformation(uint256 upgrade) public view returns (struct ICivilizations.Upgrade)
+function getUpgradeInformation(uint256 _upgrade_id) public view returns (struct ICivilizations.Upgrade _upgrade)
 ```
 
-_Returns the upgrades for a composed ID.
-@param upgrade ID of the upgrade._
+External function to return global status of an upgrade.
+
+Requirements:
+
+| Name         | Type    | Description        |
+| ------------ | ------- | ------------------ |
+| \_upgrade_id | uint256 | ID of the upgrade. |
+
+| Name      | Type                          | Description          |
+| --------- | ----------------------------- | -------------------- |
+| \_upgrade | struct ICivilizations.Upgrade | Upgrade information. |
 
 ### getCivilizations
 
 ```solidity
-function getCivilizations() public view returns (address[])
+function getCivilizations() public view returns (address[] _valid_civilizations)
 ```
 
-_Returns the list of civilizations._
+Returns the list of valid civilizations instances.
+
+| Name                  | Type      | Description                            |
+| --------------------- | --------- | -------------------------------------- |
+| \_valid_civilizations | address[] | Array of valid civilizations intances. |
 
 ### getTokenID
 
 ```solidity
-function getTokenID(address _instance, uint256 _id) public view returns (bytes)
+function getTokenID(address _civilization, uint256 _token_id) public view returns (bytes _id)
 ```
 
-_Returns a composed ID from a collection.
-@param \_instance Address of the `BaseERC721` instance.
-@param \_id The ID of the token inside the collection._
+Returns the composed ID of a token from a valid civilization.
+
+Requirements:
+
+| Name           | Type    | Description                                                            |
+| -------------- | ------- | ---------------------------------------------------------------------- |
+| \_civilization | address | Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add. |
+| \_token_id     | uint256 | ID of the token to get the composed ID.                                |
+
+| Name | Type  | Description               |
+| ---- | ----- | ------------------------- |
+| \_id | bytes | Composed ID of the token. |
 
 ### isAllowed
 
 ```solidity
-function isAllowed(address spender, bytes _id) public view returns (bool)
+function isAllowed(address _spender, bytes _id) public view returns (bool _allowed)
 ```
 
-_Function to check if an address has allowance to a composed ID.
-@param spender Address to check ownership or allowance.
-@param \_id Composed token id._
+External function to check if the `msg.sender` can access a token.
+
+Requirements:
+@param \_spender Address to check ownership or allowance.
+
+| Name      | Type    | Description                   |
+| --------- | ------- | ----------------------------- |
+| \_spender | address |                               |
+| \_id      | bytes   | Composed ID of the character. |
+
+| Name      | Type | Description                          |
+| --------- | ---- | ------------------------------------ |
+| \_allowed | bool | Boolean to check if access is valid. |
 
 ### exists
 
 ```solidity
-function exists(bytes _id) public view returns (bool)
+function exists(bytes _id) public view returns (bool _exist)
 ```
 
-_Function to check if a composed ID is already minted.
-@param \_id Composed token id._
+External function to check a composed ID is already minted.
+
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name    | Type | Description                              |
+| ------- | ---- | ---------------------------------------- |
+| \_exist | bool | Boolean to check if the token is minted. |
 
 ### ownerOf
 
 ```solidity
-function ownerOf(bytes _id) public view returns (address)
+function ownerOf(bytes _id) public view returns (address _owner)
 ```
 
-_Function to returns the actual owner of a composed ID.
-@param \_id Composed token id._
+External function to return the owner a composed ID.
 
-### \_addMinted
+Requirements:
+
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
+
+| Name    | Type    | Description                        |
+| ------- | ------- | ---------------------------------- |
+| \_owner | address | Address of the owner of the token. |
+
+### \_addMint
 
 ```solidity
-function _addMinted(address _minter) internal
+function _addMint(address _minter) internal
 ```
 
-_Adds a mint to the mint counter for the address._
+Internal function to add a mint count for the `msg.sender`.
 
-| Name     | Type    | Description         |
-| -------- | ------- | ------------------- |
-| \_minter | address | The minter address. |
+Requirements:
+
+| Name     | Type    | Description            |
+| -------- | ------- | ---------------------- |
+| \_minter | address | Address of the minter. |
 
 ### \_canMint
 
@@ -244,20 +341,29 @@ _Adds a mint to the mint counter for the address._
 function _canMint(address _minter) internal view returns (bool)
 ```
 
-_Checks if an address is able to mint more tokens._
+Internal function check if the `msg.sender` can mint a token.
 
-| Name     | Type    | Description         |
-| -------- | ------- | ------------------- |
-| \_minter | address | The minter address. |
+Requirements:
 
-### \_decomposeTokenID
+| Name     | Type    | Description            |
+| -------- | ------- | ---------------------- |
+| \_minter | address | Address of the minter. |
+
+### \_decodeID
 
 ```solidity
-function _decomposeTokenID(bytes id) internal pure returns (uint256, uint256)
+function _decodeID(bytes _id) internal pure returns (uint256 _civilization, uint256 _token_id)
 ```
 
-_Decompose a byte encoded token ID._
+Internal function to decode a composed ID to a civilization instance and token ID.
 
-| Name | Type  | Description            |
-| ---- | ----- | ---------------------- |
-| id   | bytes | The composed token id. |
+Requirements:
+
+| Name | Type  | Description  |
+| ---- | ----- | ------------ |
+| \_id | bytes | Composed ID. |
+
+| Name           | Type    | Description                          |
+| -------------- | ------- | ------------------------------------ |
+| \_civilization | uint256 | The internal ID of the civilization. |
+| \_token_id     | uint256 | The token id of the composed ID.     |

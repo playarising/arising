@@ -4,38 +4,58 @@
 
 Interface for the [Experience](/docs/core/Experience.md) contract.
 
+### setLevel
+
+```solidity
+function setLevel(address _levels) external
+```
+
+See [Experience#setLevel](/docs/core/Experience.md#setLevel)
+
 ### assignExperience
 
 ```solidity
-function assignExperience(bytes id, uint256 amount) external
+function assignExperience(bytes _id, uint256 _amount) external
 ```
+
+See [Experience#assignExperience](/docs/core/Experience.md#assignExperience)
 
 ### addAuthority
 
 ```solidity
-function addAuthority(address authority) external
+function addAuthority(address _authority) external
 ```
+
+See [Experience#addAuthority](/docs/core/Experience.md#addAuthority)
 
 ### removeAuthority
 
 ```solidity
-function removeAuthority(address authority) external
+function removeAuthority(address _authority) external
 ```
+
+See [Experience#removeAuthority](/docs/core/Experience.md#removeAuthority)
 
 ### getExperience
 
 ```solidity
-function getExperience(bytes id) external view returns (uint256)
+function getExperience(bytes _id) external view returns (uint256 _experience)
 ```
+
+See [Experience#getExperience](/docs/core/Experience.md#getExperience)
 
 ### getLevel
 
 ```solidity
-function getLevel(bytes id) external view returns (uint256)
+function getLevel(bytes _id) external view returns (uint256 _level)
 ```
+
+See [Experience#getLevel](/docs/core/Experience.md#getLevel)
 
 ### getExperienceForNextLevel
 
 ```solidity
-function getExperienceForNextLevel(bytes id) external view returns (uint256)
+function getExperienceForNextLevel(bytes _id) external view returns (uint256 _experience)
 ```
+
+See [Experience#getExperienceForNextLevel](/docs/core/Experience.md#getExperienceForNextLevel)

@@ -34,7 +34,7 @@ Requirements:
 ### mint
 
 ```solidity
-function mint(address to) public
+function mint(address _to) public
 ```
 
 Creates tokens to the address provided.
@@ -43,22 +43,22 @@ Requirements:
 
 | Name | Type    | Description                       |
 | ---- | ------- | --------------------------------- |
-| to   | address | Address that receives the tokens. |
+| \_to | address | Address that receives the tokens. |
 
 ### isApprovedOrOwner
 
 ```solidity
-function isApprovedOrOwner(address spender, uint256 id) public view virtual returns (bool _approved)
+function isApprovedOrOwner(address _spender, uint256 _token_id) public view virtual returns (bool _approved)
 ```
 
 External function to check if an address is allowed to access a token.
 
 Requirements:
 
-| Name    | Type    | Description                         |
-| ------- | ------- | ----------------------------------- |
-| spender | address | Address that will access the token. |
-| id      | uint256 | ID of the token to be accessed.     |
+| Name       | Type    | Description                         |
+| ---------- | ------- | ----------------------------------- |
+| \_spender  | address | Address that will access the token. |
+| \_token_id | uint256 | ID of the token to be accessed.     |
 
 | Name       | Type | Description                                                      |
 | ---------- | ---- | ---------------------------------------------------------------- |
@@ -67,16 +67,16 @@ Requirements:
 ### exists
 
 ```solidity
-function exists(uint256 id) public view returns (bool _exist)
+function exists(uint256 _token_id) public view returns (bool _exist)
 ```
 
 External function to check if a token id is minted.
 
 Requirements:
 
-| Name | Type    | Description                    |
-| ---- | ------- | ------------------------------ |
-| id   | uint256 | ID of the token to be checked. |
+| Name       | Type    | Description                    |
+| ---------- | ------- | ------------------------------ |
+| \_token_id | uint256 | ID of the token to be checked. |
 
 | Name    | Type | Description                                      |
 | ------- | ---- | ------------------------------------------------ |
