@@ -13,7 +13,7 @@ Implementation of the [IForge](/docs/interfaces/IForge.md) interface.
 address civilizations
 ```
 
-_Address of the [Civilizations](/docs/core/Civilizations.md) instance. \*_
+Address of the [Civilizations](/docs/core/Civilizations.md) instance.
 
 ### experience
 
@@ -21,7 +21,7 @@ _Address of the [Civilizations](/docs/core/Civilizations.md) instance. \*_
 address experience
 ```
 
-_Address of the [Experience](/docs/core/Experience.md) instance. \*_
+Address of the [Experience](/docs/core/Experience.md) instance.
 
 ### stats
 
@@ -29,7 +29,7 @@ _Address of the [Experience](/docs/core/Experience.md) instance. \*_
 address stats
 ```
 
-_Address of the [Stats](/docs/core/Stats.md) instance. \*_
+Address of the [Stats](/docs/core/Stats.md) instance.
 
 ### recipes
 
@@ -37,7 +37,7 @@ _Address of the [Stats](/docs/core/Stats.md) instance. \*_
 mapping(uint256 => struct IForge.Recipe) recipes
 ```
 
-_Map to track available recipes on the forge. \*_
+Map to track available recipes on the forge.
 
 ### \_recipes
 
@@ -45,15 +45,15 @@ _Map to track available recipes on the forge. \*_
 uint256[] _recipes
 ```
 
-_Array to track all the recipes ids. \*_
+Array to track all the forge recipes ids.
 
 ### forges
 
 ```solidity
-mapping(bytes => struct IForge.Forges) forges
+mapping(bytes => mapping(uint256 => struct IForge.Forge)) forges
 ```
 
-_Map to track forges and cooldowns for each character. \*_
+Map to track forges and cooldowns for characters.
 
 ### token
 
@@ -61,7 +61,7 @@ _Map to track forges and cooldowns for each character. \*_
 address token
 ```
 
-_Address of the token used to charge the mint. \*_
+Constant for address of the `ERC20` token used to purchase forge upgrades.
 
 ### price
 
@@ -69,7 +69,7 @@ _Address of the token used to charge the mint. \*_
 uint256 price
 ```
 
-_Price of forge upgrades. \*_
+Constant for the price of each forge upgrade (in wei).
 
 ### gold
 
@@ -77,7 +77,7 @@ _Price of forge upgrades. \*_
 address gold
 ```
 
-_The address of the [Gold](/docs/gadgets/Gold.md) instance. \*_
+Address of the [Gold](/docs/gadgets/Gold.md) instance.
 
 ### onlyAllowed
 
@@ -90,9 +90,9 @@ has allowance to access a composed ID.
 
 Requirements:
 
-| Name | Type  | Description               |
-| ---- | ----- | ------------------------- |
-| \_id | bytes | Composed ID of the token. |
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
 
 ### constructor
 
@@ -132,84 +132,96 @@ Resumes the contract
 ### disableRecipe
 
 ```solidity
-function disableRecipe(uint256 id) public
+function disableRecipe(uint256 _recipe_id) public
 ```
 
-_Disables a forge recipe._
+Disables a recipe from beign forged.
 
-| Name | Type    | Description       |
-| ---- | ------- | ----------------- |
-| id   | uint256 | ID of the recipe. |
+Requirements:
+
+| Name        | Type    | Description       |
+| ----------- | ------- | ----------------- |
+| \_recipe_id | uint256 | ID of the recipe. |
 
 ### enableRecipe
 
 ```solidity
-function enableRecipe(uint256 id) public
+function enableRecipe(uint256 _recipe_id) public
 ```
 
-_Enables a forge recipe._
+Enables a recipe to be forged.
 
-| Name | Type    | Description       |
-| ---- | ------- | ----------------- |
-| id   | uint256 | ID of the recipe. |
+Requirements:
+
+| Name        | Type    | Description       |
+| ----------- | ------- | ----------------- |
+| \_recipe_id | uint256 | ID of the recipe. |
 
 ### addRecipe
 
 ```solidity
-function addRecipe(address[] materials, uint256[] amounts, struct IStats.BasicStats stats, uint256 cooldown, uint256 level_required, uint256 cost, uint256 experience_reward, address reward) public
+function addRecipe(address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, uint256 _gold_cost, address _reward, uint256 _experience_reward) public
 ```
 
-_Adds a new recipe to the forge._
+Adds a new recipe to the forge.
 
-| Name              | Type                     | Description                                      |
-| ----------------- | ------------------------ | ------------------------------------------------ |
-| materials         | address[]                | Addresses of the raw resources for the creation. |
-| amounts           | uint256[]                | Amounts for each raw resource.                   |
-| stats             | struct IStats.BasicStats | Stat cost for the recipe.                        |
-| cooldown          | uint256                  | Cooldown in seconds for the recipe.              |
-| level_required    | uint256                  | Minimum level required.                          |
-| cost              | uint256                  | Gold cost of the recipe.                         |
-| experience_reward | uint256                  | Amount of experience rewarded.                   |
-| reward            | address                  | Address of the reward contract.                  |
+Requirements:
+
+| Name                | Type                     | Description                                                                                                |
+| ------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| \_materials         | address[]                | Array of material [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances address.                    |
+| \_amounts           | uint256[]                | Array of amounts for each material.                                                                        |
+| \_stats             | struct IStats.BasicStats | Stats to consume from the pool for craft.                                                                  |
+| \_cooldown          | uint256                  | Number of seconds for the recipe cooldown.                                                                 |
+| \_level_required    | uint256                  | Minimum level required to craft the recipe.                                                                |
+| \_gold_cost         | uint256                  | Cost of [Gold](/docs/gadgets/Gold.md) required to craft the recipe.                                        |
+| \_reward            | address                  | Address of the [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to be rewarded for the recipe. |
+| \_experience_reward | uint256                  | Amount of experience rewarded for the recipe.                                                              |
 
 ### buyUpgrade
 
 ```solidity
-function buyUpgrade(bytes id) public
+function buyUpgrade(bytes _id) public
 ```
 
-_Upgrades character to use another forge slot._
+Purchases a forge upgrade for the character provided.
 
-| Name | Type  | Description               |
-| ---- | ----- | ------------------------- |
-| id   | bytes | Composed ID of the token. |
+Requirements:
+
+| Name | Type  | Description                    |
+| ---- | ----- | ------------------------------ |
+| \_id | bytes | Composed ID of the characrter. |
 
 ### forge
 
 ```solidity
-function forge(bytes id, uint256 recipe, uint256 _forge) public
+function forge(bytes _id, uint256 _recipe_id, uint256 _forge_id) public
 ```
 
-_Forges a recipe._
+Forges a recipe and assigns it to the forge provided.
 
-| Name    | Type    | Description                   |
-| ------- | ------- | ----------------------------- |
-| id      | bytes   | Composed ID of the character. |
-| recipe  | uint256 | ID of the recipe to forge.    |
-| \_forge | uint256 | Number of the forge to use.   |
+Requirements:
+
+| Name        | Type    | Description                           |
+| ----------- | ------- | ------------------------------------- |
+| \_id        | bytes   | Composed ID of the characrter.        |
+| \_recipe_id | uint256 | ID of the recipe to forge.            |
+| \_forge_id  | uint256 | ID of the forge to assign the recipe. |
 
 ### claim
 
 ```solidity
-function claim(bytes id, uint256 _forge) public
+function claim(bytes _id, uint256 _forge_id) public
 ```
 
-_Claims a recipe already forged._
+Claims a recipe already forged.
 
-| Name    | Type    | Description                   |
-| ------- | ------- | ----------------------------- |
-| id      | bytes   | Composed ID of the character. |
-| \_forge | uint256 | Number of the forge to use.   |
+Requirements:
+
+| Name       | Type    | Description                           |
+| ---------- | ------- | ------------------------------------- |
+| \_id       | bytes   | Composed ID of the character.         |
+| \_forge_id | uint256 | ID of the forge to assign the recipe. |
 
 ### withdraw
 
@@ -217,120 +229,134 @@ _Claims a recipe already forged._
 function withdraw() public
 ```
 
-_Transfers the total amount of `token` stored in the contract to `owner`._
+Transfers the total amount of tokens stored in the contract to the owner .
 
 ### getRecipe
 
 ```solidity
-function getRecipe(uint256 id) public view returns (struct IForge.Recipe)
+function getRecipe(uint256 _recipe_id) public view returns (struct IForge.Recipe _recipe)
 ```
 
-_Reurns the recipe information of a recipe id._
+External function to return the recipe information.
 
-| Name | Type    | Description       |
-| ---- | ------- | ----------------- |
-| id   | uint256 | ID of the recipe. |
+Requirements:
+
+| Name        | Type    | Description             |
+| ----------- | ------- | ----------------------- |
+| \_recipe_id | uint256 | ID of the forge recipe. |
+
+| Name     | Type                 | Description                     |
+| -------- | -------------------- | ------------------------------- |
+| \_recipe | struct IForge.Recipe | Full information of the recipe. |
 
 ### getCharacterForge
 
 ```solidity
-function getCharacterForge(bytes id, uint256 _forge) public view returns (struct IForge.Forge)
+function getCharacterForge(bytes _id, uint256 _forge_id) public view returns (struct IForge.Forge _forge)
 ```
 
-_Reurns the forge information of a composed ID._
+External function to return the information of a character forge.
 
-| Name    | Type    | Description                   |
-| ------- | ------- | ----------------------------- |
-| id      | bytes   | Composed ID of the character. |
-| \_forge | uint256 | ID of the forge.              |
+Requirements:
+
+| Name       | Type    | Description                   |
+| ---------- | ------- | ----------------------------- |
+| \_id       | bytes   | Composed ID of the character. |
+| \_forge_id | uint256 | ID of the forge.              |
+
+| Name    | Type                | Description                    |
+| ------- | ------------------- | ------------------------------ |
+| \_forge | struct IForge.Forge | Full information of the forge. |
 
 ### getCharacterForgesUpgrades
 
 ```solidity
-function getCharacterForgesUpgrades(bytes id) public view returns (bool[3])
+function getCharacterForgesUpgrades(bytes _id) public view returns (bool[3] _upgrades)
 ```
 
-_Reurns an array of booleans for the character forges upgraded._
+External function to return an array of booleans with the purchased forge upgrades for a character.
+
+Requirements:
 
 | Name | Type  | Description                   |
 | ---- | ----- | ----------------------------- |
-| id   | bytes | Composed ID of the character. |
+| \_id | bytes | Composed ID of the character. |
+
+| Name       | Type    | Description                              |
+| ---------- | ------- | ---------------------------------------- |
+| \_upgrades | bool[3] | Array of booleans of upgrades purchases. |
 
 ### getCharacterForgesAvailability
 
 ```solidity
-function getCharacterForgesAvailability(bytes id) public view returns (bool[3])
+function getCharacterForgesAvailability(bytes _id) public view returns (bool[3] _availability)
 ```
 
-_Reurns an array of booleans for the character forges available to use._
+External function to return an array of booleans with the availability of the character forges.
+
+Requirements:
 
 | Name | Type  | Description                   |
 | ---- | ----- | ----------------------------- |
-| id   | bytes | Composed ID of the character. |
+| \_id | bytes | Composed ID of the character. |
+
+| Name           | Type    | Description                              |
+| -------------- | ------- | ---------------------------------------- |
+| \_availability | bool[3] | Array of booleans of forge availability. |
 
 ### \_isForgeAvailable
 
 ```solidity
-function _isForgeAvailable(bytes id, uint256 _forge) internal view returns (bool)
+function _isForgeAvailable(bytes _id, uint256 _forge_id) internal view returns (bool _available)
 ```
 
-_Internal function to check if a forge id is available to use._
+Internal function to check if a character forge is available.
 
-| Name    | Type    | Description                   |
-| ------- | ------- | ----------------------------- |
-| id      | bytes   | Composed ID of the character. |
-| \_forge | uint256 | Number of the forge to use.   |
+Requirements:
+
+| Name       | Type    | Description                   |
+| ---------- | ------- | ----------------------------- |
+| \_id       | bytes   | Composed ID of the character. |
+| \_forge_id | uint256 | ID of the forge.              |
+
+| Name        | Type | Description                                |
+| ----------- | ---- | ------------------------------------------ |
+| \_available | bool | Boolean to know if the forge is available. |
 
 ### \_isForgeClaimable
 
 ```solidity
-function _isForgeClaimable(bytes id, uint256 _forge) internal view returns (bool)
+function _isForgeClaimable(bytes _id, uint256 _forge_id) internal view returns (bool _claimable)
 ```
 
-_Internal function to check if a forge id is ready to claim._
+Internal function to check if a character forge is claimable.
 
-| Name    | Type    | Description                   |
-| ------- | ------- | ----------------------------- |
-| id      | bytes   | Composed ID of the character. |
-| \_forge | uint256 | Number of the forge to use.   |
+Requirements:
 
-### \_assignRecipeToForge
+| Name       | Type    | Description                   |
+| ---------- | ------- | ----------------------------- |
+| \_id       | bytes   | Composed ID of the character. |
+| \_forge_id | uint256 | ID of the forge.              |
+
+| Name        | Type | Description                                |
+| ----------- | ---- | ------------------------------------------ |
+| \_claimable | bool | Boolean to know if the forge is claimable. |
+
+### \_claim
 
 ```solidity
-function _assignRecipeToForge(bytes id, uint256 _forge, struct IForge.Recipe r) internal
+function _claim(bytes _id, uint256 _forge_id) internal returns (uint256 _experience)
 ```
 
-_Internal function to assign a recipe to a forge to create. This function assumes the forge trying to accessing
-is available (upgraded) and usable._
+Internal function to claim a finished recipe on a character forge.
 
-| Name    | Type                 | Description                   |
-| ------- | -------------------- | ----------------------------- |
-| id      | bytes                | Composed ID of the character. |
-| \_forge | uint256              | Number of the forge to use.   |
-| r       | struct IForge.Recipe | Recipe to be assigned.        |
+Requirements:
 
-### \_claimForge
+| Name       | Type    | Description                   |
+| ---------- | ------- | ----------------------------- |
+| \_id       | bytes   | Composed ID of the character. |
+| \_forge_id | uint256 | ID of the forge.              |
 
-```solidity
-function _claimForge(bytes id, uint256 _forge) internal returns (uint256)
-```
-
-_Internal function claim a reward from a forge._
-
-| Name    | Type    | Description                   |
-| ------- | ------- | ----------------------------- |
-| id      | bytes   | Composed ID of the character. |
-| \_forge | uint256 | Number of the forge to use.   |
-
-### \_getForgeFromID
-
-```solidity
-function _getForgeFromID(bytes id, uint256 _forge) internal view returns (bool, struct IForge.Forge)
-```
-
-_Internal function to return a forge instance from a number._
-
-| Name    | Type    | Description                   |
-| ------- | ------- | ----------------------------- |
-| id      | bytes   | Composed ID of the character. |
-| \_forge | uint256 | Number of the forge to use.   |
+| Name         | Type    | Description                                    |
+| ------------ | ------- | ---------------------------------------------- |
+| \_experience | uint256 | Amount of experience rewarded from the recipe. |

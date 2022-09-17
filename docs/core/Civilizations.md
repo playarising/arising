@@ -261,9 +261,9 @@ Requirements:
 | \_civilization | address | Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add. |
 | \_token_id     | uint256 | ID of the token to get the composed ID.                                |
 
-| Name | Type  | Description               |
-| ---- | ----- | ------------------------- |
-| \_id | bytes | Composed ID of the token. |
+| Name | Type  | Description                   |
+| ---- | ----- | ----------------------------- |
+| \_id | bytes | Composed ID of the character. |
 
 ### isAllowed
 

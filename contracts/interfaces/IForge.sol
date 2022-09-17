@@ -8,16 +8,31 @@ import "../interfaces/IStats.sol";
  * @notice Interface for the [Forge](/docs/core/Forge.md) contract.
  */
 interface IForge {
+    /**
+     * @notice Internal struct to containt all the information of a recipe.
+     *
+     * Requirements:
+     * @param id                    ID of the recipe.
+     * @param materials             Array of addresses of the require material instances.
+     * @param amounts               Array of amounts for each required material.
+     * @param stats_required        Amount of stats required to consume to create the recipe.
+     * @param cooldown              Cooldown in seconds of the recipe.
+     * @param level_required        Minimum level required to forge the recipe.
+     * @param gold_cost             Cost of the recipe in gold.
+     * @param reward                Address of the resulting item of the recipe.
+     * @param experience_reward     Amount of experience rewarded from the recipe.
+     * @param available             Boolean to check if the recipe is available.
+     */
     struct Recipe {
         uint256 id;
         address[] materials;
-        uint256[] material_amounts;
+        uint256[] amounts;
         IStats.BasicStats stats_required;
         uint256 cooldown;
         uint256 level_required;
+        uint256 gold_cost;
         address reward;
         uint256 experience_reward;
-        uint256 cost;
         bool available;
     }
 
@@ -28,53 +43,67 @@ interface IForge {
         bool last_recipe_claimed;
     }
 
-    struct Forges {
-        Forge forge_1;
-        Forge forge_2;
-        Forge forge_3;
-    }
+    /** @notice See [Forge#pause](/docs/core/Forge.md#pause) */
+    function pause() external;
 
-    function disableRecipe(uint256 id) external;
+    /** @notice See [Forge#unpause](/docs/core/Forge.md#unpause) */
+    function unpause() external;
 
-    function enableRecipe(uint256 id) external;
+    /** @notice See [Forge#disableRecipe](/docs/core/Forge.md#disableRecipe) */
+    function disableRecipe(uint256 _recipe_id) external;
 
+    /** @notice See [Forge#enableRecipe](/docs/core/Forge.md#enableRecipe) */
+    function enableRecipe(uint256 _recipe_id) external;
+
+    /** @notice See [Forge#addRecipe](/docs/core/Forge.md#addRecipe) */
     function addRecipe(
         address[] memory _materials,
         uint256[] memory _amounts,
-        IStats.BasicStats memory stats,
-        uint256 cooldown,
-        uint256 level_required,
-        uint256 cost,
-        uint256 exp_reward,
-        address reward
+        IStats.BasicStats memory _stats,
+        uint256 _cooldown,
+        uint256 _level_required,
+        uint256 _gold_cost,
+        address _reward,
+        uint256 _experience_reward
     ) external;
 
-    function buyUpgrade(bytes memory id) external;
+    /** @notice See [Forge#buyUpgrade](/docs/core/Forge.md#buyUpgrade) */
+    function buyUpgrade(bytes memory _id) external;
 
+    /** @notice See [Forge#forge](/docs/core/Forge.md#forge) */
     function forge(
-        bytes memory id,
-        uint256 recipe,
-        uint256 _forge
+        bytes memory _id,
+        uint256 _recipe_id,
+        uint256 _forge_id
     ) external;
 
-    function claim(bytes memory id, uint256 _forge) external;
+    /** @notice See [Forge#claim](/docs/core/Forge.md#claim) */
+    function claim(bytes memory _id, uint256 _forge_id) external;
 
+    /** @notice See [Forge#withdraw](/docs/core/Forge.md#withdraw) */
     function withdraw() external;
 
-    function getRecipe(uint256 id) external view returns (Recipe memory);
-
-    function getCharacterForge(bytes memory id, uint256 _forge)
+    /** @notice See [Forge#getRecipe](/docs/core/Forge.md#getRecipe) */
+    function getRecipe(uint256 _recipe_id)
         external
         view
-        returns (Forge memory);
+        returns (Recipe memory _recipe);
 
-    function getCharacterForgesUpgrades(bytes memory id)
+    /** @notice See [Forge#getCharacterForge](/docs/core/Forge.md#getCharacterForge) */
+    function getCharacterForge(bytes memory _id, uint256 _forge_id)
         external
         view
-        returns (bool[3] memory);
+        returns (Forge memory _forge);
 
-    function getCharacterForgesAvailability(bytes memory id)
+    /** @notice See [Forge#getCharacterForgesUpgrades](/docs/core/Forge.md#getCharacterForgesUpgrades) */
+    function getCharacterForgesUpgrades(bytes memory _id)
         external
         view
-        returns (bool[3] memory);
+        returns (bool[3] memory _upgrades);
+
+    /** @notice See [Forge#getCharacterForgesAvailability](/docs/core/Forge.md#getCharacterForgesAvailability) */
+    function getCharacterForgesAvailability(bytes memory _id)
+        external
+        view
+        returns (bool[3] memory _availability);
 }

@@ -10,13 +10,13 @@ Interface for the [Forge](/docs/core/Forge.md) contract.
 struct Recipe {
   uint256 id;
   address[] materials;
-  uint256[] material_amounts;
+  uint256[] amounts;
   struct IStats.BasicStats stats_required;
   uint256 cooldown;
   uint256 level_required;
+  uint256 gold_cost;
   address reward;
   uint256 experience_reward;
-  uint256 cost;
   bool available;
 }
 ```
@@ -33,51 +33,69 @@ struct Forge {
 
 ```
 
-### Forges
+### pause
 
 ```solidity
-struct Forges {
-  struct IForge.Forge forge_1;
-  struct IForge.Forge forge_2;
-  struct IForge.Forge forge_3;
-}
+function pause() external
 ```
+
+See [Forge#pause](/docs/core/Forge.md#pause)
+
+### unpause
+
+```solidity
+function unpause() external
+```
+
+See [Forge#unpause](/docs/core/Forge.md#unpause)
 
 ### disableRecipe
 
 ```solidity
-function disableRecipe(uint256 id) external
+function disableRecipe(uint256 _recipe_id) external
 ```
+
+See [Forge#disableRecipe](/docs/core/Forge.md#disableRecipe)
 
 ### enableRecipe
 
 ```solidity
-function enableRecipe(uint256 id) external
+function enableRecipe(uint256 _recipe_id) external
 ```
+
+See [Forge#enableRecipe](/docs/core/Forge.md#enableRecipe)
 
 ### addRecipe
 
 ```solidity
-function addRecipe(address[] _materials, uint256[] _amounts, struct IStats.BasicStats stats, uint256 cooldown, uint256 level_required, uint256 cost, uint256 exp_reward, address reward) external
+function addRecipe(address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, uint256 _gold_cost, address _reward, uint256 _experience_reward) external
 ```
+
+See [Forge#addRecipe](/docs/core/Forge.md#addRecipe)
 
 ### buyUpgrade
 
 ```solidity
-function buyUpgrade(bytes id) external
+function buyUpgrade(bytes _id) external
 ```
+
+See [Forge#buyUpgrade](/docs/core/Forge.md#buyUpgrade)
 
 ### forge
 
 ```solidity
-function forge(bytes id, uint256 recipe, uint256 _forge) external
+function forge(bytes _id, uint256 _recipe_id, uint256 _forge_id) external
 ```
+
+See [Forge#forge](/docs/core/Forge.md#forge)
 
 ### claim
 
 ```solidity
-function claim(bytes id, uint256 _forge) external
+function claim(bytes _id, uint256 _forge_id) external
 ```
+
+See [Forge#claim](/docs/core/Forge.md#claim)
 
 ### withdraw
 
@@ -85,26 +103,36 @@ function claim(bytes id, uint256 _forge) external
 function withdraw() external
 ```
 
+See [Forge#withdraw](/docs/core/Forge.md#withdraw)
+
 ### getRecipe
 
 ```solidity
-function getRecipe(uint256 id) external view returns (struct IForge.Recipe)
+function getRecipe(uint256 _recipe_id) external view returns (struct IForge.Recipe _recipe)
 ```
+
+See [Forge#getRecipe](/docs/core/Forge.md#getRecipe)
 
 ### getCharacterForge
 
 ```solidity
-function getCharacterForge(bytes id, uint256 _forge) external view returns (struct IForge.Forge)
+function getCharacterForge(bytes _id, uint256 _forge_id) external view returns (struct IForge.Forge _forge)
 ```
+
+See [Forge#getCharacterForge](/docs/core/Forge.md#getCharacterForge)
 
 ### getCharacterForgesUpgrades
 
 ```solidity
-function getCharacterForgesUpgrades(bytes id) external view returns (bool[3])
+function getCharacterForgesUpgrades(bytes _id) external view returns (bool[3] _upgrades)
 ```
+
+See [Forge#getCharacterForgesUpgrades](/docs/core/Forge.md#getCharacterForgesUpgrades)
 
 ### getCharacterForgesAvailability
 
 ```solidity
-function getCharacterForgesAvailability(bytes id) external view returns (bool[3])
+function getCharacterForgesAvailability(bytes _id) external view returns (bool[3] _availability)
 ```
+
+See [Forge#getCharacterForgesAvailability](/docs/core/Forge.md#getCharacterForgesAvailability)

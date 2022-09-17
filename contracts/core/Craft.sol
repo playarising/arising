@@ -127,6 +127,49 @@ contract Craft is ICraft, Ownable, Pausable {
     }
 
     /**
+     * @notice Adds a new recipe to craft.
+     *
+     * Requirements:
+     * @param _materials            Array of material [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances address.
+     * @param _amounts              Array of amounts for each material.
+     * @param _stats                Stats to consume from the pool for craft.
+     * @param _cooldown             Number of seconds for the recipe cooldown.
+     * @param _level_required       Minimum level required to craft the recipe.
+     * @param _gold_cost            Cost of [Gold](/docs/gadgets/Gold.md) required to craft the recipe.
+     * @param _reward               ID of the token to reward for the [Items](/docs/items/Items.md) instance.
+     * @param _experience_reward    Amount of experience rewarded for the recipe.
+     */
+    function addRecipe(
+        address[] memory _materials,
+        uint256[] memory _amounts,
+        IStats.BasicStats memory _stats,
+        uint256 _cooldown,
+        uint256 _level_required,
+        uint256 _gold_cost,
+        uint256 _reward,
+        uint256 _experience_reward
+    ) public onlyOwner {
+        uint256 id = _recipes.length + 1;
+        require(
+            _materials.length == _amounts.length,
+            "Craft: addRecipe() materials and amounts not match."
+        );
+        recipes[id] = Recipe(
+            id,
+            _materials,
+            _amounts,
+            _stats,
+            _cooldown,
+            _level_required,
+            _gold_cost,
+            _reward,
+            _experience_reward,
+            true
+        );
+        _recipes.push(id);
+    }
+
+    /**
      * @notice Initializes a recipe to be crafted.
      *
      * Requirements:
@@ -147,28 +190,32 @@ contract Craft is ICraft, Ownable, Pausable {
             "Craft: craft() slot not available to craft."
         );
 
-        Recipe memory r = recipes[_recipe_id];
-        require(r.available, "Craft: craft() recipe is not available.");
+        Recipe memory _recipe = recipes[_recipe_id];
+        require(_recipe.available, "Craft: craft() recipe is not available.");
 
         require(
-            IExperience(experience).getLevel(_id) >= r.level_required,
+            IExperience(experience).getLevel(_id) >= _recipe.level_required,
             "Craft: craft() not enough level."
         );
 
-        if (r.cost > 0) {
-            IBaseFungibleItem(gold).consume(_id, r.cost);
+        if (_recipe.gold_cost > 0) {
+            IBaseFungibleItem(gold).consume(_id, _recipe.gold_cost);
         }
 
-        for (uint256 i = 0; i < r.materials.length; i++) {
-            IBaseFungibleItem(r.materials[i]).consume(
+        for (uint256 i = 0; i < _recipe.materials.length; i++) {
+            IBaseFungibleItem(_recipe.materials[i]).consume(
                 _id,
-                r.material_amounts[i]
+                _recipe.material_amounts[i]
             );
         }
 
-        IStats(stats).consume(_id, r.stats_required);
+        IStats(stats).consume(_id, _recipe.stats_required);
 
-        _assignRecipeToSlot(_id, r);
+        craft_slots[_id] = CraftSlot(
+            block.timestamp + _recipe.cooldown,
+            _recipe.id,
+            false
+        );
     }
 
     /**
@@ -261,23 +308,6 @@ contract Craft is ICraft, Ownable, Pausable {
     }
 
     /**
-     * @notice Internal function that assigns a recipe to the crafting slot.
-     *
-     * Requirements:
-     * @param _id       Composed ID of the character.
-     * @param _recipe   Recipe to assign.
-     */
-    function _assignRecipeToSlot(bytes memory _id, Recipe memory _recipe)
-        internal
-    {
-        craft_slots[_id] = CraftSlot(
-            block.timestamp + _recipe.cooldown,
-            _recipe.id,
-            false
-        );
-    }
-
-    /**
      * @notice Internal function to claim the reward from the slot.
      *
      * Requirements:
@@ -286,12 +316,12 @@ contract Craft is ICraft, Ownable, Pausable {
      * @return _experience  Amount of experience rewarded.
      */
     function _claim(bytes memory _id) internal returns (uint256 _experience) {
-        Recipe memory r = recipes[craft_slots[_id].last_recipe];
+        Recipe memory _recipe = recipes[craft_slots[_id].last_recipe];
         IItems(items).mint(
             ICivilizations(civilizations).ownerOf(_id),
-            r.item_reward
+            _recipe.reward
         );
 
-        return r.experience_reward;
+        return _recipe.experience_reward;
     }
 }

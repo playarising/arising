@@ -13,14 +13,14 @@ interface ICraft {
      * Requirements:
      * @param id                    ID of the recipe.
      * @param materials             Array of addresses of the require material instances.
-     * @param material_amounts      Array of amounts for each required material.
+     * @param amounts               Array of amounts for each required material.
      * @param stats_required        Amount of stats required to consume to create the recipe.
      * @param cooldown              Cooldown in seconds of the recipe.
      * @param level_required        Minimum level required to craft the recipe.
-     * @param experience_reward     Amount of experience rewarded from the craft.
-     * @param cost                  Cost of the craft in gold.
+     * @param gold_cost             Cost of the recipe in gold.
+     * @param reward                ID of the reward token.
+     * @param experience_reward     Amount of experience rewarded from the recipe.
      * @param available             Boolean to check if the recipe is available.
-     * @param item_reward           Address of the craft resulting item.
      */
     struct Recipe {
         uint256 id;
@@ -29,10 +29,10 @@ interface ICraft {
         IStats.BasicStats stats_required;
         uint256 cooldown;
         uint256 level_required;
+        uint256 gold_cost;
+        uint256 reward;
         uint256 experience_reward;
-        uint256 cost;
         bool available;
-        uint256 item_reward;
     }
 
     /**
@@ -60,6 +60,18 @@ interface ICraft {
 
     /** @notice See [Craft#enableRecipe](/docs/core/Craft.md#enableRecipe) */
     function enableRecipe(uint256 _recipe_id) external;
+
+    /** @notice See [Craft#addRecipe](/docs/core/Craft.md#addRecipe) */
+    function addRecipe(
+        address[] memory _materials,
+        uint256[] memory _amounts,
+        IStats.BasicStats memory _stats,
+        uint256 _cooldown,
+        uint256 _level_required,
+        uint256 _gold_cost,
+        uint256 _reward,
+        uint256 _experience_reward
+    ) external;
 
     /** @notice See [Craft#craft](/docs/core/Craft.md#craft) */
     function craft(bytes memory _id, uint256 _recipe_id) external;

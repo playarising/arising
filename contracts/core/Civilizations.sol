@@ -289,7 +289,7 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
      * @param _civilization     Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add.
      * @param _token_id         ID of the token to get the composed ID.
      *
-     * @return _id              Composed ID of the token.
+     * @return _id              Composed ID of the character.
      */
     function getTokenID(address _civilization, uint256 _token_id)
         public

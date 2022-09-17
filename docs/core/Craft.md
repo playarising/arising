@@ -148,6 +148,27 @@ Requirements:
 | ----------- | ------- | ----------------- |
 | \_recipe_id | uint256 | ID of the recipe. |
 
+### addRecipe
+
+```solidity
+function addRecipe(address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, uint256 _gold_cost, uint256 _reward, uint256 _experience_reward) public
+```
+
+Adds a new recipe to craft.
+
+Requirements:
+
+| Name                | Type                     | Description                                                                             |
+| ------------------- | ------------------------ | --------------------------------------------------------------------------------------- |
+| \_materials         | address[]                | Array of material [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances address. |
+| \_amounts           | uint256[]                | Array of amounts for each material.                                                     |
+| \_stats             | struct IStats.BasicStats | Stats to consume from the pool for craft.                                               |
+| \_cooldown          | uint256                  | Number of seconds for the recipe cooldown.                                              |
+| \_level_required    | uint256                  | Minimum level required to craft the recipe.                                             |
+| \_gold_cost         | uint256                  | Cost of [Gold](/docs/gadgets/Gold.md) required to craft the recipe.                     |
+| \_reward            | uint256                  | ID of the token to reward for the [Items](/docs/items/Items.md) instance.               |
+| \_experience_reward | uint256                  | Amount of experience rewarded for the recipe.                                           |
+
 ### craft
 
 ```solidity
@@ -248,21 +269,6 @@ Requirements:
 | Name | Type | Description                                           |
 | ---- | ---- | ----------------------------------------------------- |
 | [0]  | bool | \_available Boolean to know if the slot is claimable. |
-
-### \_assignRecipeToSlot
-
-```solidity
-function _assignRecipeToSlot(bytes _id, struct ICraft.Recipe _recipe) internal
-```
-
-Internal function that assigns a recipe to the crafting slot.
-
-Requirements:
-
-| Name     | Type                 | Description                   |
-| -------- | -------------------- | ----------------------------- |
-| \_id     | bytes                | Composed ID of the character. |
-| \_recipe | struct ICraft.Recipe | Recipe to assign.             |
 
 ### \_claim
 
