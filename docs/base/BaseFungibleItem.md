@@ -16,14 +16,6 @@ string name
 
 Constant for the name of the item.
 
-### image
-
-```solidity
-string image
-```
-
-Constant the url pointing to the image of the item.
-
 ### symbol
 
 ```solidity
@@ -74,7 +66,7 @@ Requirements:
 ### constructor
 
 ```solidity
-constructor(string _name, string _symbol, string _image, address _civilizations) public
+constructor(string _name, string _symbol, address _civilizations) public
 ```
 
 Constructor.
@@ -85,7 +77,6 @@ Requirements:
 | --------------- | ------- | --------------------------------------------------------------------- |
 | \_name          | string  | Name of the `ERC20` token.                                            |
 | \_symbol        | string  | Symbol of the `ERC20` token.                                          |
-| \_image         | string  | Url of the item image.                                                |
 | \_civilizations | address | Address of the [Civilizations](/docs/core/Civilizations.md) instance. |
 
 ### mintTo
