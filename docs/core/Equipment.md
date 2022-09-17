@@ -60,13 +60,15 @@ _Checks if `msg.sender` is owner or allowed to manipulate a composed ID._
 constructor(address _civilizations, address _experience, address _items) public
 ```
 
-_Constructor._
+Constructor.
 
-| Name            | Type    | Description                                  |
-| --------------- | ------- | -------------------------------------------- |
-| \_civilizations | address | The address of the `Civilizations` instance. |
-| \_experience    | address | The address of the `Experience` instance.    |
-| \_items         | address | The address of the `Items` instance.         |
+Requirements:
+
+| Name            | Type    | Description                                                               |
+| --------------- | ------- | ------------------------------------------------------------------------- |
+| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
+| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.       |
+| \_items         | address | The address of the [Items](/docs/items/Items.md) instance.                |
 
 ### pause
 
@@ -74,7 +76,7 @@ _Constructor._
 function pause() public
 ```
 
-_Pauses the contract_
+Pauses the contract
 
 ### unpause
 
@@ -82,7 +84,7 @@ _Pauses the contract_
 function unpause() public
 ```
 
-_Resumes the contract_
+Resumes the contract
 
 ### equip
 

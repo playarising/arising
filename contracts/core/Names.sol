@@ -50,21 +50,23 @@ contract Names is INames, Pausable, Ownable {
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
-     * @param _civilizations    The address of the `Civilizations` instance.
-     * @param _experience    The address of the `Experience` instance.
+     * @notice Constructor.
+     *
+     * Requirements:
+     * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
+     * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      */
     constructor(address _civilizations, address _experience) {
         civilizations = _civilizations;
         experience = _experience;
     }
 
-    /** @dev Pauses the contract */
+    /** @notice Pauses the contract */
     function pause() public onlyOwner {
         _pause();
     }
 
-    /** @dev Resumes the contract */
+    /** @notice Resumes the contract */
     function unpause() public onlyOwner {
         _unpause();
     }

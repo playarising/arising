@@ -42,8 +42,10 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
-     * @param _token   Address of the token to charge for upgrades.
+     * @notice Constructor.
+     *
+     * Requirements:
+     * @param _token    Address of the token used to purchase upgrades.
      */
     constructor(address _token) {
         token = _token;
@@ -52,12 +54,12 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
         upgrades[3] = Upgrade(0, false);
     }
 
-    /** @dev Pauses the contract */
+    /** @notice Pauses the contract */
     function pause() public onlyOwner {
         _pause();
     }
 
-    /** @dev Resumes the contract */
+    /** @notice Resumes the contract */
     function unpause() public onlyOwner {
         _unpause();
     }

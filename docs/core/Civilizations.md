@@ -61,11 +61,13 @@ _Map to track upgrades information. \*_
 constructor(address _token) public
 ```
 
-_Constructor._
+Constructor.
 
-| Name    | Type    | Description                                  |
-| ------- | ------- | -------------------------------------------- |
-| \_token | address | Address of the token to charge for upgrades. |
+Requirements:
+
+| Name    | Type    | Description                                     |
+| ------- | ------- | ----------------------------------------------- |
+| \_token | address | Address of the token used to purchase upgrades. |
 
 ### pause
 
@@ -73,7 +75,7 @@ _Constructor._
 function pause() public
 ```
 
-_Pauses the contract_
+Pauses the contract
 
 ### unpause
 
@@ -81,7 +83,7 @@ _Pauses the contract_
 function unpause() public
 ```
 
-_Resumes the contract_
+Resumes the contract
 
 ### setInitializeUpgrade
 

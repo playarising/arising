@@ -56,10 +56,12 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
-     * @param _civilizations    The address of the `Civilizations` instance.
-     * @param _experience       The address of the `Experience` instance.
-     * @param _items       The address of the `Items` instance.
+     * @notice Constructor.
+     *
+     * Requirements:
+     * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
+     * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
+     * @param _items            The address of the [Items](/docs/items/Items.md) instance.
      */
     constructor(
         address _civilizations,
@@ -92,12 +94,12 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
         ] = true;
     }
 
-    /** @dev Pauses the contract */
+    /** @notice Pauses the contract */
     function pause() public onlyOwner {
         _pause();
     }
 
-    /** @dev Resumes the contract */
+    /** @notice Resumes the contract */
     function unpause() public onlyOwner {
         _unpause();
     }

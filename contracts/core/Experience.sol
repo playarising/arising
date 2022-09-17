@@ -44,9 +44,11 @@ contract Experience is IExperience, Ownable {
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
-     * @param _levels           The address of the `Levels` instance.
-     * @param _civilizations    The address of the `Civilizations` instance.
+     * @notice Constructor.
+     *
+     * Requirements:
+     * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
+     * @param _levels           The address of the [Levels](/docs/codex/Levels.md) instance.
      */
     constructor(address _levels, address _civilizations) {
         levels = _levels;

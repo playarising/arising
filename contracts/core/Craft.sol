@@ -65,12 +65,14 @@ contract Craft is ICraft, Ownable, Pausable {
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
-     * @param _civilizations        The address of the `Civilizations` instance.
-     * @param _experience           The address of the `Experience` instance.
-     * @param _stats                The address of the `Experience` instance.
-     * @param _gold                 The address of the `Gold` instance.
-     * @param _items                 The address of the `Items` instance.
+     * @notice Constructor.
+     *
+     * Requirements:
+     * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
+     * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
+     * @param _stats            The address of the [Stats](/docs/core/Stats.md) instance.
+     * @param _gold             The address of the [Gold](/docs/gadgets/Gold.md) instance.
+     * @param _items            The address of the [Items](/docs/items/Items.md) instance.
      */
     constructor(
         address _civilizations,
@@ -86,12 +88,12 @@ contract Craft is ICraft, Ownable, Pausable {
         items = _items;
     }
 
-    /** @dev Pauses the contract */
+    /** @notice Pauses the contract */
     function pause() public onlyOwner {
         _pause();
     }
 
-    /** @dev Resumes the contract */
+    /** @notice Resumes the contract */
     function unpause() public onlyOwner {
         _unpause();
     }

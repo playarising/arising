@@ -52,12 +52,14 @@ _Checks if `msg.sender` is authorized to assign experience._
 constructor(address _levels, address _civilizations) public
 ```
 
-_Constructor._
+Constructor.
 
-| Name            | Type    | Description                                  |
-| --------------- | ------- | -------------------------------------------- |
-| \_levels        | address | The address of the `Levels` instance.        |
-| \_civilizations | address | The address of the `Civilizations` instance. |
+Requirements:
+
+| Name            | Type    | Description                                                               |
+| --------------- | ------- | ------------------------------------------------------------------------- |
+| \_levels        | address | The address of the [Levels](/docs/codex/Levels.md) instance.              |
+| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
 
 ### assignExperience
 

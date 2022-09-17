@@ -93,16 +93,18 @@ _Checks if `msg.sender` is owner or allowed to manipulate a composed ID._
 constructor(address _civilizations, address _experience, address _stats, address _gold, address _token, uint256 _price) public
 ```
 
-_Constructor._
+Constructor.
 
-| Name            | Type    | Description                                        |
-| --------------- | ------- | -------------------------------------------------- |
-| \_civilizations | address | The address of the `Civilizations` instance.       |
-| \_experience    | address | The address of the `Experience` instance.          |
-| \_stats         | address | The address of the `Experience` instance.          |
-| \_gold          | address | The address of the `Gold` instance.                |
-| \_token         | address | Address of the token to charge for forge upgrades. |
-| \_price         | uint256 | Price of forge upgrades.                           |
+Requirements:
+
+| Name            | Type    | Description                                                               |
+| --------------- | ------- | ------------------------------------------------------------------------- |
+| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
+| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.       |
+| \_stats         | address | The address of the [Stats](/docs/core/Stats.md) instance.                 |
+| \_gold          | address | The address of the [Gold](/docs/gadgets/Gold.md) instance.                |
+| \_token         | address | Address of the token used to purchase.                                    |
+| \_price         | uint256 | Price for each token.                                                     |
 
 ### pause
 
@@ -110,7 +112,7 @@ _Constructor._
 function pause() public
 ```
 
-_Pauses the contract_
+Pauses the contract
 
 ### unpause
 
@@ -118,7 +120,7 @@ _Pauses the contract_
 function unpause() public
 ```
 
-_Resumes the contract_
+Resumes the contract
 
 ### disableRecipe
 

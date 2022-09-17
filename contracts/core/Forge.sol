@@ -68,13 +68,15 @@ contract Forge is IForge, Ownable, Pausable {
     // =============================================== Setters ========================================================
 
     /**
-     * @dev Constructor.
-     * @param _civilizations        The address of the `Civilizations` instance.
-     * @param _experience           The address of the `Experience` instance.
-     * @param _stats                The address of the `Experience` instance.
-     * @param _gold                 The address of the `Gold` instance.
-     * @param _token                Address of the token to charge for forge upgrades.
-     * @param _price                Price of forge upgrades.
+     * @notice Constructor.
+     *
+     * Requirements:
+     * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
+     * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
+     * @param _stats            The address of the [Stats](/docs/core/Stats.md) instance.
+     * @param _gold             The address of the [Gold](/docs/gadgets/Gold.md) instance.
+     * @param _token            Address of the token used to purchase.
+     * @param _price            Price for each token.
      */
     constructor(
         address _civilizations,
@@ -92,12 +94,12 @@ contract Forge is IForge, Ownable, Pausable {
         gold = _gold;
     }
 
-    /** @dev Pauses the contract */
+    /** @notice Pauses the contract */
     function pause() public onlyOwner {
         _pause();
     }
 
-    /** @dev Resumes the contract */
+    /** @notice Resumes the contract */
     function unpause() public onlyOwner {
         _unpause();
     }
