@@ -2,7 +2,9 @@
 
 ## Experience
 
-_`Experience` is the contract to manage the storage of experience and missions from all the civilizations._
+This contract tracks and assigns experience of all the characters stored on the [Civilizations](/docs/core/Civilizations.md) instance.
+
+_Implementation of the [IExperience](/docs/interfaces/IExperience.md) interface._
 
 ### experience
 

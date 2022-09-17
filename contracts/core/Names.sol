@@ -9,11 +9,13 @@ import "../interfaces/INames.sol";
 import "../interfaces/IExperience.sol";
 
 /**
- * @dev `Names` is a contract manage the names of Arising characters.
- *       Some checks are based on the original Rarity names contract https://github.com/rarity-adventure/rarity-names/blob/main/contracts/rarity_names.sol
- *       created by https://twitter.com/mat_nadler.
+ * @title Names
+ * @notice This contract manages unique names for all characters in the [Civilizations](/docs/core/Civilizations.md) instance.
+ * Some checks are based on the original Rarity names contract https://github.com/rarity-adventure/rarity-names/blob/main/contracts/rarity_names.sol
+ * created by https://twitter.com/mat_nadler.
+ *
+ * @dev Implementation of the [INames](/docs/interfaces/INames.md) interface.
  */
-
 contract Names is INames, Pausable, Ownable {
     // =============================================== Storage ========================================================
     /** @dev Address of the `Civilizations` implementation. **/

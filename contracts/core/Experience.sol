@@ -8,10 +8,12 @@ import "../interfaces/IExperience.sol";
 import "../interfaces/ICivilizations.sol";
 
 /**
- * @dev `Experience` is the contract to manage the storage of experience and missions from all the civilizations.
+ * @title Experience
+ * @notice This contract tracks and assigns experience of all the characters stored on the [Civilizations](/docs/core/Civilizations.md) instance.
+ *
+ * @dev Implementation of the [IExperience](/docs/interfaces/IExperience.md) interface.
  */
-
-contract Experience is Ownable, IExperience {
+contract Experience is IExperience, Ownable {
     // =============================================== Storage ========================================================
 
     /** @dev Map to store the experience from composed ID. **/

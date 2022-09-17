@@ -2,7 +2,10 @@
 
 ## Quests
 
-_`Quests` is a contract to manage the different missions characters can do._
+This contracts stores multiple quests and enables all the characters stored on the [Civilizations](/docs/core/Civilizations.md) instance
+to obtain rewards and experience from them.
+
+_Implementation of the [IQuests](/docs/interfaces/IQuests.md) interface._
 
 ### civilizations
 

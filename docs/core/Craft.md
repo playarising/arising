@@ -2,7 +2,10 @@
 
 ## Craft
 
-_`Craft` is the contract to manage item crafting for Arising._
+This contract is used to store and craft recipes through the ecosystem. This is the only contract able to mint
+items through the [Items](/docs/items/Items.md) `ERC1155` implementation.
+
+_Implementation of the [ICraft](/docs/interfaces/ICraft.md) interface._
 
 ### recipes
 

@@ -2,7 +2,10 @@
 
 ## Civilizations
 
-_`Civilizations` is the contract that stores all the usable civilizations._
+This contract stores all the [BaseERC721](/docs/base/BaseERC721.md) instances usable on the environmne. The contract
+is in charge of token ownership verifications and generating/storing composable IDs for each character.
+
+_Implementation of the [ICivilizations](/docs/interfaces/ICivilizations.md) interface._
 
 ### \_civilizations
 

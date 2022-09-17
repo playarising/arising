@@ -2,8 +2,10 @@
 
 ## Stats
 
-_`Stats` is a contract to manage the stats points and pools for a set of collections.
-The stats and the concept is created and modified based on the Cypher System for role playing games: http://cypher-system.com/._
+This contract manages the stats points and pools for all the characters stored on the [Civilizations](/docs/core/Civilizations.md) instance.
+The stats and the concept is based on the Cypher System for role playing games: http://cypher-system.com/.
+
+_Implementation of the [IStats](/docs/interfaces/IStats.md) interface._
 
 ### REFRESH_COOLDOWN_SECONDS
 

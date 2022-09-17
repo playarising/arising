@@ -2,9 +2,11 @@
 
 ## Names
 
-_`Names` is a contract manage the names of Arising characters.
+This contract manages unique names for all characters in the [Civilizations](/docs/core/Civilizations.md) instance.
 Some checks are based on the original Rarity names contract https://github.com/rarity-adventure/rarity-names/blob/main/contracts/rarity_names.sol
-created by https://twitter.com/mat_nadler._
+created by https://twitter.com/mat_nadler.
+
+_Implementation of the [INames](/docs/interfaces/INames.md) interface._
 
 ### civilizations
 

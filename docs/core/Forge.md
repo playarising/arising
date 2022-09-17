@@ -2,7 +2,10 @@
 
 ## Forge
 
-_`Forge` is a contract to convert the raw material to craftable pieces._
+This contract convets the raw resources into craftable material. It uses multiple instances of [BaseFungibleItem](/docs/base/BaseFungibleItem.md) items.
+Each character has access to a maximum of three usable forges to convert the resources.
+
+_Implementation of the [IForge](/docs/interfaces/IForge.md) interface._
 
 ### civilizations
 

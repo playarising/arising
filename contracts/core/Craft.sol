@@ -12,10 +12,12 @@ import "../interfaces/IItems.sol";
 import "../interfaces/IBaseFungibleItem.sol";
 
 /**
- * @dev `Craft` is the contract to manage item crafting for Arising.
+ * @title Craft
+ * @notice This contract is used to store and craft recipes through the ecosystem. This is the only contract able to mint
+ * items through the [Items](/docs/items/Items.md) `ERC1155` implementation.
+ *
+ * @dev Implementation of the [ICraft](/docs/interfaces/ICraft.md) interface.
  */
-
-// TODO
 contract Craft is ICraft, Ownable, Pausable {
     // =============================================== Storage ========================================================
 

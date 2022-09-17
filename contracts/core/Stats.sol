@@ -11,10 +11,17 @@ import "../interfaces/IStats.sol";
 
 /**
  * @dev `Stats` is a contract to manage the stats points and pools for a set of collections.
- *       The stats and the concept is created and modified based on the Cypher System for role playing games: http://cypher-system.com/.
+ *
  */
 
-contract Stats is Ownable, IStats, Pausable {
+/**
+ * @title Stats
+ * @notice This contract manages the stats points and pools for all the characters stored on the [Civilizations](/docs/core/Civilizations.md) instance.
+ * The stats and the concept is based on the Cypher System for role playing games: http://cypher-system.com/.
+ *
+ * @dev Implementation of the [IStats](/docs/interfaces/IStats.md) interface.
+ */
+contract Stats is IStats, Ownable, Pausable {
     // =============================================== Storage ========================================================
     /** @dev Amount of seconds for refresh cooldown.  **/
     uint256 REFRESH_COOLDOWN_SECONDS = 86400; // 1 day.

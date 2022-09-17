@@ -11,9 +11,13 @@ import "../interfaces/IBaseERC721.sol";
 import "../interfaces/ICivilizations.sol";
 
 /**
- * @dev `Civilizations` is the contract that stores all the usable civilizations.
+ * @title Civilizations
+ * @notice This contract stores all the [BaseERC721](/docs/base/BaseERC721.md) instances usable on the environmne. The contract
+ * is in charge of token ownership verifications and generating/storing composable IDs for each character.
+ *
+ * @dev Implementation of the [ICivilizations](/docs/interfaces/ICivilizations.md) interface.
  */
-contract Civilizations is Ownable, ICivilizations, Pausable {
+contract Civilizations is ICivilizations, Ownable, Pausable {
     using Address for address;
 
     // =============================================== Storage ========================================================
