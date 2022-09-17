@@ -13,7 +13,7 @@ import "../interfaces/IBaseGadgetToken.sol";
  * @notice This contract implements an `ERC20Burnable` token to serve as utility tokens that
  * can be purchased by themselves.
  *
- * @dev Implementation of the [IBaseGadgetToken](/docs/interfaces/IBaseGadgetToken.md) interface.
+ * @notice Implementation of the [IBaseGadgetToken](/docs/interfaces/IBaseGadgetToken.md) interface.
  */
 contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
     // =============================================== Storage ========================================================

@@ -4,7 +4,7 @@
 
 This contract enables characters to equip/unequip `ERC1155` tokens stored through the [Items](/docs/items/Items.md) implementation.
 
-_Implementation of the [IEquipment](/docs/interfaces/IEquipment.md) interface._
+Implementation of the [IEquipment](/docs/interfaces/IEquipment.md) interface.
 
 ### civilizations
 

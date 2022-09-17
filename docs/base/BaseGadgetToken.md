@@ -5,7 +5,7 @@
 This contract implements an `ERC20Burnable` token to serve as utility tokens that
 can be purchased by themselves.
 
-_Implementation of the [IBaseGadgetToken](/docs/interfaces/IBaseGadgetToken.md) interface._
+Implementation of the [IBaseGadgetToken](/docs/interfaces/IBaseGadgetToken.md) interface.
 
 ### token
 

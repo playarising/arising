@@ -16,7 +16,7 @@ import "../interfaces/IBaseFungibleItem.sol";
  * @notice This contract is used to store and craft recipes through the ecosystem. This is the only contract able to mint
  * items through the [Items](/docs/items/Items.md) `ERC1155` implementation.
  *
- * @dev Implementation of the [ICraft](/docs/interfaces/ICraft.md) interface.
+ * @notice Implementation of the [ICraft](/docs/interfaces/ICraft.md) interface.
  */
 contract Craft is ICraft, Ownable, Pausable {
     // =============================================== Storage ========================================================

@@ -14,7 +14,7 @@ import "../interfaces/IExperience.sol";
  * Some checks are based on the original Rarity names contract https://github.com/rarity-adventure/rarity-names/blob/main/contracts/rarity_names.sol
  * created by https://twitter.com/mat_nadler.
  *
- * @dev Implementation of the [INames](/docs/interfaces/INames.md) interface.
+ * @notice Implementation of the [INames](/docs/interfaces/INames.md) interface.
  */
 contract Names is INames, Pausable, Ownable {
     // =============================================== Storage ========================================================

@@ -11,7 +11,7 @@ import "../interfaces/IItems.sol";
  * @notice This contract is an standard `ERC1155` implementation with internal mappings to store items additional
  * information for the characters usage.
  *
- * @dev Implementation of the [IItems](/docs/interfaces/IItems.md) interface.
+ * @notice Implementation of the [IItems](/docs/interfaces/IItems.md) interface.
  */
 contract Items is IItems, Ownable, ERC1155 {
     // =============================================== Storage ========================================================

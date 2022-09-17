@@ -16,7 +16,7 @@ import "../interfaces/IStats.sol";
  * @title Equipment
  * @notice This contract enables characters to equip/unequip `ERC1155` tokens stored through the [Items](/docs/items/Items.md) implementation.
  *
- * @dev Implementation of the [IEquipment](/docs/interfaces/IEquipment.md) interface.
+ * @notice Implementation of the [IEquipment](/docs/interfaces/IEquipment.md) interface.
  */
 contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
     // =============================================== Storage ========================================================

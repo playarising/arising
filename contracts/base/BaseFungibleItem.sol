@@ -16,7 +16,7 @@ import "./BaseERC20Wrapper.sol";
  * It tracks balances of characters tokens. This also includes functions to wrap and unwrap to a
  * [BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.md) instance.
  *
- * @dev Implementation of the [IBaseFungibleItem](/docs/interfaces/IBaseFungibleItem.md) interface.
+ * @notice Implementation of the [IBaseFungibleItem](/docs/interfaces/IBaseFungibleItem.md) interface.
  */
 contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     // =============================================== Storage ========================================================

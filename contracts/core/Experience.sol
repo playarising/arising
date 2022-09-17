@@ -11,7 +11,7 @@ import "../interfaces/ICivilizations.sol";
  * @title Experience
  * @notice This contract tracks and assigns experience of all the characters stored on the [Civilizations](/docs/core/Civilizations.md) instance.
  *
- * @dev Implementation of the [IExperience](/docs/interfaces/IExperience.md) interface.
+ * @notice Implementation of the [IExperience](/docs/interfaces/IExperience.md) interface.
  */
 contract Experience is IExperience, Ownable {
     // =============================================== Storage ========================================================

@@ -5,7 +5,7 @@
 This contract is a `ERC721Enumerable` implementation for the different civilizations.
 Exposes the mint function to the owner and some check functions.
 
-_Implementation of the [IBaseERC721](/docs/interfaces/IBaseERC721.md) interface._
+Implementation of the [IBaseERC721](/docs/interfaces/IBaseERC721.md) interface.
 
 ### baseURI
 

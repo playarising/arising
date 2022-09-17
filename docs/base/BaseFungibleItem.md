@@ -6,7 +6,7 @@ This contract an imitation of the `ERC20` standard to work around the character 
 It tracks balances of characters tokens. This also includes functions to wrap and unwrap to a
 [BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.md) instance.
 
-_Implementation of the [IBaseFungibleItem](/docs/interfaces/IBaseFungibleItem.md) interface._
+Implementation of the [IBaseFungibleItem](/docs/interfaces/IBaseFungibleItem.md) interface.
 
 ### name
 

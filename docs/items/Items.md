@@ -5,7 +5,7 @@
 This contract is an standard `ERC1155` implementation with internal mappings to store items additional
 information for the characters usage.
 
-_Implementation of the [IItems](/docs/interfaces/IItems.md) interface._
+Implementation of the [IItems](/docs/interfaces/IItems.md) interface.
 
 ### items
 

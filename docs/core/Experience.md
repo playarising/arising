@@ -4,7 +4,7 @@
 
 This contract tracks and assigns experience of all the characters stored on the [Civilizations](/docs/core/Civilizations.md) instance.
 
-_Implementation of the [IExperience](/docs/interfaces/IExperience.md) interface._
+Implementation of the [IExperience](/docs/interfaces/IExperience.md) interface.
 
 ### experience
 

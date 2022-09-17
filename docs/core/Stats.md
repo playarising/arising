@@ -5,7 +5,7 @@
 This contract manages the stats points and pools for all the characters stored on the [Civilizations](/docs/core/Civilizations.md) instance.
 The stats and the concept is based on the Cypher System for role playing games: http://cypher-system.com/.
 
-_Implementation of the [IStats](/docs/interfaces/IStats.md) interface._
+Implementation of the [IStats](/docs/interfaces/IStats.md) interface.
 
 ### REFRESH_COOLDOWN_SECONDS
 
