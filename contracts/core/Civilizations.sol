@@ -23,10 +23,10 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
 
     // =============================================== Storage ========================================================
     /** @notice Map to track the supported [BaseERC721](/docs/base/BaseERC721.md) instances. */
-    mapping(address => uint256) civilizations;
+    mapping(uint256 => address) civilizations;
 
     /** @notice Array to track the [BaseERC721](/docs/base/BaseERC721.md) IDs. */
-    address[] _civilizations;
+    uint256[] private _civilizations;
 
     /** @notice Map to track the count of address mints. */
     mapping(address => uint256) private _minters;
@@ -131,30 +131,30 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
             "Civilizations: addCivilization() missing civilization ownership."
         );
         uint256 _civilization_id = _civilizations.length + 1;
-        civilizations[_civilization] = _civilization_id;
-        _civilizations.push(_civilization);
+        civilizations[_civilization_id] = _civilization;
+        _civilizations.push(_civilization_id);
     }
 
     /**
      * @notice Creates a new token of the valid civilizations list to the `msg.sender`.
      *
      * Requirements:
-     * @param _civilization     Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add.
+     * @param _civilization_id     ID of the civilization.
      */
-    function mint(address _civilization) public whenNotPaused {
+    function mint(uint256 _civilization_id) public whenNotPaused {
         require(
-            _civilization != address(0),
-            "Civilizations: mint() civilization address is empty."
+            _civilization_id != 0 && _civilization_id <= _civilizations.length,
+            "Civilizations: mint() invalid civilization id."
         );
         require(
-            civilizations[_civilization] != 0,
+            civilizations[_civilization_id] != address(0),
             "Civilizations: mint() invalid civilization address."
         );
         require(
             _canMint(msg.sender),
             "Civilizations: mint() address already minted."
         );
-        IBaseERC721(_civilization).mint(msg.sender);
+        IBaseERC721(civilizations[_civilization_id]).mint(msg.sender);
         _addMint(msg.sender);
     }
 
@@ -204,30 +204,6 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     // =============================================== Getters ========================================================
 
     /**
-     * @notice External function to return the internal ID of a valid civilization.
-     *
-     * Requirements:
-     * @param _civilization     Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add.
-     * 
-     * @return _civilization_id Internal ID of the civilization.
-]     */
-    function getID(address _civilization)
-        public
-        view
-        returns (uint256 _civilization_id)
-    {
-        require(
-            _civilization != address(0),
-            "Civilizations: getID() instance address is empty."
-        );
-        require(
-            civilizations[_civilization] != 0,
-            "Civilizations: getID() invalid instance address."
-        );
-        return civilizations[_civilization];
-    }
-
-    /**
      * @notice External function to return the upgrades for a composed ID.
      *
      * Requirements:
@@ -270,53 +246,35 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     }
 
     /**
-     * @notice Returns the list of valid civilizations instances.
-     *
-     * @return _valid_civilizations     Array of valid civilizations intances.
-     */
-    function getCivilizations()
-        public
-        view
-        returns (address[] memory _valid_civilizations)
-    {
-        return _civilizations;
-    }
-
-    /**
      * @notice Returns the composed ID of a token from a valid civilization.
      *
      * Requirements:
-     * @param _civilization     Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add.
+     * @param _civilization_id  ID of the civilization.
      * @param _token_id         ID of the token to get the composed ID.
      *
      * @return _id              Composed ID of the character.
      */
-    function getTokenID(address _civilization, uint256 _token_id)
+    function getTokenID(uint256 _civilization_id, uint256 _token_id)
         public
         view
         returns (bytes memory _id)
     {
         require(
-            _civilization != address(0),
-            "Civilizations: getTokenID() civilization address is empty."
-        );
-        uint256 _civilization_id = civilizations[_civilization];
-        require(
-            _civilization_id != 0,
-            "Civilizations: getTokenID() invalid civilization address."
+            _civilization_id != 0 && _civilization_id <= _civilizations.length,
+            "Civilizations: getTokenID() invalid civilization id."
         );
         require(
-            IBaseERC721(_civilization).exists(_token_id),
+            IBaseERC721(civilizations[_civilization_id]).exists(_token_id),
             "Civilizations: getTokenID() token not minted."
         );
-        return abi.encode(_civilization_id, _id);
+        return abi.encode(_civilization_id, _token_id);
     }
 
     /**
      * @notice External function to check if the `msg.sender` can access a token.
      *
      * Requirements:
-     *  @param _spender     Address to check ownership or allowance.
+     * @param _spender      Address to check ownership or allowance.
      * @param _id           Composed ID of the character.
      *
      * @return _allowed     Boolean to check if access is valid.
@@ -328,11 +286,16 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     {
         (uint256 _civilization_id, uint256 _token_id) = _decodeID(_id);
         require(
-            _civilization_id <= _civilizations.length,
-            "Civilizations: isAllowed() id of the civilization is not valid."
+            _civilization_id != 0 && _civilization_id <= _civilizations.length,
+            "Civilizations: isAllowed() invalid civilization id."
         );
-        address instance = _civilizations[_civilization_id - 1];
-        return IBaseERC721(instance).isApprovedOrOwner(_spender, _token_id);
+        address _civilization = civilizations[_civilization_id];
+        require(
+            _civilization != address(0),
+            "Civilizations: isAllowed() address of the civilization not found."
+        );
+        return
+            IBaseERC721(_civilization).isApprovedOrOwner(_spender, _token_id);
     }
 
     /**
@@ -346,11 +309,15 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     function exists(bytes memory _id) public view returns (bool _exist) {
         (uint256 _civilization_id, uint256 _token_id) = _decodeID(_id);
         require(
-            _civilization_id <= _civilizations.length,
-            "Civilizations: exists() id of the civilization is not valid."
+            _civilization_id != 0 && _civilization_id <= _civilizations.length,
+            "Civilizations: exists() invalid civilization id."
         );
-        address instance = _civilizations[_civilization_id - 1];
-        return IBaseERC721(instance).exists(_token_id);
+        address _civilization = civilizations[_civilization_id];
+        require(
+            _civilization != address(0),
+            "Civilizations: isAllowed() address of the civilization not found."
+        );
+        return IBaseERC721(_civilization).exists(_token_id);
     }
 
     /**
@@ -364,11 +331,15 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     function ownerOf(bytes memory _id) public view returns (address _owner) {
         (uint256 _civilization_id, uint256 _token_id) = _decodeID(_id);
         require(
-            _civilization_id <= _civilizations.length,
-            "Civilizations: ownerOf() id of the civilization is not valid."
+            _civilization_id != 0 && _civilization_id <= _civilizations.length,
+            "Civilizations: ownerOf() invalid civilization id."
         );
-        address instance = _civilizations[_civilization_id - 1];
-        return IERC721(instance).ownerOf(_token_id);
+        address _civilization = civilizations[_civilization_id];
+        require(
+            _civilization != address(0),
+            "Civilizations: isAllowed() address of the civilization not found."
+        );
+        return IERC721(_civilization).ownerOf(_token_id);
     }
 
     // =============================================== Internal ========================================================

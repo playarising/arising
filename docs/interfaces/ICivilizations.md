@@ -65,7 +65,7 @@ See [Civilizations#addCivilization](/docs/core/Civilizations.md#addCivilization)
 ### mint
 
 ```solidity
-function mint(address _civilization) external
+function mint(uint256 _civilization_id) external
 ```
 
 See [Civilizations#mint](/docs/core/Civilizations.md#mint)
@@ -86,18 +86,10 @@ function withdraw() external
 
 See [Civilizations#withdraw](/docs/core/Civilizations.md#withdraw)
 
-### getID
-
-```solidity
-function getID(address _civilization) external view returns (uint256)
-```
-
-See [Civilizations#getID](/docs/core/Civilizations.md#getID)
-
 ### getCharacterUpgrades
 
 ```solidity
-function getCharacterUpgrades(bytes _id) external view returns (bool[3])
+function getCharacterUpgrades(bytes _id) external view returns (bool[3] _upgrades)
 ```
 
 See [Civilizations#getCharacterUpgrades](/docs/core/Civilizations.md#getCharacterUpgrades)
@@ -105,23 +97,15 @@ See [Civilizations#getCharacterUpgrades](/docs/core/Civilizations.md#getCharacte
 ### getUpgradeInformation
 
 ```solidity
-function getUpgradeInformation(uint256 _upgrade_id) external view returns (struct ICivilizations.Upgrade)
+function getUpgradeInformation(uint256 _upgrade_id) external view returns (struct ICivilizations.Upgrade _upgrade)
 ```
 
 See [Civilizations#getUpgradeInformation](/docs/core/Civilizations.md#getUpgradeInformation)
 
-### getCivilizations
-
-```solidity
-function getCivilizations() external view returns (address[])
-```
-
-See [Civilizations#getCivilizations](/docs/core/Civilizations.md#getCivilizations)
-
 ### getTokenID
 
 ```solidity
-function getTokenID(address _civilization, uint256 _token_id) external view returns (bytes)
+function getTokenID(uint256 _civilization_id, uint256 _token_id) external view returns (bytes _id)
 ```
 
 See [Civilizations#getTokenID](/docs/core/Civilizations.md#getTokenID)
@@ -129,7 +113,7 @@ See [Civilizations#getTokenID](/docs/core/Civilizations.md#getTokenID)
 ### isAllowed
 
 ```solidity
-function isAllowed(address _spender, bytes _id) external view returns (bool)
+function isAllowed(address _spender, bytes _id) external view returns (bool _allowed)
 ```
 
 See [Civilizations#isAllowed](/docs/core/Civilizations.md#isAllowed)
@@ -137,7 +121,7 @@ See [Civilizations#isAllowed](/docs/core/Civilizations.md#isAllowed)
 ### exists
 
 ```solidity
-function exists(bytes _id) external view returns (bool)
+function exists(bytes _id) external view returns (bool _exist)
 ```
 
 See [Civilizations#exists](/docs/core/Civilizations.md#exists)
@@ -145,7 +129,7 @@ See [Civilizations#exists](/docs/core/Civilizations.md#exists)
 ### ownerOf
 
 ```solidity
-function ownerOf(bytes _id) external view returns (address)
+function ownerOf(bytes _id) external view returns (address _owner)
 ```
 
 See [Civilizations#ownerOf](/docs/core/Civilizations.md#ownerOf)

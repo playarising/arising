@@ -10,7 +10,7 @@ Implementation of the [ICivilizations](/docs/interfaces/ICivilizations.md) inter
 ### civilizations
 
 ```solidity
-mapping(address => uint256) civilizations
+mapping(uint256 => address) civilizations
 ```
 
 Map to track the supported [BaseERC721](/docs/base/BaseERC721.md) instances.
@@ -18,7 +18,7 @@ Map to track the supported [BaseERC721](/docs/base/BaseERC721.md) instances.
 ### \_civilizations
 
 ```solidity
-address[] _civilizations
+uint256[] _civilizations
 ```
 
 Array to track the [BaseERC721](/docs/base/BaseERC721.md) IDs.
@@ -146,16 +146,16 @@ Requirements:
 ### mint
 
 ```solidity
-function mint(address _civilization) public
+function mint(uint256 _civilization_id) public
 ```
 
 Creates a new token of the valid civilizations list to the `msg.sender`.
 
 Requirements:
 
-| Name           | Type    | Description                                                            |
-| -------------- | ------- | ---------------------------------------------------------------------- |
-| \_civilization | address | Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add. |
+| Name              | Type    | Description             |
+| ----------------- | ------- | ----------------------- |
+| \_civilization_id | uint256 | ID of the civilization. |
 
 ### buyUpgrade
 
@@ -179,24 +179,6 @@ function withdraw() public
 ```
 
 Transfers the total amount of tokens stored in the contract to the owner .
-
-### getID
-
-```solidity
-function getID(address _civilization) public view returns (uint256 _civilization_id)
-```
-
-External function to return the internal ID of a valid civilization.
-
-Requirements:
-
-| Name           | Type    | Description                                                            |
-| -------------- | ------- | ---------------------------------------------------------------------- |
-| \_civilization | address | Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add. |
-
-| Name              | Type    | Description                        |
-| ----------------- | ------- | ---------------------------------- |
-| \_civilization_id | uint256 | Internal ID of the civilization. ] |
 
 ### getCharacterUpgrades
 
@@ -234,32 +216,20 @@ Requirements:
 | --------- | ----------------------------- | -------------------- |
 | \_upgrade | struct ICivilizations.Upgrade | Upgrade information. |
 
-### getCivilizations
-
-```solidity
-function getCivilizations() public view returns (address[] _valid_civilizations)
-```
-
-Returns the list of valid civilizations instances.
-
-| Name                  | Type      | Description                            |
-| --------------------- | --------- | -------------------------------------- |
-| \_valid_civilizations | address[] | Array of valid civilizations intances. |
-
 ### getTokenID
 
 ```solidity
-function getTokenID(address _civilization, uint256 _token_id) public view returns (bytes _id)
+function getTokenID(uint256 _civilization_id, uint256 _token_id) public view returns (bytes _id)
 ```
 
 Returns the composed ID of a token from a valid civilization.
 
 Requirements:
 
-| Name           | Type    | Description                                                            |
-| -------------- | ------- | ---------------------------------------------------------------------- |
-| \_civilization | address | Address of the [BaseERC721](/docs/base/BaseERC721.md) instance to add. |
-| \_token_id     | uint256 | ID of the token to get the composed ID.                                |
+| Name              | Type    | Description                             |
+| ----------------- | ------- | --------------------------------------- |
+| \_civilization_id | uint256 | ID of the civilization.                 |
+| \_token_id        | uint256 | ID of the token to get the composed ID. |
 
 | Name | Type  | Description                   |
 | ---- | ----- | ----------------------------- |
@@ -274,12 +244,11 @@ function isAllowed(address _spender, bytes _id) public view returns (bool _allow
 External function to check if the `msg.sender` can access a token.
 
 Requirements:
-@param \_spender Address to check ownership or allowance.
 
-| Name      | Type    | Description                   |
-| --------- | ------- | ----------------------------- |
-| \_spender | address |                               |
-| \_id      | bytes   | Composed ID of the character. |
+| Name      | Type    | Description                              |
+| --------- | ------- | ---------------------------------------- |
+| \_spender | address | Address to check ownership or allowance. |
+| \_id      | bytes   | Composed ID of the character.            |
 
 | Name      | Type | Description                          |
 | --------- | ---- | ------------------------------------ |
