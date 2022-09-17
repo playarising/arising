@@ -5,7 +5,7 @@
 This contract is an standard `ERC1155` implementation with internal mappings to store items additional
 information for the characters usage.
 
-_Implementation of the {IItems} interface._
+_Implementation of the [IItems](/docs/interfaces/IItems.md) interface._
 
 ### items
 
@@ -56,12 +56,12 @@ Adds the item data to relate with a specific token ID.
 
 Requirements:
 
-| Name              | Type                         | Description                                      |
-| ----------------- | ---------------------------- | ------------------------------------------------ |
-| \_level_required  | uint256                      | Minimum level for a character to use the item.   |
-| \_item_type       | enum IItems.ItemType         | Type of the item defined by the enum {ItemType}. |
-| \_stats_modifiers | struct IItems.StatsModifiers | Item modifiers for the character stats.          |
-| \_attributes      | struct IItems.Attributes     | Specific item attributes.                        |
+| Name              | Type                         | Description                                                                           |
+| ----------------- | ---------------------------- | ------------------------------------------------------------------------------------- |
+| \_level_required  | uint256                      | Minimum level for a character to use the item.                                        |
+| \_item_type       | enum IItems.ItemType         | Type of the item defined by the enum [ItemType](/docs/interfaces/IItems.md#itemtype). |
+| \_stats_modifiers | struct IItems.StatsModifiers | Item modifiers for the character stats.                                               |
+| \_attributes      | struct IItems.Attributes     | Specific item attributes.                                                             |
 
 ### disableItem
 

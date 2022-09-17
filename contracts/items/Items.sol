@@ -11,7 +11,7 @@ import "../interfaces/IItems.sol";
  * @notice This contract is an standard `ERC1155` implementation with internal mappings to store items additional
  * information for the characters usage.
  *
- * @dev Implementation of the {IItems} interface.
+ * @dev Implementation of the [IItems](/docs/interfaces/IItems.md) interface.
  */
 contract Items is IItems, Ownable, ERC1155 {
     // =============================================== Storage ========================================================
@@ -45,7 +45,7 @@ contract Items is IItems, Ownable, ERC1155 {
      *
      * Requirements:
      * @param _level_required   Minimum level for a character to use the item.
-     * @param _item_type        Type of the item defined by the enum {ItemType}.
+     * @param _item_type        Type of the item defined by the enum [ItemType](/docs/interfaces/IItems.md#itemtype).
      * @param _stats_modifiers  Item modifiers for the character stats.
      * @param _attributes       Specific item attributes.
      */

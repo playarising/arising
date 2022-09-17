@@ -90,7 +90,7 @@ Requirements:
 function mint(uint256 _amount) public
 ```
 
-Creates tokens to the {msg.sender} by charging the total amount of tokens.
+Creates tokens to the `msg.sender` by charging the total amount of tokens.
 
 Requirements:
 

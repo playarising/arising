@@ -75,7 +75,7 @@ contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
     }
 
     /**
-     * @notice Creates tokens to the {msg.sender} by charging the total amount of tokens.
+     * @notice Creates tokens to the `msg.sender` by charging the total amount of tokens.
      *
      * Requirements:
      * @param _amount   Amount of tokens to purchase.

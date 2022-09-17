@@ -5,7 +5,7 @@ import "../base/BaseGadgetToken.sol";
 
 /**
  * @title Vitalizer
- * @notice This contract is an instance of {BaseGadgetToken} to reclaim sacrificed points on the [Stats](/docs/core/Stats.md) contract.
+ * @notice This contract is an instance of [BaseGadgetToken](/docs/base/BaseGadgetToken.md) to reclaim sacrificed points on the [Stats](/docs/core/Stats.md) contract.
  */
 contract Vitalizer is BaseGadgetToken {
     // =============================================== Setters ========================================================

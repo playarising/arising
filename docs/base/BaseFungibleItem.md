@@ -62,7 +62,7 @@ Constant for the address of the [BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.m
 modifier onlyAllowed(bytes _id)
 ```
 
-Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the {msg.sender} is the owner or
+Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the `msg.sender` is the owner or
 has allowance to access a composed ID.
 
 Requirements:

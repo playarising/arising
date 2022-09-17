@@ -5,7 +5,7 @@
 This contract is a static storage with utility functions to determine the level
 table for the [Experience](/docs/core/Experience.md) contract.
 
-_Implementation of the {ILevels} interface._
+_Implementation of the [ILevels](/docs/interfaces/ILevels.md) interface._
 
 ### levels
 

@@ -2,7 +2,7 @@
 
 ## Refresher
 
-This contract is an instance of {BaseGadgetToken} to perform paid refreshes for the [Stats](/docs/core/Stats.md) contract.
+This contract is an instance of [BaseGadgetToken](/docs/base/BaseGadgetToken.md) to perform paid refreshes for the [Stats](/docs/core/Stats.md) contract.
 
 ### constructor
 

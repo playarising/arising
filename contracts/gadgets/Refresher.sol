@@ -5,7 +5,7 @@ import "../base/BaseGadgetToken.sol";
 
 /**
  * @title Refresher
- * @notice This contract is an instance of {BaseGadgetToken} to perform paid refreshes for the [Stats](/docs/core/Stats.md) contract.
+ * @notice This contract is an instance of [BaseGadgetToken](/docs/base/BaseGadgetToken.md) to perform paid refreshes for the [Stats](/docs/core/Stats.md) contract.
  */
 contract Refresher is BaseGadgetToken {
     // =============================================== Setters ========================================================

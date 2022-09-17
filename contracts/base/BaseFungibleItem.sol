@@ -42,7 +42,7 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     // =============================================== Modifiers ======================================================
 
     /**
-     * @notice Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the {msg.sender} is the owner or
+     * @notice Checks against the [Civilizations](/docs/core/Civilizations.md) instance if the `msg.sender` is the owner or
      * has allowance to access a composed ID.
      *
      * Requirements:
