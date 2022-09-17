@@ -25,7 +25,7 @@ interface IQuests {
      * Requirements:
      * @param id                    ID of the quest.
      * @param quest_type            Type of the added quest.
-     * @param gold_reward           Amount of [Gold](/docs/gadgets/Gold.md) tokens to reward.
+     * @param gold_reward           Amount of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) tokens to reward.
      * @param resources_reward      Array of [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to reward for the quest.
      * @param resources_amounts     Array of amounts for each resource reward.
      * @param experience_reward     Amount of experience rewarded for the quest.

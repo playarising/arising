@@ -29,7 +29,7 @@ contract Quests is IQuests, Ownable, Pausable {
     /** @notice Address of the [Stats](/docs/core/Stats.md) instance. */
     address public stats;
 
-    /** @notice Address of the [Gold](/docs/gadgets/Gold.md) instance. */
+    /** @notice Address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance. */
     address public gold;
 
     /** @notice Map to track all the available quests. */
@@ -52,6 +52,10 @@ contract Quests is IQuests, Ownable, Pausable {
      */
     modifier onlyAllowed(bytes memory _id) {
         require(
+            ICivilizations(civilizations).exists(_id),
+            "Quests: onlyAllowed() token not minted."
+        );
+        require(
             ICivilizations(civilizations).isAllowed(msg.sender, _id),
             "Quests: onlyAllowed() msg.sender is not allowed to access this token."
         );
@@ -67,7 +71,7 @@ contract Quests is IQuests, Ownable, Pausable {
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      * @param _stats            The address of the [Stats](/docs/core/Stats.md) instance.
-     * @param _gold             The address of the [Gold](/docs/gadgets/Gold.md) instance.
+     * @param _gold             The address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance.
      */
     constructor(
         address _civilizations,
@@ -124,7 +128,7 @@ contract Quests is IQuests, Ownable, Pausable {
      *
      * Requirements:
      * @param _quest_type           Type of the added quest.
-     * @param _gold_reward          Amount of [Gold](/docs/gadgets/Gold.md) tokens to reward.
+     * @param _gold_reward          Amount of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) tokens to reward.
      * @param _resources_reward     Array of [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to reward for the quest.
      * @param _resources_amounts    Array of amounts for each resource reward.
      * @param _experience_reward    Amount of experience rewarded for the quest.

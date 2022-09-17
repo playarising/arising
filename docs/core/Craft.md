@@ -29,7 +29,7 @@ Array to track all the recipes IDs.
 address gold
 ```
 
-The address of the [Gold](/docs/gadgets/Gold.md) instance.
+The address of the the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance.
 
 ### civilizations
 
@@ -96,13 +96,13 @@ Constructor.
 
 Requirements:
 
-| Name            | Type    | Description                                                               |
-| --------------- | ------- | ------------------------------------------------------------------------- |
-| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
-| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.       |
-| \_stats         | address | The address of the [Stats](/docs/core/Stats.md) instance.                 |
-| \_gold          | address | The address of the [Gold](/docs/gadgets/Gold.md) instance.                |
-| \_items         | address | The address of the [Items](/docs/items/Items.md) instance.                |
+| Name            | Type    | Description                                                                          |
+| --------------- | ------- | ------------------------------------------------------------------------------------ |
+| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance.            |
+| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.                  |
+| \_stats         | address | The address of the [Stats](/docs/core/Stats.md) instance.                            |
+| \_gold          | address | The address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance. |
+| \_items         | address | The address of the [Items](/docs/items/Items.md) instance.                           |
 
 ### pause
 
@@ -158,16 +158,16 @@ Adds a new recipe to craft.
 
 Requirements:
 
-| Name                | Type                     | Description                                                                             |
-| ------------------- | ------------------------ | --------------------------------------------------------------------------------------- |
-| \_materials         | address[]                | Array of material [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances address. |
-| \_amounts           | uint256[]                | Array of amounts for each material.                                                     |
-| \_stats             | struct IStats.BasicStats | Stats to consume from the pool for craft.                                               |
-| \_cooldown          | uint256                  | Number of seconds for the recipe cooldown.                                              |
-| \_level_required    | uint256                  | Minimum level required to craft the recipe.                                             |
-| \_gold_cost         | uint256                  | Cost of [Gold](/docs/gadgets/Gold.md) required to craft the recipe.                     |
-| \_reward            | uint256                  | ID of the token to reward for the [Items](/docs/items/Items.md) instance.               |
-| \_experience_reward | uint256                  | Amount of experience rewarded for the recipe.                                           |
+| Name                | Type                     | Description                                                                                   |
+| ------------------- | ------------------------ | --------------------------------------------------------------------------------------------- |
+| \_materials         | address[]                | Array of material [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances address.       |
+| \_amounts           | uint256[]                | Array of amounts for each material.                                                           |
+| \_stats             | struct IStats.BasicStats | Stats to consume from the pool for craft.                                                     |
+| \_cooldown          | uint256                  | Number of seconds for the recipe cooldown.                                                    |
+| \_level_required    | uint256                  | Minimum level required to craft the recipe.                                                   |
+| \_gold_cost         | uint256                  | Cost of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) required to craft the recipe. |
+| \_reward            | uint256                  | ID of the token to reward for the [Items](/docs/items/Items.md) instance.                     |
+| \_experience_reward | uint256                  | Amount of experience rewarded for the recipe.                                                 |
 
 ### craft
 

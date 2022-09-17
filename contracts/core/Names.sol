@@ -41,6 +41,10 @@ contract Names is INames, Pausable, Ownable {
      */
     modifier onlyAllowed(bytes memory _id) {
         require(
+            ICivilizations(civilizations).exists(_id),
+            "Names: onlyAllowed() token not minted."
+        );
+        require(
             ICivilizations(civilizations).isAllowed(msg.sender, _id),
             "Names: onlyAllowed() msg.sender is not allowed to access this token."
         );

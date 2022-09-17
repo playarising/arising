@@ -31,10 +31,10 @@ contract Stats is IStats, Ownable, Pausable {
     /** @notice Map track the last refresh timestamps of the characters. */
     mapping(bytes => uint256) last_refresh;
 
-    /** @notice Address of the [Refresher](/docs/gadgets/Refresher.md) instance. */
+    /** @notice Address of the Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance. */
     address public refresher;
 
-    /** @notice Address of the [Vitalizer](/docs/gadgets/Vitalizer.md) instance. */
+    /** @notice Address of the Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance. */
     address public vitalizer;
 
     /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
@@ -59,6 +59,10 @@ contract Stats is IStats, Ownable, Pausable {
      * @param _id   Composed ID of the character.
      */
     modifier onlyAllowed(bytes memory _id) {
+        require(
+            ICivilizations(civilizations).exists(_id),
+            "Stats: onlyAllowed() token not minted."
+        );
         require(
             ICivilizations(civilizations).isAllowed(msg.sender, _id),
             "Stats: onlyAllowed() msg.sender is not allowed to access this token."
@@ -102,20 +106,20 @@ contract Stats is IStats, Ownable, Pausable {
     }
 
     /**
-     * @notice Changes the [Refresher](/docs/gadgets/Refresher.md) instance to use for paid refreshes.
+     * @notice Changes the Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance to use for paid refreshes.
      *
      * Requirements:
-     * @param _refresher    Address of the new [Refresher](/docs/gadgets/Refresher.md) instance.
+     * @param _refresher    Address of the new Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance.
      */
     function setRefreshToken(address _refresher) public onlyOwner {
         refresher = _refresher;
     }
 
     /**
-     * @notice Changes the [Vitalizer](/docs/gadgets/Vitalizer.md) instance to use for sacrifice points recover.
+     * @notice Changes the Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance to use for sacrifice points recover.
      *
      * Requirements:
-     * @param _vitalizer    Address of the new [Vitalizer](/docs/gadgets/Vitalizer.md) instance.
+     * @param _vitalizer    Address of the new Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance.
      */
     function setVitalizerToken(address _vitalizer) public onlyOwner {
         vitalizer = _vitalizer;
@@ -218,7 +222,7 @@ contract Stats is IStats, Ownable, Pausable {
     }
 
     /**
-     * @notice Refills the pool stats for the character spending a [Refresher](/docs/gadgets/Refresher.md) token.
+     * @notice Refills the pool stats for the character spending a Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) token.
      *
      * Requirements:
      * @param _id   Composed ID of the character.
@@ -236,7 +240,6 @@ contract Stats is IStats, Ownable, Pausable {
             IERC20(refresher).allowance(msg.sender, address(this)) >= 1,
             "Stats: refreshWithToken() not enough refresh tokens allowance."
         );
-
         require(
             getNextRefreshWithTokenTime(_id) <= block.timestamp,
             "Stats: refreshWithToken() no more refresh with tokens available."
@@ -266,7 +269,7 @@ contract Stats is IStats, Ownable, Pausable {
     }
 
     /**
-     * @notice Recovers a sacrificed point spending a [Vitalizer](/docs/gadgets/Vitalizer.md) token.
+     * @notice Recovers a sacrificed point spending a Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) token.
      *
      * Requirements:
      * @param _id       Composed ID of the character.
@@ -292,7 +295,7 @@ contract Stats is IStats, Ownable, Pausable {
         );
         require(
             IERC20(vitalizer).allowance(msg.sender, address(this)) >= 1,
-            "Stats:consumeVitalizer() not enough vitalizer tokens allowance."
+            "Stats: consumeVitalizer() not enough vitalizer tokens allowance."
         );
 
         ERC20Burnable(vitalizer).burnFrom(msg.sender, 1);
@@ -404,7 +407,7 @@ contract Stats is IStats, Ownable, Pausable {
     }
 
     /**
-     * @notice External function that returns the next refresher timestamp for a character when using a [Refresher](/docs/gadgets/Refresher.md) token.
+     * @notice External function that returns the next refresher timestamp for a character when using a Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) token.
      *
      * Requirements:
      * @param _id           Composed ID of the character.

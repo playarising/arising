@@ -37,7 +37,7 @@ Address of the [Stats](/docs/core/Stats.md) instance.
 address gold
 ```
 
-Address of the [Gold](/docs/gadgets/Gold.md) instance.
+Address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance.
 
 ### quests
 
@@ -88,12 +88,12 @@ Constructor.
 
 Requirements:
 
-| Name            | Type    | Description                                                               |
-| --------------- | ------- | ------------------------------------------------------------------------- |
-| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
-| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.       |
-| \_stats         | address | The address of the [Stats](/docs/core/Stats.md) instance.                 |
-| \_gold          | address | The address of the [Gold](/docs/gadgets/Gold.md) instance.                |
+| Name            | Type    | Description                                                                          |
+| --------------- | ------- | ------------------------------------------------------------------------------------ |
+| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance.            |
+| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.                  |
+| \_stats         | address | The address of the [Stats](/docs/core/Stats.md) instance.                            |
+| \_gold          | address | The address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance. |
 
 ### pause
 
@@ -152,7 +152,7 @@ Requirements:
 | Name                | Type                     | Description                                                                                    |
 | ------------------- | ------------------------ | ---------------------------------------------------------------------------------------------- |
 | \_quest_type        | enum IQuests.QuestType   | Type of the added quest.                                                                       |
-| \_gold_reward       | uint256                  | Amount of [Gold](/docs/gadgets/Gold.md) tokens to reward.                                      |
+| \_gold_reward       | uint256                  | Amount of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) tokens to reward.            |
 | \_resources_reward  | address[]                | Array of [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to reward for the quest. |
 | \_resources_amounts | uint256[]                | Array of amounts for each resource reward.                                                     |
 | \_experience_reward | uint256                  | Amount of experience rewarded for the quest.                                                   |

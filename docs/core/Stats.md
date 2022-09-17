@@ -45,7 +45,7 @@ Map track the last refresh timestamps of the characters.
 address refresher
 ```
 
-Address of the [Refresher](/docs/gadgets/Refresher.md) instance.
+Address of the Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance.
 
 ### vitalizer
 
@@ -53,7 +53,7 @@ Address of the [Refresher](/docs/gadgets/Refresher.md) instance.
 address vitalizer
 ```
 
-Address of the [Vitalizer](/docs/gadgets/Vitalizer.md) instance.
+Address of the Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance.
 
 ### civilizations
 
@@ -153,13 +153,13 @@ Requirements:
 function setRefreshToken(address _refresher) public
 ```
 
-Changes the [Refresher](/docs/gadgets/Refresher.md) instance to use for paid refreshes.
+Changes the Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance to use for paid refreshes.
 
 Requirements:
 
-| Name        | Type    | Description                                                          |
-| ----------- | ------- | -------------------------------------------------------------------- |
-| \_refresher | address | Address of the new [Refresher](/docs/gadgets/Refresher.md) instance. |
+| Name        | Type    | Description                                                                             |
+| ----------- | ------- | --------------------------------------------------------------------------------------- |
+| \_refresher | address | Address of the new Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance. |
 
 ### setVitalizerToken
 
@@ -167,13 +167,13 @@ Requirements:
 function setVitalizerToken(address _vitalizer) public
 ```
 
-Changes the [Vitalizer](/docs/gadgets/Vitalizer.md) instance to use for sacrifice points recover.
+Changes the Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance to use for sacrifice points recover.
 
 Requirements:
 
-| Name        | Type    | Description                                                          |
-| ----------- | ------- | -------------------------------------------------------------------- |
-| \_vitalizer | address | Address of the new [Vitalizer](/docs/gadgets/Vitalizer.md) instance. |
+| Name        | Type    | Description                                                                             |
+| ----------- | ------- | --------------------------------------------------------------------------------------- |
+| \_vitalizer | address | Address of the new Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance. |
 
 ### consume
 
@@ -225,7 +225,7 @@ Requirements:
 function refreshWithToken(bytes _id) public
 ```
 
-Refills the pool stats for the character spending a [Refresher](/docs/gadgets/Refresher.md) token.
+Refills the pool stats for the character spending a Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) token.
 
 Requirements:
 
@@ -239,7 +239,7 @@ Requirements:
 function consumeVitalizer(bytes _id, struct IStats.BasicStats _stats) public
 ```
 
-Recovers a sacrificed point spending a [Vitalizer](/docs/gadgets/Vitalizer.md) token.
+Recovers a sacrificed point spending a Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) token.
 
 Requirements:
 
@@ -341,7 +341,7 @@ Requirements:
 function getNextRefreshWithTokenTime(bytes _id) public view returns (uint256 _timestamp)
 ```
 
-External function that returns the next refresher timestamp for a character when using a [Refresher](/docs/gadgets/Refresher.md) token.
+External function that returns the next refresher timestamp for a character when using a Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) token.
 
 Requirements:
 

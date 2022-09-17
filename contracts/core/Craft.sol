@@ -27,7 +27,7 @@ contract Craft is ICraft, Ownable, Pausable {
     /** @notice Array to track all the recipes IDs. */
     uint256[] private _recipes;
 
-    /** @notice The address of the [Gold](/docs/gadgets/Gold.md) instance. */
+    /** @notice The address of the the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance. */
     address public gold;
 
     /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
@@ -56,6 +56,10 @@ contract Craft is ICraft, Ownable, Pausable {
      */
     modifier onlyAllowed(bytes memory _id) {
         require(
+            ICivilizations(civilizations).exists(_id),
+            "Craft: onlyAllowed() token not minted."
+        );
+        require(
             ICivilizations(civilizations).isAllowed(msg.sender, _id),
             "Craft: onlyAllowed() msg.sender is not allowed to access this token."
         );
@@ -71,7 +75,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      * @param _stats            The address of the [Stats](/docs/core/Stats.md) instance.
-     * @param _gold             The address of the [Gold](/docs/gadgets/Gold.md) instance.
+     * @param _gold             The address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance.
      * @param _items            The address of the [Items](/docs/items/Items.md) instance.
      */
     constructor(
@@ -135,7 +139,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * @param _stats                Stats to consume from the pool for craft.
      * @param _cooldown             Number of seconds for the recipe cooldown.
      * @param _level_required       Minimum level required to craft the recipe.
-     * @param _gold_cost            Cost of [Gold](/docs/gadgets/Gold.md) required to craft the recipe.
+     * @param _gold_cost            Cost of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) required to craft the recipe.
      * @param _reward               ID of the token to reward for the [Items](/docs/items/Items.md) instance.
      * @param _experience_reward    Amount of experience rewarded for the recipe.
      */

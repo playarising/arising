@@ -37,7 +37,7 @@ Address of the [Stats](/docs/core/Stats.md) instance.
 address gold
 ```
 
-Address of the [Gold](/docs/gadgets/Gold.md) instance.
+Address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance.
 
 ### recipes
 
@@ -104,14 +104,14 @@ Constructor.
 
 Requirements:
 
-| Name            | Type    | Description                                                               |
-| --------------- | ------- | ------------------------------------------------------------------------- |
-| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
-| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.       |
-| \_stats         | address | The address of the [Stats](/docs/core/Stats.md) instance.                 |
-| \_gold          | address | The address of the [Gold](/docs/gadgets/Gold.md) instance.                |
-| \_token         | address | Address of the token used to purchase.                                    |
-| \_price         | uint256 | Price for each token.                                                     |
+| Name            | Type    | Description                                                                          |
+| --------------- | ------- | ------------------------------------------------------------------------------------ |
+| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance.            |
+| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.                  |
+| \_stats         | address | The address of the [Stats](/docs/core/Stats.md) instance.                            |
+| \_gold          | address | The address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance. |
+| \_token         | address | Address of the token used to purchase.                                               |
+| \_price         | uint256 | Price for each token.                                                                |
 
 ### pause
 
@@ -174,7 +174,7 @@ Requirements:
 | \_stats             | struct IStats.BasicStats | Stats to consume from the pool for recipe.                                                                 |
 | \_cooldown          | uint256                  | Number of seconds for the recipe cooldown.                                                                 |
 | \_level_required    | uint256                  | Minimum level required to forge the recipe.                                                                |
-| \_gold_cost         | uint256                  | Cost of [Gold](/docs/gadgets/Gold.md) required to forge the recipe.                                        |
+| \_gold_cost         | uint256                  | Cost of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) required to forge the recipe.              |
 | \_reward            | address                  | Address of the [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to be rewarded for the recipe. |
 | \_experience_reward | uint256                  | Amount of experience rewarded for the recipe.                                                              |
 

@@ -47,6 +47,10 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
      */
     modifier onlyAllowed(bytes memory _id) {
         require(
+            ICivilizations(civilizations).exists(_id),
+            "Equipment: onlyAllowed() token not minted."
+        );
+        require(
             ICivilizations(civilizations).isAllowed(msg.sender, _id),
             "Equipment: onlyAllowed() msg.sender is not allowed to access this token."
         );

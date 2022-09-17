@@ -30,7 +30,7 @@ contract Forge is IForge, Ownable, Pausable {
     /** @notice Address of the [Stats](/docs/core/Stats.md) instance. */
     address public stats;
 
-    /** @notice Address of the [Gold](/docs/gadgets/Gold.md) instance. */
+    /** @notice Address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance. */
     address public gold;
 
     /** @notice Map to track available recipes on the forge. */
@@ -59,6 +59,10 @@ contract Forge is IForge, Ownable, Pausable {
      */
     modifier onlyAllowed(bytes memory _id) {
         require(
+            ICivilizations(civilizations).exists(_id),
+            "Forge: onlyAllowed() token not minted."
+        );
+        require(
             ICivilizations(civilizations).isAllowed(msg.sender, _id),
             "Forge: onlyAllowed() msg.sender is not allowed to access this token."
         );
@@ -74,7 +78,7 @@ contract Forge is IForge, Ownable, Pausable {
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      * @param _stats            The address of the [Stats](/docs/core/Stats.md) instance.
-     * @param _gold             The address of the [Gold](/docs/gadgets/Gold.md) instance.
+     * @param _gold             The address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance.
      * @param _token            Address of the token used to purchase.
      * @param _price            Price for each token.
      */
@@ -141,7 +145,7 @@ contract Forge is IForge, Ownable, Pausable {
      * @param _stats                Stats to consume from the pool for recipe.
      * @param _cooldown             Number of seconds for the recipe cooldown.
      * @param _level_required       Minimum level required to forge the recipe.
-     * @param _gold_cost            Cost of [Gold](/docs/gadgets/Gold.md) required to forge the recipe.
+     * @param _gold_cost            Cost of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) required to forge the recipe.
      * @param _reward               Address of the [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to be rewarded for the recipe.
      * @param _experience_reward    Amount of experience rewarded for the recipe.
      */

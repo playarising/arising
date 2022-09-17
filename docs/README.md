@@ -22,12 +22,6 @@
 - [Quests](/docs/core/Quests.md)
 - [Stats](/docs/core/Stats.md)
 
-### Gadgets
-
-- [Gold](/docs/gadgets/Gold.md)
-- [Refresher](/docs/gadgets/Refresher.md)
-- [Vitalizer](/docs/gadgets/Vitalizer.md)
-
 ### Interfaces
 
 - [IBaseERC20Wrapper](/docs/interfaces/IBaseERC20Wrapper.md)

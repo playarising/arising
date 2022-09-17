@@ -47,6 +47,10 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
      */
     modifier onlyAllowed(bytes memory _id) {
         require(
+            ICivilizations(civilizations).exists(_id),
+            "BaseFungibleItem: onlyAllowed() token not minted."
+        );
+        require(
             ICivilizations(civilizations).isAllowed(msg.sender, _id),
             "BaseFungibleItem: onlyAllowed() msg.sender is not allowed to access this token."
         );
