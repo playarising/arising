@@ -248,4 +248,25 @@ describe("Quests", () => {
     quest = await this.quests.getCharacterCurrentQuest(id);
     expect(quest.claimed_reward).to.eq(true);
   });
+
+  it("should add a quest complete it and claim with 100% fulfillment", async () => {
+    const id = await this.civ.getTokenID(1, 1);
+    await this.quests.addQuest(
+      0,
+      10,
+      [this.resource.address],
+      [10],
+      100,
+      { might: 2, speed: 2, intellect: 2 },
+      3600,
+      1
+    );
+    await this.quests.startQuest(id, 2, { might: 2, speed: 2, intellect: 2 });
+    const quest = await this.quests.getCharacterCurrentQuest(id);
+    await ethers.provider.send("evm_mine", [quest.cooldown.toNumber()]);
+    await this.quests.claimQuest(id);
+    expect(await this.resource.balanceOf(id)).to.eq(13);
+    expect(await this.gold.balanceOf(id)).to.eq(13);
+    expect(await this.experience.getExperience(id)).to.eq(10135);
+  });
 });
