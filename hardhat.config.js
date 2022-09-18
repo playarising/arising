@@ -18,7 +18,7 @@ const argv = require("yargs/yargs")()
       alias: "compileVersion",
       type: "string",
       default: "0.8.17",
-    }
+    },
   }).argv;
 
 if (argv.enableGasReport) {

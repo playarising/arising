@@ -20,77 +20,8 @@ Etia is a fantasy world in which all characters take part. A world with four big
 
 ### [Documentation](docs/)
 
-### [Contracts interaction map](diagram/arising-diagram.jpeg?raw=true)
+### [Deployments](deployments/)
+
+### [Diagram](diagram/arising-diagram.jpeg?raw=true)
 
 </span>
-
-## Deployments
-
-### Civilizations
-
-| Contract     | Deployment |
-| ------------ | ---------- |
-| **Ard**      |            |
-| **Hartheim** |            |
-| **IKarans**  |            |
-| **Shinkari** |            |
-| **Tarki**    |            |
-| **Zhand**    |            |
-
-### Core
-
-| Contract          | Deployment |
-| ----------------- | ---------- |
-| **Civilizations** |            |
-| **Craft**         |            |
-| **Equipment**     |            |
-| **Experience**    |            |
-| **Forge**         |            |
-| **Levels**        |            |
-| **Names**         |            |
-| **Quests**        |            |
-| **Stats**         |            |
-
-### Raw Materials
-
-| Contract       | Deployment |
-| -------------- | ---------- |
-| **Adamantine** |            |
-| **Bronze**     |            |
-| **Coal**       |            |
-| **Cobalt**     |            |
-| **Cotton**     |            |
-| **Iron**       |            |
-| **Leather**    |            |
-| **Platinum**   |            |
-| **Silk**       |            |
-| **Silver**     |            |
-| **Stone**      |            |
-| **Wood**       |            |
-| **Wool**       |            |
-
-### Basic Materials
-
-| Contract            | Deployment |
-| ------------------- | ---------- |
-| **AdamantineBar**   |            |
-| **BronzeBar**       |            |
-| **CobaltBar**       |            |
-| **CottonFabric**    |            |
-| **GoldBar**         |            |
-| **HardenedLeather** |            |
-| **IronBar**         |            |
-| **PlatinumBar**     |            |
-| **SilkFabric**      |            |
-| **SilverBar**       |            |
-| **SteelBar**        |            |
-| **WoodPlank**       |            |
-| **WoolFabric**      |            |
-
-### Gadgets
-
-| Contract      | Deployment |
-| ------------- | ---------- |
-| **Gold**      |            |
-| **Refresher** |            |
-| **Vitalizer** |            |
