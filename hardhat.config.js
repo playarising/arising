@@ -18,11 +18,7 @@ const argv = require("yargs/yargs")()
       alias: "compileVersion",
       type: "string",
       default: "0.8.17",
-    },
-    coinmarketcap: {
-      alias: "coinmarketcapApiKey",
-      type: "string",
-    },
+    }
   }).argv;
 
 if (argv.enableGasReport) {
@@ -56,7 +52,7 @@ module.exports = {
     token: "MATIC",
     currency: "USD",
     outputFile: argv.ci ? "gas-report.txt" : undefined,
-    coinmarketcap: argv.coinmarketcap,
+    coinmarketcap: process.env.COINMARKETCAP_API_KEY,
   },
   docgen: {
     path: "./docs",
