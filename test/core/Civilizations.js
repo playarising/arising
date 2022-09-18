@@ -168,6 +168,12 @@ describe("Civilizations", () => {
     ).to.revertedWith("Civilizations: ownerOf() invalid civilization id.");
   });
 
+  it("should fail to set the mint price from non owner", async () => {
+    await expect(this.civ.connect(this.minter).setMintPrice(1)).to.revertedWith(
+      "Ownable: caller is not the owner"
+    );
+  });
+
   it("should fail to set upgrade price from non owner", async () => {
     await expect(
       this.civ.connect(this.minter).setUpgradePrice(1, 1)
@@ -235,6 +241,11 @@ describe("Civilizations", () => {
     const upgrade3 = await this.civ.getUpgradeInformation(3);
     expect(upgrade3.available).to.eq(false);
     expect(upgrade3.price).to.eq(ethers.utils.parseEther("89.99"));
+  });
+
+  it("should set the mint price correctly", async () => {
+    await this.civ.setMintPrice(ethers.utils.parseEther("19.99"));
+    expect(await this.civ.price()).to.eq(ethers.utils.parseEther("19.99"));
   });
 
   it("should change the charge token correctly", async () => {
@@ -364,6 +375,30 @@ describe("Civilizations", () => {
     );
     expect(await this.mock.balanceOf(this.civ.address)).to.eq(
       ethers.utils.parseEther("179.97")
+    );
+    await this.civ.withdraw();
+    expect(await this.mock.balanceOf(this.owner.address)).to.eq(
+      ethers.utils.parseEther("3679.97")
+    );
+    expect(await this.mock.balanceOf(this.civ.address)).to.eq(
+      ethers.utils.parseEther("0")
+    );
+  });
+
+  it("should be able to mint with price", async () => {
+    expect(await this.mock.balanceOf(this.owner.address)).to.eq(
+      ethers.utils.parseEther("3679.97")
+    );
+    expect(await this.mock.balanceOf(this.civ.address)).to.eq(
+      ethers.utils.parseEther("0")
+    );
+    await this.mock.approve(this.civ.address, ethers.utils.parseEther("1000"));
+    await this.civ.mint(1);
+    expect(await this.mock.balanceOf(this.owner.address)).to.eq(
+      ethers.utils.parseEther("3659.98")
+    );
+    expect(await this.mock.balanceOf(this.civ.address)).to.eq(
+      ethers.utils.parseEther("19.99")
     );
     await this.civ.withdraw();
     expect(await this.mock.balanceOf(this.owner.address)).to.eq(

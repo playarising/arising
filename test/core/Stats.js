@@ -59,7 +59,7 @@ describe("Stats", () => {
     await this.collection.deployed();
 
     const Civilizations = await ethers.getContractFactory("Civilizations");
-    this.civ = await Civilizations.deploy(receiver.address);
+    this.civ = await Civilizations.deploy(this.mock.address);
     await this.civ.deployed();
     await this.civ.addCivilization(this.collection.address);
 

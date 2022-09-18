@@ -187,6 +187,7 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
             _canMint(msg.sender),
             "Civilizations: mint() address already minted."
         );
+        IERC20(token).transferFrom(msg.sender, address(this), price);
         _addMint(msg.sender);
         emit Summoned(
             msg.sender,
