@@ -10,11 +10,19 @@ interface IItems {
      * @notice Internal struct to store the item properties.
      *
      * Requirements:
-     * @param min   The minimum amount of experience to achieve the level.
-     * @param max   The maximum amount of experience for this level (non inclusive).
+     * @param id                The id of the item.
+     * @param name              The name of the item.
+     * @param description       The description of the item
+     * @param level_required    The minimum level required to equip the item.
+     * @param item_type         The item type to use for the equipment slot.
+     * @param stat_modifiers    The modifiers that add or removes from the character pool.
+     * @param attributes        The base item attributes.
+     * @param available         Boolean to check if the item is available to be equiped.
      */
     struct Item {
         uint256 id;
+        string name;
+        string description;
         uint256 level_required;
         ItemType item_type;
         StatsModifiers stat_modifiers;
@@ -125,6 +133,8 @@ interface IItems {
 
     /** @notice See [Items#addItem](/docs/items/Items.md#addItem) */
     function addItem(
+        string memory _name,
+        string memory _description,
         uint256 _level_required,
         ItemType _item_type,
         StatsModifiers memory _stats_modifiers,

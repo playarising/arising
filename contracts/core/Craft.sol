@@ -78,7 +78,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * @notice Event emmited when the [addRecipe](#addRecipe) function is called.
      *
      * Requirements:
-     * @param _recipe_id    ID of the the recipe added.
+     * @param _recipe_id    ID of the recipe added.
      * @param _name         Name of the recipe.
      * @param _description  Recipe description
      */
@@ -92,7 +92,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * @notice Event emmited when the [enableRecipe](#enableRecipe) function is called.
      *
      * Requirements:
-     * @param _recipe_id    ID of the the recipe added.
+     * @param _recipe_id    ID of the recipe enabled.
      */
     event EnableRecipe(uint256 indexed _recipe_id);
 
@@ -100,7 +100,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * @notice Event emmited when the [disableRecipe](#disableRecipe) function is called.
      *
      * Requirements:
-     * @param _recipe_id    ID of the the recipe added.
+     * @param _recipe_id    ID of the recipe disabled.
      */
     event DisableRecipe(uint256 indexed _recipe_id);
 

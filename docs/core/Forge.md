@@ -104,11 +104,11 @@ Event emmited when the [addRecipe](#addRecipe) function is called.
 
 Requirements:
 
-| Name          | Type    | Description                 |
-| ------------- | ------- | --------------------------- |
-| \_recipe_id   | uint256 | ID of the the recipe added. |
-| \_name        | string  | Name of the recipe.         |
-| \_description | string  | Recipe description          |
+| Name          | Type    | Description             |
+| ------------- | ------- | ----------------------- |
+| \_recipe_id   | uint256 | ID of the recipe added. |
+| \_name        | string  | Name of the recipe.     |
+| \_description | string  | Recipe description      |
 
 ### EnableRecipe
 
@@ -120,9 +120,9 @@ Event emmited when the [enableRecipe](#enableRecipe) function is called.
 
 Requirements:
 
-| Name        | Type    | Description                 |
-| ----------- | ------- | --------------------------- |
-| \_recipe_id | uint256 | ID of the the recipe added. |
+| Name        | Type    | Description               |
+| ----------- | ------- | ------------------------- |
+| \_recipe_id | uint256 | ID of the recipe enabled. |
 
 ### DisableRecipe
 
@@ -134,9 +134,9 @@ Event emmited when the [disableRecipe](#disableRecipe) function is called.
 
 Requirements:
 
-| Name        | Type    | Description                 |
-| ----------- | ------- | --------------------------- |
-| \_recipe_id | uint256 | ID of the the recipe added. |
+| Name        | Type    | Description                |
+| ----------- | ------- | -------------------------- |
+| \_recipe_id | uint256 | ID of the recipe disabled. |
 
 ### constructor
 

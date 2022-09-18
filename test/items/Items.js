@@ -85,6 +85,8 @@ describe("Items", () => {
   it("should fail to add an item from non owner", async () => {
     await expect(
       this.items.connect(this.minter).addItem(
+        "test",
+        "test 2",
         1,
         1,
         {
@@ -114,32 +116,38 @@ describe("Items", () => {
   });
 
   it("should add an item correctly", async () => {
-    await this.items.addItem(
-      1,
-      2,
-      {
-        might: 1,
-        speed: 1,
-        intellect: 1,
-        might_reducer: 1,
-        speed_reducer: 1,
-        intellect_reducer: 1,
-      },
-      {
-        atk: 0,
-        atk_reducer: 0,
-        def: 0,
-        def_reducer: 0,
-        range: 0,
-        range_reducer: 0,
-        mag_atk: 0,
-        mag_atk_reducer: 0,
-        mag_def: 0,
-        mag_def_reducer: 0,
-        rate: 0,
-        rate_reducer: 0,
-      }
-    );
+    await expect(
+      this.items.addItem(
+        "test",
+        "test 2",
+        1,
+        2,
+        {
+          might: 1,
+          speed: 1,
+          intellect: 1,
+          might_reducer: 1,
+          speed_reducer: 1,
+          intellect_reducer: 1,
+        },
+        {
+          atk: 0,
+          atk_reducer: 0,
+          def: 0,
+          def_reducer: 0,
+          range: 0,
+          range_reducer: 0,
+          mag_atk: 0,
+          mag_atk_reducer: 0,
+          mag_def: 0,
+          mag_def_reducer: 0,
+          rate: 0,
+          rate_reducer: 0,
+        }
+      )
+    )
+      .to.emit(this.items, "AddItem")
+      .withArgs(1, "test", "test 2");
     const item = await this.items.getItem(1);
     expect(item.level_required).to.eq(1);
     expect(item.item_type).to.eq(2);
@@ -173,13 +181,17 @@ describe("Items", () => {
   });
 
   it("should disable an item correctly", async () => {
-    await this.items.disableItem(1);
+    await expect(this.items.disableItem(1))
+      .to.emit(this.items, "DisableItem")
+      .withArgs(1);
     const item = await this.items.getItem(1);
     expect(item.available).to.eq(false);
   });
 
   it("should enable an item correctly", async () => {
-    await this.items.enableItem(1);
+    await expect(this.items.enableItem(1))
+      .to.emit(this.items, "EnableItem")
+      .withArgs(1);
     const item = await this.items.getItem(1);
     expect(item.available).to.eq(true);
   });
