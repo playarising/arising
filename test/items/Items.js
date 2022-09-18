@@ -15,7 +15,7 @@ describe("Items", () => {
 
   it("should fail to mint an invalid item", async () => {
     await expect(this.items.mint(this.owner.address, 1)).to.revertedWith(
-      "Items: mint() invalid item it."
+      "Items: mint() invalid item id."
     );
   });
 

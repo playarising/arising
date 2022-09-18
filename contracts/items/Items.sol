@@ -39,7 +39,7 @@ contract Items is IItems, Ownable, ERC1155 {
     function mint(address _to, uint256 _item_id) public onlyOwner {
         require(
             _item_id != 0 && _item_id <= _items.length,
-            "Items: mint() invalid item it."
+            "Items: mint() invalid item id."
         );
         _mint(_to, _item_id, 1, "");
     }
