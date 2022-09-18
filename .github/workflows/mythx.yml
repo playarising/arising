@@ -38,7 +38,18 @@ jobs:
             --group-name "@playarising/arising@${{ github.sha }}" \
             --solc-version 0.8.17 \
             --check-properties \
-            flat/BaseERC20Wrapper.sol  \
-            flat/BaseERC721.sol  \
-            flat/BaseFungibleItem.sol  \
-            flat/BaseGadgetToken.sol
+            flat/base/BaseERC20Wrapper.sol  \
+            flat/base/BaseERC721.sol  \
+            flat/base/BaseFungibleItem.sol  \
+            flat/base/BaseGadgetToken.sol  \
+            flat/codex/Levels.sol  \
+            flat/core/Civilizations.sol  \
+            flat/core/Craft.sol  \
+            flat/core/Equipment.sol  \
+            flat/core/Experience.sol  \
+            flat/core/Forge.sol  \
+            flat/core/Names.sol  \
+            flat/core/Quests.sol  \
+            flat/core/Stats.sol  \
+            flat/items/Items.sol
+                        
