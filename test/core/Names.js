@@ -45,7 +45,7 @@ describe("Names", () => {
   });
 
   it("should not be able to claim a name when paused", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     expect(await this.names.paused()).to.eq(false);
     await this.names.pause();
     expect(await this.names.paused()).to.eq(true);
@@ -94,21 +94,21 @@ describe("Names", () => {
   });
 
   it("should fail trying to claim a name from a non level 5 character", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     await expect(
       this.names.claimName(id, "Conan de Barbarian")
     ).to.revertedWith("Name: claimName() not enough level.");
   });
 
   it("should fail trying to replacing a name from a non level 5 character", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     await expect(
       this.names.replaceName(id, "Conan de Barbarian")
     ).to.revertedWith("Name: replaceName() not enough level.");
   });
 
   it("should fail trying to claim an invalid name", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     await this.experience.assignExperience(id, 20000);
     await expect(this.names.claimName(id, "trailing space ")).to.revertedWith(
       "Name: claimName() invalid name."
@@ -116,7 +116,7 @@ describe("Names", () => {
   });
 
   it("should claim a name for a token", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     expect(await this.names.getCharacterName(id)).to.eq("");
     await this.names.claimName(id, "Conan de Barbarian");
     expect(await this.names.getCharacterName(id)).to.eq("Conan de Barbarian");
@@ -131,14 +131,14 @@ describe("Names", () => {
   });
 
   it("should fail to claim a name for a token with a name already claimed", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     await expect(this.names.claimName(id, "Conan")).to.revertedWith(
       "Name: claimName() already named."
     );
   });
 
   it("should fail trying to replace an invalid name", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     await expect(this.names.replaceName(id, "trailing space ")).to.revertedWith(
       "Name: replaceName() invalid name."
     );
@@ -152,7 +152,7 @@ describe("Names", () => {
   });
 
   it("should fail trying to replace an already used name", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     const id2 = this.civ.getTokenID(1, 2);
     await this.names.claimName(id2, "Gandalf the White");
     await expect(
@@ -161,7 +161,7 @@ describe("Names", () => {
   });
 
   it("should replace a name correctly", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     expect(await this.names.getCharacterName(id)).to.eq("Conan de Barbarian");
     await this.names.replaceName(id, "Radagast The Brown");
     expect(await this.names.getCharacterName(id)).to.eq("Radagast The Brown");
@@ -176,7 +176,7 @@ describe("Names", () => {
   });
 
   it("should clear a name correctly", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     expect(await this.names.getCharacterName(id)).to.eq("Radagast The Brown");
     await this.names.clearName(id);
     expect(await this.names.getCharacterName(id)).to.eq("");
@@ -184,7 +184,7 @@ describe("Names", () => {
   });
 
   it("should fail to rename a token from a non allowed", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     await expect(
       this.names.connect(this.minter1).replaceName(id, "Conan")
     ).to.revertedWith(
@@ -193,7 +193,7 @@ describe("Names", () => {
   });
 
   it("should be able to replace a name with approval and allowance", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     await this.collection.approve(this.minter1.address, 1);
     await this.collection.setApprovalForAll(this.minter2.address, true);
     expect(await this.names.getCharacterName(id)).to.eq("");

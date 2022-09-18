@@ -46,6 +46,36 @@ modifier onlyAuthorized()
 
 Checks against if the `msg.sender` is authorized to assign experience.
 
+### ExperienceIncreased
+
+```solidity
+event ExperienceIncreased(bytes _id, uint256 _experience)
+```
+
+Event emmited when the [assignExperience](#assignExperience) function is called.
+
+Requirements:
+
+| Name         | Type    | Description                   |
+| ------------ | ------- | ----------------------------- |
+| \_id         | bytes   | Composed ID of the character. |
+| \_experience | uint256 | Total experience amount.      |
+
+### NewLevel
+
+```solidity
+event NewLevel(bytes _id, uint256 _level)
+```
+
+Event emmited when the [assignExperience](#assignExperience) function is called if the character increased a level.
+
+Requirements:
+
+| Name    | Type    | Description                   |
+| ------- | ------- | ----------------------------- |
+| \_id    | bytes   | Composed ID of the character. |
+| \_level | uint256 | The new level reached.        |
+
 ### constructor
 
 ```solidity

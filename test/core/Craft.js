@@ -204,7 +204,18 @@ describe("Craft", () => {
     await expect(
       this.craft
         .connect(this.receiver)
-        .addRecipe([], [], { might: 1, speed: 1, intellect: 1 }, 1, 1, 1, 1, 1)
+        .addRecipe(
+          "Test",
+          "test 2",
+          [],
+          [],
+          { might: 1, speed: 1, intellect: 1 },
+          1,
+          1,
+          1,
+          1,
+          1
+        )
     ).to.revertedWith("Ownable: caller is not the owner");
   });
 
@@ -213,6 +224,8 @@ describe("Craft", () => {
       this.craft
         .connect(this.receiver)
         .addUpgrade(
+          "Test",
+          "test 2",
           [],
           [],
           { might: 1, speed: 1, intellect: 1 },
@@ -228,6 +241,8 @@ describe("Craft", () => {
   it("should fail adding a recipe when materials and amount doesn't match", async () => {
     await expect(
       this.craft.addRecipe(
+        "Test",
+        "test 2",
         [this.resource.address],
         [],
         { might: 1, speed: 1, intellect: 1 },
@@ -243,6 +258,8 @@ describe("Craft", () => {
   it("should fail adding an upgrade when no owner", async () => {
     await expect(
       this.craft.addUpgrade(
+        "Test",
+        "test 2",
         [this.resource.address],
         [],
         { might: 1, speed: 1, intellect: 1 },
@@ -256,32 +273,44 @@ describe("Craft", () => {
   });
 
   it("should add a recipe correctly", async () => {
-    await this.craft.addRecipe(
-      [this.resource.address],
-      [10],
-      { might: 1, speed: 1, intellect: 1 },
-      3600,
-      3,
-      100,
-      1,
-      1
-    );
+    await expect(
+      this.craft.addRecipe(
+        "Test",
+        "test 2",
+        [this.resource.address],
+        [10],
+        { might: 1, speed: 1, intellect: 1 },
+        3600,
+        3,
+        100,
+        1,
+        1
+      )
+    )
+      .to.emit(this.craft, "AddRecipe")
+      .withArgs(1, "Test", "test 2");
 
     const recipe = await this.craft.getRecipe(1);
     expect(recipe.available).to.eq(true);
   });
 
   it("should add an upgrade correctly", async () => {
-    await this.craft.addUpgrade(
-      [this.resource.address],
-      [10],
-      { might: 1, speed: 1, intellect: 1 },
-      { might: 1, speed: 1, intellect: 1 },
-      5,
-      1,
-      1,
-      2
-    );
+    await expect(
+      this.craft.addUpgrade(
+        "Test",
+        "test 2",
+        [this.resource.address],
+        [10],
+        { might: 1, speed: 1, intellect: 1 },
+        { might: 1, speed: 1, intellect: 1 },
+        5,
+        1,
+        1,
+        2
+      )
+    )
+      .to.emit(this.craft, "AddUpgrade")
+      .withArgs(1, "Test", "test 2");
 
     const upgrade = await this.craft.getUpgrade(1);
     expect(upgrade.available).to.eq(true);
@@ -290,10 +319,14 @@ describe("Craft", () => {
   it("should enable and disable the recipe correctly", async () => {
     let recipe = await this.craft.getRecipe(1);
     expect(recipe.available).to.eq(true);
-    await this.craft.disableRecipe(1);
+    await expect(this.craft.disableRecipe(1))
+      .to.emit(this.craft, "DisableRecipe")
+      .withArgs(1);
     recipe = await this.craft.getRecipe(1);
     expect(recipe.available).to.eq(false);
-    await this.craft.enableRecipe(1);
+    await expect(this.craft.enableRecipe(1))
+      .to.emit(this.craft, "EnableRecipe")
+      .withArgs(1);
     recipe = await this.craft.getRecipe(1);
     expect(recipe.available).to.eq(true);
   });
@@ -301,10 +334,14 @@ describe("Craft", () => {
   it("should enable and disable the upgrade correctly", async () => {
     let upgrade = await this.craft.getUpgrade(1);
     expect(upgrade.available).to.eq(true);
-    await this.craft.disableUpgrade(1);
+    await expect(this.craft.disableUpgrade(1))
+      .to.emit(this.craft, "DisableUpgrade")
+      .withArgs(1);
     upgrade = await this.craft.getUpgrade(1);
     expect(upgrade.available).to.eq(false);
-    await this.craft.enableUpgrade(1);
+    await expect(this.craft.enableUpgrade(1))
+      .to.emit(this.craft, "EnableUpgrade")
+      .withArgs(1);
     upgrade = await this.craft.getUpgrade(1);
     expect(upgrade.available).to.eq(true);
   });

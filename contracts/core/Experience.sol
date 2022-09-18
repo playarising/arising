@@ -39,6 +39,26 @@ contract Experience is IExperience, Ownable {
         _;
     }
 
+    // =============================================== Events =========================================================
+
+    /**
+     * @notice Event emmited when the [assignExperience](#assignExperience) function is called.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     * @param _experience   Total experience amount.
+     */
+    event ExperienceIncreased(bytes indexed _id, uint256 _experience);
+
+    /**
+     * @notice Event emmited when the [assignExperience](#assignExperience) function is called if the character increased a level.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _level    The new level reached.
+     */
+    event NewLevel(bytes indexed _id, uint256 _level);
+
     // =============================================== Setters ========================================================
 
     /**
@@ -79,7 +99,13 @@ contract Experience is IExperience, Ownable {
             ICivilizations(civilizations).exists(_id),
             "Experience: assignExperience() token not minted."
         );
+        uint256 _old_level = ILevels(levels).getLevel(experience[_id]);
         experience[_id] += _amount;
+        uint256 _new_level = ILevels(levels).getLevel(experience[_id]);
+        if (_old_level != _new_level) {
+            emit NewLevel(_id, _new_level);
+        }
+        emit ExperienceIncreased(_id, experience[_id]);
     }
 
     /**
