@@ -27,7 +27,7 @@ contract Items is IItems, Ownable, ERC1155 {
     /**
      * @notice Constructor.
      */
-    constructor() ERC1155("https://items.playarising.com/{id}/") {}
+    constructor() ERC1155("https://items.playarising.com/{id}") {}
 
     /**
      * @notice Creates tokens to the address provided.
@@ -37,6 +37,10 @@ contract Items is IItems, Ownable, ERC1155 {
      * @param _item_id      ID of the item to be created.
      */
     function mint(address _to, uint256 _item_id) public onlyOwner {
+        require(
+            _item_id != 0 && _item_id <= _items.length,
+            "Items: mint() invalid item it."
+        );
         _mint(_to, _item_id, 1, "");
     }
 
@@ -106,6 +110,10 @@ contract Items is IItems, Ownable, ERC1155 {
      * @return _item    Full item information.
      */
     function getItem(uint256 _item_id) public view returns (Item memory _item) {
+        require(
+            _item_id != 0 && _item_id <= _items.length,
+            "Items: getItem() invalid item it."
+        );
         return items[_item_id];
     }
 }
