@@ -1,0 +1,44 @@
+name: Mythx
+
+on: workflow_dispatch
+
+jobs:
+  mythx:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: latest
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: '**/node_modules'
+          key: yarn-v2-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn-v2-
+      - run: yarn install
+      - run: yarn flat
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 'latest'
+      - name: Install MythX
+        run: |
+          pip3 install mythx-cli 
+          pip3 install solc-select
+          solc-select install 0.8.17
+          solc-select use 0.8.17
+      - name: Submit code to Mythx
+        run: |
+          mythx --api-key ${{ secrets.MYTHX_API_KEY }} \
+            --yes \
+            analyze \
+            --mode deep \
+            --async \
+            --create-group \
+            --group-name "@playarising/arising@${{ github.sha }}" \
+            --solc-version 0.8.17 \
+            --check-properties \
+            flat/BaseERC20Wrapper.sol  \
+            flat/BaseERC721.sol  \
+            flat/BaseFungibleItem.sol  \
+            flat/BaseGadgetToken.sol
