@@ -25,25 +25,6 @@ jobs:
           ENABLE_GAS_REPORT: true
       - name: Print gas report
         run: cat gas-report.txt
-
-  coverage:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-      - uses: actions/setup-node@v3
-        with:
-          node-version: latest
-      - uses: actions/cache@v3
-        id: cache
-        with:
-          path: '**/node_modules'
-          key: yarn-v2-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-v2-
-      - run: yarn install      
-      - run: yarn ci
-        if: steps.cache.outputs.cache-hit != 'true'
       - run: yarn run coverage
         env:
           NODE_OPTIONS: --max_old_space_size=4096
