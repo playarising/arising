@@ -61,7 +61,12 @@ describe("Civilizations", () => {
   });
 
   it("should mint a token correctly", async () => {
-    await this.civ.mint(1);
+    await expect(this.civ.mint(1))
+      .to.emit(this.civ, "Summoned")
+      .withArgs(
+        this.owner.address,
+        "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000001"
+      );
     expect(await this.collection.balanceOf(this.owner.address)).to.eq(1);
   });
 
@@ -354,9 +359,15 @@ describe("Civilizations", () => {
     await this.mock
       .connect(this.minter3)
       .approve(this.civ.address, ethers.utils.parseEther("1000"));
-    await this.civ.connect(this.minter3).buyUpgrade(id, 1);
-    await this.civ.connect(this.minter3).buyUpgrade(id, 2);
-    await this.civ.connect(this.minter3).buyUpgrade(id, 3);
+    await expect(this.civ.connect(this.minter3).buyUpgrade(id, 1))
+      .to.emit(this.civ, "UpgradePurchased")
+      .withArgs(id, 1);
+    await expect(this.civ.connect(this.minter3).buyUpgrade(id, 2))
+      .to.emit(this.civ, "UpgradePurchased")
+      .withArgs(id, 2);
+    await expect(this.civ.connect(this.minter3).buyUpgrade(id, 3))
+      .to.emit(this.civ, "UpgradePurchased")
+      .withArgs(id, 3);
     const upgrades = await this.civ.getCharacterUpgrades(id);
     expect(upgrades[0]).to.eq(true);
     expect(upgrades[1]).to.eq(true);

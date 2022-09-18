@@ -113,7 +113,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * @param _description      Recipe description
      */
     event AddUpgrade(
-        address indexed _upgrade_id,
+        uint256 indexed _upgrade_id,
         string _name,
         string _description
     );
@@ -182,6 +182,7 @@ contract Craft is ICraft, Ownable, Pausable {
             "Craft: disableRecipe() invalid recipe id."
         );
         recipes[_recipe_id].available = false;
+        emit DisableRecipe(_recipe_id);
     }
 
     /**
@@ -196,6 +197,7 @@ contract Craft is ICraft, Ownable, Pausable {
             "Craft: enableRecipe() invalid recipe id."
         );
         recipes[_recipe_id].available = true;
+        emit EnableRecipe(_recipe_id);
     }
 
     /**
@@ -210,6 +212,7 @@ contract Craft is ICraft, Ownable, Pausable {
             "Craft: disableUpgrade() invalid upgrade id."
         );
         upgrades[_upgrade_id].available = false;
+        emit DisableUpgrade(_upgrade_id);
     }
 
     /**
@@ -224,12 +227,15 @@ contract Craft is ICraft, Ownable, Pausable {
             "Craft: enableUpgrade() invalid upgrade id."
         );
         upgrades[_upgrade_id].available = true;
+        emit EnableUpgrade(_upgrade_id);
     }
 
     /**
      * @notice Adds a new recipe to craft.
      *
      * Requirements:
+     * @param _name                 Name of the recipe.
+     * @param _description          Description of the recipe.
      * @param _materials            Array of material [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances address.
      * @param _amounts              Array of amounts for each material.
      * @param _stats                Stats to consume from the pool for craft.
@@ -240,6 +246,8 @@ contract Craft is ICraft, Ownable, Pausable {
      * @param _experience_reward    Amount of experience rewarded for the recipe.
      */
     function addRecipe(
+        string memory _name,
+        string memory _description,
         address[] memory _materials,
         uint256[] memory _amounts,
         IStats.BasicStats memory _stats,
@@ -256,6 +264,8 @@ contract Craft is ICraft, Ownable, Pausable {
         );
         recipes[_recipe_id] = Recipe(
             _recipe_id,
+            _name,
+            _description,
             _materials,
             _amounts,
             _stats,
@@ -267,22 +277,27 @@ contract Craft is ICraft, Ownable, Pausable {
             true
         );
         _recipes.push(_recipe_id);
+        emit AddRecipe(_recipe_id, _name, _description);
     }
 
     /**
      * @notice Adds a new recipe to craft.
      *
      * Requirements:
+     * @param _name                 Name of the upgrade.
+     * @param _description          Description of the upgrade.
      * @param _materials            Array of material [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances address.
      * @param _amounts              Array of amounts for each material.
      * @param _stats                Stats to consume from the pool for upgrade.
-     * @param _sacrifice                Stats to sacrficie from the base stats for upgrade.
+     * @param _sacrifice            Stats to sacrficed from the base stats for upgrade.
      * @param _level_required       Minimum level required to craft the recipe.
      * @param _upgraded_item        ID of the token item that is being upgraded from the [Items](/docs/items/Items.md) instance.
      * @param _gold_cost            Cost of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) required to craft the recipe.
      * @param _reward               ID of the token to reward for the [Items](/docs/items/Items.md) instance.
      */
     function addUpgrade(
+        string memory _name,
+        string memory _description,
         address[] memory _materials,
         uint256[] memory _amounts,
         IStats.BasicStats memory _stats,
@@ -299,6 +314,8 @@ contract Craft is ICraft, Ownable, Pausable {
         );
         upgrades[_upgrade_id] = Upgrade(
             _upgrade_id,
+            _name,
+            _description,
             _materials,
             _amounts,
             _stats,
@@ -310,6 +327,7 @@ contract Craft is ICraft, Ownable, Pausable {
             true
         );
         _upgrades.push(_upgrade_id);
+        emit AddUpgrade(_upgrade_id, _name, _description);
     }
 
     /**
