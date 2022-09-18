@@ -251,7 +251,7 @@ contract Forge is IForge, Ownable, Pausable {
         );
         require(
             _isForgeAvailable(_id, _forge_id),
-            "Forge: forge() forge not available."
+            "Forge: forge() forge is already being used."
         );
 
         Recipe memory _recipe = recipes[_recipe_id];
