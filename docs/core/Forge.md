@@ -94,6 +94,50 @@ Requirements:
 | ---- | ----- | ----------------------------- |
 | \_id | bytes | Composed ID of the character. |
 
+### AddRecipe
+
+```solidity
+event AddRecipe(uint256 _recipe_id, string _name, string _description)
+```
+
+Event emmited when the [addRecipe](#addRecipe) function is called.
+
+Requirements:
+
+| Name          | Type    | Description                 |
+| ------------- | ------- | --------------------------- |
+| \_recipe_id   | uint256 | ID of the the recipe added. |
+| \_name        | string  | Name of the recipe.         |
+| \_description | string  | Recipe description          |
+
+### EnableRecipe
+
+```solidity
+event EnableRecipe(uint256 _recipe_id)
+```
+
+Event emmited when the [enableRecipe](#enableRecipe) function is called.
+
+Requirements:
+
+| Name        | Type    | Description                 |
+| ----------- | ------- | --------------------------- |
+| \_recipe_id | uint256 | ID of the the recipe added. |
+
+### DisableRecipe
+
+```solidity
+event DisableRecipe(uint256 _recipe_id)
+```
+
+Event emmited when the [disableRecipe](#disableRecipe) function is called.
+
+Requirements:
+
+| Name        | Type    | Description                 |
+| ----------- | ------- | --------------------------- |
+| \_recipe_id | uint256 | ID of the the recipe added. |
+
 ### constructor
 
 ```solidity
@@ -160,7 +204,7 @@ Requirements:
 ### addRecipe
 
 ```solidity
-function addRecipe(address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, uint256 _gold_cost, address _reward, uint256 _experience_reward) public
+function addRecipe(string _name, string _description, address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, uint256 _gold_cost, address _reward, uint256 _experience_reward) public
 ```
 
 Adds a new recipe to the forge.
@@ -169,6 +213,8 @@ Requirements:
 
 | Name                | Type                     | Description                                                                                                |
 | ------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| \_name              | string                   | Name of the recipe.                                                                                        |
+| \_description       | string                   | Description of the recipe.                                                                                 |
 | \_materials         | address[]                | Array of material [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances address.                    |
 | \_amounts           | uint256[]                | Array of amounts for each material.                                                                        |
 | \_stats             | struct IStats.BasicStats | Stats to consume from the pool for recipe.                                                                 |

@@ -108,6 +108,8 @@ describe("Forge", () => {
       this.forge
         .connect(this.receiver)
         .addRecipe(
+          "test",
+          "test 2",
           [],
           [],
           { might: 1, speed: 1, intellect: 1 },
@@ -121,21 +123,29 @@ describe("Forge", () => {
   });
 
   it("should add recipes correctly", async () => {
-    await this.forge.addRecipe(
-      [this.wood.address],
-      [1],
-      { might: 0, speed: 1, intellect: 0 },
-      300,
-      5,
-      2,
-      this.wood_plank.address,
-      25
-    );
+    await expect(
+      this.forge.addRecipe(
+        "test",
+        "test 2",
+        [this.wood.address],
+        [1],
+        { might: 0, speed: 1, intellect: 0 },
+        300,
+        5,
+        2,
+        this.wood_plank.address,
+        25
+      )
+    )
+      .to.emit(this.forge, "AddRecipe")
+      .withArgs(1, "test", "test 2");
   });
 
   it("should fail adding a recipe when material and amounts are not the same", async () => {
     await expect(
       this.forge.addRecipe(
+        "test",
+        "test 2",
         [this.wood.address],
         [1, 2],
         { might: 1, speed: 1, intellect: 1 },
@@ -172,10 +182,14 @@ describe("Forge", () => {
   it("should disable and enable a recipe correctly", async () => {
     let r = await this.forge.getRecipe(1);
     expect(r.available).to.eq(true);
-    await this.forge.disableRecipe(1);
+    await expect(this.forge.disableRecipe(1))
+      .to.emit(this.forge, "DisableRecipe")
+      .withArgs(1);
     r = await this.forge.getRecipe(1);
     expect(r.available).to.eq(false);
-    await this.forge.enableRecipe(1);
+    await expect(this.forge.enableRecipe(1))
+      .to.emit(this.forge, "EnableRecipe")
+      .withArgs(1);
     r = await this.forge.getRecipe(1);
     expect(r.available).to.eq(true);
   });

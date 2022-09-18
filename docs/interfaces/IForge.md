@@ -9,6 +9,8 @@ Interface for the [Forge](/docs/core/Forge.md) contract.
 ```solidity
 struct Recipe {
   uint256 id;
+  string name;
+  string description;
   address[] materials;
   uint256[] amounts;
   struct IStats.BasicStats stats_required;
@@ -68,7 +70,7 @@ See [Forge#enableRecipe](/docs/core/Forge.md#enableRecipe)
 ### addRecipe
 
 ```solidity
-function addRecipe(address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, uint256 _gold_cost, address _reward, uint256 _experience_reward) external
+function addRecipe(string _name, string _description, address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, uint256 _gold_cost, address _reward, uint256 _experience_reward) external
 ```
 
 See [Forge#addRecipe](/docs/core/Forge.md#addRecipe)

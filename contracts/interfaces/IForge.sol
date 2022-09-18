@@ -13,6 +13,8 @@ interface IForge {
      *
      * Requirements:
      * @param id                    ID of the recipe.
+     * @param name                  Name of the recipe.
+     * @param description           Description of the recipe.
      * @param materials             Array of addresses of the require material instances.
      * @param amounts               Array of amounts for each required material.
      * @param stats_required        Amount of stats required to consume to create the recipe.
@@ -25,6 +27,8 @@ interface IForge {
      */
     struct Recipe {
         uint256 id;
+        string name;
+        string description;
         address[] materials;
         uint256[] amounts;
         IStats.BasicStats stats_required;
@@ -57,6 +61,8 @@ interface IForge {
 
     /** @notice See [Forge#addRecipe](/docs/core/Forge.md#addRecipe) */
     function addRecipe(
+        string memory _name,
+        string memory _description,
         address[] memory _materials,
         uint256[] memory _amounts,
         IStats.BasicStats memory _stats,
