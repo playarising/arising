@@ -81,6 +81,22 @@ function enableRecipe(uint256 _recipe_id) external
 
 See [Craft#enableRecipe](/docs/core/Craft.md#enableRecipe)
 
+### disableUpgrade
+
+```solidity
+function disableUpgrade(uint256 _upgrade_id) external
+```
+
+See [Craft#disableUpgrade](/docs/core/Craft.md#disableUpgrade)
+
+### enableUpgrade
+
+```solidity
+function enableUpgrade(uint256 _upgrade_id) external
+```
+
+See [Craft#enableUpgrade](/docs/core/Craft.md#enableUpgrade)
+
 ### addRecipe
 
 ```solidity
@@ -88,6 +104,14 @@ function addRecipe(address[] _materials, uint256[] _amounts, struct IStats.Basic
 ```
 
 See [Craft#addRecipe](/docs/core/Craft.md#addRecipe)
+
+### addUpgrade
+
+```solidity
+function addUpgrade(address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, struct IStats.BasicStats _sacrifice, uint256 _level_required, uint256 _upgraded_item, uint256 _gold_cost, uint256 _reward) external
+```
+
+See [Craft#addUpgrade](/docs/core/Craft.md#addUpgrade)
 
 ### craft
 
@@ -105,6 +129,14 @@ function claim(bytes _id) external
 
 See [Craft#claim](/docs/core/Craft.md#claim)
 
+### upgrade
+
+```solidity
+function upgrade(bytes _id, uint256 _upgrade_id) external
+```
+
+See [Craft#upgrade](/docs/core/Craft.md#upgrade)
+
 ### getRecipe
 
 ```solidity
@@ -112,6 +144,14 @@ function getRecipe(uint256 _recipe_id) external view returns (struct ICraft.Reci
 ```
 
 See [Craft#getRecipe](/docs/core/Craft.md#getRecipe)
+
+### getUpgrade
+
+```solidity
+function getUpgrade(uint256 _upgrade_id) external view returns (struct ICraft.Upgrade _upgrade)
+```
+
+See [Craft#getUpgrade](/docs/core/Craft.md#getUpgrade)
 
 ### getCharacterCrafSlot
 

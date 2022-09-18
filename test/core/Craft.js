@@ -137,6 +137,18 @@ describe("Craft", () => {
     ).to.revertedWith("Ownable: caller is not the owner");
   });
 
+  it("should fail disabling an upgrade when no owner", async () => {
+    await expect(
+      this.craft.connect(this.receiver).disableUpgrade(1)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should fail enabling an upgrade when no owner", async () => {
+    await expect(
+      this.craft.connect(this.receiver).enableUpgrade(1)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
   it("should fail disabling a recibe when it doesn't exists", async () => {
     await expect(this.craft.disableRecipe(1)).to.revertedWith(
       "Craft: disableRecipe() invalid recipe id."
@@ -149,11 +161,40 @@ describe("Craft", () => {
     );
   });
 
+  it("should fail disabling an upgrade when it doesn't exists", async () => {
+    await expect(this.craft.disableUpgrade(1)).to.revertedWith(
+      "Craft: disableUpgrade() invalid upgrade id."
+    );
+  });
+
+  it("should fail enabling an upgrade when it doesn't exists", async () => {
+    await expect(this.craft.enableUpgrade(1)).to.revertedWith(
+      "Craft: enableUpgrade() invalid upgrade id."
+    );
+  });
+
   it("should fail adding a recipe when no owner", async () => {
     await expect(
       this.craft
         .connect(this.receiver)
         .addRecipe([], [], { might: 1, speed: 1, intellect: 1 }, 1, 1, 1, 1, 1)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should fail adding an upgrade when no owner", async () => {
+    await expect(
+      this.craft
+        .connect(this.receiver)
+        .addUpgrade(
+          [],
+          [],
+          { might: 1, speed: 1, intellect: 1 },
+          { might: 1, speed: 1, intellect: 1 },
+          1,
+          1,
+          1,
+          1
+        )
     ).to.revertedWith("Ownable: caller is not the owner");
   });
 
@@ -172,7 +213,22 @@ describe("Craft", () => {
     ).to.revertedWith("Craft: addRecipe() materials and amounts not match.");
   });
 
-  it("should enable a recipe correctly", async () => {
+  it("should fail adding an upgrade when no owner", async () => {
+    await expect(
+      this.craft.addUpgrade(
+        [this.resource.address],
+        [],
+        { might: 1, speed: 1, intellect: 1 },
+        { might: 1, speed: 1, intellect: 1 },
+        1,
+        1,
+        1,
+        1
+      )
+    ).to.revertedWith("Craft: addUpgrade() materials and amounts not match.");
+  });
+
+  it("should add a recipe correctly", async () => {
     await this.craft.addRecipe(
       [this.resource.address],
       [10],
@@ -186,6 +242,22 @@ describe("Craft", () => {
 
     const recipe = await this.craft.getRecipe(1);
     expect(recipe.available).to.eq(true);
+  });
+
+  it("should add an upgrade correctly", async () => {
+    await this.craft.addUpgrade(
+      [this.resource.address],
+      [10],
+      { might: 1, speed: 1, intellect: 1 },
+      { might: 1, speed: 1, intellect: 1 },
+      1,
+      1,
+      1,
+      1
+    );
+
+    const upgrade = await this.craft.getUpgrade(1);
+    expect(upgrade.available).to.eq(true);
   });
 
   it("should enable and disable the recupe correctly", async () => {

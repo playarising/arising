@@ -88,6 +88,12 @@ interface ICraft {
     /** @notice See [Craft#enableRecipe](/docs/core/Craft.md#enableRecipe) */
     function enableRecipe(uint256 _recipe_id) external;
 
+    /** @notice See [Craft#disableUpgrade](/docs/core/Craft.md#disableUpgrade) */
+    function disableUpgrade(uint256 _upgrade_id) external;
+
+    /** @notice See [Craft#enableUpgrade](/docs/core/Craft.md#enableUpgrade) */
+    function enableUpgrade(uint256 _upgrade_id) external;
+
     /** @notice See [Craft#addRecipe](/docs/core/Craft.md#addRecipe) */
     function addRecipe(
         address[] memory _materials,
@@ -100,17 +106,38 @@ interface ICraft {
         uint256 _experience_reward
     ) external;
 
+    /** @notice See [Craft#addUpgrade](/docs/core/Craft.md#addUpgrade) */
+    function addUpgrade(
+        address[] memory _materials,
+        uint256[] memory _amounts,
+        IStats.BasicStats memory _stats,
+        IStats.BasicStats memory _sacrifice,
+        uint256 _level_required,
+        uint256 _upgraded_item,
+        uint256 _gold_cost,
+        uint256 _reward
+    ) external;
+
     /** @notice See [Craft#craft](/docs/core/Craft.md#craft) */
     function craft(bytes memory _id, uint256 _recipe_id) external;
 
     /** @notice See [Craft#claim](/docs/core/Craft.md#claim) */
     function claim(bytes memory _id) external;
 
+    /** @notice See [Craft#upgrade](/docs/core/Craft.md#upgrade) */
+    function upgrade(bytes memory _id, uint256 _upgrade_id) external;
+
     /** @notice See [Craft#getRecipe](/docs/core/Craft.md#getRecipe) */
     function getRecipe(uint256 _recipe_id)
         external
         view
         returns (Recipe memory _recipe);
+
+    /** @notice See [Craft#getUpgrade](/docs/core/Craft.md#getUpgrade) */
+    function getUpgrade(uint256 _upgrade_id)
+        external
+        view
+        returns (Upgrade memory _upgrade);
 
     /** @notice See [Craft#getCharacterCrafSlot](/docs/core/Craft.md#getCharacterCrafSlot) */
     function getCharacterCrafSlot(bytes memory _id)

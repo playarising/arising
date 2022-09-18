@@ -296,6 +296,24 @@ Requirements:
 | -------- | -------------------- | ------------------------------ |
 | \_recipe | struct ICraft.Recipe | Full information of the recipe |
 
+### getUpgrade
+
+```solidity
+function getUpgrade(uint256 _upgrade_id) public view returns (struct ICraft.Upgrade _upgrade)
+```
+
+Returns the full information of an upgrade.
+
+Requirements:
+
+| Name         | Type    | Description        |
+| ------------ | ------- | ------------------ |
+| \_upgrade_id | uint256 | ID of the upgrade. |
+
+| Name      | Type                  | Description                     |
+| --------- | --------------------- | ------------------------------- |
+| \_upgrade | struct ICraft.Upgrade | Full information of the upgrade |
+
 ### getCharacterCrafSlot
 
 ```solidity

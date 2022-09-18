@@ -394,6 +394,26 @@ contract Craft is ICraft, Ownable, Pausable {
     }
 
     /**
+     * @notice Returns the full information of an upgrade.
+     *
+     * Requirements:
+     * @param _upgrade_id   ID of the upgrade.
+     *
+     * @return _upgrade     Full information of the upgrade
+     */
+    function getUpgrade(uint256 _upgrade_id)
+        public
+        view
+        returns (Upgrade memory _upgrade)
+    {
+        require(
+            _upgrade_id != 0 && _upgrade_id <= _recipes.length,
+            "Craft: getUpgrade() invalid recipe id."
+        );
+        return upgrades[_upgrade_id];
+    }
+
+    /**
      * @notice Returns character craft slot information.
      *
      * Requirements:

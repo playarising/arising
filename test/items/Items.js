@@ -19,9 +19,21 @@ describe("Items", () => {
     );
   });
 
+  it("should fail to burn an invalid item", async () => {
+    await expect(this.items.burn(this.owner.address, 1)).to.revertedWith(
+      "Items: burn() invalid item id."
+    );
+  });
+
   it("should fail to mint from non owner or authority", async () => {
     await expect(
       this.items.connect(this.minter).mint(this.owner.address, 1)
+    ).to.revertedWith("Items: onlyAuthorized() msg.sender not authorized.");
+  });
+
+  it("should fail to burn from non owner or authority", async () => {
+    await expect(
+      this.items.connect(this.minter).burn(this.owner.address, 1)
     ).to.revertedWith("Items: onlyAuthorized() msg.sender not authorized.");
   });
 
@@ -142,9 +154,18 @@ describe("Items", () => {
     ).to.revertedWith("Items: onlyAuthorized() msg.sender not authorized.");
   });
 
+  it("should add an authority, burn and remove it correctly", async () => {
+    await this.items.addAuthority(this.minter.address);
+    await this.items.connect(this.minter).burn(this.owner.address, 1);
+    await this.items.removeAuthority(this.minter.address);
+    await expect(
+      this.items.connect(this.minter).burn(this.owner.address, 1)
+    ).to.revertedWith("Items: onlyAuthorized() msg.sender not authorized.");
+  });
+
   it("should mint an item correctly", async () => {
     await this.items.mint(this.owner.address, 1);
-    expect(await this.items.balanceOf(this.owner.address, 1)).to.eq(2);
+    expect(await this.items.balanceOf(this.owner.address, 1)).to.eq(1);
   });
 
   it("should return the item uri correctly", async () => {
