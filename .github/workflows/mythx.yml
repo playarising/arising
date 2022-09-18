@@ -32,7 +32,7 @@ jobs:
           mythx --api-key ${{ secrets.MYTHX_API_KEY }} \
             --yes \
             analyze \
-            --mode standard \
+            --mode deep \
             --async \
             --create-group \
             --group-name "@playarising/arising@${{ github.sha }}" \
