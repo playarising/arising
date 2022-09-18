@@ -27,6 +27,12 @@ contract Craft is ICraft, Ownable, Pausable {
     /** @notice Array to track all the recipes IDs. */
     uint256[] private _recipes;
 
+    /** @notice Map to track available upgrades to craft. */
+    mapping(uint256 => Upgrade) public upgrades;
+
+    /** @notice Array to track all the upgrades IDs. */
+    uint256[] private _upgrades;
+
     /** @notice The address of the the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance. */
     address public gold;
 
@@ -43,7 +49,7 @@ contract Craft is ICraft, Ownable, Pausable {
     address public items;
 
     /** @notice Map to track craft slots and cooldowns for each character. */
-    mapping(bytes => CraftSlot) public craft_slots;
+    mapping(bytes => Slot) public craft_slots;
 
     // =============================================== Modifiers ======================================================
 
@@ -131,6 +137,34 @@ contract Craft is ICraft, Ownable, Pausable {
     }
 
     /**
+     * @notice Disables an upgrade from beign crafted.
+     *
+     * Requirements:
+     * @param _upgrade_id   ID of the upgrade.
+     */
+    function disableUpgrade(uint256 _upgrade_id) public onlyOwner {
+        require(
+            _upgrade_id != 0 && _upgrade_id <= _recipes.length,
+            "Craft: disableUpgrade() invalid upgrade id."
+        );
+        upgrades[_upgrade_id].available = false;
+    }
+
+    /**
+     * @notice Enables an upgrade to be crafted.
+     *
+     * Requirements:
+     * @param _upgrade_id   ID of the upgrade.
+     */
+    function enableUpgrade(uint256 _upgrade_id) public onlyOwner {
+        require(
+            _upgrade_id != 0 && _upgrade_id <= _upgrades.length,
+            "Craft: enableUpgrade() invalid upgrade id."
+        );
+        upgrades[_upgrade_id].available = true;
+    }
+
+    /**
      * @notice Adds a new recipe to craft.
      *
      * Requirements:
@@ -174,6 +208,49 @@ contract Craft is ICraft, Ownable, Pausable {
     }
 
     /**
+     * @notice Adds a new recipe to craft.
+     *
+     * Requirements:
+     * @param _materials            Array of material [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances address.
+     * @param _amounts              Array of amounts for each material.
+     * @param _stats                Stats to consume from the pool for upgrade.
+     * @param _sacrifice                Stats to sacrficie from the base stats for upgrade.
+     * @param _level_required       Minimum level required to craft the recipe.
+     * @param _upgraded_item        ID of the token item that is being upgraded from the [Items](/docs/items/Items.md) instance.
+     * @param _gold_cost            Cost of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) required to craft the recipe.
+     * @param _reward               ID of the token to reward for the [Items](/docs/items/Items.md) instance.
+     */
+    function addUpgrade(
+        address[] memory _materials,
+        uint256[] memory _amounts,
+        IStats.BasicStats memory _stats,
+        IStats.BasicStats memory _sacrifice,
+        uint256 _level_required,
+        uint256 _upgraded_item,
+        uint256 _gold_cost,
+        uint256 _reward
+    ) public onlyOwner {
+        uint256 _upgrade_id = _upgrades.length + 1;
+        require(
+            _materials.length == _amounts.length,
+            "Craft: addUpgrade() materials and amounts not match."
+        );
+        upgrades[_upgrade_id] = Upgrade(
+            _upgrade_id,
+            _materials,
+            _amounts,
+            _stats,
+            _sacrifice,
+            _level_required,
+            _upgraded_item,
+            _gold_cost,
+            _reward,
+            true
+        );
+        _upgrades.push(_upgrade_id);
+    }
+
+    /**
      * @notice Initializes a recipe to be crafted.
      *
      * Requirements:
@@ -187,7 +264,7 @@ contract Craft is ICraft, Ownable, Pausable {
     {
         require(
             _recipe_id != 0 && _recipe_id <= _recipes.length,
-            "Craft: enableRecipe() invalid recipe id."
+            "Craft: craft() invalid recipe id."
         );
         require(
             _isSlotAvailable(_id),
@@ -215,7 +292,7 @@ contract Craft is ICraft, Ownable, Pausable {
 
         IStats(stats).consume(_id, _recipe.stats_required);
 
-        craft_slots[_id] = CraftSlot(
+        craft_slots[_id] = Slot(
             block.timestamp + _recipe.cooldown,
             _recipe.id,
             false
@@ -238,10 +315,59 @@ contract Craft is ICraft, Ownable, Pausable {
             ICivilizations(civilizations).ownerOf(_id),
             _recipe.reward
         );
+    }
 
-        IExperience(experience).assignExperience(
-            _id,
-            _recipe.experience_reward
+    /**
+     * @notice Upgrades an item.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     * @param _upgrade_id   ID of the upgrade to perform.
+     */
+    function upgrade(bytes memory _id, uint256 _upgrade_id)
+        public
+        whenNotPaused
+        onlyAllowed(_id)
+    {
+        require(
+            _upgrade_id != 0 && _upgrade_id <= _recipes.length,
+            "Craft: upgrade() invalid recipe id."
+        );
+
+        Upgrade memory _upgrade = upgrades[_upgrade_id];
+        require(
+            _upgrade.available,
+            "Craft: upgrade() upgrade is not available."
+        );
+
+        require(
+            IExperience(experience).getLevel(_id) >= _upgrade.level_required,
+            "Craft: upgrade() not enough level."
+        );
+
+        if (_upgrade.gold_cost > 0) {
+            IBaseFungibleItem(gold).consume(_id, _upgrade.gold_cost);
+        }
+
+        for (uint256 i = 0; i < _upgrade.materials.length; i++) {
+            IBaseFungibleItem(_upgrade.materials[i]).consume(
+                _id,
+                _upgrade.material_amounts[i]
+            );
+        }
+
+        IStats(stats).consume(_id, _upgrade.stats_required);
+
+        IStats(stats).sacrifice(_id, _upgrade.stats_sacrificed);
+
+        IItems(stats).burn(
+            ICivilizations(civilizations).ownerOf(_id),
+            _upgrade.upgraded_item
+        );
+
+        IItems(stats).mint(
+            ICivilizations(civilizations).ownerOf(_id),
+            _upgrade.reward
         );
     }
 
@@ -275,10 +401,10 @@ contract Craft is ICraft, Ownable, Pausable {
      *
      * @return _slot    Full information of character crafting slot.
      */
-    function getCharacterSlot(bytes memory _id)
+    function getCharacterCrafSlot(bytes memory _id)
         public
         view
-        returns (CraftSlot memory _slot)
+        returns (Slot memory _slot)
     {
         return craft_slots[_id];
     }
@@ -298,7 +424,7 @@ contract Craft is ICraft, Ownable, Pausable {
         view
         returns (bool _available)
     {
-        CraftSlot memory s = craft_slots[_id];
+        Slot memory s = craft_slots[_id];
 
         if (s.cooldown == 0) {
             return true;
@@ -316,7 +442,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * @return _available   Boolean to know if the slot is claimable.
      */
     function _isSlotClaimable(bytes memory _id) internal view returns (bool) {
-        CraftSlot memory s = craft_slots[_id];
+        Slot memory s = craft_slots[_id];
         return
             s.cooldown <= block.timestamp && !s.claimed && s.last_recipe != 0;
     }

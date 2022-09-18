@@ -21,10 +21,27 @@ struct Recipe {
 }
 ```
 
-### CraftSlot
+### Upgrade
 
 ```solidity
-struct CraftSlot {
+struct Upgrade {
+  uint256 id;
+  address[] materials;
+  uint256[] material_amounts;
+  struct IStats.BasicStats stats_required;
+  struct IStats.BasicStats stats_sacrificed;
+  uint256 level_required;
+  uint256 upgraded_item;
+  uint256 gold_cost;
+  uint256 reward;
+  bool available;
+}
+```
+
+### Slot
+
+```solidity
+struct Slot {
   uint256 cooldown;
   uint256 last_recipe;
   bool claimed;
@@ -96,10 +113,10 @@ function getRecipe(uint256 _recipe_id) external view returns (struct ICraft.Reci
 
 See [Craft#getRecipe](/docs/core/Craft.md#getRecipe)
 
-### getCharacterSlot
+### getCharacterCrafSlot
 
 ```solidity
-function getCharacterSlot(bytes _id) external view returns (struct ICraft.CraftSlot _slot)
+function getCharacterCrafSlot(bytes _id) external view returns (struct ICraft.Slot _slot)
 ```
 
-See [Craft#getCharacterSlot](/docs/core/Craft.md#getCharacterSlot)
+See [Craft#getCharacterCrafSlot](/docs/core/Craft.md#getCharacterCrafSlot)

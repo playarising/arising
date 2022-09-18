@@ -62,6 +62,21 @@ Requirements:
 | \_to      | address | Address that receives the tokens. |
 | \_item_id | uint256 | ID of the item to be created.     |
 
+### burn
+
+```solidity
+function burn(address _from, uint256 _item_id) public
+```
+
+Removes tokens from the address provided.
+
+Requirements:
+
+| Name      | Type    | Description                       |
+| --------- | ------- | --------------------------------- |
+| \_from    | address | Address that receives the tokens. |
+| \_item_id | uint256 | ID of the item to be created.     |
+
 ### addAuthority
 
 ```solidity

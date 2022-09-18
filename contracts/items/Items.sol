@@ -61,6 +61,21 @@ contract Items is IItems, Ownable, ERC1155 {
     }
 
     /**
+     * @notice Removes tokens from the address provided.
+     *
+     * Requirements:
+     * @param _from         Address that receives the tokens.
+     * @param _item_id      ID of the item to be created.
+     */
+    function burn(address _from, uint256 _item_id) public onlyAuthorized {
+        require(
+            _item_id != 0 && _item_id <= _items.length,
+            "Items: burn() invalid item id."
+        );
+        _burn(_from, _item_id, 1);
+    }
+
+    /**
      * @notice Assigns a new address as an authority to mint items.
      *
      * Requirements:

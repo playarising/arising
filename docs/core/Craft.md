@@ -23,6 +23,22 @@ uint256[] _recipes
 
 Array to track all the recipes IDs.
 
+### upgrades
+
+```solidity
+mapping(uint256 => struct ICraft.Upgrade) upgrades
+```
+
+Map to track available upgrades to craft.
+
+### \_upgrades
+
+```solidity
+uint256[] _upgrades
+```
+
+Array to track all the upgrades IDs.
+
 ### gold
 
 ```solidity
@@ -66,7 +82,7 @@ Address of the [Items](/docs/items/Items.md) instance.
 ### craft_slots
 
 ```solidity
-mapping(bytes => struct ICraft.CraftSlot) craft_slots
+mapping(bytes => struct ICraft.Slot) craft_slots
 ```
 
 Map to track craft slots and cooldowns for each character.
@@ -148,6 +164,34 @@ Requirements:
 | ----------- | ------- | ----------------- |
 | \_recipe_id | uint256 | ID of the recipe. |
 
+### disableUpgrade
+
+```solidity
+function disableUpgrade(uint256 _upgrade_id) public
+```
+
+Disables an upgrade from beign crafted.
+
+Requirements:
+
+| Name         | Type    | Description        |
+| ------------ | ------- | ------------------ |
+| \_upgrade_id | uint256 | ID of the upgrade. |
+
+### enableUpgrade
+
+```solidity
+function enableUpgrade(uint256 _upgrade_id) public
+```
+
+Enables an upgrade to be crafted.
+
+Requirements:
+
+| Name         | Type    | Description        |
+| ------------ | ------- | ------------------ |
+| \_upgrade_id | uint256 | ID of the upgrade. |
+
 ### addRecipe
 
 ```solidity
@@ -168,6 +212,27 @@ Requirements:
 | \_gold_cost         | uint256                  | Cost of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) required to craft the recipe. |
 | \_reward            | uint256                  | ID of the token to reward for the [Items](/docs/items/Items.md) instance.                     |
 | \_experience_reward | uint256                  | Amount of experience rewarded for the recipe.                                                 |
+
+### addUpgrade
+
+```solidity
+function addUpgrade(address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, struct IStats.BasicStats _sacrifice, uint256 _level_required, uint256 _upgraded_item, uint256 _gold_cost, uint256 _reward) public
+```
+
+Adds a new recipe to craft.
+
+Requirements:
+
+| Name             | Type                     | Description                                                                                   |
+| ---------------- | ------------------------ | --------------------------------------------------------------------------------------------- |
+| \_materials      | address[]                | Array of material [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances address.       |
+| \_amounts        | uint256[]                | Array of amounts for each material.                                                           |
+| \_stats          | struct IStats.BasicStats | Stats to consume from the pool for upgrade.                                                   |
+| \_sacrifice      | struct IStats.BasicStats | Stats to sacrficie from the base stats for upgrade.                                           |
+| \_level_required | uint256                  | Minimum level required to craft the recipe.                                                   |
+| \_upgraded_item  | uint256                  | ID of the token item that is being upgraded from the [Items](/docs/items/Items.md) instance.  |
+| \_gold_cost      | uint256                  | Cost of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) required to craft the recipe. |
+| \_reward         | uint256                  | ID of the token to reward for the [Items](/docs/items/Items.md) instance.                     |
 
 ### craft
 
@@ -198,6 +263,21 @@ Requirements:
 | ---- | ----- | ----------------------------- |
 | \_id | bytes | Composed ID of the character. |
 
+### upgrade
+
+```solidity
+function upgrade(bytes _id, uint256 _upgrade_id) public
+```
+
+Upgrades an item.
+
+Requirements:
+
+| Name         | Type    | Description                   |
+| ------------ | ------- | ----------------------------- |
+| \_id         | bytes   | Composed ID of the character. |
+| \_upgrade_id | uint256 | ID of the upgrade to perform. |
+
 ### getRecipe
 
 ```solidity
@@ -216,10 +296,10 @@ Requirements:
 | -------- | -------------------- | ------------------------------ |
 | \_recipe | struct ICraft.Recipe | Full information of the recipe |
 
-### getCharacterSlot
+### getCharacterCrafSlot
 
 ```solidity
-function getCharacterSlot(bytes _id) public view returns (struct ICraft.CraftSlot _slot)
+function getCharacterCrafSlot(bytes _id) public view returns (struct ICraft.Slot _slot)
 ```
 
 Returns character craft slot information.
@@ -230,9 +310,9 @@ Requirements:
 | ---- | ----- | ----------------------------- |
 | \_id | bytes | Composed ID of the character. |
 
-| Name   | Type                    | Description                                  |
-| ------ | ----------------------- | -------------------------------------------- |
-| \_slot | struct ICraft.CraftSlot | Full information of character crafting slot. |
+| Name   | Type               | Description                                  |
+| ------ | ------------------ | -------------------------------------------- |
+| \_slot | struct ICraft.Slot | Full information of character crafting slot. |
 
 ### \_isSlotAvailable
 

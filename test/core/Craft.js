@@ -145,7 +145,7 @@ describe("Craft", () => {
 
   it("should fail enabling a recibe when it doesn't exists", async () => {
     await expect(this.craft.enableRecipe(1)).to.revertedWith(
-      "Craft: enableRecipe() invalid recipe id."
+      "Craft: craft() invalid recipe id."
     );
   });
 
@@ -220,7 +220,7 @@ describe("Craft", () => {
   it("should fail crafting an invalid recipe", async () => {
     const id = await this.civ.getTokenID(1, 1);
     await expect(this.craft.craft(id, 2)).to.revertedWith(
-      "Craft: enableRecipe() invalid recipe id."
+      "Craft: craft() invalid recipe id."
     );
   });
 
@@ -248,7 +248,7 @@ describe("Craft", () => {
     await this.resource.mintTo(id, 10000);
     await this.gold.mintTo(id, 10000);
     await this.craft.craft(id, 1);
-    const slot = await this.craft.getCharacterSlot(id);
+    const slot = await this.craft.getCharacterCrafSlot(id);
     expect(slot.last_recipe).to.eq(1);
     expect(slot.claimed).to.eq(false);
   });
@@ -269,12 +269,12 @@ describe("Craft", () => {
 
   it("should claim the recipe successfully", async () => {
     const id = await this.civ.getTokenID(1, 1);
-    let slot = await this.craft.getCharacterSlot(id);
+    let slot = await this.craft.getCharacterCrafSlot(id);
     await ethers.provider.send("evm_mine", [slot.cooldown.toNumber()]);
     expect(await this.items.balanceOf(this.owner.address, 1)).to.eq(0);
     await this.craft.claim(id);
     expect(await this.items.balanceOf(this.owner.address, 1)).to.eq(1);
-    slot = await this.craft.getCharacterSlot(id);
+    slot = await this.craft.getCharacterCrafSlot(id);
     expect(slot.claimed).to.eq(true);
   });
 });

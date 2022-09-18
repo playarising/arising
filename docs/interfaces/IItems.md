@@ -94,6 +94,14 @@ function mint(address _to, uint256 _item_id) external
 
 See [Items#mint](/docs/items/Items.md#mint)
 
+### burn
+
+```solidity
+function burn(address _from, uint256 _item_id) external
+```
+
+See [Items#burn](/docs/items/Items.md#burn)
+
 ### addAuthority
 
 ```solidity

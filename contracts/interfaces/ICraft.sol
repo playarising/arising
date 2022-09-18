@@ -19,7 +19,6 @@ interface ICraft {
      * @param level_required        Minimum level required to craft the recipe.
      * @param gold_cost             Cost of the recipe in gold.
      * @param reward                ID of the reward token.
-     * @param experience_reward     Amount of experience rewarded from the recipe.
      * @param available             Boolean to check if the recipe is available.
      */
     struct Recipe {
@@ -36,14 +35,42 @@ interface ICraft {
     }
 
     /**
-     * @notice Internal struct to store the information of a crafting slot.
+     * @notice Internal struct to containt all the information of an upgrade.
+     *
+     * Requirements:
+     * @param id                    ID of the upgrade.
+     * @param materials             Array of addresses of the require material instances.
+     * @param amounts               Array of amounts for each required material.
+     * @param stats_required        Amount of stats required to consume to create the upgrade.
+     * @param stats_sacrificed      Amount of stats required to sacrifice to create the upgrade.
+     * @param level_required        Minimum level required to craft the upgrade.
+     * @param upgraded_item         ID of the item is beign upgraded.
+     * @param gold_cost             Cost of the upgrade in gold.
+     * @param reward                ID of the reward token.
+     * @param available             Boolean to check if the upgrade is available.
+     */
+    struct Upgrade {
+        uint256 id;
+        address[] materials;
+        uint256[] material_amounts;
+        IStats.BasicStats stats_required;
+        IStats.BasicStats stats_sacrificed;
+        uint256 level_required;
+        uint256 upgraded_item;
+        uint256 gold_cost;
+        uint256 reward;
+        bool available;
+    }
+
+    /**
+     * @notice Internal struct to store the information of a crafting or upgrading slot.
      *
      * Requirements:
      * @param cooldown      Timestamp on which the slot is claimable.
      * @param last_recipe   The last crafted recipe.
      * @param claimed       Boolean to know if the last crafted recipe is already claimed.
      */
-    struct CraftSlot {
+    struct Slot {
         uint256 cooldown;
         uint256 last_recipe;
         bool claimed;
@@ -85,9 +112,9 @@ interface ICraft {
         view
         returns (Recipe memory _recipe);
 
-    /** @notice See [Craft#getCharacterSlot](/docs/core/Craft.md#getCharacterSlot) */
-    function getCharacterSlot(bytes memory _id)
+    /** @notice See [Craft#getCharacterCrafSlot](/docs/core/Craft.md#getCharacterCrafSlot) */
+    function getCharacterCrafSlot(bytes memory _id)
         external
         view
-        returns (CraftSlot memory _slot);
+        returns (Slot memory _slot);
 }
