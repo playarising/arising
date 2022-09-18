@@ -103,6 +103,33 @@ describe("Craft", () => {
       }
     );
 
+    await this.items.addItem(
+      1,
+      2,
+      {
+        might: 1,
+        speed: 1,
+        intellect: 1,
+        might_reducer: 1,
+        speed_reducer: 1,
+        intellect_reducer: 1,
+      },
+      {
+        atk: 0,
+        atk_reducer: 0,
+        def: 0,
+        def_reducer: 0,
+        range: 0,
+        range_reducer: 0,
+        mag_atk: 0,
+        mag_atk_reducer: 0,
+        mag_def: 0,
+        mag_def_reducer: 0,
+        rate: 0,
+        rate_reducer: 0,
+      }
+    );
+
     await this.items.addAuthority(this.craft.address);
   });
 
@@ -250,17 +277,17 @@ describe("Craft", () => {
       [10],
       { might: 1, speed: 1, intellect: 1 },
       { might: 1, speed: 1, intellect: 1 },
+      5,
       1,
       1,
-      1,
-      1
+      2
     );
 
     const upgrade = await this.craft.getUpgrade(1);
     expect(upgrade.available).to.eq(true);
   });
 
-  it("should enable and disable the recupe correctly", async () => {
+  it("should enable and disable the recipe correctly", async () => {
     let recipe = await this.craft.getRecipe(1);
     expect(recipe.available).to.eq(true);
     await this.craft.disableRecipe(1);
@@ -269,6 +296,17 @@ describe("Craft", () => {
     await this.craft.enableRecipe(1);
     recipe = await this.craft.getRecipe(1);
     expect(recipe.available).to.eq(true);
+  });
+
+  it("should enable and disable the upgrade correctly", async () => {
+    let upgrade = await this.craft.getUpgrade(1);
+    expect(upgrade.available).to.eq(true);
+    await this.craft.disableUpgrade(1);
+    upgrade = await this.craft.getUpgrade(1);
+    expect(upgrade.available).to.eq(false);
+    await this.craft.enableUpgrade(1);
+    upgrade = await this.craft.getUpgrade(1);
+    expect(upgrade.available).to.eq(true);
   });
 
   it("should fail when trying to craft for a non owned token", async () => {
@@ -348,5 +386,38 @@ describe("Craft", () => {
     expect(await this.items.balanceOf(this.owner.address, 1)).to.eq(1);
     slot = await this.craft.getCharacterCrafSlot(id);
     expect(slot.claimed).to.eq(true);
+  });
+
+  it("should fail when trying to upgrade an invalid upgrade", async () => {
+    const id = await this.civ.getTokenID(1, 1);
+    await expect(this.craft.upgrade(id, 2)).to.revertedWith(
+      "Craft: upgrade() invalid recipe id."
+    );
+  });
+
+  it("should fail when trying to upgrade an upgrade not available", async () => {
+    const id = await this.civ.getTokenID(1, 1);
+    await this.craft.disableUpgrade(1);
+    await expect(this.craft.upgrade(id, 1)).to.revertedWith(
+      "Craft: upgrade() upgrade is not available."
+    );
+    await this.craft.enableUpgrade(1);
+  });
+
+  it("should fail when trying to upgrade an upgrade with not enough level", async () => {
+    const id = await this.civ.getTokenID(1, 1);
+    await expect(this.craft.upgrade(id, 1)).to.revertedWith(
+      "Craft: upgrade() not enough level."
+    );
+  });
+
+  it("should upgrade the recipe successfully", async () => {
+    const id = await this.civ.getTokenID(1, 1);
+    await this.experience.assignExperience(id, 50000);
+    expect(await this.items.balanceOf(this.owner.address, 2)).to.eq(0);
+    expect(await this.items.balanceOf(this.owner.address, 1)).to.eq(1);
+    await this.craft.upgrade(id, 1);
+    expect(await this.items.balanceOf(this.owner.address, 2)).to.eq(1);
+    expect(await this.items.balanceOf(this.owner.address, 1)).to.eq(0);
   });
 });

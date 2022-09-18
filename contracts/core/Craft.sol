@@ -360,12 +360,12 @@ contract Craft is ICraft, Ownable, Pausable {
 
         IStats(stats).sacrifice(_id, _upgrade.stats_sacrificed);
 
-        IItems(stats).burn(
+        IItems(items).burn(
             ICivilizations(civilizations).ownerOf(_id),
             _upgrade.upgraded_item
         );
 
-        IItems(stats).mint(
+        IItems(items).mint(
             ICivilizations(civilizations).ownerOf(_id),
             _upgrade.reward
         );
