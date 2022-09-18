@@ -47,9 +47,8 @@ interface IStats {
     /** @notice See [Stats#refreshWithToken](/docs/codex/Stats.md#refreshWithToken) */
     function refreshWithToken(bytes memory _id) external;
 
-    /** @notice See [Stats#consumeVitalizer](/docs/codex/Stats.md#consumeVitalizer) */
-    function consumeVitalizer(bytes memory _id, BasicStats memory _stats)
-        external;
+    /** @notice See [Stats#vitalize](/docs/codex/Stats.md#vitalize) */
+    function vitalize(bytes memory _id, BasicStats memory _stats) external;
 
     /** @notice See [Stats#assignPoints](/docs/codex/Stats.md#assignPoints) */
     function assignPoints(bytes memory _id, BasicStats memory _stats) external;

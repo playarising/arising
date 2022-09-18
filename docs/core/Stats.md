@@ -102,6 +102,22 @@ Requirements:
 | ---- | ----- | ----------------------------- |
 | \_id | bytes | Composed ID of the character. |
 
+### ChangedPoints
+
+```solidity
+event ChangedPoints(bytes _id, struct IStats.BasicStats _base_stats, struct IStats.BasicStats _pool_stats)
+```
+
+Event emmited when the character base or pool points change.
+
+Requirements:
+
+| Name         | Type                     | Description                   |
+| ------------ | ------------------------ | ----------------------------- |
+| \_id         | bytes                    | Composed ID of the character. |
+| \_base_stats | struct IStats.BasicStats | Pool stat points              |
+| \_pool_stats | struct IStats.BasicStats | Pool stat points.             |
+
 ### constructor
 
 ```solidity
@@ -233,10 +249,10 @@ Requirements:
 | ---- | ----- | ----------------------------- |
 | \_id | bytes | Composed ID of the character. |
 
-### consumeVitalizer
+### vitalize
 
 ```solidity
-function consumeVitalizer(bytes _id, struct IStats.BasicStats _stats) public
+function vitalize(bytes _id, struct IStats.BasicStats _stats) public
 ```
 
 Recovers a sacrificed point spending a Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) token.
