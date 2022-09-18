@@ -102,6 +102,94 @@ Requirements:
 | ---- | ----- | ----------------------------- |
 | \_id | bytes | Composed ID of the character. |
 
+### AddRecipe
+
+```solidity
+event AddRecipe(uint256 _recipe_id, string _name, string _description)
+```
+
+Event emmited when the [addRecipe](#addRecipe) function is called.
+
+Requirements:
+
+| Name          | Type    | Description                 |
+| ------------- | ------- | --------------------------- |
+| \_recipe_id   | uint256 | ID of the the recipe added. |
+| \_name        | string  | Name of the recipe.         |
+| \_description | string  | Recipe description          |
+
+### EnableRecipe
+
+```solidity
+event EnableRecipe(uint256 _recipe_id)
+```
+
+Event emmited when the [enableRecipe](#enableRecipe) function is called.
+
+Requirements:
+
+| Name        | Type    | Description                 |
+| ----------- | ------- | --------------------------- |
+| \_recipe_id | uint256 | ID of the the recipe added. |
+
+### DisableRecipe
+
+```solidity
+event DisableRecipe(uint256 _recipe_id)
+```
+
+Event emmited when the [disableRecipe](#disableRecipe) function is called.
+
+Requirements:
+
+| Name        | Type    | Description                 |
+| ----------- | ------- | --------------------------- |
+| \_recipe_id | uint256 | ID of the the recipe added. |
+
+### AddUpgrade
+
+```solidity
+event AddUpgrade(address _upgrade_id, string _name, string _description)
+```
+
+Event emmited when the [addUpgrade](#addUpgrade) function is called.
+
+Requirements:
+
+| Name          | Type    | Description                  |
+| ------------- | ------- | ---------------------------- |
+| \_upgrade_id  | address | ID of the the upgrade added. |
+| \_name        | string  | Name of the recipe.          |
+| \_description | string  | Recipe description           |
+
+### EnableUpgrade
+
+```solidity
+event EnableUpgrade(uint256 _upgrade_id)
+```
+
+Event emmited when the [enableUpgrade](#enableUpgrade) function is called.
+
+Requirements:
+
+| Name         | Type    | Description                 |
+| ------------ | ------- | --------------------------- |
+| \_upgrade_id | uint256 | ID of the the recipe added. |
+
+### DisableUpgrade
+
+```solidity
+event DisableUpgrade(uint256 _upgrade_id)
+```
+
+Event emmited when the [disableUpgrade](#disableUpgrade) function is called.
+
+Requirements:
+
+| Name         | Type    | Description                 |
+| ------------ | ------- | --------------------------- |
+| \_upgrade_id | uint256 | ID of the the recipe added. |
+
 ### constructor
 
 ```solidity

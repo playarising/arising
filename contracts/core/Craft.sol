@@ -72,6 +72,68 @@ contract Craft is ICraft, Ownable, Pausable {
         _;
     }
 
+    // =============================================== Events =========================================================
+
+    /**
+     * @notice Event emmited when the [addRecipe](#addRecipe) function is called.
+     *
+     * Requirements:
+     * @param _recipe_id    ID of the the recipe added.
+     * @param _name         Name of the recipe.
+     * @param _description  Recipe description
+     */
+    event AddRecipe(
+        uint256 indexed _recipe_id,
+        string _name,
+        string _description
+    );
+
+    /**
+     * @notice Event emmited when the [enableRecipe](#enableRecipe) function is called.
+     *
+     * Requirements:
+     * @param _recipe_id    ID of the the recipe added.
+     */
+    event EnableRecipe(uint256 indexed _recipe_id);
+
+    /**
+     * @notice Event emmited when the [disableRecipe](#disableRecipe) function is called.
+     *
+     * Requirements:
+     * @param _recipe_id    ID of the the recipe added.
+     */
+    event DisableRecipe(uint256 indexed _recipe_id);
+
+    /**
+     * @notice Event emmited when the [addUpgrade](#addUpgrade) function is called.
+     *
+     * Requirements:
+     * @param _upgrade_id       ID of the the upgrade added.
+     * @param _name             Name of the recipe.
+     * @param _description      Recipe description
+     */
+    event AddUpgrade(
+        address indexed _upgrade_id,
+        string _name,
+        string _description
+    );
+
+    /**
+     * @notice Event emmited when the [enableUpgrade](#enableUpgrade) function is called.
+     *
+     * Requirements:
+     * @param _upgrade_id    ID of the the recipe added.
+     */
+    event EnableUpgrade(uint256 indexed _upgrade_id);
+
+    /**
+     * @notice Event emmited when the [disableUpgrade](#disableUpgrade) function is called.
+     *
+     * Requirements:
+     * @param _upgrade_id    ID of the the recipe added.
+     */
+    event DisableUpgrade(uint256 indexed _upgrade_id);
+
     // =============================================== Setters ========================================================
 
     /**

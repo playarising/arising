@@ -31,6 +31,9 @@ interface ICivilizations {
     /** @notice See [Civilizations#setUpgradePrice](/docs/core/Civilizations.md#setUpgradePrice) */
     function setUpgradePrice(uint256 _upgrade_id, uint256 _price) external;
 
+    /** @notice See [Civilizations#setMintPrice](/docs/core/Civilizations.md#setMintPrice) */
+    function setMintPrice(uint256 _price) external;
+
     /** @notice See [Civilizations#setToken](/docs/core/Civilizations.md#setToken) */
     function setToken(address _token) external;
 

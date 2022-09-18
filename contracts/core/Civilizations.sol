@@ -40,10 +40,13 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     /** @notice Map to track the upgrades information. */
     mapping(uint256 => Upgrade) public upgrades;
 
+    /** @notice Map to the price to mint characters. */
+    uint256 public price;
+
     // =============================================== Events =========================================================
 
     /**
-     * @notice Event emmited when the [Civilization#mint](/docs/core/Civilizations.md#mint) function is called.
+     * @notice Event emmited when the [mint](#mint) function is called.
      *
      * Requirements:
      * @param _owner    Owner of the minted token.
@@ -52,7 +55,7 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     event Summoned(address indexed _owner, bytes indexed _id);
 
     /**
-     * @notice Event emmited when the [Civilization#buyUpgrade](/docs/core/Civilizations.md#buyUpgrade) function is called.
+     * @notice Event emmited when the [buyUpgrade](#buyUpgrade) function is called.
      *
      * Requirements:
      * @param _id   Composed ID of the character.
@@ -123,6 +126,16 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
             "Civilizations: setUpgradePrice() invalid upgrade id."
         );
         upgrades[_upgrade_id].price = _price;
+    }
+
+    /**
+     * @notice Sets the price to mint a character.
+     *
+     * Requirements:
+     * @param _price     Amount of tokens to pay for the upgrade.
+     */
+    function setMintPrice(uint256 _price) public onlyOwner {
+        price = _price;
     }
 
     /**

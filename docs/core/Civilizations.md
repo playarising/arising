@@ -55,13 +55,21 @@ mapping(uint256 => struct ICivilizations.Upgrade) upgrades
 
 Map to track the upgrades information.
 
+### price
+
+```solidity
+uint256 price
+```
+
+Map to the price to mint characters.
+
 ### Summoned
 
 ```solidity
 event Summoned(address _owner, bytes _id)
 ```
 
-Event emmited when the [Civilization#mint](/docs/core/Civilizations.md#mint) function is called.
+Event emmited when the [mint](#mint) function is called.
 
 Requirements:
 
@@ -76,7 +84,7 @@ Requirements:
 event UpgradePurchased(bytes _id, uint256 _upgrade_id)
 ```
 
-Event emmited when the [Civilization#buyUpgrade](/docs/core/Civilizations.md#buyUpgrade) function is called.
+Event emmited when the [buyUpgrade](#buyUpgrade) function is called.
 
 Requirements:
 
@@ -144,6 +152,20 @@ Requirements:
 | ------------ | ------- | ---------------------------------------- |
 | \_upgrade_id | uint256 | ID of the upgrade to change.             |
 | \_price      | uint256 | Amount of tokens to pay for the upgrade. |
+
+### setMintPrice
+
+```solidity
+function setMintPrice(uint256 _price) public
+```
+
+Sets the price to mint a character.
+
+Requirements:
+
+| Name    | Type    | Description                              |
+| ------- | ------- | ---------------------------------------- |
+| \_price | uint256 | Amount of tokens to pay for the upgrade. |
 
 ### setToken
 
