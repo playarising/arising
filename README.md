@@ -19,4 +19,3 @@ Etia is a fantasy world in which all characters take part. A world with four big
 - [Documentation](docs/)
 - [Deployments](deployments/)
 - [Diagram](diagram/arising-diagram.jpeg?raw=true)
-

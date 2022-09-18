@@ -129,6 +129,11 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
             "Equipment: equip() item type not for this slot."
         );
 
+        require(
+            IExperience(experience).getLevel(_id) >= item_data.level_required,
+            "Equipment: equip() not enough level to equip item."
+        );
+
         if (item_data.item_type == IItems.ItemType.TWO_HANDED) {
             if (character_equipments[_id][EquipmentSlot.RIGHT_HAND].equiped) {
                 unequip(_id, EquipmentSlot.RIGHT_HAND);
