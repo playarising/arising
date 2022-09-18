@@ -267,7 +267,9 @@ describe("Equipment", () => {
     const id = await this.civ.getTokenID(1, 1);
     await this.experience.assignExperience(id, 5000);
     await this.items.setApprovalForAll(this.equipment.address, true);
-    await this.equipment.equip(id, 0, 1);
+    await expect(this.equipment.equip(id, 0, 1))
+      .to.emit(this.equipment, "Equipped")
+      .withArgs(id, 0, 1);
     const equipment = await this.equipment.getCharacterEquipment(id);
     expect(equipment.helmet.id).to.eq(1);
     expect(equipment.helmet.equiped).to.eq(true);
@@ -340,10 +342,16 @@ describe("Equipment", () => {
     );
   });
 
-  it("should remove both hands slots when equiping a two handed item", async () => {
-    // 11 left y 12 right
-    // 11 one handed y 12 two handed
+  it("should unequip an item successfully", async () => {
     const id = await this.civ.getTokenID(1, 1);
+    await expect(this.equipment.unequip(id, 0))
+      .to.emit(this.equipment, "Unequipped")
+      .withArgs(id, 0);
+  });
+
+  it("should remove both hands slots when equiping a two handed item", async () => {
+    const id = await this.civ.getTokenID(1, 1);
+    await this.equipment.equip(id, 0, 3);
     expect(await this.items.balanceOf(this.owner.address, 4)).to.eq(2);
     await this.equipment.equip(id, 11, 4);
     await this.equipment.equip(id, 12, 4);
