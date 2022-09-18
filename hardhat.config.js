@@ -51,6 +51,7 @@ module.exports = {
   gasReporter: {
     currency: "USD",
     outputFile: argv.ci ? "gas-report.txt" : undefined,
+    gasPriceApi: process.env.COINMARKETCAP_API
   },
   docgen: {
     path: "./docs",
