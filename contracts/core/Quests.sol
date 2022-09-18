@@ -205,7 +205,7 @@ contract Quests is IQuests, Ownable, Pausable {
             _quest.stats_cost.intellect;
         uint256 _fullfilment = _total_stats_consumed >= _max_quest_stats
             ? 100
-            : (_total_stats_consumed / _max_quest_stats) * 100;
+            : (_total_stats_consumed * 100) / _max_quest_stats;
         character_quests[_id] = CurrentQuest(
             _quest_id,
             false,
@@ -233,20 +233,21 @@ contract Quests is IQuests, Ownable, Pausable {
         character_quests[_id].claimed_reward = true;
 
         Quest memory _quest = quests[character_quests[_id].last_quest_id];
-        IExperience(experience).assignExperience(
-            _id,
-            (_quest.experience_reward * character_quests[_id].fullfilment) / 100
-        );
-        IBaseFungibleItem(gold).mintTo(
-            _id,
-            (_quest.gold_reward * character_quests[_id].fullfilment) / 100
-        );
+
+        uint256 _experience = (_quest.experience_reward *
+            character_quests[_id].fullfilment) / 100;
+
+        IExperience(experience).assignExperience(_id, _experience);
+
+        uint256 _gold = (_quest.gold_reward *
+            character_quests[_id].fullfilment) / 100;
+
+        IBaseFungibleItem(gold).mintTo(_id, _gold);
         for (uint256 i = 0; i < _quest.resources_reward.length; i++) {
-            IBaseFungibleItem(_quest.resources_reward[i]).mintTo(
-                _id,
-                (_quest.resources_amounts[i] *
-                    character_quests[_id].fullfilment) / 100
-            );
+            uint256 _amount = (_quest.resources_amounts[i] *
+                character_quests[_id].fullfilment) / 100;
+
+            IBaseFungibleItem(_quest.resources_reward[i]).mintTo(_id, _amount);
         }
     }
 

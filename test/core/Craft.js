@@ -199,7 +199,7 @@ describe("Craft", () => {
     expect(recipe.available).to.eq(true);
   });
 
-  it("should fail when trying to equip for a non owned token", async () => {
+  it("should fail when trying to craft for a non owned token", async () => {
     const id = await this.civ.getTokenID(1, 1);
     await expect(
       this.craft.connect(this.receiver).craft(id, 1)
@@ -208,7 +208,7 @@ describe("Craft", () => {
     );
   });
 
-  it("should fail when trying to equip for a non minted token", async () => {
+  it("should fail when trying to craft for a non minted token", async () => {
     await expect(
       this.craft.craft(
         "0x00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000005",
