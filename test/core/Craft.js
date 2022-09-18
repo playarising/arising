@@ -145,7 +145,7 @@ describe("Craft", () => {
 
   it("should fail enabling a recibe when it doesn't exists", async () => {
     await expect(this.craft.enableRecipe(1)).to.revertedWith(
-      "Craft: craft() invalid recipe id."
+      "Craft: enableRecipe() invalid recipe id."
     );
   });
 
