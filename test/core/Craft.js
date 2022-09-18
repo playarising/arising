@@ -103,7 +103,7 @@ describe("Craft", () => {
       }
     );
 
-    await this.items.transferOwnership(this.craft.address);
+    await this.items.addAuthority(this.craft.address);
   });
 
   it("should not be able to craft when paused", async () => {

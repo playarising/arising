@@ -27,11 +27,11 @@ contract Items is IItems, Ownable, ERC1155 {
 
     // =============================================== Modifiers ======================================================
 
-    /** @notice Extends the `onlyOwner` modifier to check if the `msg.sender` is the craft instance. */
-    modifier onlyOnweOrAuthorized() {
+    /** @notice Checks against if the `msg.sender` is authorized to mint items. */
+    modifier onlyAuthorized() {
         require(
-            authorized[_msgSender()] || owner() == _msgSender(),
-            "Items: onlyOwnerOrCraft() msg.sender is not allowed to mint."
+            authorized[msg.sender],
+            "Items: onlyAuthorized() msg.sender not authorized."
         );
         _;
     }
@@ -41,7 +41,9 @@ contract Items is IItems, Ownable, ERC1155 {
     /**
      * @notice Constructor.
      */
-    constructor() ERC1155("https://items.playarising.com/{id}") {}
+    constructor() ERC1155("https://items.playarising.com/{id}") {
+        authorized[msg.sender] = true;
+    }
 
     /**
      * @notice Creates tokens to the address provided.
@@ -50,7 +52,7 @@ contract Items is IItems, Ownable, ERC1155 {
      * @param _to           Address that receives the tokens.
      * @param _item_id      ID of the item to be created.
      */
-    function mint(address _to, uint256 _item_id) public onlyOnweOrAuthorized {
+    function mint(address _to, uint256 _item_id) public onlyAuthorized {
         require(
             _item_id != 0 && _item_id <= _items.length,
             "Items: mint() invalid item id."

@@ -31,13 +31,13 @@ mapping(address => bool) authorized
 
 Map to store the list of authorized addresses to mint tokens.
 
-### onlyOnweOrAuthorized
+### onlyAuthorized
 
 ```solidity
-modifier onlyOnweOrAuthorized()
+modifier onlyAuthorized()
 ```
 
-Extends the `onlyOwner` modifier to check if the `msg.sender` is the craft instance.
+Checks against if the `msg.sender` is authorized to mint items.
 
 ### constructor
 

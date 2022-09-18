@@ -22,9 +22,7 @@ describe("Items", () => {
   it("should fail to mint from non owner or authority", async () => {
     await expect(
       this.items.connect(this.minter).mint(this.owner.address, 1)
-    ).to.revertedWith(
-      "Items: onlyOwnerOrCraft() msg.sender is not allowed to mint."
-    );
+    ).to.revertedWith("Items: onlyAuthorized() msg.sender not authorized.");
   });
 
   it("should fail to add and remove an authority from non owner", async () => {
@@ -38,7 +36,7 @@ describe("Items", () => {
 
   it("should fail to remove a non authorized address", async () => {
     await expect(
-      this.items.removeAuthority(this.owner.address)
+      this.items.removeAuthority(this.minter.address)
     ).to.revertedWith("Items: removeAuthority() address is not authorized.");
   });
 
@@ -141,9 +139,7 @@ describe("Items", () => {
     await this.items.removeAuthority(this.minter.address);
     await expect(
       this.items.connect(this.minter).mint(this.owner.address, 1)
-    ).to.revertedWith(
-      "Items: onlyOwnerOrCraft() msg.sender is not allowed to mint."
-    );
+    ).to.revertedWith("Items: onlyAuthorized() msg.sender not authorized.");
   });
 
   it("should mint an item correctly", async () => {
