@@ -122,13 +122,26 @@ describe("Quests", () => {
     await expect(
       this.quests
         .connect(this.receiver)
-        .addQuest(0, 0, [], [], 1, { might: 1, speed: 1, intellect: 1 }, 1, 1)
+        .addQuest(
+          "test",
+          "test 2",
+          0,
+          0,
+          [],
+          [],
+          1,
+          { might: 1, speed: 1, intellect: 1 },
+          1,
+          1
+        )
     ).to.revertedWith("Ownable: caller is not the owner");
   });
 
   it("should fail adding a quest when materials and amount doesn't match", async () => {
     await expect(
       this.quests.addQuest(
+        "test",
+        "test 2",
         0,
         0,
         [this.resource.address],
@@ -143,6 +156,8 @@ describe("Quests", () => {
 
   it("should enable a quest correctly", async () => {
     await this.quests.addQuest(
+      "test",
+      "test 2",
       0,
       10,
       [this.resource.address],
@@ -160,10 +175,14 @@ describe("Quests", () => {
   it("should enable and disable the quest correctly", async () => {
     let quest = await this.quests.getQuest(1);
     expect(quest.available).to.eq(true);
-    await this.quests.disableQuest(1);
+    await expect(this.quests.disableQuest(1))
+      .to.emit(this.quests, "DisableQuest")
+      .withArgs(1);
     quest = await this.quests.getQuest(1);
     expect(quest.available).to.eq(false);
-    await this.quests.enableQuest(1);
+    await expect(this.quests.enableQuest(1))
+      .to.emit(this.quests, "EnableQuest")
+      .withArgs(1);
     quest = await this.quests.getQuest(1);
     expect(quest.available).to.eq(true);
   });
@@ -251,16 +270,22 @@ describe("Quests", () => {
 
   it("should add a quest complete it and claim with 100% fulfillment", async () => {
     const id = await this.civ.getTokenID(1, 1);
-    await this.quests.addQuest(
-      0,
-      10,
-      [this.resource.address],
-      [10],
-      100,
-      { might: 2, speed: 2, intellect: 2 },
-      3600,
-      1
-    );
+    await expect(
+      this.quests.addQuest(
+        "test",
+        "test 2",
+        0,
+        10,
+        [this.resource.address],
+        [10],
+        100,
+        { might: 2, speed: 2, intellect: 2 },
+        3600,
+        1
+      )
+    )
+      .to.emit(this.quests, "AddQuest")
+      .withArgs(2, "test", "test 2");
     await this.quests.startQuest(id, 2, { might: 2, speed: 2, intellect: 2 });
     const quest = await this.quests.getCharacterCurrentQuest(id);
     await ethers.provider.send("evm_mine", [quest.cooldown.toNumber()]);
