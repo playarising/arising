@@ -198,6 +198,7 @@ contract Forge is IForge, Ownable, Pausable {
             IERC20(token).allowance(msg.sender, address(this)) >= price,
             "Forge: buyUpgrade() not enough allowance to buy upgrade."
         );
+
         bool canUpgrade = false;
         if (!forges[_id][2].available) {
             canUpgrade = true;

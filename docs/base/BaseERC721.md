@@ -34,7 +34,7 @@ Requirements:
 ### mint
 
 ```solidity
-function mint(address _to) public
+function mint(address _to) public returns (uint256)
 ```
 
 Creates tokens to the address provided.
@@ -44,6 +44,10 @@ Requirements:
 | Name | Type    | Description                       |
 | ---- | ------- | --------------------------------- |
 | \_to | address | Address that receives the tokens. |
+
+| Name | Type    | Description                         |
+| ---- | ------- | ----------------------------------- |
+| [0]  | uint256 | \_token_id The ID of the new token. |
 
 ### isApprovedOrOwner
 

@@ -307,9 +307,7 @@ contract Craft is ICraft, Ownable, Pausable {
      */
     function claim(bytes memory _id) public whenNotPaused onlyAllowed(_id) {
         require(_isSlotClaimable(_id), "Craft: claim() slot is not claimable.");
-
         craft_slots[_id].claimed = true;
-
         Recipe memory _recipe = recipes[craft_slots[_id].last_recipe];
         IItems(items).mint(
             ICivilizations(civilizations).ownerOf(_id),

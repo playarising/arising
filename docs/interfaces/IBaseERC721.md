@@ -7,7 +7,7 @@ Interface for the [BaseERC721](/docs/base/BaseERC721.md) contract.
 ### mint
 
 ```solidity
-function mint(address _to) external
+function mint(address _to) external returns (uint256 _token_id)
 ```
 
 See [BaseERC721#mint](/docs/base/BaseERC721.md#mint)

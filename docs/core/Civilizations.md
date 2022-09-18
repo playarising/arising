@@ -55,6 +55,36 @@ mapping(uint256 => struct ICivilizations.Upgrade) upgrades
 
 Map to track the upgrades information.
 
+### Summoned
+
+```solidity
+event Summoned(address _owner, bytes _id)
+```
+
+Event emmited when the [Civilization#mint](/docs/core/Civilizations.md#mint) function is called.
+
+Requirements:
+
+| Name    | Type    | Description                   |
+| ------- | ------- | ----------------------------- |
+| \_owner | address | Owner of the minted token.    |
+| \_id    | bytes   | Composed ID of the character. |
+
+### UpgradePurchased
+
+```solidity
+event UpgradePurchased(bytes _id, uint256 _upgrade_id)
+```
+
+Event emmited when the [Civilization#buyUpgrade](/docs/core/Civilizations.md#buyUpgrade) function is called.
+
+Requirements:
+
+| Name         | Type    | Description                   |
+| ------------ | ------- | ----------------------------- |
+| \_id         | bytes   | Composed ID of the character. |
+| \_upgrade_id | uint256 | ID of the upgrade purchased.  |
+
 ### constructor
 
 ```solidity

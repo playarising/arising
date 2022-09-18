@@ -41,10 +41,14 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
      * @notice Creates tokens to the address provided.
      *
      * Requirements:
-     * @param _to    Address that receives the tokens.
+     * @param _to           Address that receives the tokens.
+     *
+     * @return _token_id    The ID of the new token.
      */
-    function mint(address _to) public onlyOwner {
-        _safeMint(_to, totalSupply() + 1);
+    function mint(address _to) public onlyOwner returns (uint256) {
+        uint256 _token_id = totalSupply() + 1;
+        _safeMint(_to, _token_id);
+        return _token_id;
     }
 
     // =============================================== Getters ========================================================
