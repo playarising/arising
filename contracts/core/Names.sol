@@ -51,6 +51,17 @@ contract Names is INames, Pausable, Ownable {
         _;
     }
 
+    // =============================================== Events =========================================================
+
+    /**
+     * @notice Event emmited when the character name is changed.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _name     New name of the character.
+     */
+    event ChangeName(bytes indexed _id, string _name);
+
     // =============================================== Setters ========================================================
 
     /**
@@ -102,6 +113,7 @@ contract Names is INames, Pausable, Ownable {
         );
         claimed_names[toLowerCase(_name)] = true;
         names[_id] = _name;
+        emit ChangeName(_id, _name);
     }
 
     /**
@@ -134,6 +146,7 @@ contract Names is INames, Pausable, Ownable {
         claimed_names[toLowerCase(_new_name)] = false;
 
         names[_id] = _new_name;
+        emit ChangeName(_id, _new_name);
     }
 
     /**
@@ -150,6 +163,7 @@ contract Names is INames, Pausable, Ownable {
         );
         claimed_names[toLowerCase(old_name)] = false;
         names[_id] = "";
+        emit ChangeName(_id, "");
     }
 
     // =============================================== Getters ========================================================

@@ -55,6 +55,21 @@ Requirements:
 | ---- | ----- | ----------------------------- |
 | \_id | bytes | Composed ID of the character. |
 
+### ChangeName
+
+```solidity
+event ChangeName(bytes _id, string _name)
+```
+
+Event emmited when the character name is changed.
+
+Requirements:
+
+| Name   | Type   | Description                   |
+| ------ | ------ | ----------------------------- |
+| \_id   | bytes  | Composed ID of the character. |
+| \_name | string | New name of the character.    |
+
 ### constructor
 
 ```solidity

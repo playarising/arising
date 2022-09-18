@@ -77,6 +77,8 @@ describe("Craft", () => {
     await this.experience.addAuthority(this.craft.address);
 
     await this.items.addItem(
+      "test",
+      "test 2",
       1,
       2,
       {
@@ -104,6 +106,8 @@ describe("Craft", () => {
     );
 
     await this.items.addItem(
+      "test",
+      "test 2",
       1,
       2,
       {

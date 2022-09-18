@@ -13,6 +13,8 @@ describe("Equipment", () => {
     await this.items.deployed();
 
     await this.items.addItem(
+      "test",
+      "test 2",
       1,
       0,
       {
@@ -39,6 +41,8 @@ describe("Equipment", () => {
       }
     );
     await this.items.addItem(
+      "test",
+      "test 2",
       3,
       1,
       {
@@ -66,6 +70,8 @@ describe("Equipment", () => {
     );
 
     await this.items.addItem(
+      "test",
+      "test 2",
       1,
       0,
       {
@@ -93,6 +99,8 @@ describe("Equipment", () => {
     );
 
     await this.items.addItem(
+      "test",
+      "test 2",
       1,
       11,
       {
@@ -120,6 +128,8 @@ describe("Equipment", () => {
     );
 
     await this.items.addItem(
+      "test",
+      "test 2",
       1,
       12,
       {

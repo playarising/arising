@@ -118,7 +118,9 @@ describe("Names", () => {
   it("should claim a name for a token", async () => {
     const id = await this.civ.getTokenID(1, 1);
     expect(await this.names.getCharacterName(id)).to.eq("");
-    await this.names.claimName(id, "Conan de Barbarian");
+    await expect(this.names.claimName(id, "Conan de Barbarian"))
+      .to.emit(this.names, "ChangeName")
+      .withArgs(id, "Conan de Barbarian");
     expect(await this.names.getCharacterName(id)).to.eq("Conan de Barbarian");
   });
 
@@ -163,7 +165,9 @@ describe("Names", () => {
   it("should replace a name correctly", async () => {
     const id = await this.civ.getTokenID(1, 1);
     expect(await this.names.getCharacterName(id)).to.eq("Conan de Barbarian");
-    await this.names.replaceName(id, "Radagast The Brown");
+    await expect(this.names.replaceName(id, "Radagast The Brown"))
+      .to.emit(this.names, "ChangeName")
+      .withArgs(id, "Radagast The Brown");
     expect(await this.names.getCharacterName(id)).to.eq("Radagast The Brown");
     expect(await this.names.isNameAvailable("Conan de Barbarian")).to.eq(true);
   });
@@ -178,7 +182,9 @@ describe("Names", () => {
   it("should clear a name correctly", async () => {
     const id = await this.civ.getTokenID(1, 1);
     expect(await this.names.getCharacterName(id)).to.eq("Radagast The Brown");
-    await this.names.clearName(id);
+    await expect(this.names.clearName(id))
+      .to.emit(this.names, "ChangeName")
+      .withArgs(id, "");
     expect(await this.names.getCharacterName(id)).to.eq("");
     expect(await this.names.isNameAvailable("Radagast The Brown")).to.eq(true);
   });
