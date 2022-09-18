@@ -21,8 +21,8 @@ iterate_sources() {
 iterate_sources "$ROOT"base/ "$FLAT"base/
 iterate_sources "$ROOT"codex/ "$FLAT"codex/
 iterate_sources "$ROOT"core/ "$FLAT"core/
-iterate_sources "$ROOT"items/ "$FLAT"items/
+iterate_sources "$ROOT"items/ "$FLAT"/items/
 
-sed -i '' '/SPDX-License-Identifier: MIT/d' flat/**/*.sol
-sed -i '' '/pragma solidity/d' flat/**/*.sol
-sed -i '' '1s/^/pragma solidity 0.8.17;\n/' flat/**/*.sol
+sed -i '/SPDX-License-Identifier: MIT/d' flat/**/*.sol
+sed -i '/pragma solidity/d' flat/**/*.sol
+sed -i '1s/^/pragma solidity 0.8.17;\n/' flat/**/*.sol
