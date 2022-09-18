@@ -23,6 +23,22 @@ uint256[] _items
 
 Array to track a full list of item IDs.
 
+### authorized
+
+```solidity
+mapping(address => bool) authorized
+```
+
+Map to store the list of authorized addresses to mint tokens.
+
+### onlyOnweOrAuthorized
+
+```solidity
+modifier onlyOnweOrAuthorized()
+```
+
+Extends the `onlyOwner` modifier to check if the `msg.sender` is the craft instance.
+
 ### constructor
 
 ```solidity
@@ -45,6 +61,34 @@ Requirements:
 | --------- | ------- | --------------------------------- |
 | \_to      | address | Address that receives the tokens. |
 | \_item_id | uint256 | ID of the item to be created.     |
+
+### addAuthority
+
+```solidity
+function addAuthority(address _authority) public
+```
+
+Assigns a new address as an authority to mint items.
+
+Requirements:
+
+| Name        | Type    | Description                |
+| ----------- | ------- | -------------------------- |
+| \_authority | address | Address to give authority. |
+
+### removeAuthority
+
+```solidity
+function removeAuthority(address _authority) public
+```
+
+Removes an authority to mint items.
+
+Requirements:
+
+| Name        | Type    | Description                |
+| ----------- | ------- | -------------------------- |
+| \_authority | address | Address to give authority. |
 
 ### addItem
 

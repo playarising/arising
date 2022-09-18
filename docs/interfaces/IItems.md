@@ -94,6 +94,22 @@ function mint(address _to, uint256 _item_id) external
 
 See [Items#mint](/docs/items/Items.md#mint)
 
+### addAuthority
+
+```solidity
+function addAuthority(address _authority) external
+```
+
+See [Items#addAuthority](/docs/items/Items.md#addAuthority)
+
+### removeAuthority
+
+```solidity
+function removeAuthority(address _authority) external
+```
+
+See [Items#removeAuthority](/docs/items/Items.md#removeAuthority)
+
 ### addItem
 
 ```solidity

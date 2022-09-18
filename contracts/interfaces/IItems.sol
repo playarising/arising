@@ -114,6 +114,12 @@ interface IItems {
     /** @notice See [Items#mint](/docs/items/Items.md#mint) */
     function mint(address _to, uint256 _item_id) external;
 
+    /** @notice See [Items#addAuthority](/docs/items/Items.md#addAuthority) */
+    function addAuthority(address _authority) external;
+
+    /** @notice See [Items#removeAuthority](/docs/items/Items.md#removeAuthority) */
+    function removeAuthority(address _authority) external;
+
     /** @notice See [Items#addItem](/docs/items/Items.md#addItem) */
     function addItem(
         uint256 _level_required,

@@ -19,10 +19,27 @@ describe("Items", () => {
     );
   });
 
-  it("should fail to mint from non owner", async () => {
+  it("should fail to mint from non owner or authority", async () => {
     await expect(
       this.items.connect(this.minter).mint(this.owner.address, 1)
+    ).to.revertedWith(
+      "Items: onlyOwnerOrCraft() msg.sender is not allowed to mint."
+    );
+  });
+
+  it("should fail to add and remove an authority from non owner", async () => {
+    await expect(
+      this.items.connect(this.minter).addAuthority(this.owner.address)
     ).to.revertedWith("Ownable: caller is not the owner");
+    await expect(
+      this.items.connect(this.minter).removeAuthority(this.owner.address)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should fail to remove a non authorized address", async () => {
+    await expect(
+      this.items.removeAuthority(this.owner.address)
+    ).to.revertedWith("Items: removeAuthority() address is not authorized.");
   });
 
   it("should fail to disabling an invalid item", async () => {
@@ -118,9 +135,20 @@ describe("Items", () => {
     expect(item.item_type).to.eq(2);
   });
 
+  it("should add an authority, mint and remove it correctly", async () => {
+    await this.items.addAuthority(this.minter.address);
+    await this.items.connect(this.minter).mint(this.owner.address, 1);
+    await this.items.removeAuthority(this.minter.address);
+    await expect(
+      this.items.connect(this.minter).mint(this.owner.address, 1)
+    ).to.revertedWith(
+      "Items: onlyOwnerOrCraft() msg.sender is not allowed to mint."
+    );
+  });
+
   it("should mint an item correctly", async () => {
     await this.items.mint(this.owner.address, 1);
-    expect(await this.items.balanceOf(this.owner.address, 1)).to.eq(1);
+    expect(await this.items.balanceOf(this.owner.address, 1)).to.eq(2);
   });
 
   it("should return the item uri correctly", async () => {

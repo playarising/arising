@@ -22,6 +22,20 @@ contract Items is IItems, Ownable, ERC1155 {
     /** @notice Array to track a full list of item IDs. */
     uint256[] _items;
 
+    /** @notice Map to store the list of authorized addresses to mint tokens. */
+    mapping(address => bool) authorized;
+
+    // =============================================== Modifiers ======================================================
+
+    /** @notice Extends the `onlyOwner` modifier to check if the `msg.sender` is the craft instance. */
+    modifier onlyOnweOrAuthorized() {
+        require(
+            authorized[_msgSender()] || owner() == _msgSender(),
+            "Items: onlyOwnerOrCraft() msg.sender is not allowed to mint."
+        );
+        _;
+    }
+
     // =============================================== Setters ========================================================
 
     /**
@@ -36,12 +50,36 @@ contract Items is IItems, Ownable, ERC1155 {
      * @param _to           Address that receives the tokens.
      * @param _item_id      ID of the item to be created.
      */
-    function mint(address _to, uint256 _item_id) public onlyOwner {
+    function mint(address _to, uint256 _item_id) public onlyOnweOrAuthorized {
         require(
             _item_id != 0 && _item_id <= _items.length,
             "Items: mint() invalid item id."
         );
         _mint(_to, _item_id, 1, "");
+    }
+
+    /**
+     * @notice Assigns a new address as an authority to mint items.
+     *
+     * Requirements:
+     * @param _authority    Address to give authority.
+     */
+    function addAuthority(address _authority) public onlyOwner {
+        authorized[_authority] = true;
+    }
+
+    /**
+     * @notice Removes an authority to mint items.
+     *
+     * Requirements:
+     * @param _authority    Address to give authority.
+     */
+    function removeAuthority(address _authority) public onlyOwner {
+        require(
+            authorized[_authority],
+            "Items: removeAuthority() address is not authorized."
+        );
+        authorized[_authority] = false;
     }
 
     /**
