@@ -9,6 +9,8 @@ Interface for the [Items](/docs/items/Items.md) contract.
 ```solidity
 struct Item {
   uint256 id;
+  string name;
+  string description;
   uint256 level_required;
   enum IItems.ItemType item_type;
   struct IItems.StatsModifiers stat_modifiers;
@@ -121,7 +123,7 @@ See [Items#removeAuthority](/docs/items/Items.md#removeAuthority)
 ### addItem
 
 ```solidity
-function addItem(uint256 _level_required, enum IItems.ItemType _item_type, struct IItems.StatsModifiers _stats_modifiers, struct IItems.Attributes _attributes) external
+function addItem(string _name, string _description, uint256 _level_required, enum IItems.ItemType _item_type, struct IItems.StatsModifiers _stats_modifiers, struct IItems.Attributes _attributes) external
 ```
 
 See [Items#addItem](/docs/items/Items.md#addItem)

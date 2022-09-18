@@ -40,6 +40,29 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     /** @notice Map to track the upgrades information. */
     mapping(uint256 => Upgrade) public upgrades;
 
+    /** @notice Map to the price to mint characters. */
+    uint256 public price;
+
+    // =============================================== Events =========================================================
+
+    /**
+     * @notice Event emmited when the [mint](#mint) function is called.
+     *
+     * Requirements:
+     * @param _owner    Owner of the minted token.
+     * @param _id       Composed ID of the character.
+     */
+    event Summoned(address indexed _owner, bytes indexed _id);
+
+    /**
+     * @notice Event emmited when the [buyUpgrade](#buyUpgrade) function is called.
+     *
+     * Requirements:
+     * @param _id   Composed ID of the character.
+     * @param _upgrade_id   ID of the upgrade purchased.
+     */
+    event UpgradePurchased(bytes indexed _id, uint256 indexed _upgrade_id);
+
     // =============================================== Setters ========================================================
 
     /**
@@ -106,6 +129,16 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     }
 
     /**
+     * @notice Sets the price to mint a character.
+     *
+     * Requirements:
+     * @param _price     Amount of tokens to pay for the upgrade.
+     */
+    function setMintPrice(uint256 _price) public onlyOwner {
+        price = _price;
+    }
+
+    /**
      * @notice Changes the token address to charge.
      *
      * Requirements:
@@ -154,8 +187,15 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
             _canMint(msg.sender),
             "Civilizations: mint() address already minted."
         );
-        IBaseERC721(civilizations[_civilization_id]).mint(msg.sender);
+        IERC20(token).transferFrom(msg.sender, address(this), price);
         _addMint(msg.sender);
+        emit Summoned(
+            msg.sender,
+            getTokenID(
+                _civilization_id,
+                IBaseERC721(civilizations[_civilization_id]).mint(msg.sender)
+            )
+        );
     }
 
     /**
@@ -193,6 +233,7 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
         );
         IERC20(token).transferFrom(msg.sender, address(this), _price);
         character_upgrades[_id][_upgrade_id] = true;
+        emit UpgradePurchased(_id, _upgrade_id);
     }
 
     /** @notice Transfers the total amount of tokens stored in the contract to the owner .*/

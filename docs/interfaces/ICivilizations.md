@@ -46,6 +46,14 @@ function setUpgradePrice(uint256 _upgrade_id, uint256 _price) external
 
 See [Civilizations#setUpgradePrice](/docs/core/Civilizations.md#setUpgradePrice)
 
+### setMintPrice
+
+```solidity
+function setMintPrice(uint256 _price) external
+```
+
+See [Civilizations#setMintPrice](/docs/core/Civilizations.md#setMintPrice)
+
 ### setToken
 
 ```solidity

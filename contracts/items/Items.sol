@@ -36,6 +36,34 @@ contract Items is IItems, Ownable, ERC1155 {
         _;
     }
 
+    // =============================================== Events =========================================================
+
+    /**
+     * @notice Event emmited when the [addItem](#addItem) function is called.
+     *
+     * Requirements:
+     * @param _item_id    ID of the item added.
+     * @param _name         Name of the recipe.
+     * @param _description  Recipe description
+     */
+    event AddItem(uint256 indexed _item_id, string _name, string _description);
+
+    /**
+     * @notice Event emmited when the [enableItem](#enableItem) function is called.
+     *
+     * Requirements:
+     * @param _item_id    ID of the item enabled.
+     */
+    event EnableItem(uint256 indexed _item_id);
+
+    /**
+     * @notice Event emmited when the [disableItem](#disableItem) function is called.
+     *
+     * Requirements:
+     * @param _item_id    ID of the the item disabled.
+     */
+    event DisableItem(uint256 indexed _item_id);
+
     // =============================================== Setters ========================================================
 
     /**
@@ -103,12 +131,16 @@ contract Items is IItems, Ownable, ERC1155 {
      * @notice Adds the item data to relate with a specific token ID.
      *
      * Requirements:
+     * @param _name             The item name.
+     * @param _description      The item description.
      * @param _level_required   Minimum level for a character to use the item.
      * @param _item_type        Type of the item defined by the enum [ItemType](/docs/interfaces/IItems.md#itemtype).
      * @param _stats_modifiers  Item modifiers for the character stats.
      * @param _attributes       Specific item attributes.
      */
     function addItem(
+        string memory _name,
+        string memory _description,
         uint256 _level_required,
         ItemType _item_type,
         StatsModifiers memory _stats_modifiers,
@@ -117,6 +149,8 @@ contract Items is IItems, Ownable, ERC1155 {
         uint256 _item_id = _items.length + 1;
         items[_item_id] = Item(
             _item_id,
+            _name,
+            _description,
             _level_required,
             _item_type,
             _stats_modifiers,
@@ -124,6 +158,7 @@ contract Items is IItems, Ownable, ERC1155 {
             true
         );
         _items.push(_item_id);
+        emit AddItem(_item_id, _name, _description);
     }
 
     /**
@@ -138,6 +173,7 @@ contract Items is IItems, Ownable, ERC1155 {
             "Items: disableItem() invalid item it."
         );
         items[_item_id].available = false;
+        emit DisableItem(_item_id);
     }
 
     /**
@@ -152,6 +188,7 @@ contract Items is IItems, Ownable, ERC1155 {
             "Items: enableItem() invalid item it."
         );
         items[_item_id].available = true;
+        emit EnableItem(_item_id);
     }
 
     // =============================================== Getters ========================================================

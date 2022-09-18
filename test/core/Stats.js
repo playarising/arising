@@ -59,7 +59,7 @@ describe("Stats", () => {
     await this.collection.deployed();
 
     const Civilizations = await ethers.getContractFactory("Civilizations");
-    this.civ = await Civilizations.deploy(receiver.address);
+    this.civ = await Civilizations.deploy(this.mock.address);
     await this.civ.deployed();
     await this.civ.addCivilization(this.collection.address);
 
@@ -283,7 +283,9 @@ describe("Stats", () => {
 
   it("should perform a free refresh correctly and prevent a second refresh instantly", async () => {
     const id = await this.civ.getTokenID(1, 1);
-    await this.stats.refresh(id);
+    await expect(this.stats.refresh(id))
+      .to.emit(this.stats, "ChangedPoints")
+      .withArgs(id, [49, 49, 49], [49, 49, 49]);
     const pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(49);
     expect(pool.speed).to.eq(49);
@@ -296,7 +298,11 @@ describe("Stats", () => {
   it("should perform a free refresh when time is available", async () => {
     const id = await this.civ.getTokenID(1, 1);
     const nextTime = await this.stats.getNextRefreshTime(id);
-    await this.stats.consume(id, { might: 45, speed: 45, intellect: 45 });
+    await expect(
+      this.stats.consume(id, { might: 45, speed: 45, intellect: 45 })
+    )
+      .to.emit(this.stats, "ChangedPoints")
+      .withArgs(id, [49, 49, 49], [4, 4, 4]);
     let pool = await this.stats.getPoolStats(id);
     expect(pool.might).to.eq(4);
     expect(pool.speed).to.eq(4);
@@ -377,19 +383,17 @@ describe("Stats", () => {
   it("should fail to use a vitalizer with no tokens", async () => {
     const id = await this.civ.getTokenID(1, 1);
     await expect(
-      this.stats.consumeVitalizer(id, { might: 1, speed: 0, intellect: 0 })
-    ).to.revertedWith(
-      "Stats: consumeVitalizer() not enough vitalizer tokens balance."
-    );
+      this.stats.vitalize(id, { might: 1, speed: 0, intellect: 0 })
+    ).to.revertedWith("Stats: vitalize() not enough vitalizer tokens balance.");
   });
 
   it("should fail to use a vitalizer with no allowance", async () => {
     const id = await this.civ.getTokenID(1, 1);
     await this.vitalizer.mintFree(this.owner.address, 10);
     await expect(
-      this.stats.consumeVitalizer(id, { might: 1, speed: 0, intellect: 0 })
+      this.stats.vitalize(id, { might: 1, speed: 0, intellect: 0 })
     ).to.revertedWith(
-      "Stats: consumeVitalizer() not enough vitalizer tokens allowance."
+      "Stats: vitalize() not enough vitalizer tokens allowance."
     );
   });
 
@@ -398,16 +402,16 @@ describe("Stats", () => {
     await this.vitalizer.mintFree(this.owner.address, 10);
     await this.vitalizer.approve(this.stats.address, 10);
     await expect(
-      this.stats.consumeVitalizer(id, { might: 1, speed: 1, intellect: 0 })
-    ).to.revertedWith("Stats: consumeVitalizer() too many points to recover.");
+      this.stats.vitalize(id, { might: 1, speed: 1, intellect: 0 })
+    ).to.revertedWith("Stats: vitalize() too many points to recover.");
     await expect(
-      this.stats.consumeVitalizer(id, { might: 0, speed: 0, intellect: 0 })
-    ).to.revertedWith("Stats: consumeVitalizer() too many points to recover.");
+      this.stats.vitalize(id, { might: 0, speed: 0, intellect: 0 })
+    ).to.revertedWith("Stats: vitalize() too many points to recover.");
   });
 
   it("should use vitalizer correctly", async () => {
     const id = await this.civ.getTokenID(1, 1);
-    await this.stats.consumeVitalizer(id, { might: 1, speed: 0, intellect: 0 });
+    await this.stats.vitalize(id, { might: 1, speed: 0, intellect: 0 });
     await this.stats.consume(id, { might: 20, speed: 20, intellect: 20 });
     let base = await this.stats.getBaseStats(id);
     let pool = await this.stats.getPoolStats(id);
@@ -417,7 +421,7 @@ describe("Stats", () => {
     expect(pool.might).to.eq(25);
     expect(pool.speed).to.eq(24);
     expect(pool.intellect).to.eq(24);
-    await this.stats.consumeVitalizer(id, { might: 0, speed: 1, intellect: 0 });
+    await this.stats.vitalize(id, { might: 0, speed: 1, intellect: 0 });
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(50);
@@ -426,7 +430,7 @@ describe("Stats", () => {
     expect(pool.might).to.eq(25);
     expect(pool.speed).to.eq(25);
     expect(pool.intellect).to.eq(24);
-    await this.stats.consumeVitalizer(id, { might: 0, speed: 0, intellect: 1 });
+    await this.stats.vitalize(id, { might: 0, speed: 0, intellect: 1 });
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(50);
@@ -435,7 +439,7 @@ describe("Stats", () => {
     expect(pool.might).to.eq(25);
     expect(pool.speed).to.eq(25);
     expect(pool.intellect).to.eq(25);
-    await this.stats.consumeVitalizer(id, { might: 1, speed: 0, intellect: 0 });
+    await this.stats.vitalize(id, { might: 1, speed: 0, intellect: 0 });
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(51);
@@ -444,7 +448,7 @@ describe("Stats", () => {
     expect(pool.might).to.eq(26);
     expect(pool.speed).to.eq(25);
     expect(pool.intellect).to.eq(25);
-    await this.stats.consumeVitalizer(id, { might: 0, speed: 1, intellect: 0 });
+    await this.stats.vitalize(id, { might: 0, speed: 1, intellect: 0 });
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(51);
@@ -453,7 +457,7 @@ describe("Stats", () => {
     expect(pool.might).to.eq(26);
     expect(pool.speed).to.eq(26);
     expect(pool.intellect).to.eq(25);
-    await this.stats.consumeVitalizer(id, { might: 0, speed: 0, intellect: 1 });
+    await this.stats.vitalize(id, { might: 0, speed: 0, intellect: 1 });
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(51);
@@ -462,7 +466,7 @@ describe("Stats", () => {
     expect(pool.might).to.eq(26);
     expect(pool.speed).to.eq(26);
     expect(pool.intellect).to.eq(26);
-    await this.stats.consumeVitalizer(id, { might: 1, speed: 0, intellect: 0 });
+    await this.stats.vitalize(id, { might: 1, speed: 0, intellect: 0 });
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(52);
@@ -471,7 +475,7 @@ describe("Stats", () => {
     expect(pool.might).to.eq(27);
     expect(pool.speed).to.eq(26);
     expect(pool.intellect).to.eq(26);
-    await this.stats.consumeVitalizer(id, { might: 0, speed: 1, intellect: 0 });
+    await this.stats.vitalize(id, { might: 0, speed: 1, intellect: 0 });
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(52);
@@ -480,7 +484,7 @@ describe("Stats", () => {
     expect(pool.might).to.eq(27);
     expect(pool.speed).to.eq(27);
     expect(pool.intellect).to.eq(26);
-    await this.stats.consumeVitalizer(id, { might: 0, speed: 0, intellect: 1 });
+    await this.stats.vitalize(id, { might: 0, speed: 0, intellect: 1 });
     base = await this.stats.getBaseStats(id);
     pool = await this.stats.getPoolStats(id);
     expect(base.might).to.eq(52);
@@ -494,10 +498,8 @@ describe("Stats", () => {
   it("should fail to use a vitalizer without sacrificed points", async () => {
     const id = await this.civ.getTokenID(1, 1);
     await expect(
-      this.stats.consumeVitalizer(id, { might: 0, speed: 0, intellect: 1 })
-    ).to.revertedWith(
-      "Stats: consumeVitalizer() not enough sacrificed points."
-    );
+      this.stats.vitalize(id, { might: 0, speed: 0, intellect: 1 })
+    ).to.revertedWith("Stats: vitalize() not enough sacrificed points.");
   });
 
   it("should not change pool values when sacrifice and pool has less than max", async () => {

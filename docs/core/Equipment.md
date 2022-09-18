@@ -61,6 +61,37 @@ Requirements:
 | ---- | ----- | ----------------------------- |
 | \_id | bytes | Composed ID of the character. |
 
+### Equipped
+
+```solidity
+event Equipped(bytes _id, enum IEquipment.EquipmentSlot _slot, uint256 _item_id)
+```
+
+Event emmited when the [equip](#equip) function is called.
+
+Requirements:
+
+| Name      | Type                          | Description                   |
+| --------- | ----------------------------- | ----------------------------- |
+| \_id      | bytes                         | Composed ID of the character. |
+| \_slot    | enum IEquipment.EquipmentSlot | Slot of the item equiped.     |
+| \_item_id | uint256                       | ID of the item equipped.      |
+
+### Unequipped
+
+```solidity
+event Unequipped(bytes _id, enum IEquipment.EquipmentSlot _slot)
+```
+
+Event emmited when the [unequip](#unequip) function is called.
+
+Requirements:
+
+| Name   | Type                          | Description                   |
+| ------ | ----------------------------- | ----------------------------- |
+| \_id   | bytes                         | Composed ID of the character. |
+| \_slot | enum IEquipment.EquipmentSlot | Slot of the item unequipped.  |
+
 ### constructor
 
 ```solidity

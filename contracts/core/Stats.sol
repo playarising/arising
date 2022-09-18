@@ -70,6 +70,22 @@ contract Stats is IStats, Ownable, Pausable {
         _;
     }
 
+    // =============================================== Events =========================================================
+
+    /**
+     * @notice Event emmited when the character base or pool points change.
+     *
+     * Requirements:
+     * @param _id           Composed ID of the character.
+     * @param _pool_stats   Pool stat points.
+     * @param _base_stats   Pool stat points
+     */
+    event ChangedPoints(
+        bytes indexed _id,
+        BasicStats _base_stats,
+        BasicStats _pool_stats
+    );
+
     // =============================================== Setters ========================================================
 
     /**
@@ -154,6 +170,7 @@ contract Stats is IStats, Ownable, Pausable {
         pool[_id].might -= _stats.might;
         pool[_id].speed -= _stats.speed;
         pool[_id].intellect -= _stats.intellect;
+        emit ChangedPoints(_id, base[_id], pool[_id]);
     }
 
     /**
@@ -201,6 +218,7 @@ contract Stats is IStats, Ownable, Pausable {
         sacrifices[_id] += _stats.might;
         sacrifices[_id] += _stats.speed;
         sacrifices[_id] += _stats.intellect;
+        emit ChangedPoints(_id, base[_id], pool[_id]);
     }
 
     /**
@@ -219,6 +237,7 @@ contract Stats is IStats, Ownable, Pausable {
         pool[_id].speed = base[_id].speed;
         pool[_id].intellect = base[_id].intellect;
         last_refresh[_id] = block.timestamp;
+        emit ChangedPoints(_id, base[_id], pool[_id]);
     }
 
     /**
@@ -266,6 +285,7 @@ contract Stats is IStats, Ownable, Pausable {
         }
 
         refresher_usage_time[_id] = block.timestamp;
+        emit ChangedPoints(_id, base[_id], pool[_id]);
     }
 
     /**
@@ -275,27 +295,24 @@ contract Stats is IStats, Ownable, Pausable {
      * @param _id       Composed ID of the character.
      * @param _stats    Stats to sacrifice.
      */
-    function consumeVitalizer(bytes memory _id, BasicStats memory _stats)
+    function vitalize(bytes memory _id, BasicStats memory _stats)
         public
         whenNotPaused
         onlyAllowed(_id)
     {
         require(
             sacrifices[_id] > 0,
-            "Stats: consumeVitalizer() not enough sacrificed points."
+            "Stats: vitalize() not enough sacrificed points."
         );
         uint256 sum = _stats.might + _stats.speed + _stats.intellect;
-        require(
-            sum == 1,
-            "Stats: consumeVitalizer() too many points to recover."
-        );
+        require(sum == 1, "Stats: vitalize() too many points to recover.");
         require(
             IERC20(vitalizer).balanceOf(msg.sender) >= 1,
-            "Stats: consumeVitalizer() not enough vitalizer tokens balance."
+            "Stats: vitalize() not enough vitalizer tokens balance."
         );
         require(
             IERC20(vitalizer).allowance(msg.sender, address(this)) >= 1,
-            "Stats: consumeVitalizer() not enough vitalizer tokens allowance."
+            "Stats: vitalize() not enough vitalizer tokens allowance."
         );
 
         ERC20Burnable(vitalizer).burnFrom(msg.sender, 1);
@@ -308,6 +325,7 @@ contract Stats is IStats, Ownable, Pausable {
         pool[_id].intellect += _stats.intellect;
 
         sacrifices[_id] -= 1;
+        emit ChangedPoints(_id, base[_id], pool[_id]);
     }
 
     /**
@@ -334,6 +352,7 @@ contract Stats is IStats, Ownable, Pausable {
         pool[_id].might += _stats.might;
         pool[_id].speed += _stats.speed;
         pool[_id].intellect += _stats.intellect;
+        emit ChangedPoints(_id, base[_id], pool[_id]);
     }
 
     // =============================================== Getters ========================================================

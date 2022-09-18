@@ -17,8 +17,12 @@ describe("BaseFungibleItems", () => {
     );
     await this.collection.deployed();
 
+    const MockToken = await ethers.getContractFactory("MockToken");
+    this.mock = await MockToken.deploy(ethers.utils.parseEther("100"));
+    await this.mock.deployed();
+
     const Civilizations = await ethers.getContractFactory("Civilizations");
-    this.civ = await Civilizations.deploy(this.owner.address);
+    this.civ = await Civilizations.deploy(this.mock.address);
     await this.civ.deployed();
 
     await this.civ.addCivilization(this.collection.address);

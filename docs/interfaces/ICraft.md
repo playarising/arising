@@ -9,6 +9,8 @@ Interface for the [Craft](/docs/core/Craft.md) contract.
 ```solidity
 struct Recipe {
   uint256 id;
+  string name;
+  string description;
   address[] materials;
   uint256[] material_amounts;
   struct IStats.BasicStats stats_required;
@@ -26,6 +28,8 @@ struct Recipe {
 ```solidity
 struct Upgrade {
   uint256 id;
+  string name;
+  string description;
   address[] materials;
   uint256[] material_amounts;
   struct IStats.BasicStats stats_required;
@@ -100,7 +104,7 @@ See [Craft#enableUpgrade](/docs/core/Craft.md#enableUpgrade)
 ### addRecipe
 
 ```solidity
-function addRecipe(address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, uint256 _gold_cost, uint256 _reward, uint256 _experience_reward) external
+function addRecipe(string _name, string _description, address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, uint256 _gold_cost, uint256 _reward, uint256 _experience_reward) external
 ```
 
 See [Craft#addRecipe](/docs/core/Craft.md#addRecipe)
@@ -108,7 +112,7 @@ See [Craft#addRecipe](/docs/core/Craft.md#addRecipe)
 ### addUpgrade
 
 ```solidity
-function addUpgrade(address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, struct IStats.BasicStats _sacrifice, uint256 _level_required, uint256 _upgraded_item, uint256 _gold_cost, uint256 _reward) external
+function addUpgrade(string _name, string _description, address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, struct IStats.BasicStats _sacrifice, uint256 _level_required, uint256 _upgraded_item, uint256 _gold_cost, uint256 _reward) external
 ```
 
 See [Craft#addUpgrade](/docs/core/Craft.md#addUpgrade)

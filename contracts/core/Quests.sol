@@ -62,6 +62,38 @@ contract Quests is IQuests, Ownable, Pausable {
         _;
     }
 
+    // =============================================== Events =========================================================
+
+    /**
+     * @notice Event emmited when the [addQuest](#addQuest) function is called.
+     *
+     * Requirements:
+     * @param _quest_id     ID of the quest added.
+     * @param _name         Name of the quest.
+     * @param _description  Quest description
+     */
+    event AddQuest(
+        uint256 indexed _quest_id,
+        string _name,
+        string _description
+    );
+
+    /**
+     * @notice Event emmited when the [enableQuest](#enableQuest) function is called.
+     *
+     * Requirements:
+     * @param _quest_id    ID of the quest enabled.
+     */
+    event EnableQuest(uint256 indexed _quest_id);
+
+    /**
+     * @notice Event emmited when the [disableQuest](#disableQuest) function is called.
+     *
+     * Requirements:
+     * @param _quest_id    ID of the recipe disabled.
+     */
+    event DisableQuest(uint256 indexed _quest_id);
+
     // =============================================== Setters ========================================================
 
     /**
@@ -107,6 +139,7 @@ contract Quests is IQuests, Ownable, Pausable {
             "Quests: disableQuest() invalid quest id."
         );
         quests[_quest_id].available = false;
+        emit DisableQuest(_quest_id);
     }
 
     /**
@@ -121,12 +154,15 @@ contract Quests is IQuests, Ownable, Pausable {
             "Quests: enableQuest() invalid quest id."
         );
         quests[_quest_id].available = true;
+        emit EnableQuest(_quest_id);
     }
 
     /**
      * @notice Adds a new quest for characters.
      *
      * Requirements:
+     * @param _name                 Name of the quest.
+     * @param _description          Description of the quest.
      * @param _quest_type           Type of the added quest.
      * @param _gold_reward          Amount of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) tokens to reward.
      * @param _resources_reward     Array of [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to reward for the quest.
@@ -137,6 +173,8 @@ contract Quests is IQuests, Ownable, Pausable {
      * @param _level_required       Minimum level required to start the quest.
      */
     function addQuest(
+        string memory _name,
+        string memory _description,
         QuestType _quest_type,
         uint256 _gold_reward,
         address[] memory _resources_reward,
@@ -153,6 +191,8 @@ contract Quests is IQuests, Ownable, Pausable {
         );
         quests[_quest_id] = Quest(
             _quest_id,
+            _name,
+            _description,
             _quest_type,
             _gold_reward,
             _resources_reward,
@@ -164,6 +204,7 @@ contract Quests is IQuests, Ownable, Pausable {
             true
         );
         _quests.push(_quest_id);
+        emit AddQuest(_quest_id, _name, _description);
     }
 
     /**

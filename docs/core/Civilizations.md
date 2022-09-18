@@ -55,6 +55,44 @@ mapping(uint256 => struct ICivilizations.Upgrade) upgrades
 
 Map to track the upgrades information.
 
+### price
+
+```solidity
+uint256 price
+```
+
+Map to the price to mint characters.
+
+### Summoned
+
+```solidity
+event Summoned(address _owner, bytes _id)
+```
+
+Event emmited when the [mint](#mint) function is called.
+
+Requirements:
+
+| Name    | Type    | Description                   |
+| ------- | ------- | ----------------------------- |
+| \_owner | address | Owner of the minted token.    |
+| \_id    | bytes   | Composed ID of the character. |
+
+### UpgradePurchased
+
+```solidity
+event UpgradePurchased(bytes _id, uint256 _upgrade_id)
+```
+
+Event emmited when the [buyUpgrade](#buyUpgrade) function is called.
+
+Requirements:
+
+| Name         | Type    | Description                   |
+| ------------ | ------- | ----------------------------- |
+| \_id         | bytes   | Composed ID of the character. |
+| \_upgrade_id | uint256 | ID of the upgrade purchased.  |
+
 ### constructor
 
 ```solidity
@@ -114,6 +152,20 @@ Requirements:
 | ------------ | ------- | ---------------------------------------- |
 | \_upgrade_id | uint256 | ID of the upgrade to change.             |
 | \_price      | uint256 | Amount of tokens to pay for the upgrade. |
+
+### setMintPrice
+
+```solidity
+function setMintPrice(uint256 _price) public
+```
+
+Sets the price to mint a character.
+
+Requirements:
+
+| Name    | Type    | Description                              |
+| ------- | ------- | ---------------------------------------- |
+| \_price | uint256 | Amount of tokens to pay for the upgrade. |
 
 ### setToken
 

@@ -57,6 +57,27 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
         _;
     }
 
+    // =============================================== Events =========================================================
+
+    /**
+     * @notice Event emmited when the [equip](#equip) function is called.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _slot     Slot of the item equiped.
+     * @param _item_id  ID of the item equipped.
+     */
+    event Equipped(bytes indexed _id, EquipmentSlot _slot, uint256 _item_id);
+
+    /**
+     * @notice Event emmited when the [unequip](#unequip) function is called.
+     *
+     * Requirements:
+     * @param _id       Composed ID of the character.
+     * @param _slot     Slot of the item unequipped.
+     */
+    event Unequipped(bytes indexed _id, EquipmentSlot _slot);
+
     // =============================================== Setters ========================================================
 
     /**
@@ -154,6 +175,7 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
 
         character_equipments[_id][_slot].equiped = true;
         character_equipments[_id][_slot].id = _item_id;
+        emit Equipped(_id, _slot, _item_id);
     }
 
     /**
@@ -184,6 +206,7 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
             1,
             ""
         );
+        emit Unequipped(_id, _slot);
     }
 
     // =============================================== Getters ========================================================

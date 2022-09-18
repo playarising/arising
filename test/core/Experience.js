@@ -21,8 +21,12 @@ describe("Experience", () => {
     );
     await this.collection.deployed();
 
+    const MockToken = await ethers.getContractFactory("MockToken");
+    this.mock = await MockToken.deploy(ethers.utils.parseEther("100"));
+    await this.mock.deployed();
+
     const Civilizations = await ethers.getContractFactory("Civilizations");
-    this.civ = await Civilizations.deploy(receiver.address);
+    this.civ = await Civilizations.deploy(this.mock.address);
     await this.civ.deployed();
     await this.civ.addCivilization(this.collection.address);
 
@@ -54,21 +58,26 @@ describe("Experience", () => {
   });
 
   it("should assign the experience correctly", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     expect(await this.experience.getExperience(id)).to.eq(0);
-    await this.experience.assignExperience(id, 1000);
+    await expect(this.experience.assignExperience(id, 999))
+      .to.emit(this.experience, "ExperienceIncreased")
+      .withArgs(id, 999);
+    await expect(this.experience.assignExperience(id, 1))
+      .to.emit(this.experience, "NewLevel")
+      .withArgs(id, 1);
     expect(await this.experience.getExperience(id)).to.eq(1000);
   });
 
   it("should return the level correctly", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     expect(await this.experience.getLevel(id)).to.eq(1);
     await this.experience.assignExperience(id, 1020);
     expect(await this.experience.getLevel(id)).to.eq(2);
   });
 
   it("should remove an authority and prevent from assigning experience from a non authority", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     await this.experience.removeAuthority(this.owner.address);
     await expect(this.experience.assignExperience(id, 1020)).to.revertedWith(
       "Experience: onlyAuthorized() msg.sender not authorized."
@@ -76,14 +85,14 @@ describe("Experience", () => {
   });
 
   it("should prevent adding an authority from non owner", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     await expect(
       this.experience.connect(this.receiver).addAuthority(this.owner.address)
     ).to.revertedWith("Ownable: caller is not the owner");
   });
 
   it("should add a second authority and check missing experience for next level", async () => {
-    const id = this.civ.getTokenID(1, 1);
+    const id = await this.civ.getTokenID(1, 1);
     await this.experience.addAuthority(this.owner.address);
     await this.experience.assignExperience(id, 500);
     const missing = await this.experience.getExperienceForNextLevel(id);

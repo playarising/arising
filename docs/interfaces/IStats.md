@@ -87,13 +87,13 @@ function refreshWithToken(bytes _id) external
 
 See [Stats#refreshWithToken](/docs/codex/Stats.md#refreshWithToken)
 
-### consumeVitalizer
+### vitalize
 
 ```solidity
-function consumeVitalizer(bytes _id, struct IStats.BasicStats _stats) external
+function vitalize(bytes _id, struct IStats.BasicStats _stats) external
 ```
 
-See [Stats#consumeVitalizer](/docs/codex/Stats.md#consumeVitalizer)
+See [Stats#vitalize](/docs/codex/Stats.md#vitalize)
 
 ### assignPoints
 

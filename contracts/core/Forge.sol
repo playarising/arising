@@ -69,6 +69,38 @@ contract Forge is IForge, Ownable, Pausable {
         _;
     }
 
+    // =============================================== Events =========================================================
+
+    /**
+     * @notice Event emmited when the [addRecipe](#addRecipe) function is called.
+     *
+     * Requirements:
+     * @param _recipe_id    ID of the recipe added.
+     * @param _name         Name of the recipe.
+     * @param _description  Recipe description
+     */
+    event AddRecipe(
+        uint256 indexed _recipe_id,
+        string _name,
+        string _description
+    );
+
+    /**
+     * @notice Event emmited when the [enableRecipe](#enableRecipe) function is called.
+     *
+     * Requirements:
+     * @param _recipe_id    ID of the recipe enabled.
+     */
+    event EnableRecipe(uint256 indexed _recipe_id);
+
+    /**
+     * @notice Event emmited when the [disableRecipe](#disableRecipe) function is called.
+     *
+     * Requirements:
+     * @param _recipe_id    ID of the recipe disabled.
+     */
+    event DisableRecipe(uint256 indexed _recipe_id);
+
     // =============================================== Setters ========================================================
 
     /**
@@ -120,6 +152,7 @@ contract Forge is IForge, Ownable, Pausable {
             "Forge: disableRecipe() invalid recipe id."
         );
         recipes[_recipe_id].available = false;
+        emit DisableRecipe(_recipe_id);
     }
 
     /**
@@ -134,12 +167,15 @@ contract Forge is IForge, Ownable, Pausable {
             "Forge: enableRecipe() invalid recipe id."
         );
         recipes[_recipe_id].available = true;
+        emit EnableRecipe(_recipe_id);
     }
 
     /**
      * @notice Adds a new recipe to the forge.
      *
      * Requirements:
+     * @param _name                 Name of the recipe.
+     * @param _description          Description of the recipe.
      * @param _materials            Array of material [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances address.
      * @param _amounts              Array of amounts for each material.
      * @param _stats                Stats to consume from the pool for recipe.
@@ -150,6 +186,8 @@ contract Forge is IForge, Ownable, Pausable {
      * @param _experience_reward    Amount of experience rewarded for the recipe.
      */
     function addRecipe(
+        string memory _name,
+        string memory _description,
         address[] memory _materials,
         uint256[] memory _amounts,
         IStats.BasicStats memory _stats,
@@ -166,6 +204,8 @@ contract Forge is IForge, Ownable, Pausable {
         );
         recipes[_recipe_id] = Recipe(
             _recipe_id,
+            _name,
+            _description,
             _materials,
             _amounts,
             _stats,
@@ -177,6 +217,7 @@ contract Forge is IForge, Ownable, Pausable {
             true
         );
         _recipes.push(_recipe_id);
+        emit AddRecipe(_recipe_id, _name, _description);
     }
 
     /**
@@ -198,6 +239,7 @@ contract Forge is IForge, Ownable, Pausable {
             IERC20(token).allowance(msg.sender, address(this)) >= price,
             "Forge: buyUpgrade() not enough allowance to buy upgrade."
         );
+
         bool canUpgrade = false;
         if (!forges[_id][2].available) {
             canUpgrade = true;

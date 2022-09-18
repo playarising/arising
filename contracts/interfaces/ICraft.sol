@@ -12,6 +12,8 @@ interface ICraft {
      *
      * Requirements:
      * @param id                    ID of the recipe.
+     * @param name                  Name of the recipe.
+     * @param description           Description of the recipe.
      * @param materials             Array of addresses of the require material instances.
      * @param amounts               Array of amounts for each required material.
      * @param stats_required        Amount of stats required to consume to create the recipe.
@@ -23,6 +25,8 @@ interface ICraft {
      */
     struct Recipe {
         uint256 id;
+        string name;
+        string description;
         address[] materials;
         uint256[] material_amounts;
         IStats.BasicStats stats_required;
@@ -39,6 +43,8 @@ interface ICraft {
      *
      * Requirements:
      * @param id                    ID of the upgrade.
+     * @param name                  Name of the upgrade.
+     * @param description           Description of the upgrade.
      * @param materials             Array of addresses of the require material instances.
      * @param amounts               Array of amounts for each required material.
      * @param stats_required        Amount of stats required to consume to create the upgrade.
@@ -51,6 +57,8 @@ interface ICraft {
      */
     struct Upgrade {
         uint256 id;
+        string name;
+        string description;
         address[] materials;
         uint256[] material_amounts;
         IStats.BasicStats stats_required;
@@ -96,6 +104,8 @@ interface ICraft {
 
     /** @notice See [Craft#addRecipe](/docs/core/Craft.md#addRecipe) */
     function addRecipe(
+        string memory _name,
+        string memory _description,
         address[] memory _materials,
         uint256[] memory _amounts,
         IStats.BasicStats memory _stats,
@@ -108,6 +118,8 @@ interface ICraft {
 
     /** @notice See [Craft#addUpgrade](/docs/core/Craft.md#addUpgrade) */
     function addUpgrade(
+        string memory _name,
+        string memory _description,
         address[] memory _materials,
         uint256[] memory _amounts,
         IStats.BasicStats memory _stats,

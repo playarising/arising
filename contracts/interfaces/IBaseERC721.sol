@@ -7,7 +7,7 @@ pragma solidity 0.8.17;
  */
 interface IBaseERC721 {
     /** @notice See [BaseERC721#mint](/docs/base/BaseERC721.md#mint) */
-    function mint(address _to) external;
+    function mint(address _to) external returns (uint256 _token_id);
 
     /** @notice See [BaseERC721#isApprovedOrOwner](/docs/base/BaseERC721.md#isApprovedOrOwner) */
     function isApprovedOrOwner(address _spender, uint256 _token_id)

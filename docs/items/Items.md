@@ -39,6 +39,50 @@ modifier onlyAuthorized()
 
 Checks against if the `msg.sender` is authorized to mint items.
 
+### AddItem
+
+```solidity
+event AddItem(uint256 _item_id, string _name, string _description)
+```
+
+Event emmited when the [addItem](#addItem) function is called.
+
+Requirements:
+
+| Name          | Type    | Description           |
+| ------------- | ------- | --------------------- |
+| \_item_id     | uint256 | ID of the item added. |
+| \_name        | string  | Name of the recipe.   |
+| \_description | string  | Recipe description    |
+
+### EnableItem
+
+```solidity
+event EnableItem(uint256 _item_id)
+```
+
+Event emmited when the [enableItem](#enableItem) function is called.
+
+Requirements:
+
+| Name      | Type    | Description             |
+| --------- | ------- | ----------------------- |
+| \_item_id | uint256 | ID of the item enabled. |
+
+### DisableItem
+
+```solidity
+event DisableItem(uint256 _item_id)
+```
+
+Event emmited when the [disableItem](#disableItem) function is called.
+
+Requirements:
+
+| Name      | Type    | Description                  |
+| --------- | ------- | ---------------------------- |
+| \_item_id | uint256 | ID of the the item disabled. |
+
 ### constructor
 
 ```solidity
@@ -108,7 +152,7 @@ Requirements:
 ### addItem
 
 ```solidity
-function addItem(uint256 _level_required, enum IItems.ItemType _item_type, struct IItems.StatsModifiers _stats_modifiers, struct IItems.Attributes _attributes) public
+function addItem(string _name, string _description, uint256 _level_required, enum IItems.ItemType _item_type, struct IItems.StatsModifiers _stats_modifiers, struct IItems.Attributes _attributes) public
 ```
 
 Adds the item data to relate with a specific token ID.
@@ -117,6 +161,8 @@ Requirements:
 
 | Name              | Type                         | Description                                                                           |
 | ----------------- | ---------------------------- | ------------------------------------------------------------------------------------- |
+| \_name            | string                       | The item name.                                                                        |
+| \_description     | string                       | The item description.                                                                 |
 | \_level_required  | uint256                      | Minimum level for a character to use the item.                                        |
 | \_item_type       | enum IItems.ItemType         | Type of the item defined by the enum [ItemType](/docs/interfaces/IItems.md#itemtype). |
 | \_stats_modifiers | struct IItems.StatsModifiers | Item modifiers for the character stats.                                               |
