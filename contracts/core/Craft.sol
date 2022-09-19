@@ -33,9 +33,6 @@ contract Craft is ICraft, Ownable, Pausable {
     /** @notice Array to track all the upgrades IDs. */
     uint256[] private _upgrades;
 
-    /** @notice The address of the the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance. */
-    address public gold;
-
     /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
     address public civilizations;
 
@@ -143,20 +140,17 @@ contract Craft is ICraft, Ownable, Pausable {
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      * @param _stats            The address of the [Stats](/docs/core/Stats.md) instance.
-     * @param _gold             The address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance.
      * @param _items            The address of the [Items](/docs/items/Items.md) instance.
      */
     constructor(
         address _civilizations,
         address _experience,
         address _stats,
-        address _gold,
         address _items
     ) {
         civilizations = _civilizations;
         experience = _experience;
         stats = _stats;
-        gold = _gold;
         items = _items;
     }
 
@@ -241,7 +235,6 @@ contract Craft is ICraft, Ownable, Pausable {
      * @param _stats                Stats to consume from the pool for craft.
      * @param _cooldown             Number of seconds for the recipe cooldown.
      * @param _level_required       Minimum level required to craft the recipe.
-     * @param _gold_cost            Cost of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) required to craft the recipe.
      * @param _reward               ID of the token to reward for the [Items](/docs/items/Items.md) instance.
      * @param _experience_reward    Amount of experience rewarded for the recipe.
      */
@@ -253,7 +246,6 @@ contract Craft is ICraft, Ownable, Pausable {
         IStats.BasicStats memory _stats,
         uint256 _cooldown,
         uint256 _level_required,
-        uint256 _gold_cost,
         uint256 _reward,
         uint256 _experience_reward
     ) public onlyOwner {
@@ -271,7 +263,6 @@ contract Craft is ICraft, Ownable, Pausable {
             _stats,
             _cooldown,
             _level_required,
-            _gold_cost,
             _reward,
             _experience_reward,
             true
@@ -306,7 +297,6 @@ contract Craft is ICraft, Ownable, Pausable {
      * @param _sacrifice            Stats to sacrficed from the base stats for upgrade.
      * @param _level_required       Minimum level required to craft the recipe.
      * @param _upgraded_item        ID of the token item that is being upgraded from the [Items](/docs/items/Items.md) instance.
-     * @param _gold_cost            Cost of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) required to craft the recipe.
      * @param _reward               ID of the token to reward for the [Items](/docs/items/Items.md) instance.
      */
     function addUpgrade(
@@ -318,7 +308,6 @@ contract Craft is ICraft, Ownable, Pausable {
         IStats.BasicStats memory _sacrifice,
         uint256 _level_required,
         uint256 _upgraded_item,
-        uint256 _gold_cost,
         uint256 _reward
     ) public onlyOwner {
         uint256 _upgrade_id = _upgrades.length + 1;
@@ -336,7 +325,6 @@ contract Craft is ICraft, Ownable, Pausable {
             _sacrifice,
             _level_required,
             _upgraded_item,
-            _gold_cost,
             _reward,
             true
         );
@@ -386,10 +374,6 @@ contract Craft is ICraft, Ownable, Pausable {
             IExperience(experience).getLevel(_id) >= _recipe.level_required,
             "Craft: craft() not enough level."
         );
-
-        if (_recipe.gold_cost > 0) {
-            IBaseFungibleItem(gold).consume(_id, _recipe.gold_cost);
-        }
 
         for (uint256 i = 0; i < _recipe.materials.length; i++) {
             IBaseFungibleItem(_recipe.materials[i]).consume(
@@ -450,10 +434,6 @@ contract Craft is ICraft, Ownable, Pausable {
             IExperience(experience).getLevel(_id) >= _upgrade.level_required,
             "Craft: upgrade() not enough level."
         );
-
-        if (_upgrade.gold_cost > 0) {
-            IBaseFungibleItem(gold).consume(_id, _upgrade.gold_cost);
-        }
 
         for (uint256 i = 0; i < _upgrade.materials.length; i++) {
             IBaseFungibleItem(_upgrade.materials[i]).consume(

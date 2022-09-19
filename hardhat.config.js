@@ -31,9 +31,7 @@ require("solidity-docgen");
 module.exports = {
   defaultNetwork: "hardhat",
   networks: {
-    hardhat: {
-      blockGasLimit: 30000000,
-    },
+    hardhat: {},
   },
   solidity: {
     compilers: [

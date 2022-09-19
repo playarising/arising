@@ -30,9 +30,6 @@ contract Forge is IForge, Ownable, Pausable {
     /** @notice Address of the [Stats](/docs/core/Stats.md) instance. */
     address public stats;
 
-    /** @notice Address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance. */
-    address public gold;
-
     /** @notice Map to track available recipes on the forge. */
     mapping(uint256 => Recipe) public recipes;
 
@@ -110,15 +107,13 @@ contract Forge is IForge, Ownable, Pausable {
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      * @param _stats            The address of the [Stats](/docs/core/Stats.md) instance.
-     * @param _gold             The address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance.
      * @param _token            Address of the token used to purchase.
-     * @param _price            Price for each token.
+     * @param _price            Price for each upgrade.
      */
     constructor(
         address _civilizations,
         address _experience,
         address _stats,
-        address _gold,
         address _token,
         uint256 _price
     ) {
@@ -127,7 +122,6 @@ contract Forge is IForge, Ownable, Pausable {
         stats = _stats;
         token = _token;
         price = _price;
-        gold = _gold;
     }
 
     /** @notice Pauses the contract */
@@ -181,7 +175,6 @@ contract Forge is IForge, Ownable, Pausable {
      * @param _stats                Stats to consume from the pool for recipe.
      * @param _cooldown             Number of seconds for the recipe cooldown.
      * @param _level_required       Minimum level required to forge the recipe.
-     * @param _gold_cost            Cost of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) required to forge the recipe.
      * @param _reward               Address of the [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to be rewarded for the recipe.
      * @param _experience_reward    Amount of experience rewarded for the recipe.
      */
@@ -193,7 +186,6 @@ contract Forge is IForge, Ownable, Pausable {
         IStats.BasicStats memory _stats,
         uint256 _cooldown,
         uint256 _level_required,
-        uint256 _gold_cost,
         address _reward,
         uint256 _experience_reward
     ) public onlyOwner {
@@ -211,7 +203,6 @@ contract Forge is IForge, Ownable, Pausable {
             _stats,
             _cooldown,
             _level_required,
-            _gold_cost,
             _reward,
             _experience_reward,
             true
@@ -317,10 +308,6 @@ contract Forge is IForge, Ownable, Pausable {
             IExperience(experience).getLevel(_id) >= _recipe.level_required,
             "Forge: forge() not enough level."
         );
-
-        if (_recipe.gold_cost > 0) {
-            IBaseFungibleItem(gold).consume(_id, _recipe.gold_cost);
-        }
 
         for (uint256 i = 0; i < _recipe.materials.length; i++) {
             IBaseFungibleItem(_recipe.materials[i]).consume(

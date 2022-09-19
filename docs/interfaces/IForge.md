@@ -16,7 +16,6 @@ struct Recipe {
   struct IStats.BasicStats stats_required;
   uint256 cooldown;
   uint256 level_required;
-  uint256 gold_cost;
   address reward;
   uint256 experience_reward;
   bool available;
@@ -70,7 +69,7 @@ See [Forge#enableRecipe](/docs/core/Forge.md#enableRecipe)
 ### addRecipe
 
 ```solidity
-function addRecipe(string _name, string _description, address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, uint256 _gold_cost, address _reward, uint256 _experience_reward) external
+function addRecipe(string _name, string _description, address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, address _reward, uint256 _experience_reward) external
 ```
 
 See [Forge#addRecipe](/docs/core/Forge.md#addRecipe)

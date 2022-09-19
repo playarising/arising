@@ -72,7 +72,6 @@ describe("Forge", () => {
       this.civ.address,
       this.experience.address,
       this.stats.address,
-      this.gold.address,
       this.mock.address,
       ethers.utils.parseEther("49.99")
     );
@@ -115,7 +114,6 @@ describe("Forge", () => {
           { might: 1, speed: 1, intellect: 1 },
           1,
           1,
-          1,
           this.owner.address,
           1
         )
@@ -131,7 +129,6 @@ describe("Forge", () => {
         [1],
         { might: 0, speed: 1, intellect: 0 },
         300,
-        5,
         2,
         this.wood_plank.address,
         25
@@ -149,7 +146,6 @@ describe("Forge", () => {
         [this.wood.address],
         [1, 2],
         { might: 1, speed: 1, intellect: 1 },
-        1,
         1,
         1,
         this.owner.address,
@@ -502,7 +498,6 @@ describe("Forge", () => {
     expect(forge3.last_recipe).to.eq(1);
     expect(forge3.last_recipe_claimed).to.eq(false);
 
-    expect(await this.gold.balanceOf(id)).to.eq(0);
     expect(await this.wood.balanceOf(id)).to.eq(0);
   });
 

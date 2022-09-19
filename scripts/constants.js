@@ -1,56 +1,6 @@
-import { ethers } from "hardhat";
+const { ethers } = require("hardhat");
 
-const GADGETS_PAYMENT_TOKEN_ADDRESS = "";
-
-export const CIVILIZATIONS = [
-  {
-    name: "Arising: Ard",
-    symbol: "ARISING",
-    url: "https://characters.playarising.com/ard/",
-  },
-  {
-    name: "Arising: Hartheim",
-    symbol: "ARISING",
-    url: "https://characters.playarising.com/hartheim/",
-  },
-  {
-    name: "Arising: I'Karans",
-    symbol: "ARISING",
-    url: "https://characters.playarising.com/ikarans/",
-  },
-  {
-    name: "Arising: Shinkari",
-    symbol: "ARISING",
-    url: "https://characters.playarising.com/shinkari/",
-  },
-  {
-    name: "Arising: Tark'i",
-    symbol: "ARISING",
-    url: "https://characters.playarising.com/tarki/",
-  },
-  {
-    name: "Arising: Zhand",
-    symbol: "ARISING",
-    url: "https://characters.playarising.com/zhand/",
-  },
-];
-
-export const GADGETS = [
-  {
-    name: "Arising: Refresh Token",
-    symbol: "REFRESHER",
-    token: GADGETS_PAYMENT_TOKEN_ADDRESS,
-    price: ethers.utils.parseEther("4.99"),
-  },
-  {
-    name: "Arising: Vitalizer Token",
-    symbol: "VITALIZER",
-    token: GADGETS_PAYMENT_TOKEN_ADDRESS,
-    price: ethers.utils.parseEther("49.99"),
-  },
-];
-
-export const MATERIALS = [
+const MATERIALS = [
   {
     name: "Arising: Gold",
     symbol: "GOLD",

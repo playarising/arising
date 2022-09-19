@@ -19,7 +19,6 @@ interface ICraft {
      * @param stats_required        Amount of stats required to consume to create the recipe.
      * @param cooldown              Cooldown in seconds of the recipe.
      * @param level_required        Minimum level required to craft the recipe.
-     * @param gold_cost             Cost of the recipe in gold.
      * @param reward                ID of the reward token.
      * @param available             Boolean to check if the recipe is available.
      */
@@ -32,7 +31,6 @@ interface ICraft {
         IStats.BasicStats stats_required;
         uint256 cooldown;
         uint256 level_required;
-        uint256 gold_cost;
         uint256 reward;
         uint256 experience_reward;
         bool available;
@@ -51,7 +49,6 @@ interface ICraft {
      * @param stats_sacrificed      Amount of stats required to sacrifice to create the upgrade.
      * @param level_required        Minimum level required to craft the upgrade.
      * @param upgraded_item         ID of the item is beign upgraded.
-     * @param gold_cost             Cost of the upgrade in gold.
      * @param reward                ID of the reward token.
      * @param available             Boolean to check if the upgrade is available.
      */
@@ -65,7 +62,6 @@ interface ICraft {
         IStats.BasicStats stats_sacrificed;
         uint256 level_required;
         uint256 upgraded_item;
-        uint256 gold_cost;
         uint256 reward;
         bool available;
     }
@@ -111,7 +107,6 @@ interface ICraft {
         IStats.BasicStats memory _stats,
         uint256 _cooldown,
         uint256 _level_required,
-        uint256 _gold_cost,
         uint256 _reward,
         uint256 _experience_reward
     ) external;
@@ -129,7 +124,6 @@ interface ICraft {
         IStats.BasicStats memory _sacrifice,
         uint256 _level_required,
         uint256 _upgraded_item,
-        uint256 _gold_cost,
         uint256 _reward
     ) external;
 

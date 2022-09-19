@@ -125,19 +125,18 @@ Requirements:
 ### constructor
 
 ```solidity
-constructor(address _civilizations, address _experience, address _stats, address _gold) public
+constructor(address _civilizations, address _experience, address _stats) public
 ```
 
 Constructor.
 
 Requirements:
 
-| Name            | Type    | Description                                                                          |
-| --------------- | ------- | ------------------------------------------------------------------------------------ |
-| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance.            |
-| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.                  |
-| \_stats         | address | The address of the [Stats](/docs/core/Stats.md) instance.                            |
-| \_gold          | address | The address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance. |
+| Name            | Type    | Description                                                               |
+| --------------- | ------- | ------------------------------------------------------------------------- |
+| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
+| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.       |
+| \_stats         | address | The address of the [Stats](/docs/core/Stats.md) instance.                 |
 
 ### pause
 

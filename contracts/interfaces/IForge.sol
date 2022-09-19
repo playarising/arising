@@ -20,7 +20,6 @@ interface IForge {
      * @param stats_required        Amount of stats required to consume to create the recipe.
      * @param cooldown              Cooldown in seconds of the recipe.
      * @param level_required        Minimum level required to forge the recipe.
-     * @param gold_cost             Cost of the recipe in gold.
      * @param reward                Address of the resulting item of the recipe.
      * @param experience_reward     Amount of experience rewarded from the recipe.
      * @param available             Boolean to check if the recipe is available.
@@ -34,7 +33,6 @@ interface IForge {
         IStats.BasicStats stats_required;
         uint256 cooldown;
         uint256 level_required;
-        uint256 gold_cost;
         address reward;
         uint256 experience_reward;
         bool available;
@@ -68,7 +66,6 @@ interface IForge {
         IStats.BasicStats memory _stats,
         uint256 _cooldown,
         uint256 _level_required,
-        uint256 _gold_cost,
         address _reward,
         uint256 _experience_reward
     ) external;

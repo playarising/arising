@@ -4,6 +4,8 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
+import "../base/BaseFungibleItem.sol";
+
 import "../interfaces/IQuests.sol";
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/IExperience.sol";
@@ -103,18 +105,18 @@ contract Quests is IQuests, Ownable, Pausable {
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      * @param _stats            The address of the [Stats](/docs/core/Stats.md) instance.
-     * @param _gold             The address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance.
      */
     constructor(
         address _civilizations,
         address _experience,
-        address _stats,
-        address _gold
+        address _stats
     ) {
         civilizations = _civilizations;
         experience = _experience;
         stats = _stats;
-        gold = _gold;
+        gold = address(
+            new BaseFungibleItem("Arising: Gold", "GOLD", civilizations)
+        );
     }
 
     /** @notice Pauses the contract */

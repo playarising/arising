@@ -16,7 +16,6 @@ struct Recipe {
   struct IStats.BasicStats stats_required;
   uint256 cooldown;
   uint256 level_required;
-  uint256 gold_cost;
   uint256 reward;
   uint256 experience_reward;
   bool available;
@@ -36,7 +35,6 @@ struct Upgrade {
   struct IStats.BasicStats stats_sacrificed;
   uint256 level_required;
   uint256 upgraded_item;
-  uint256 gold_cost;
   uint256 reward;
   bool available;
 }
@@ -104,7 +102,7 @@ See [Craft#enableUpgrade](/docs/core/Craft.md#enableUpgrade)
 ### addRecipe
 
 ```solidity
-function addRecipe(string _name, string _description, address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, uint256 _gold_cost, uint256 _reward, uint256 _experience_reward) external
+function addRecipe(string _name, string _description, address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, uint256 _reward, uint256 _experience_reward) external
 ```
 
 See [Craft#addRecipe](/docs/core/Craft.md#addRecipe)
@@ -120,7 +118,7 @@ See [Craft#updateRecipe](/docs/core/Craft.md#updateRecipe)
 ### addUpgrade
 
 ```solidity
-function addUpgrade(string _name, string _description, address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, struct IStats.BasicStats _sacrifice, uint256 _level_required, uint256 _upgraded_item, uint256 _gold_cost, uint256 _reward) external
+function addUpgrade(string _name, string _description, address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, struct IStats.BasicStats _sacrifice, uint256 _level_required, uint256 _upgraded_item, uint256 _reward) external
 ```
 
 See [Craft#addUpgrade](/docs/core/Craft.md#addUpgrade)

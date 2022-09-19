@@ -69,7 +69,6 @@ describe("Craft", () => {
       this.civ.address,
       this.experience.address,
       this.stats.address,
-      this.gold.address,
       this.items.address
     );
     await this.craft.deployed();
@@ -217,7 +216,6 @@ describe("Craft", () => {
           1,
           1,
           1,
-          1,
           1
         )
     ).to.revertedWith("Ownable: caller is not the owner");
@@ -236,7 +234,6 @@ describe("Craft", () => {
           { might: 1, speed: 1, intellect: 1 },
           1,
           1,
-          1,
           1
         )
     ).to.revertedWith("Ownable: caller is not the owner");
@@ -250,7 +247,6 @@ describe("Craft", () => {
         [this.resource.address],
         [],
         { might: 1, speed: 1, intellect: 1 },
-        1,
         1,
         1,
         1,
@@ -270,7 +266,6 @@ describe("Craft", () => {
         { might: 1, speed: 1, intellect: 1 },
         1,
         1,
-        1,
         1
       )
     ).to.revertedWith("Craft: addUpgrade() materials and amounts not match.");
@@ -286,7 +281,6 @@ describe("Craft", () => {
         { might: 1, speed: 1, intellect: 1 },
         3600,
         3,
-        100,
         1,
         1
       )
@@ -308,7 +302,6 @@ describe("Craft", () => {
         { might: 1, speed: 1, intellect: 1 },
         { might: 1, speed: 1, intellect: 1 },
         5,
-        1,
         1,
         2
       )

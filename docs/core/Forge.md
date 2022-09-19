@@ -31,14 +31,6 @@ address stats
 
 Address of the [Stats](/docs/core/Stats.md) instance.
 
-### gold
-
-```solidity
-address gold
-```
-
-Address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance.
-
 ### recipes
 
 ```solidity
@@ -141,21 +133,20 @@ Requirements:
 ### constructor
 
 ```solidity
-constructor(address _civilizations, address _experience, address _stats, address _gold, address _token, uint256 _price) public
+constructor(address _civilizations, address _experience, address _stats, address _token, uint256 _price) public
 ```
 
 Constructor.
 
 Requirements:
 
-| Name            | Type    | Description                                                                          |
-| --------------- | ------- | ------------------------------------------------------------------------------------ |
-| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance.            |
-| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.                  |
-| \_stats         | address | The address of the [Stats](/docs/core/Stats.md) instance.                            |
-| \_gold          | address | The address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance. |
-| \_token         | address | Address of the token used to purchase.                                               |
-| \_price         | uint256 | Price for each token.                                                                |
+| Name            | Type    | Description                                                               |
+| --------------- | ------- | ------------------------------------------------------------------------- |
+| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
+| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.       |
+| \_stats         | address | The address of the [Stats](/docs/core/Stats.md) instance.                 |
+| \_token         | address | Address of the token used to purchase.                                    |
+| \_price         | uint256 | Price for each upgrade.                                                   |
 
 ### pause
 
@@ -204,7 +195,7 @@ Requirements:
 ### addRecipe
 
 ```solidity
-function addRecipe(string _name, string _description, address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, uint256 _gold_cost, address _reward, uint256 _experience_reward) public
+function addRecipe(string _name, string _description, address[] _materials, uint256[] _amounts, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required, address _reward, uint256 _experience_reward) public
 ```
 
 Adds a new recipe to the forge.
@@ -220,7 +211,6 @@ Requirements:
 | \_stats             | struct IStats.BasicStats | Stats to consume from the pool for recipe.                                                                 |
 | \_cooldown          | uint256                  | Number of seconds for the recipe cooldown.                                                                 |
 | \_level_required    | uint256                  | Minimum level required to forge the recipe.                                                                |
-| \_gold_cost         | uint256                  | Cost of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) required to forge the recipe.              |
 | \_reward            | address                  | Address of the [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to be rewarded for the recipe. |
 | \_experience_reward | uint256                  | Amount of experience rewarded for the recipe.                                                              |
 
