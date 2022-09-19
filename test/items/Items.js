@@ -195,4 +195,76 @@ describe("Items", () => {
     const item = await this.items.getItem(1);
     expect(item.available).to.eq(true);
   });
+
+  it("should fail when trying to update an item that doesn't exist", async () => {
+    await expect(
+      this.items.updateItem({
+        id: 5,
+        name: "test",
+        description: "test 2",
+        level_required: 1,
+        item_type: 2,
+        stats_modifiers: {
+          might: 1,
+          speed: 1,
+          intellect: 1,
+          might_reducer: 1,
+          speed_reducer: 1,
+          intellect_reducer: 1,
+        },
+        attributes: {
+          atk: 0,
+          atk_reducer: 0,
+          def: 0,
+          def_reducer: 0,
+          range: 0,
+          range_reducer: 0,
+          mag_atk: 0,
+          mag_atk_reducer: 0,
+          mag_def: 0,
+          mag_def_reducer: 0,
+          rate: 0,
+          rate_reducer: 0,
+        },
+        available: true,
+      })
+    ).to.revertedWith("Items: updateItem() invalid item id.");
+  });
+
+  it("should update an item correctly", async () => {
+    let item = await this.items.getItem(1);
+    expect(item.stats_modifiers.might).to.eq(1);
+    await this.items.updateItem({
+      id: 1,
+      name: "test",
+      description: "test 2",
+      level_required: 1,
+      item_type: 2,
+      stats_modifiers: {
+        might: 5,
+        speed: 1,
+        intellect: 1,
+        might_reducer: 1,
+        speed_reducer: 1,
+        intellect_reducer: 1,
+      },
+      attributes: {
+        atk: 0,
+        atk_reducer: 0,
+        def: 0,
+        def_reducer: 0,
+        range: 0,
+        range_reducer: 0,
+        mag_atk: 0,
+        mag_atk_reducer: 0,
+        mag_def: 0,
+        mag_def_reducer: 0,
+        rate: 0,
+        rate_reducer: 0,
+      },
+      available: true,
+    });
+    item = await this.items.getItem(1);
+    expect(item.stats_modifiers.might).to.eq(5);
+  });
 });

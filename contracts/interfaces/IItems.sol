@@ -25,7 +25,7 @@ interface IItems {
         string description;
         uint256 level_required;
         ItemType item_type;
-        StatsModifiers stat_modifiers;
+        StatsModifiers stats_modifiers;
         Attributes attributes;
         bool available;
     }

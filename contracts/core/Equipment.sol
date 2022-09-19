@@ -262,12 +262,12 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
             ItemEquiped memory e = character_equipments[_id][EquipmentSlot(i)];
             if (e.equiped) {
                 IItems.Item memory item = IItems(items).getItem(e.id);
-                _additions.might += item.stat_modifiers.might;
-                _additions.speed += item.stat_modifiers.speed;
-                _additions.intellect += item.stat_modifiers.intellect;
-                _reductions.might += item.stat_modifiers.might_reducer;
-                _reductions.speed += item.stat_modifiers.speed_reducer;
-                _reductions.intellect += item.stat_modifiers.intellect_reducer;
+                _additions.might += item.stats_modifiers.might;
+                _additions.speed += item.stats_modifiers.speed;
+                _additions.intellect += item.stats_modifiers.intellect;
+                _reductions.might += item.stats_modifiers.might_reducer;
+                _reductions.speed += item.stats_modifiers.speed_reducer;
+                _reductions.intellect += item.stats_modifiers.intellect_reducer;
             }
         }
 

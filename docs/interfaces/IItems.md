@@ -13,7 +13,7 @@ struct Item {
   string description;
   uint256 level_required;
   enum IItems.ItemType item_type;
-  struct IItems.StatsModifiers stat_modifiers;
+  struct IItems.StatsModifiers stats_modifiers;
   struct IItems.Attributes attributes;
   bool available;
 }
