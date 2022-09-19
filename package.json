@@ -15,7 +15,7 @@
     "ci": "env CI=true",
     "compile": "hardhat compile",
     "coverage": "env COVERAGE=true hardhat coverage",
-    "deploy": "hardhat run ./scripts/deploy.js --network mumbai",
+    "deploy": "hardhat run ./scripts/deploy.js --network mainnet",
     "doc": "rm -rf docs/*/ && hardhat docgen && yarn format",
     "flat": "./scripts/flat.sh",
     "format": "prettier --write '**/*.{sol,js,json,md}'",

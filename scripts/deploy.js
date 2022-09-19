@@ -1,89 +1,89 @@
 const { ethers } = require("hardhat");
 
-const CIVILIZATIONS = [
-  {
-    name: "Arising: Ard",
-    symbol: "ARISING",
-    url: "https://characters.playarising.com/ard/",
-  },
-  {
-    name: "Arising: Hartheim",
-    symbol: "ARISING",
-    url: "https://characters.playarising.com/hartheim/",
-  },
-  {
-    name: "Arising: I'Karans",
-    symbol: "ARISING",
-    url: "https://characters.playarising.com/ikarans/",
-  },
-  {
-    name: "Arising: Shinkari",
-    symbol: "ARISING",
-    url: "https://characters.playarising.com/shinkari/",
-  },
-  {
-    name: "Arising: Tark'i",
-    symbol: "ARISING",
-    url: "https://characters.playarising.com/tarki/",
-  },
-  {
-    name: "Arising: Zhand",
-    symbol: "ARISING",
-    url: "https://characters.playarising.com/zhand/",
-  },
-];
-
-const TOKEN = "0xc9dfa81f7e4A02FbA4FCce3D5AD95940F054d259";
+const TOKEN = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
 
 async function main() {
   const Levels = await ethers.getContractFactory("Levels");
-  const Civilizations = await ethers.getContractFactory("Civilizations");
-  const BaseERC721 = await ethers.getContractFactory("BaseERC721");
-  const Experience = await ethers.getContractFactory("Experience");
-  const Names = await ethers.getContractFactory("Names");
-  const Items = await ethers.getContractFactory("Items");
-  const Stats = await ethers.getContractFactory("Stats");
-  const BaseGadgetToken = await ethers.getContractFactory("BaseGadgetToken");
-  const Equipment = await ethers.getContractFactory("Equipment");
-  const Forge = await ethers.getContractFactory("Forge");
-  const Craft = await ethers.getContractFactory("Craft");
-  const Quests = await ethers.getContractFactory("Quests");
 
   console.log("==> Deploying Levels");
   const levels = await Levels.deploy();
   await levels.deployed();
 
-  console.log("==> Deploying Civilizations");
-  const civilizations = await Civilizations.deploy(TOKEN);
-  await civilizations.deployed();
+  const Civilizations = await ethers.getContractFactory("Civilizations");
 
-  console.log("==> Configuring Civilizations");
-  await civilizations.setMintPrice(ethers.utils.parseEther("8.99"));
-  for (let i = 0; i < CIVILIZATIONS.length; i++) {
-    const civ = await BaseERC721.deploy(
-      CIVILIZATIONS[i].name,
-      CIVILIZATIONS[i].symbol,
-      CIVILIZATIONS[i].url
-    );
-    await civ.deployed();
-    await civilizations.addCivilization(civ.address);
-    await civ.transferOwnership(civilizations.address);
-  }
+  console.log("==> Deploying Civilizations");
+  const civ = await Civilizations.deploy(TOKEN);
+  await civ.deployed();
+
+  const BaseERC721 = await ethers.getContractFactory("BaseERC721");
+
+  console.log("==> Deploying Ard");
+  const ard = await BaseERC721.deploy(
+    "Arising: Ard",
+    "ARISING",
+    "https://characters.playarising.com/ard/"
+  );
+  await ard.deployed();
+
+  console.log("==> Deploying Hartheim");
+  const hartheim = await BaseERC721.deploy(
+    "Arising: Hartheim",
+    "ARISING",
+    "https://characters.playarising.com/hartheim/"
+  );
+  await hartheim.deployed();
+
+  console.log("==> Deploying I'Karans");
+  const ikarans = await BaseERC721.deploy(
+    "Arising: I'Karans",
+    "ARISING",
+    "https://characters.playarising.com/ikarans/"
+  );
+  await ikarans.deployed();
+
+  console.log("==> Deploying Shinkari");
+  const shinkari = await BaseERC721.deploy(
+    "Arising: Shinkari",
+    "ARISING",
+    "https://characters.playarising.com/shinkari/"
+  );
+  await shinkari.deployed();
+
+  console.log("==> Deploying Tark'i");
+  const tarki = await BaseERC721.deploy(
+    "Arising: Tark'i",
+    "ARISING",
+    "https://characters.playarising.com/tarki/"
+  );
+  await tarki.deployed();
+
+  console.log("==> Deploying Zhand");
+  const zhand = await BaseERC721.deploy(
+    "Arising: Zhand",
+    "ARISING",
+    "https://characters.playarising.com/zhand/"
+  );
+  await zhand.deployed();
+
+  const Experience = await ethers.getContractFactory("Experience");
 
   console.log("==> Deploying Experience");
-  const experience = await Experience.deploy(
-    civilizations.address,
-    levels.address
-  );
+  const experience = await Experience.deploy(civ.address, levels.address);
   await experience.deployed();
 
+  const Names = await ethers.getContractFactory("Names");
+
   console.log("==> Deploying Names");
-  const names = await Names.deploy(civilizations.address, experience.address);
+  const names = await Names.deploy(civ.address, experience.address);
   await names.deployed();
+
+  const Items = await ethers.getContractFactory("Items");
 
   console.log("==> Deploying Items");
   const items = await Items.deploy();
   await items.deployed();
+
+  const BaseGadgetToken = await ethers.getContractFactory("BaseGadgetToken");
 
   console.log("==> Deploying Refresher");
   const refresher = await BaseGadgetToken.deploy(
@@ -101,25 +101,29 @@ async function main() {
     TOKEN,
     ethers.utils.parseEther("49.99")
   );
-  await refresher.deployed();
+  await vitalizer.deployed();
+
+  const Stats = await ethers.getContractFactory("Stats");
 
   console.log("==> Deploying Stats");
-  const stats = await Stats.deploy(civilizations.address, experience.address);
+  const stats = await Stats.deploy(civ.address, experience.address);
   await stats.deployed();
-  await stats.setRefreshToken(refresher.address);
-  await stats.setVitalizerToken(vitalizer.address);
+
+  const Equipment = await ethers.getContractFactory("Equipment");
 
   console.log("==> Deploying Equipment");
   const equipment = await Equipment.deploy(
-    civilizations.address,
+    civ.address,
     experience.address,
     items.address
   );
   await equipment.deployed();
 
+  const Forge = await ethers.getContractFactory("Forge");
+
   console.log("==> Deploying Forge");
   const forge = await Forge.deploy(
-    civilizations.address,
+    civ.address,
     experience.address,
     stats.address,
     TOKEN,
@@ -127,25 +131,35 @@ async function main() {
   );
   await forge.deployed();
 
+  const Craft = await ethers.getContractFactory("Craft");
+
   console.log("==> Deploying Craft");
   const craft = await Craft.deploy(
-    civilizations.address,
+    civ.address,
     experience.address,
     stats.address,
     items.address
   );
   await craft.deployed();
 
+  const Quests = await ethers.getContractFactory("Quests");
+
   console.log("==> Deploying Quests");
   const quests = await Quests.deploy(
-    civilizations.address,
+    civ.address,
     experience.address,
     stats.address
   );
   await quests.deployed();
 
   console.log("==> Levels deployed:", levels.address);
-  console.log("==> Civilizations deployed:", civilizations.address);
+  console.log("==> Civilizations deployed:", civ.address);
+  console.log("==> Ard deployed:", ard.address);
+  console.log("==> Hartheim deployed:", hartheim.address);
+  console.log("==> I'Karans deployed:", ikarans.address);
+  console.log("==> Shinkari deployed:", shinkari.address);
+  console.log("==> Tark'i deployed:", tarki.address);
+  console.log("==> Zhand deployed:", zhand.address);
   console.log("==> Experience deployed:", experience.address);
   console.log("==> Names deployed:", names.address);
   console.log("==> Items deployed:", items.address);
@@ -156,6 +170,155 @@ async function main() {
   console.log("==> Forge deployed:", forge.address);
   console.log("==> Craft deployed:", craft.address);
   console.log("==> Quests deployed:", quests.address);
+
+  await (await civ.setMintPrice(ethers.utils.parseEther("8.99"))).wait();
+  await (await stats.setRefreshToken(refresher.address)).wait();
+  await (await stats.setVitalizerToken(vitalizer.address)).wait();
+  await (await civ.addCivilization(ard.address)).wait();
+  await (await ard.transferOwnership(civ.address)).wait();
+  await (await civ.addCivilization(hartheim.address)).wait();
+  await (await hartheim.transferOwnership(civ.address)).wait();
+  await (await civ.addCivilization(ikarans.address)).wait();
+  await (await ikarans.transferOwnership(civ.address)).wait();
+  await (await civ.addCivilization(shinkari.address)).wait();
+  await (await shinkari.transferOwnership(civ.address)).wait();
+  await (await civ.addCivilization(tarki.address)).wait();
+  await (await tarki.transferOwnership(civ.address)).wait();
+  await (await civ.addCivilization(zhand.address)).wait();
+  await (await zhand.transferOwnership(civ.address)).wait();
+
+  const BaseFungibleItem = await ethers.getContractFactory("BaseFungibleItem");
+  const gold = BaseFungibleItem.attach(await this.quests.gold());
+
+  try {
+    await run("verify:verify", {
+      address: await gold.wrapper(),
+      constructorArguments: ["Arising: Gold", "GOLD"],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: await this.quests.gold(),
+      constructorArguments: ["Arising: Gold", "GOLD", civ.address],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: levels.address,
+      constructorArguments: [],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: civ.address,
+      constructorArguments: [TOKEN],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: experience.address,
+      constructorArguments: [civ.address, levels.address],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: names.address,
+      constructorArguments: [civ.address, experience.address],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: items.address,
+      constructorArguments: [],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: refresher.address,
+      constructorArguments: [
+        "Arising: Refresh Token",
+        "REFRESHER",
+        TOKEN,
+        ethers.utils.parseEther("4.99"),
+      ],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: vitalizer.address,
+      constructorArguments: [
+        "Arising: Vitalizer Token",
+        "VITALIZER",
+        TOKEN,
+        ethers.utils.parseEther("49.99"),
+      ],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: stats.address,
+      constructorArguments: [civ.address, experience.address],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: equipment.address,
+      constructorArguments: [civ.address, experience.address, items.address],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: forge.address,
+      constructorArguments: [
+        civ.address,
+        experience.address,
+        stats.address,
+        TOKEN,
+        ethers.utils.parseEther("19.99"),
+      ],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: quests.address,
+      constructorArguments: [civ.address, experience.address, stats.address],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: craft.address,
+      constructorArguments: [
+        civ.address,
+        experience.address,
+        stats.address,
+        items.address,
+      ],
+    });
+  } catch (e) {}
+
+  try {
+    await run("verify:verify", {
+      address: zhand.address,
+      constructorArguments: [
+        "Arising: Zhand",
+        "ARISING",
+        "https://characters.playarising.com/zhand/",
+      ],
+    });
+  } catch (e) {}
 }
 
 main()
