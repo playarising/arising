@@ -128,6 +128,14 @@ function addItem(string _name, string _description, uint256 _level_required, enu
 
 See [Items#addItem](/docs/items/Items.md#addItem)
 
+### updateItem
+
+```solidity
+function updateItem(struct IItems.Item _item) external
+```
+
+See [Items#updateItem](/docs/items/Items.md#updateItem)
+
 ### disableItem
 
 ```solidity

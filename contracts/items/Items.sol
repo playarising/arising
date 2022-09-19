@@ -162,6 +162,20 @@ contract Items is IItems, Ownable, ERC1155 {
     }
 
     /**
+     * @notice Updates a previously added item.
+     *
+     * Requirements:
+     * @param _item   Full information of the item.
+     */
+    function updateItem(Item memory _item) public onlyOwner {
+        require(
+            _item.id != 0 && _item.id <= _items.length,
+            "Items: updateItem() invalid item id."
+        );
+        items[_item.id] = _item;
+    }
+
+    /**
      * @notice Disables an item from beign equiped.
      *
      * Requirements:

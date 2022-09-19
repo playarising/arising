@@ -141,6 +141,9 @@ interface IItems {
         Attributes memory _attributes
     ) external;
 
+    /** @notice See [Items#updateItem](/docs/items/Items.md#updateItem) */
+    function updateItem(Item memory _item) external;
+
     /** @notice See [Items#disableItem](/docs/items/Items.md#disableItem) */
     function disableItem(uint256 _item_id) external;
 

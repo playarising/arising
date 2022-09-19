@@ -206,6 +206,20 @@ Requirements:
 | \_cooldown          | uint256                  | Number of seconds for the quest cooldown.                                                      |
 | \_level_required    | uint256                  | Minimum level required to start the quest.                                                     |
 
+### updateQuest
+
+```solidity
+function updateQuest(struct IQuests.Quest _quest) public
+```
+
+Updates a previously added quest.
+
+Requirements:
+
+| Name    | Type                 | Description                    |
+| ------- | -------------------- | ------------------------------ |
+| \_quest | struct IQuests.Quest | Full information of the quest. |
+
 ### startQuest
 
 ```solidity

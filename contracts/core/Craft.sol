@@ -281,6 +281,20 @@ contract Craft is ICraft, Ownable, Pausable {
     }
 
     /**
+     * @notice Updates a previously added craft recipe.
+     *
+     * Requirements:
+     * @param _recipe   Full information of the recipe.
+     */
+    function updateRecipe(Recipe memory _recipe) public onlyOwner {
+        require(
+            _recipe.id != 0 && _recipe.id <= _recipes.length,
+            "Craft: updateRecipe() invalid recipe id."
+        );
+        recipes[_recipe.id] = _recipe;
+    }
+
+    /**
      * @notice Adds a new recipe to craft.
      *
      * Requirements:
@@ -328,6 +342,20 @@ contract Craft is ICraft, Ownable, Pausable {
         );
         _upgrades.push(_upgrade_id);
         emit AddUpgrade(_upgrade_id, _name, _description);
+    }
+
+    /**
+     * @notice Updates a previously added upgrade recipe.
+     *
+     * Requirements:
+     * @param _upgrade   Full information of the recipe.
+     */
+    function updateUpgrade(Upgrade memory _upgrade) public onlyOwner {
+        require(
+            _upgrade.id != 0 && _upgrade.id <= _recipes.length,
+            "Craft: updateUpgrade() invalid upgrade id."
+        );
+        upgrades[_upgrade.id] = _upgrade;
     }
 
     /**

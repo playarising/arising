@@ -168,6 +168,20 @@ Requirements:
 | \_stats_modifiers | struct IItems.StatsModifiers | Item modifiers for the character stats.                                               |
 | \_attributes      | struct IItems.Attributes     | Specific item attributes.                                                             |
 
+### updateItem
+
+```solidity
+function updateItem(struct IItems.Item _item) public
+```
+
+Updates a previously added item.
+
+Requirements:
+
+| Name   | Type               | Description                   |
+| ------ | ------------------ | ----------------------------- |
+| \_item | struct IItems.Item | Full information of the item. |
+
 ### disableItem
 
 ```solidity

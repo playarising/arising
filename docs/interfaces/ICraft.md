@@ -109,6 +109,14 @@ function addRecipe(string _name, string _description, address[] _materials, uint
 
 See [Craft#addRecipe](/docs/core/Craft.md#addRecipe)
 
+### updateRecipe
+
+```solidity
+function updateRecipe(struct ICraft.Recipe _recipe) external
+```
+
+See [Craft#updateRecipe](/docs/core/Craft.md#updateRecipe)
+
 ### addUpgrade
 
 ```solidity
@@ -116,6 +124,14 @@ function addUpgrade(string _name, string _description, address[] _materials, uin
 ```
 
 See [Craft#addUpgrade](/docs/core/Craft.md#addUpgrade)
+
+### updateUpgrade
+
+```solidity
+function updateUpgrade(struct ICraft.Upgrade _upgrade) external
+```
+
+See [Craft#updateUpgrade](/docs/core/Craft.md#updateUpgrade)
 
 ### craft
 

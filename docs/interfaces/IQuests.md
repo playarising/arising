@@ -86,6 +86,14 @@ function addQuest(string _name, string _description, enum IQuests.QuestType _que
 
 See [Quests#addQuest](/docs/core/Quests.md#addQuest)
 
+### updateQuest
+
+```solidity
+function updateQuest(struct IQuests.Quest _quest) external
+```
+
+See [Quests#updateQuest](/docs/core/Quests.md#updateQuest)
+
 ### startQuest
 
 ```solidity

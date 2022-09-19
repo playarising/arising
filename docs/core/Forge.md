@@ -224,6 +224,20 @@ Requirements:
 | \_reward            | address                  | Address of the [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to be rewarded for the recipe. |
 | \_experience_reward | uint256                  | Amount of experience rewarded for the recipe.                                                              |
 
+### updateRecipe
+
+```solidity
+function updateRecipe(struct IForge.Recipe _recipe) public
+```
+
+Updates a previously added forge recipe.
+
+Requirements:
+
+| Name     | Type                 | Description                     |
+| -------- | -------------------- | ------------------------------- |
+| \_recipe | struct IForge.Recipe | Full information of the recipe. |
+
 ### buyUpgrade
 
 ```solidity

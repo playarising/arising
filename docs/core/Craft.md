@@ -303,6 +303,20 @@ Requirements:
 | \_reward            | uint256                  | ID of the token to reward for the [Items](/docs/items/Items.md) instance.                     |
 | \_experience_reward | uint256                  | Amount of experience rewarded for the recipe.                                                 |
 
+### updateRecipe
+
+```solidity
+function updateRecipe(struct ICraft.Recipe _recipe) public
+```
+
+Updates a previously added craft recipe.
+
+Requirements:
+
+| Name     | Type                 | Description                     |
+| -------- | -------------------- | ------------------------------- |
+| \_recipe | struct ICraft.Recipe | Full information of the recipe. |
+
 ### addUpgrade
 
 ```solidity
@@ -325,6 +339,20 @@ Requirements:
 | \_upgraded_item  | uint256                  | ID of the token item that is being upgraded from the [Items](/docs/items/Items.md) instance.  |
 | \_gold_cost      | uint256                  | Cost of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) required to craft the recipe. |
 | \_reward         | uint256                  | ID of the token to reward for the [Items](/docs/items/Items.md) instance.                     |
+
+### updateUpgrade
+
+```solidity
+function updateUpgrade(struct ICraft.Upgrade _upgrade) public
+```
+
+Updates a previously added upgrade recipe.
+
+Requirements:
+
+| Name      | Type                  | Description                     |
+| --------- | --------------------- | ------------------------------- |
+| \_upgrade | struct ICraft.Upgrade | Full information of the recipe. |
 
 ### craft
 

@@ -116,6 +116,9 @@ interface ICraft {
         uint256 _experience_reward
     ) external;
 
+    /** @notice See [Craft#updateRecipe](/docs/core/Craft.md#updateRecipe) */
+    function updateRecipe(Recipe memory _recipe) external;
+
     /** @notice See [Craft#addUpgrade](/docs/core/Craft.md#addUpgrade) */
     function addUpgrade(
         string memory _name,
@@ -129,6 +132,9 @@ interface ICraft {
         uint256 _gold_cost,
         uint256 _reward
     ) external;
+
+    /** @notice See [Craft#updateUpgrade](/docs/core/Craft.md#updateUpgrade) */
+    function updateUpgrade(Upgrade memory _upgrade) external;
 
     /** @notice See [Craft#craft](/docs/core/Craft.md#craft) */
     function craft(bytes memory _id, uint256 _recipe_id) external;

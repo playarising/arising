@@ -75,6 +75,14 @@ function addRecipe(string _name, string _description, address[] _materials, uint
 
 See [Forge#addRecipe](/docs/core/Forge.md#addRecipe)
 
+### updateRecipe
+
+```solidity
+function updateRecipe(struct IForge.Recipe _recipe) external
+```
+
+See [Forge#updateRecipe](/docs/core/Forge.md#updateRecipe)
+
 ### buyUpgrade
 
 ```solidity

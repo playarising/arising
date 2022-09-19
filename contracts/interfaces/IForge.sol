@@ -73,6 +73,9 @@ interface IForge {
         uint256 _experience_reward
     ) external;
 
+    /** @notice See [Forge#updateRecipe](/docs/core/Forge.md#updateRecipe) */
+    function updateRecipe(Recipe memory _recipe) external;
+
     /** @notice See [Forge#buyUpgrade](/docs/core/Forge.md#buyUpgrade) */
     function buyUpgrade(bytes memory _id) external;
 

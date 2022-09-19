@@ -208,6 +208,20 @@ contract Quests is IQuests, Ownable, Pausable {
     }
 
     /**
+     * @notice Updates a previously added quest.
+     *
+     * Requirements:
+     * @param _quest   Full information of the quest.
+     */
+    function updateQuest(Quest memory _quest) public onlyOwner {
+        require(
+            _quest.id != 0 && _quest.id <= _quests.length,
+            "Quests: updateQuest() invalid quest id."
+        );
+        quests[_quest.id] = _quest;
+    }
+
+    /**
      * @notice Starts a quest for the character provided.
      *
      * Requirements:

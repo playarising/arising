@@ -93,6 +93,9 @@ interface IQuests {
         uint256 _level_required
     ) external;
 
+    /** @notice See [Quests#updateQuest](/docs/core/Quests.md#updateQuest) */
+    function updateQuest(Quest memory _quest) external;
+
     /** @notice See [Quests#startQuest](/docs/core/Quests.md#startQuest) */
     function startQuest(
         bytes memory _id,

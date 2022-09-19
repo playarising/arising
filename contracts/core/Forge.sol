@@ -221,6 +221,20 @@ contract Forge is IForge, Ownable, Pausable {
     }
 
     /**
+     * @notice Updates a previously added forge recipe.
+     *
+     * Requirements:
+     * @param _recipe   Full information of the recipe.
+     */
+    function updateRecipe(Recipe memory _recipe) public onlyOwner {
+        require(
+            _recipe.id != 0 && _recipe.id <= _recipes.length,
+            "Forge: updateRecipe() invalid recipe id."
+        );
+        recipes[_recipe.id] = _recipe;
+    }
+
+    /**
      * @notice Purchases a forge upgrade for the character provided.
      *
      * Requirements:
