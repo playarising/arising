@@ -90,11 +90,7 @@ contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
                 getTotalCost(_amount),
             "BaseGadgetToken: mint() not enough allowance to mint tokens."
         );
-        IERC20(token).transferFrom(
-            msg.sender,
-            address(this),
-            (_amount * price)
-        );
+        IERC20(token).transferFrom(msg.sender, owner(), (_amount * price));
         _mint(msg.sender, _amount);
     }
 
@@ -111,12 +107,6 @@ contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
         onlyOwner
     {
         _mint(_receiver, _amount);
-    }
-
-    /** @notice Transfers the total amount of tokens stored in the contract to the owner .*/
-    function withdraw() public onlyOwner {
-        uint256 _balance = IERC20(token).balanceOf(address(this));
-        IERC20(token).transfer(owner(), _balance);
     }
 
     // =============================================== Getters ========================================================

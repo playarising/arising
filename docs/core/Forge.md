@@ -283,14 +283,6 @@ Requirements:
 | \_id       | bytes   | Composed ID of the character.         |
 | \_forge_id | uint256 | ID of the forge to assign the recipe. |
 
-### withdraw
-
-```solidity
-function withdraw() public
-```
-
-Transfers the total amount of tokens stored in the contract to the owner .
-
 ### getRecipe
 
 ```solidity

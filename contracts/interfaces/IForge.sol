@@ -89,9 +89,6 @@ interface IForge {
     /** @notice See [Forge#claim](/docs/core/Forge.md#claim) */
     function claim(bytes memory _id, uint256 _forge_id) external;
 
-    /** @notice See [Forge#withdraw](/docs/core/Forge.md#withdraw) */
-    function withdraw() external;
-
     /** @notice See [Forge#getRecipe](/docs/core/Forge.md#getRecipe) */
     function getRecipe(uint256 _recipe_id)
         external

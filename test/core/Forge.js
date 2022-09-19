@@ -282,9 +282,6 @@ describe("Forge", () => {
       ethers.utils.parseEther("1000")
     );
     await this.forge.buyUpgrade(id);
-    expect(await this.mock.balanceOf(this.forge.address)).to.eq(
-      ethers.utils.parseEther("49.99")
-    );
 
     const forge2 = await this.forge.getCharacterForge(id, 2);
     expect(forge2.available).to.eq(true);
@@ -308,9 +305,6 @@ describe("Forge", () => {
   it("should be able to purchase the third upgrade", async () => {
     const id = await this.civ.getTokenID(1, 1);
     await this.forge.buyUpgrade(id);
-    expect(await this.mock.balanceOf(this.forge.address)).to.eq(
-      ethers.utils.parseEther("99.98")
-    );
 
     const forge3 = await this.forge.getCharacterForge(id, 3);
     expect(forge3.available).to.eq(true);
@@ -336,19 +330,6 @@ describe("Forge", () => {
     await expect(this.forge.buyUpgrade(id)).to.revertedWith(
       "Forge: buyUpgrade() no spot available."
     );
-  });
-
-  it("should fail when trying to withdraw tokens from non owner", async () => {
-    await expect(this.forge.connect(this.receiver).withdraw()).to.revertedWith(
-      "Ownable: caller is not the owner"
-    );
-  });
-
-  it("should withdraw tokens correctly", async () => {
-    let balance = await this.mock.balanceOf(this.owner.address);
-    await this.forge.withdraw();
-    balance = await this.mock.balanceOf(this.owner.address);
-    expect(balance).to.eq(ethers.utils.parseEther("1000"));
   });
 
   it("should fail trying to claim from non purchased forge 2", async () => {

@@ -24,9 +24,6 @@ interface IBaseGadgetToken {
     /** @notice See [BaseGadgetToken#mintFree](/docs/base/BaseGadgetToken.md#mintFree) */
     function mintFree(address _receiver, uint256 _amount) external;
 
-    /** @notice See [BaseGadgetToken#withdraw](/docs/base/BaseGadgetToken.md#withdraw) */
-    function withdraw() external;
-
     /** @notice See [BaseGadgetToken#getTotalCost](/docs/base/BaseGadgetToken.md#getTotalCost) */
     function getTotalCost(uint256 _amount) external returns (uint256 _cost);
 }

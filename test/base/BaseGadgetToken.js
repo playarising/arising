@@ -97,12 +97,6 @@ describe("BaseGadgetToken", () => {
     );
   });
 
-  it("should not be able to withdraw from non owner", async () => {
-    await expect(this.token.connect(this.minter).withdraw()).to.revertedWith(
-      "Ownable: caller is not the owner"
-    );
-  });
-
   it("should not be able to set price from non owner", async () => {
     await expect(
       this.token.connect(this.minter).setPrice(ethers.utils.parseEther("5"))
@@ -113,22 +107,6 @@ describe("BaseGadgetToken", () => {
     await expect(
       this.token.connect(this.minter).setToken(this.mock.address)
     ).to.revertedWith("Ownable: caller is not the owner");
-  });
-
-  it("should be able to withdraw the tokens by the owner", async () => {
-    expect(await this.mock.balanceOf(this.owner.address)).to.eq(
-      ethers.utils.parseEther("5")
-    );
-    expect(await this.mock.balanceOf(this.token.address)).to.eq(
-      ethers.utils.parseEther("5")
-    );
-    await this.token.withdraw();
-    expect(await this.mock.balanceOf(this.owner.address)).to.eq(
-      ethers.utils.parseEther("10")
-    );
-    expect(await this.mock.balanceOf(this.token.address)).to.eq(
-      ethers.utils.parseEther("0")
-    );
   });
 
   it("should be able to set a new price", async () => {

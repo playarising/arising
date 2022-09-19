@@ -374,49 +374,14 @@ describe("Civilizations", () => {
     expect(upgrades[2]).to.eq(true);
   });
 
-  it("should not be able to withdraw from non owner", async () => {
-    await expect(this.civ.connect(this.minter).withdraw()).to.revertedWith(
-      "Ownable: caller is not the owner"
-    );
-  });
-
-  it("should be able to withdraw the tokens by the owner", async () => {
-    expect(await this.mock.balanceOf(this.owner.address)).to.eq(
-      ethers.utils.parseEther("3500")
-    );
-    expect(await this.mock.balanceOf(this.civ.address)).to.eq(
-      ethers.utils.parseEther("179.97")
-    );
-    await this.civ.withdraw();
-    expect(await this.mock.balanceOf(this.owner.address)).to.eq(
-      ethers.utils.parseEther("3679.97")
-    );
-    expect(await this.mock.balanceOf(this.civ.address)).to.eq(
-      ethers.utils.parseEther("0")
-    );
-  });
-
   it("should be able to mint with price", async () => {
     expect(await this.mock.balanceOf(this.owner.address)).to.eq(
       ethers.utils.parseEther("3679.97")
     );
-    expect(await this.mock.balanceOf(this.civ.address)).to.eq(
-      ethers.utils.parseEther("0")
-    );
     await this.mock.approve(this.civ.address, ethers.utils.parseEther("1000"));
     await this.civ.mint(1);
     expect(await this.mock.balanceOf(this.owner.address)).to.eq(
-      ethers.utils.parseEther("3659.98")
-    );
-    expect(await this.mock.balanceOf(this.civ.address)).to.eq(
-      ethers.utils.parseEther("19.99")
-    );
-    await this.civ.withdraw();
-    expect(await this.mock.balanceOf(this.owner.address)).to.eq(
       ethers.utils.parseEther("3679.97")
-    );
-    expect(await this.mock.balanceOf(this.civ.address)).to.eq(
-      ethers.utils.parseEther("0")
     );
   });
 });

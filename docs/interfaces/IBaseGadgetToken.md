@@ -52,14 +52,6 @@ function mintFree(address _receiver, uint256 _amount) external
 
 See [BaseGadgetToken#mintFree](/docs/base/BaseGadgetToken.md#mintFree)
 
-### withdraw
-
-```solidity
-function withdraw() external
-```
-
-See [BaseGadgetToken#withdraw](/docs/base/BaseGadgetToken.md#withdraw)
-
 ### getTotalCost
 
 ```solidity

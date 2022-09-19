@@ -86,14 +86,6 @@ function buyUpgrade(bytes _id, uint256 _upgrade_id) external
 
 See [Civilizations#buyUpgrade](/docs/core/Civilizations.md#buyUpgrade)
 
-### withdraw
-
-```solidity
-function withdraw() external
-```
-
-See [Civilizations#withdraw](/docs/core/Civilizations.md#withdraw)
-
 ### getCharacterUpgrades
 
 ```solidity

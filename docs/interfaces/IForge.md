@@ -107,14 +107,6 @@ function claim(bytes _id, uint256 _forge_id) external
 
 See [Forge#claim](/docs/core/Forge.md#claim)
 
-### withdraw
-
-```solidity
-function withdraw() external
-```
-
-See [Forge#withdraw](/docs/core/Forge.md#withdraw)
-
 ### getRecipe
 
 ```solidity

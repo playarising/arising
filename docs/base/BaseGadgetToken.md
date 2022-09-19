@@ -113,14 +113,6 @@ Requirements:
 | \_receiver | address | Address that receives the tokens. |
 | \_amount   | uint256 | Amount of tokens to create.       |
 
-### withdraw
-
-```solidity
-function withdraw() public
-```
-
-Transfers the total amount of tokens stored in the contract to the owner .
-
 ### getTotalCost
 
 ```solidity

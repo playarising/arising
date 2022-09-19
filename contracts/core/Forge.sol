@@ -263,7 +263,7 @@ contract Forge is IForge, Ownable, Pausable {
         }
 
         require(canUpgrade, "Forge: buyUpgrade() no spot available.");
-        IERC20(token).transferFrom(msg.sender, address(this), price);
+        IERC20(token).transferFrom(msg.sender, owner(), price);
 
         if (!forges[_id][2].available) {
             forges[_id][2].available = true;
@@ -375,12 +375,6 @@ contract Forge is IForge, Ownable, Pausable {
             _id,
             _recipe.experience_reward
         );
-    }
-
-    /** @notice Transfers the total amount of tokens stored in the contract to the owner .*/
-    function withdraw() public onlyOwner {
-        uint256 balance = IERC20(token).balanceOf(address(this));
-        IERC20(token).transfer(owner(), balance);
     }
 
     // =============================================== Getters ========================================================

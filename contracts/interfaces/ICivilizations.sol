@@ -46,9 +46,6 @@ interface ICivilizations {
     /** @notice See [Civilizations#buyUpgrade](/docs/core/Civilizations.md#buyUpgrade) */
     function buyUpgrade(bytes memory _id, uint256 _upgrade_id) external;
 
-    /** @notice See [Civilizations#withdraw](/docs/core/Civilizations.md#withdraw) */
-    function withdraw() external;
-
     /** @notice See [Civilizations#getCharacterUpgrades](/docs/core/Civilizations.md#getCharacterUpgrades) */
     function getCharacterUpgrades(bytes memory _id)
         external

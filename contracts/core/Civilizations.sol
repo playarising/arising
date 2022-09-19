@@ -187,7 +187,7 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
             _canMint(msg.sender),
             "Civilizations: mint() address already minted."
         );
-        IERC20(token).transferFrom(msg.sender, address(this), price);
+        IERC20(token).transferFrom(msg.sender, owner(), price);
         _addMint(msg.sender);
         emit Summoned(
             msg.sender,
@@ -231,15 +231,9 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
                 upgrades[_upgrade_id].price,
             "Civilizations: buyUpgrade() not enough allowance to mint tokens."
         );
-        IERC20(token).transferFrom(msg.sender, address(this), _price);
+        IERC20(token).transferFrom(msg.sender, owner(), _price);
         character_upgrades[_id][_upgrade_id] = true;
         emit UpgradePurchased(_id, _upgrade_id);
-    }
-
-    /** @notice Transfers the total amount of tokens stored in the contract to the owner .*/
-    function withdraw() public onlyOwner {
-        uint256 balance = IERC20(token).balanceOf(address(this));
-        IERC20(token).transfer(owner(), balance);
     }
 
     // =============================================== Getters ========================================================

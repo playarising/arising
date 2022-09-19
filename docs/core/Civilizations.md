@@ -224,14 +224,6 @@ Requirements:
 | \_id         | bytes   | Composed ID of the character.  |
 | \_upgrade_id | uint256 | ID of the upgrade to purchase. |
 
-### withdraw
-
-```solidity
-function withdraw() public
-```
-
-Transfers the total amount of tokens stored in the contract to the owner .
-
 ### getCharacterUpgrades
 
 ```solidity
