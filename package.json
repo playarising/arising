@@ -20,7 +20,8 @@
     "doc": "rm -rf docs/*/ && hardhat docgen && yarn format",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test",
     "sort": "npx sort-package-json",
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "deploy": "hardhat run ./scripts/deploy.js --network mumbai"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "2.1.1",

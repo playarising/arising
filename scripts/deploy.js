@@ -44,21 +44,20 @@ async function main() {
   const Items = await ethers.getContractFactory("Items");
   const Stats = await ethers.getContractFactory("Stats");
   const BaseGadgetToken = await ethers.getContractFactory("BaseGadgetToken");
-  const BaseFungibleItem = await ethers.getContractFactory("BaseFungibleItem");
   const Equipment = await ethers.getContractFactory("Equipment");
   const Forge = await ethers.getContractFactory("Forge");
   const Craft = await ethers.getContractFactory("Craft");
   const Quests = await ethers.getContractFactory("Quests");
 
-  console.log("==> Deploying the Levels...");
+  console.log("==> Deploying Levels...");
   const levels = await Levels.deploy();
   await levels.deployed();
 
-  console.log("==> Deploying the Civilizations...");
+  console.log("==> Deploying Civilizations...");
   const civilizations = await Civilizations.deploy(TOKEN);
   await civilizations.deployed();
 
-  console.log("==> Configuring civilizations...");
+  console.log("==> Configuring Civilizations...");
   await civilizations.setMintPrice(ethers.utils.parseEther("8.99"));
   for (let i = 0; i < CIVILIZATIONS.length; i++) {
     const civ = await BaseERC721.deploy(
@@ -71,22 +70,22 @@ async function main() {
     await civ.transferOwnership(civilizations.address);
   }
 
-  console.log("==> Deploying the Experience...");
+  console.log("==> Deploying Experience...");
   const experience = await Experience.deploy(
     civilizations.address,
     levels.address
   );
   await experience.deployed();
 
-  console.log("==> Deploying the Names...");
+  console.log("==> Deploying Names...");
   const names = await Names.deploy(civilizations.address, experience.address);
   await names.deployed();
 
-  console.log("==> Deploying the Items...");
+  console.log("==> Deploying Items...");
   const items = await Items.deploy();
   await items.deployed();
 
-  console.log("==> Deploying the Refresher...");
+  console.log("==> Deploying Refresher...");
   const refresher = await BaseGadgetToken.deploy(
     "Arising: Refresh Token",
     "REFRESHER",
@@ -95,7 +94,7 @@ async function main() {
   );
   await refresher.deployed();
 
-  console.log("==> Deploying the Refresher...");
+  console.log("==> Deploying Vitalizer...");
   const vitalizer = await BaseGadgetToken.deploy(
     "Arising: Vitalizer Token",
     "VITALIZER",
@@ -104,21 +103,13 @@ async function main() {
   );
   await refresher.deployed();
 
-  console.log("==> Deploying the Stats...");
+  console.log("==> Deploying Stats...");
   const stats = await Stats.deploy(civilizations.address, experience.address);
   await stats.deployed();
   await stats.setRefreshToken(refresher.address);
   await stats.setVitalizerToken(vitalizer.address);
 
-  console.log("==> Deploying the Gold...");
-  const gold = await BaseFungibleItem.deploy(
-    "Arising: Gold",
-    "GOLD",
-    civilizations.address
-  );
-  await gold.deployed();
-
-  console.log("==> Deploying the Equipment...");
+  console.log("==> Deploying Equipment...");
   const equipment = await Equipment.deploy(
     civilizations.address,
     experience.address,
@@ -126,16 +117,32 @@ async function main() {
   );
   await equipment.deployed();
 
-  console.log("==> Deploying the Forge...");
+  console.log("==> Deploying Forge...");
   const forge = await Forge.deploy(
     civilizations.address,
     experience.address,
     stats.address,
-    gold.address,
     TOKEN,
     ethers.utils.parseEther("19.99")
   );
   await forge.deployed();
+
+  console.log("==> Deploying Craft...");
+  const craft = await Craft.deploy(
+    civilizations.address,
+    experience.address,
+    stats.address,
+    items.address
+  );
+  await craft.deployed();
+
+  console.log("==> Deploying Quests...");
+  const quests = await Quests.deploy(
+    civilizations.address,
+    experience.address,
+    stats.address
+  );
+  await quests.deployed();
 
   console.log("==> Levels deployed:", levels.address);
   console.log("==> Civilizations deployed:", civilizations.address);
@@ -145,8 +152,10 @@ async function main() {
   console.log("==> Refresher deployed:", refresher.address);
   console.log("==> Vitalizer deployed:", vitalizer.address);
   console.log("==> Stats deployed:", stats.address);
-  console.log("==> Gold deployed:", stats.address);
-  console.log("==> Equipment deployed:", stats.address);
+  console.log("==> Equipment deployed:", equipment.address);
+  console.log("==> Forge deployed:", forge.address);
+  console.log("==> Craft deployed:", craft.address);
+  console.log("==> Quests deployed:", quests.address);
 }
 
 main()
