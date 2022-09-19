@@ -26,6 +26,7 @@ if (argv.enableGasReport) {
 }
 
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
 require("solidity-docgen");
 
 module.exports = {

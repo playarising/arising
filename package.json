@@ -15,16 +15,17 @@
     "ci": "env CI=true",
     "compile": "hardhat compile",
     "coverage": "env COVERAGE=true hardhat coverage",
+    "deploy": "hardhat run ./scripts/deploy.js --network mumbai",
+    "doc": "rm -rf docs/*/ && hardhat docgen && yarn format",
     "flat": "./scripts/flat.sh",
     "format": "prettier --write '**/*.{sol,js,json,md}'",
-    "doc": "rm -rf docs/*/ && hardhat docgen && yarn format",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test",
     "sort": "npx sort-package-json",
-    "test": "hardhat test",
-    "deploy": "hardhat run ./scripts/deploy.js --network mumbai"
+    "test": "hardhat test"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "2.1.1",
+    "@nomiclabs/hardhat-etherscan": "3.1.0",
     "@nomiclabs/hardhat-waffle": "2.0.3",
     "@openzeppelin/contracts": "4.7.3",
     "@openzeppelin/contracts-upgradeable": "4.7.3",
