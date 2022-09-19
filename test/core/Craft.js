@@ -461,4 +461,84 @@ describe("Craft", () => {
     expect(await this.items.balanceOf(this.owner.address, 2)).to.eq(1);
     expect(await this.items.balanceOf(this.owner.address, 1)).to.eq(0);
   });
+
+  it("should fail when trying to upgrade an invalid recipe ", async () => {
+    await expect(
+      this.craft.updateRecipe({
+        id: 5,
+        name: "Test",
+        description: "test 2",
+        materials: [this.resource.address],
+        material_amounts: [10],
+        stats_required: { might: 1, speed: 1, intellect: 1 },
+        cooldown: 3600,
+        level_required: 3,
+        gold_cost: 100,
+        reward: 1,
+        experience_reward: 1,
+        available: true,
+      })
+    ).to.revertedWith("Craft: updateRecipe() invalid recipe id.");
+  });
+
+  it("should fail when trying to upgrade an invalid upgrade ", async () => {
+    await expect(
+      this.craft.updateUpgrade({
+        id: 5,
+        name: "Test",
+        description: "test 2",
+        materials: [this.resource.address],
+        material_amounts: [10],
+        stats_required: { might: 1, speed: 1, intellect: 1 },
+        stats_sacrificed: { might: 1, speed: 1, intellect: 1 },
+        level_required: 3,
+        gold_cost: 100,
+        upgraded_item: 1,
+        reward: 1,
+        available: true,
+      })
+    ).to.revertedWith("Craft: updateUpgrade() invalid upgrade id.");
+  });
+
+  it("should update a recipe correctly", async () => {
+    let recipe = await this.craft.getRecipe(1);
+    expect(recipe.stats_required.might).to.eq(1);
+    await this.craft.updateRecipe({
+      id: 1,
+      name: "Test",
+      description: "test 2",
+      materials: [this.resource.address],
+      material_amounts: [10],
+      stats_required: { might: 5, speed: 1, intellect: 1 },
+      cooldown: 3600,
+      level_required: 3,
+      gold_cost: 100,
+      reward: 1,
+      experience_reward: 1,
+      available: true,
+    });
+    recipe = await this.craft.getRecipe(1);
+    expect(recipe.stats_required.might).to.eq(5);
+  });
+
+  it("should update an upgrade correctly", async () => {
+    let upgrade = await this.craft.getUpgrade(1);
+    expect(upgrade.stats_required.might).to.eq(1);
+    await this.craft.updateUpgrade({
+      id: 1,
+      name: "Test",
+      description: "test 2",
+      materials: [this.resource.address],
+      material_amounts: [10],
+      stats_required: { might: 5, speed: 1, intellect: 1 },
+      stats_sacrificed: { might: 1, speed: 1, intellect: 1 },
+      level_required: 3,
+      gold_cost: 100,
+      upgraded_item: 1,
+      reward: 1,
+      available: true,
+    });
+    upgrade = await this.craft.getUpgrade(1);
+    expect(upgrade.stats_required.might).to.eq(5);
+  });
 });
