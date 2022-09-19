@@ -46,13 +46,6 @@ describe("Quests", () => {
       "BaseFungibleItem"
     );
 
-    this.gold = await BaseFungibleItem.deploy(
-      "Ard: Gold",
-      "GOLD",
-      this.civ.address
-    );
-    await this.gold.deployed();
-
     this.resource = await BaseFungibleItem.deploy(
       "Ard: Resource",
       "WOOD",
@@ -64,12 +57,13 @@ describe("Quests", () => {
     this.quests = await Quests.deploy(
       this.civ.address,
       this.experience.address,
-      this.stats.address,
-      this.gold.address
+      this.stats.address
     );
+
+    this.gold = BaseFungibleItem.attach(await this.quests.gold());
+
     await this.quests.deployed();
     await this.resource.transferOwnership(this.quests.address);
-    await this.gold.transferOwnership(this.quests.address);
     await this.experience.addAuthority(this.quests.address);
   });
 
