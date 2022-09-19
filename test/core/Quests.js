@@ -294,4 +294,44 @@ describe("Quests", () => {
     expect(await this.gold.balanceOf(id)).to.eq(13);
     expect(await this.experience.getExperience(id)).to.eq(10135);
   });
+
+  it("should fail when trying to update a quest that doesn't exist", async () => {
+    await expect(
+      this.quests.updateQuest({
+        id: 5,
+        name: "test",
+        description: "test 2",
+        quest_type: 0,
+        gold_reward: 10,
+        resources_reward: [this.resource.address],
+        resources_amounts: [10],
+        experience_reward: 100,
+        stats_cost: { might: 2, speed: 2, intellect: 2 },
+        cooldown: 3600,
+        level_required: 1,
+        available: true,
+      })
+    ).to.revertedWith("Quests: updateQuest() invalid quest id.");
+  });
+
+  it("should update a quest correctly", async () => {
+    let quest = await this.quests.getQuest(1);
+    expect(quest.stats_cost.might).to.eq(7);
+    await this.quests.updateQuest({
+      id: 1,
+      name: "test",
+      description: "test 2",
+      quest_type: 0,
+      gold_reward: 10,
+      resources_reward: [this.resource.address],
+      resources_amounts: [10],
+      experience_reward: 100,
+      stats_cost: { might: 5, speed: 2, intellect: 2 },
+      cooldown: 3600,
+      level_required: 1,
+      available: true,
+    });
+    quest = await this.quests.getQuest(1);
+    expect(quest.stats_cost.might).to.eq(5);
+  });
 });

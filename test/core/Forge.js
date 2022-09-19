@@ -591,4 +591,44 @@ describe("Forge", () => {
     expect(await this.experience.getExperience(id)).to.eq(50150);
     expect(await this.wood_plank.balanceOf(id)).to.eq(6);
   });
+
+  it("should fail when trying to update recipe that doesn't exist", async () => {
+    await expect(
+      this.forge.updateRecipe({
+        id: 4,
+        name: "test",
+        description: "test 2",
+        materials: [this.wood.address],
+        amounts: [1],
+        stats_required: { might: 0, speed: 1, intellect: 0 },
+        cooldown: 300,
+        level_required: 5,
+        gold_cost: 2,
+        reward: this.wood_plank.address,
+        experience_reward: 25,
+        available: true,
+      })
+    ).to.revertedWith("Forge: updateRecipe() invalid recipe id.");
+  });
+
+  it("should update a recipe correctly", async () => {
+    let recipe = await this.forge.getRecipe(1);
+    expect(recipe.stats_required.might).to.eq(0);
+    this.forge.updateRecipe({
+      id: 1,
+      name: "test",
+      description: "test 2",
+      materials: [this.wood.address],
+      amounts: [1],
+      stats_required: { might: 0, speed: 1, intellect: 0 },
+      cooldown: 300,
+      level_required: 5,
+      gold_cost: 2,
+      reward: this.wood_plank.address,
+      experience_reward: 25,
+      available: true,
+    });
+    recipe = await this.forge.getRecipe(1);
+    expect(recipe.stats_required.might).to.eq(0);
+  });
 });
