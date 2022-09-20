@@ -76,11 +76,7 @@ contract Forge is IForge, Ownable, Pausable {
      * @param _name         Name of the recipe.
      * @param _description  Recipe description
      */
-    event AddRecipe(
-        uint256 _recipe_id,
-        string _name,
-        string _description
-    );
+    event AddRecipe(uint256 _recipe_id, string _name, string _description);
 
     /**
      * @notice Event emmited when the [enableRecipe](#enableRecipe) function is called.
@@ -132,6 +128,16 @@ contract Forge is IForge, Ownable, Pausable {
     /** @notice Resumes the contract */
     function unpause() public onlyOwner {
         _unpause();
+    }
+
+    /**
+     * @notice Sets the price to upgrade a character.
+     *
+     * Requirements:
+     * @param _price     Amount of tokens to pay for the upgrade.
+     */
+    function setUpgradePrice(uint256 _price) public onlyOwner {
+        price = _price;
     }
 
     /**

@@ -97,6 +97,17 @@ describe("Forge", () => {
     await this.experience.addAuthority(this.forge.address);
   });
 
+  it("should set the upgrade price correctly", async () => {
+    await this.forge.setUpgradePrice(ethers.utils.parseEther("19.99"));
+    expect(await this.forge.price()).to.eq(ethers.utils.parseEther("19.99"));
+  });
+
+  it("should fail to set the mint price from non owner", async () => {
+    await expect(
+      this.forge.connect(this.receiver).setUpgradePrice(1)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
   it("should not be able to forge when paused", async () => {
     const id = await this.civ.getTokenID(1, 2);
     expect(await this.forge.paused()).to.eq(false);

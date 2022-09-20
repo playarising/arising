@@ -4,25 +4,25 @@
 
 | Contract     | Mainnet                                      |
 | ------------ | -------------------------------------------- |
-| **Ard**      | `0xA2236E94AcB7218aAfc9f316Af99d8ceF015467B` |
-| **Hartheim** | `0xBAAA04A0f721C1072F3568789cc5a6Ed94B93b27` |
-| **IKarans**  | `0xE7ceBeA0c6D770aefe2aDde67865EE5CFCabBd61` |
-| **Shinkari** | `0x53806c8961696974f89E5Bb70f7c9C0B6c73c237` |
-| **Tarki**    | `0xAb945B58A9dfb6BEEfCf27A4b549e766Aa326900` |
-| **Zhand**    | `0x052eAcc476Fef3f969359f36b753cD2792B4cF28` |
+| **Ard**      | `0xF6eAf00881560f70D6d5768e0ABE33f387b60511` |
+| **Hartheim** | `0xAf16C9F032b495608F7D63fBf7194842B4FA881B` |
+| **IKarans**  | `0x6C22267a63cc01b4921b34E05E5582B13DD1125C` |
+| **Shinkari** | `0xbF31FF9019EB9c65c1Cc7Fbaf4c87dA9A68b0968` |
+| **Tarki**    | `0xA8F367b33A6a829cC847C139D2FEb66B8ee4EE8E` |
+| **Zhand**    | `0xe3b751Bf8f44e6010CcafD375AD8910Da2cf33C0` |
 
 ### Core
 
 | Contract          | Mainnet                                      |
 | ----------------- | -------------------------------------------- |
-| **Civilizations** | `0x3A8520C29F173325a5D9628f93047F9e76E93913` |
-| **Craft**         | `0x9C42486e738BA706fed82C0fb200690b458D33dd` |
-| **Equipment**     | `0x581482aa94CD2B3a1AEFFFA64370758c6a755b33` |
-| **Experience**    | `0x09da32078Fb961C9Fad6145E4AA28Db0B6d9bE80` |
-| **Forge**         | `0x6736D89F30D2dFE79B0c076b65D22bd3038D2ffD` |
-| **Names**         | `0xEcCbe5378e4D40814c2D0951aEFec95CCcB77477` |
-| **Quests**        | `0x42Deff46AE9F7354810F2BF4266dE0610F0A80fA` |
-| **Stats**         | `0x9D11138c961e86E3DB253025143283F56D73f14b` |
+| **Civilizations** | `0x127d1bddaedD7A1dbA34366974C7C8271527C528` |
+| **Craft**         | `0x71f767B971DE5A39047D46459B7E37ad2a55e021` |
+| **Equipment**     | `0x6c0f6bF5D8D58Bdf640CaB3A934ea14d5c2540b1` |
+| **Experience**    | `0xbFf401F897542010931858d54f603B27E61fe1F9` |
+| **Forge**         | `0xcC4E46691BE44ae8aC5811Ee3658915403b4F26B` |
+| **Names**         | `0xc6c6Eb71df6bbD1739221fDb2516038EdBc3dCA1` |
+| **Quests**        | `0xCcFAa62214DBbC68B5bB07f7Fbd9cFa4cf99B5D3` |
+| **Stats**         | `0xf0B66Ad54Fd62F206fB2603966c0e6C21350AF6D` |
 
 ### Raw Materials
 
@@ -38,18 +38,18 @@
 
 | Contract  | Mainnet                                      |
 | --------- | -------------------------------------------- |
-| **Items** | `0x138f2c664a4299aFCe77b45A5968594d8D1F5FE4` |
+| **Items** | `0x8C292EB10F21C59e336a0e404534bD5957E8439A` |
 
 ### Gadgets
 
 | Contract      | Mainnet                                      |
 | ------------- | -------------------------------------------- |
-| **Gold**      | `0xfb5D12BCA454F21249980EF6BB48ff98d098c244` |
-| **Refresher** | `0x9dEc1886E592ce886b62033392969754871A0d29` |
-| **Vitalizer** | `0x7864e79445CD19BDbC47Db4a398B2BcaC64BbA8D` |
+| **Gold**      | `0x0d675cd4c54a0a12afc53a6e39dea9ea318a99ec` |
+| **Refresher** | `0x691010171FE4Ec484dFD975AdeF032290d56FADC` |
+| **Vitalizer** | `0x21Ee26BF5B6eDC1b12f40a390c1f53b3f30Ee444` |
 
 ### Codex
 
 | Contract   | Mainnet                                      |
 | ---------- | -------------------------------------------- |
-| **Levels** | `0x98b93063802cBBb4264dEcDA7cF3D8f4a672619B` |
+| **Levels** | `0x2015808Eb9F7B52587b35ceC18Ff10878544C237` |

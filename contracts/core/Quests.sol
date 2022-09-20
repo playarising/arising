@@ -74,11 +74,7 @@ contract Quests is IQuests, Ownable, Pausable {
      * @param _name         Name of the quest.
      * @param _description  Quest description
      */
-    event AddQuest(
-        uint256 _quest_id,
-        string _name,
-        string _description
-    );
+    event AddQuest(uint256 _quest_id, string _name, string _description);
 
     /**
      * @notice Event emmited when the [enableQuest](#enableQuest) function is called.

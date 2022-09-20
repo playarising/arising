@@ -79,11 +79,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * @param _name         Name of the recipe.
      * @param _description  Recipe description
      */
-    event AddRecipe(
-        uint256 _recipe_id,
-        string _name,
-        string _description
-    );
+    event AddRecipe(uint256 _recipe_id, string _name, string _description);
 
     /**
      * @notice Event emmited when the [enableRecipe](#enableRecipe) function is called.
@@ -109,11 +105,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * @param _name             Name of the recipe.
      * @param _description      Recipe description
      */
-    event AddUpgrade(
-        uint256 _upgrade_id,
-        string _name,
-        string _description
-    );
+    event AddUpgrade(uint256 _upgrade_id, string _name, string _description);
 
     /**
      * @notice Event emmited when the [enableUpgrade](#enableUpgrade) function is called.

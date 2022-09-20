@@ -35,7 +35,7 @@ async function main() {
 
   console.log("==> Deploying I'Karans");
   const ikarans = await BaseERC721.deploy(
-    "Arising: I'Karans",
+    "Arising: IKarans",
     "ARISING",
     "https://characters.playarising.com/ikarans/"
   );
@@ -51,7 +51,7 @@ async function main() {
 
   console.log("==> Deploying Tark'i");
   const tarki = await BaseERC721.deploy(
-    "Arising: Tark'i",
+    "Arising: Tarki",
     "ARISING",
     "https://characters.playarising.com/tarki/"
   );
@@ -90,7 +90,7 @@ async function main() {
     "Arising: Refresh Token",
     "REFRESHER",
     TOKEN,
-    ethers.utils.parseEther("4.99")
+    "4990000"
   );
   await refresher.deployed();
 
@@ -99,7 +99,7 @@ async function main() {
     "Arising: Vitalizer Token",
     "VITALIZER",
     TOKEN,
-    ethers.utils.parseEther("49.99")
+    "49990000"
   );
   await vitalizer.deployed();
 
@@ -131,7 +131,7 @@ async function main() {
     experience.address,
     stats.address,
     TOKEN,
-    ethers.utils.parseEther("19.99")
+    "19990000"
   );
   await forge.deployed();
 
@@ -176,7 +176,7 @@ async function main() {
   console.log("==> Quests deployed:", quests.address);
 
   await (await items.transferOwnership(craft.address)).wait();
-  await (await civ.setMintPrice(ethers.utils.parseEther("8.99"))).wait();
+  await (await civ.setMintPrice("8990000")).wait();
   await (await stats.setRefreshToken(refresher.address)).wait();
   await (await stats.setVitalizerToken(vitalizer.address)).wait();
   await (await civ.addCivilization(ard.address)).wait();
@@ -194,10 +194,10 @@ async function main() {
 
   const BaseFungibleItem = await ethers.getContractFactory("BaseFungibleItem");
   const gold = BaseFungibleItem.attach(await quests.gold());
-
+  const gold_wrapper = await gold.wrapper();
   try {
     await run("verify:verify", {
-      address: await gold.wrapper(),
+      address: gold_wrapper,
       constructorArguments: ["Arising: Gold", "GOLD"],
     });
   } catch (e) {}
@@ -251,7 +251,7 @@ async function main() {
         "Arising: Refresh Token",
         "REFRESHER",
         TOKEN,
-        ethers.utils.parseEther("4.99"),
+        "4990000",
       ],
     });
   } catch (e) {}
@@ -263,7 +263,7 @@ async function main() {
         "Arising: Vitalizer Token",
         "VITALIZER",
         TOKEN,
-        ethers.utils.parseEther("49.99"),
+        "49990000",
       ],
     });
   } catch (e) {}
@@ -294,7 +294,7 @@ async function main() {
         experience.address,
         stats.address,
         TOKEN,
-        ethers.utils.parseEther("19.99"),
+        "19990000",
       ],
     });
   } catch (e) {}
