@@ -44,7 +44,7 @@
 
 | Contract      | Mainnet                                      |
 | ------------- | -------------------------------------------- |
-| **Gold**      | `0x9fbaee066f251d6a37bbc0fe7eb070817b9f487a` |
+| **Gold**      | `0xfb5D12BCA454F21249980EF6BB48ff98d098c244` |
 | **Refresher** | `0x9dEc1886E592ce886b62033392969754871A0d29` |
 | **Vitalizer** | `0x7864e79445CD19BDbC47Db4a398B2BcaC64BbA8D` |
 
