@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "../interfaces/IBaseERC721.sol";
+import "../interfaces/ICivilizations.sol";
 
 /**
  * @title BaseERC721
@@ -19,22 +20,28 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
     /** @notice Constant for the base url of the token metadata. */
     string public baseURI;
 
+    /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
+    address public civilizations;
+
     // =============================================== Setters ========================================================
 
     /**
      * @notice Constructor.
      *
      * Requirements:
-     * @param _name     Name of the `ERC721` token.
-     * @param _symbol   Symbol of the `ERC721` token.
-     * @param _uri      Base url for the tokens metadata.
+     * @param _name             Name of the `ERC721` token.
+     * @param _symbol           Symbol of the `ERC721` token.
+     * @param _uri              Base url for the tokens metadata.
+     * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      */
     constructor(
         string memory _name,
         string memory _symbol,
-        string memory _uri
+        string memory _uri,
+        address _civilizations
     ) ERC721(_name, _symbol) {
         baseURI = _uri;
+        civilizations = _civilizations;
     }
 
     /**
@@ -102,5 +109,15 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
         returns (string memory _uri)
     {
         return baseURI;
+    }
+
+    function _afterTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override {
+        super._afterTokenTransfer(from, to, tokenId);
+
+        ICivilizations(civilizations).transfer(from, to, tokenId);
     }
 }

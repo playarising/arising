@@ -8,8 +8,17 @@ describe("BaseERC721", () => {
     this.owner = owner;
     this.minter = minter;
 
+    const MockEmitter = await ethers.getContractFactory("MockEmitter");
+    this.mock = await MockEmitter.deploy();
+    await this.mock.deployed();
+
     const BaseERC721 = await ethers.getContractFactory("BaseERC721");
-    this.token = await BaseERC721.deploy("Test", "TEST", "https://test.uri/");
+    this.token = await BaseERC721.deploy(
+      "Test",
+      "TEST",
+      "https://test.uri/",
+      this.mock.address
+    );
     await this.token.deployed();
   });
 

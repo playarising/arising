@@ -24,6 +24,13 @@ interface ICivilizations {
     /** @notice See [Civilizations#unpause](/docs/core/Civilizations.md#unpause) */
     function unpause() external;
 
+    /** @notice See [Civilizations#transfer](/docs/core/Civilizations.md#transfer) */
+    function transfer(
+        address _from,
+        address _to,
+        uint256 _token_id
+    ) external;
+
     /** @notice See [Civilizations#setInitializeUpgrade](/docs/core/Civilizations.md#setInitializeUpgrade) */
     function setInitializeUpgrade(uint256 _upgrade_id, bool _available)
         external;

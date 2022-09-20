@@ -25,6 +25,9 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     /** @notice Map to track the supported [BaseERC721](/docs/base/BaseERC721.md) instances. */
     mapping(uint256 => address) civilizations;
 
+    /** @notice Map to track the IDs of the supported [BaseERC721](/docs/base/BaseERC721.md) instances. */
+    mapping(address => uint256) civilizations_id;
+
     /** @notice Array to track the [BaseERC721](/docs/base/BaseERC721.md) IDs. */
     uint256[] private _civilizations;
 
@@ -42,6 +45,17 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
 
     /** @notice Map to the price to mint characters. */
     uint256 public price;
+
+    // =============================================== Modifiers ======================================================
+
+    /**  @notice Checks if the `msg.sender` is a civilization contract to emit a Transfer event. */
+    modifier onlyCivilization() {
+        require(
+            civilizations_id[msg.sender] != 0,
+            "Civilizations: onlyCivilization() msg.sender is not a valid civilization."
+        );
+        _;
+    }
 
     // =============================================== Events =========================================================
 
@@ -62,6 +76,16 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
      * @param _upgrade_id   ID of the upgrade purchased.
      */
     event UpgradePurchased(bytes _id, uint256 _upgrade_id);
+
+    /**
+     * @notice Event emmited when the [transfer](#transfer) function is called.
+     *
+     * Requirements:
+     * @param _from     Address of the character transfering the character.
+     * @param _to       New owner of the character.
+     * @param _id       Composed ID of the character
+     */
+    event Transfer(address _from, address _to, bytes _id);
 
     // =============================================== Setters ========================================================
 
@@ -86,6 +110,23 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     /** @notice Resumes the contract */
     function unpause() public onlyOwner {
         _unpause();
+    }
+
+    /**
+     * @notice Emits a transfer event to track the user of the character.
+     *
+     * Requirements:
+     * @param _from         Address of the character transfering the character.
+     * @param _to           New owner of the character.
+     * @param _token_id     ID of the character in the context of a [BaseERC721](/docs/base/BaseERC721.md) instance.
+     */
+    function transfer(
+        address _from,
+        address _to,
+        uint256 _token_id
+    ) public onlyCivilization {
+        uint256 _civilization_id = civilizations_id[msg.sender];
+        emit Transfer(_from, _to, getTokenID(_civilization_id, _token_id));
     }
 
     /**
@@ -160,11 +201,12 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
             "Civilizations: addCivilization() civilization address is empty."
         );
         require(
-            msg.sender == Ownable(_civilization).owner(),
+            address(this) == Ownable(_civilization).owner(),
             "Civilizations: addCivilization() missing civilization ownership."
         );
         uint256 _civilization_id = _civilizations.length + 1;
         civilizations[_civilization_id] = _civilization;
+        civilizations_id[_civilization] = _civilization_id;
         _civilizations.push(_civilization_id);
     }
 

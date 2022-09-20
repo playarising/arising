@@ -50,20 +50,22 @@ describe("Stats", () => {
     const levels = await Levels.deploy();
     await levels.deployed();
 
+    const Civilizations = await ethers.getContractFactory("Civilizations");
+    this.civ = await Civilizations.deploy(this.mock.address);
+    await this.civ.deployed();
+
     const BaseERC721 = await ethers.getContractFactory("BaseERC721");
     this.collection = await BaseERC721.deploy(
       "Test Collection",
       "TEST",
-      "https://test.uri/"
+      "https://test.uri/",
+      this.civ.address
     );
     await this.collection.deployed();
+    await this.collection.transferOwnership(this.civ.address);
 
-    const Civilizations = await ethers.getContractFactory("Civilizations");
-    this.civ = await Civilizations.deploy(this.mock.address);
-    await this.civ.deployed();
     await this.civ.addCivilization(this.collection.address);
 
-    await this.collection.transferOwnership(this.civ.address);
     await this.civ.mint(1);
     const Experience = await ethers.getContractFactory("Experience");
     this.experience = await Experience.deploy(levels.address, this.civ.address);

@@ -9,14 +9,6 @@ describe("BaseFungibleItems", () => {
     this.minter = minter;
     this.minter2 = minter2;
 
-    const BaseERC721 = await ethers.getContractFactory("BaseERC721");
-    this.collection = await BaseERC721.deploy(
-      "Test Collection",
-      "TEST",
-      "https://test.uri/"
-    );
-    await this.collection.deployed();
-
     const MockToken = await ethers.getContractFactory("MockToken");
     this.mock = await MockToken.deploy(ethers.utils.parseEther("100"));
     await this.mock.deployed();
@@ -25,8 +17,17 @@ describe("BaseFungibleItems", () => {
     this.civ = await Civilizations.deploy(this.mock.address);
     await this.civ.deployed();
 
-    await this.civ.addCivilization(this.collection.address);
+    const BaseERC721 = await ethers.getContractFactory("BaseERC721");
+    this.collection = await BaseERC721.deploy(
+      "Test Collection",
+      "TEST",
+      "https://test.uri/",
+      this.civ.address
+    );
+    await this.collection.deployed();
     await this.collection.transferOwnership(this.civ.address);
+
+    await this.civ.addCivilization(this.collection.address);
 
     await this.civ.mint(1);
 

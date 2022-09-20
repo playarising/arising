@@ -163,14 +163,6 @@ describe("Equipment", () => {
     await this.items.mint(this.owner.address, 4);
     await this.items.mint(this.owner.address, 5);
 
-    const BaseERC721 = await ethers.getContractFactory("BaseERC721");
-    this.collection = await BaseERC721.deploy(
-      "Test Collection",
-      "TEST",
-      "https://test.uri/"
-    );
-    await this.collection.deployed();
-
     const MockToken = await ethers.getContractFactory("MockToken");
     this.mock = await MockToken.deploy(ethers.utils.parseEther("5000"));
     await this.mock.deployed();
@@ -178,9 +170,19 @@ describe("Equipment", () => {
     const Civilizations = await ethers.getContractFactory("Civilizations");
     this.civ = await Civilizations.deploy(this.mock.address);
     await this.civ.deployed();
+
+    const BaseERC721 = await ethers.getContractFactory("BaseERC721");
+    this.collection = await BaseERC721.deploy(
+      "Test Collection",
+      "TEST",
+      "https://test.uri/",
+      this.civ.address
+    );
+    await this.collection.deployed();
+    await this.collection.transferOwnership(this.civ.address);
+
     await this.civ.addCivilization(this.collection.address);
 
-    await this.collection.transferOwnership(this.civ.address);
     await this.civ.mint(1);
 
     const Levels = await ethers.getContractFactory("Levels");

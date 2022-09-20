@@ -12,14 +12,6 @@ describe("Craft", () => {
     const levels = await Levels.deploy();
     await levels.deployed();
 
-    const BaseERC721 = await ethers.getContractFactory("BaseERC721");
-    this.collection = await BaseERC721.deploy(
-      "Test Collection",
-      "TEST",
-      "https://test.uri/"
-    );
-    await this.collection.deployed();
-
     const MockToken = await ethers.getContractFactory("MockToken");
     this.mock = await MockToken.deploy(ethers.utils.parseEther("1000"));
     await this.mock.deployed();
@@ -28,8 +20,17 @@ describe("Craft", () => {
     this.civ = await Civilizations.deploy(this.mock.address);
     await this.civ.deployed();
 
-    await this.civ.addCivilization(this.collection.address);
+    const BaseERC721 = await ethers.getContractFactory("BaseERC721");
+    this.collection = await BaseERC721.deploy(
+      "Test Collection",
+      "TEST",
+      "https://test.uri/",
+      this.civ.address
+    );
+    await this.collection.deployed();
     await this.collection.transferOwnership(this.civ.address);
+
+    await this.civ.addCivilization(this.collection.address);
 
     await this.civ.mint(1);
     await this.civ.connect(this.receiver).mint(1);
