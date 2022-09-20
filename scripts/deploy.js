@@ -103,12 +103,6 @@ async function main() {
   );
   await vitalizer.deployed();
 
-  const Stats = await ethers.getContractFactory("Stats");
-
-  console.log("==> Deploying Stats");
-  const stats = await Stats.deploy(civ.address, experience.address);
-  await stats.deployed();
-
   const Equipment = await ethers.getContractFactory("Equipment");
 
   console.log("==> Deploying Equipment");
@@ -118,6 +112,16 @@ async function main() {
     items.address
   );
   await equipment.deployed();
+
+  const Stats = await ethers.getContractFactory("Stats");
+
+  console.log("==> Deploying Stats");
+  const stats = await Stats.deploy(
+    civ.address,
+    experience.address,
+    equipment.address
+  );
+  await stats.deployed();
 
   const Forge = await ethers.getContractFactory("Forge");
 
@@ -171,6 +175,7 @@ async function main() {
   console.log("==> Craft deployed:", craft.address);
   console.log("==> Quests deployed:", quests.address);
 
+  await (await items.transferOwnership(craft.address)).wait();
   await (await civ.setMintPrice(ethers.utils.parseEther("8.99"))).wait();
   await (await stats.setRefreshToken(refresher.address)).wait();
   await (await stats.setVitalizerToken(vitalizer.address)).wait();
@@ -188,7 +193,7 @@ async function main() {
   await (await zhand.transferOwnership(civ.address)).wait();
 
   const BaseFungibleItem = await ethers.getContractFactory("BaseFungibleItem");
-  const gold = BaseFungibleItem.attach(await this.quests.gold());
+  const gold = BaseFungibleItem.attach(await quests.gold());
 
   try {
     await run("verify:verify", {
@@ -199,7 +204,7 @@ async function main() {
 
   try {
     await run("verify:verify", {
-      address: await this.quests.gold(),
+      address: await quests.gold(),
       constructorArguments: ["Arising: Gold", "GOLD", civ.address],
     });
   } catch (e) {}
@@ -266,7 +271,11 @@ async function main() {
   try {
     await run("verify:verify", {
       address: stats.address,
-      constructorArguments: [civ.address, experience.address],
+      constructorArguments: [
+        civ.address,
+        experience.address,
+        equipment.address,
+      ],
     });
   } catch (e) {}
 

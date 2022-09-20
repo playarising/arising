@@ -32,7 +32,7 @@ require("solidity-docgen");
 module.exports = {
   defaultNetwork: "hardhat",
   networks: {
-    hardhat: {},
+    mainnet: {},
   },
   solidity: {
     compilers: [
