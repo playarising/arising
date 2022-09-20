@@ -164,6 +164,20 @@ function unpause() public
 
 Resumes the contract
 
+### setUpgradePrice
+
+```solidity
+function setUpgradePrice(uint256 _price) public
+```
+
+Sets the price to upgrade a character.
+
+Requirements:
+
+| Name    | Type    | Description                              |
+| ------- | ------- | ---------------------------------------- |
+| \_price | uint256 | Amount of tokens to pay for the upgrade. |
+
 ### disableRecipe
 
 ```solidity

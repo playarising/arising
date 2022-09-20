@@ -21,7 +21,8 @@ async function main() {
   const ard = await BaseERC721.deploy(
     "Arising: Ard",
     "ARISING",
-    "https://characters.playarising.com/ard/"
+    "https://characters.playarising.com/ard/",
+    civ.address
   );
   await ard.deployed();
 
@@ -29,7 +30,8 @@ async function main() {
   const hartheim = await BaseERC721.deploy(
     "Arising: Hartheim",
     "ARISING",
-    "https://characters.playarising.com/hartheim/"
+    "https://characters.playarising.com/hartheim/",
+    civ.address
   );
   await hartheim.deployed();
 
@@ -37,7 +39,8 @@ async function main() {
   const ikarans = await BaseERC721.deploy(
     "Arising: IKarans",
     "ARISING",
-    "https://characters.playarising.com/ikarans/"
+    "https://characters.playarising.com/ikarans/",
+    civ.address
   );
   await ikarans.deployed();
 
@@ -45,7 +48,8 @@ async function main() {
   const shinkari = await BaseERC721.deploy(
     "Arising: Shinkari",
     "ARISING",
-    "https://characters.playarising.com/shinkari/"
+    "https://characters.playarising.com/shinkari/",
+    civ.address
   );
   await shinkari.deployed();
 
@@ -53,7 +57,8 @@ async function main() {
   const tarki = await BaseERC721.deploy(
     "Arising: Tarki",
     "ARISING",
-    "https://characters.playarising.com/tarki/"
+    "https://characters.playarising.com/tarki/",
+    civ.address
   );
   await tarki.deployed();
 
@@ -61,7 +66,8 @@ async function main() {
   const zhand = await BaseERC721.deploy(
     "Arising: Zhand",
     "ARISING",
-    "https://characters.playarising.com/zhand/"
+    "https://characters.playarising.com/zhand/",
+    civ.address
   );
   await zhand.deployed();
 
@@ -175,22 +181,25 @@ async function main() {
   console.log("==> Craft deployed:", craft.address);
   console.log("==> Quests deployed:", quests.address);
 
-  await (await items.transferOwnership(craft.address)).wait();
   await (await civ.setMintPrice("8990000")).wait();
   await (await stats.setRefreshToken(refresher.address)).wait();
   await (await stats.setVitalizerToken(vitalizer.address)).wait();
-  await (await civ.addCivilization(ard.address)).wait();
+
+  await (await items.transferOwnership(craft.address)).wait();
+
   await (await ard.transferOwnership(civ.address)).wait();
-  await (await civ.addCivilization(hartheim.address)).wait();
   await (await hartheim.transferOwnership(civ.address)).wait();
-  await (await civ.addCivilization(ikarans.address)).wait();
   await (await ikarans.transferOwnership(civ.address)).wait();
-  await (await civ.addCivilization(shinkari.address)).wait();
   await (await shinkari.transferOwnership(civ.address)).wait();
-  await (await civ.addCivilization(tarki.address)).wait();
   await (await tarki.transferOwnership(civ.address)).wait();
-  await (await civ.addCivilization(zhand.address)).wait();
   await (await zhand.transferOwnership(civ.address)).wait();
+
+  await (await civ.addCivilization(ard.address)).wait();
+  await (await civ.addCivilization(hartheim.address)).wait();
+  await (await civ.addCivilization(ikarans.address)).wait();
+  await (await civ.addCivilization(shinkari.address)).wait();
+  await (await civ.addCivilization(tarki.address)).wait();
+  await (await civ.addCivilization(zhand.address)).wait();
 
   const BaseFungibleItem = await ethers.getContractFactory("BaseFungibleItem");
   const gold = BaseFungibleItem.attach(await quests.gold());
@@ -325,6 +334,7 @@ async function main() {
         "Arising: Zhand",
         "ARISING",
         "https://characters.playarising.com/zhand/",
+        civ.address,
       ],
     });
   } catch (e) {}

@@ -15,6 +15,14 @@ mapping(uint256 => address) civilizations
 
 Map to track the supported [BaseERC721](/docs/base/BaseERC721.md) instances.
 
+### civilizations_id
+
+```solidity
+mapping(address => uint256) civilizations_id
+```
+
+Map to track the IDs of the supported [BaseERC721](/docs/base/BaseERC721.md) instances.
+
 ### \_civilizations
 
 ```solidity
@@ -63,6 +71,14 @@ uint256 price
 
 Map to the price to mint characters.
 
+### onlyCivilization
+
+```solidity
+modifier onlyCivilization()
+```
+
+Checks if the `msg.sender` is a civilization contract to emit a Transfer event.
+
 ### Summoned
 
 ```solidity
@@ -93,6 +109,22 @@ Requirements:
 | \_id         | bytes   | Composed ID of the character. |
 | \_upgrade_id | uint256 | ID of the upgrade purchased.  |
 
+### Transfer
+
+```solidity
+event Transfer(address _from, address _to, bytes _id)
+```
+
+Event emmited when the [transfer](#transfer) function is called.
+
+Requirements:
+
+| Name   | Type    | Description                                         |
+| ------ | ------- | --------------------------------------------------- |
+| \_from | address | Address of the character transfering the character. |
+| \_to   | address | New owner of the character.                         |
+| \_id   | bytes   | Composed ID of the character                        |
+
 ### constructor
 
 ```solidity
@@ -122,6 +154,22 @@ function unpause() public
 ```
 
 Resumes the contract
+
+### transfer
+
+```solidity
+function transfer(address _from, address _to, uint256 _token_id) public
+```
+
+Emits a transfer event to track the user of the character.
+
+Requirements:
+
+| Name       | Type    | Description                                                                              |
+| ---------- | ------- | ---------------------------------------------------------------------------------------- |
+| \_from     | address | Address of the character transfering the character.                                      |
+| \_to       | address | New owner of the character.                                                              |
+| \_token_id | uint256 | ID of the character in the context of a [BaseERC721](/docs/base/BaseERC721.md) instance. |
 
 ### setInitializeUpgrade
 

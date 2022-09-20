@@ -111,6 +111,7 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
         return baseURI;
     }
 
+    /** @notice Internal function that overrides the `ERC721_afterTokenTransfer` function to emit the transfer event.  */
     function _afterTokenTransfer(
         address from,
         address to,

@@ -15,21 +15,30 @@ string baseURI
 
 Constant for the base url of the token metadata.
 
+### civilizations
+
+```solidity
+address civilizations
+```
+
+Address of the [Civilizations](/docs/core/Civilizations.md) instance.
+
 ### constructor
 
 ```solidity
-constructor(string _name, string _symbol, string _uri) public
+constructor(string _name, string _symbol, string _uri, address _civilizations) public
 ```
 
 Constructor.
 
 Requirements:
 
-| Name     | Type   | Description                       |
-| -------- | ------ | --------------------------------- |
-| \_name   | string | Name of the `ERC721` token.       |
-| \_symbol | string | Symbol of the `ERC721` token.     |
-| \_uri    | string | Base url for the tokens metadata. |
+| Name            | Type    | Description                                                               |
+| --------------- | ------- | ------------------------------------------------------------------------- |
+| \_name          | string  | Name of the `ERC721` token.                                               |
+| \_symbol        | string  | Symbol of the `ERC721` token.                                             |
+| \_uri           | string  | Base url for the tokens metadata.                                         |
+| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
 
 ### mint
 
@@ -98,3 +107,11 @@ with an URI specified over the constructor.
 | Name  | Type   | Description                   |
 | ----- | ------ | ----------------------------- |
 | \_uri | string | Base URL from the constructor |
+
+### \_afterTokenTransfer
+
+```solidity
+function _afterTokenTransfer(address from, address to, uint256 tokenId) internal virtual
+```
+
+Internal function that overrides the `ERC721_afterTokenTransfer` function to emit the transfer event.

@@ -30,6 +30,14 @@ function unpause() external
 
 See [Civilizations#unpause](/docs/core/Civilizations.md#unpause)
 
+### transfer
+
+```solidity
+function transfer(address _from, address _to, uint256 _token_id) external
+```
+
+See [Civilizations#transfer](/docs/core/Civilizations.md#transfer)
+
 ### setInitializeUpgrade
 
 ```solidity
