@@ -26,8 +26,23 @@
 
 ### Raw Materials
 
-| Contract | Mainnet |
-| -------- | ------- |
+| Contract       | Mainnet                                      |
+| -------------- | -------------------------------------------- |
+| **Wood**       | `0x0E898309BA89440A875DE2A36E6462C539df7362` |
+| **Bones**      | `0x6B6d1E4632F746Ce19037522a38412C8e2f617B5` |
+| **Cooper**     | `0xD8a3cEcAE02410353a72e132A3233c2Fcd6BDe31` |
+| **Bronze**     | `0xDd573e100Fb18bD5eFbb50151E2005414200Cda8` |
+| **Stone**      | `0x606975301212c873Ef6Eb00721941a83e8340b55` |
+| **Iron**       | `0xaEC419a5aE05Fc086F89dc05d6B31D6000FDF68F` |
+| **Leather**    | `0x42ef8A1Ef0bc56a376eb0774404b5A80784d4F75` |
+| **Cotton**     | `0x7b90ecA1453e396280AF79E7Ce1cB68Ed8d71EeD` |
+| **Wool**       | `0x254dE71E31fCE7071d35A0d93465105224218f9c` |
+| **Silk**       | `0xc2F5C977c86d208459C2Dd361BA4c6851C0B4180` |
+| **Silver**     | `0x4154C71b793bd07735223cDB8C84249459B3823B` |
+| **Coal**       | `0xb8ef0E8480f560913D38d1622A96639d83A75964` |
+| **Cobalt**     | `0xc6C6cceDa13aCe3e3d1690C16617f63177bcfd7B` |
+| **Platinum**   | `0xCEdb3035Ead28da98c04149AE7ea98de33De5835` |
+| **Adamantine** | `0xbd21a63D35F7bc9eCcA62d2A4B20999B4bE9660c` |
 
 ### Basic Materials
 
