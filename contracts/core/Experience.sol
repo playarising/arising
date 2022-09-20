@@ -68,9 +68,9 @@ contract Experience is IExperience, Ownable {
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _levels           The address of the [Levels](/docs/codex/Levels.md) instance.
      */
-    constructor(address _levels, address _civilizations) {
-        levels = _levels;
+    constructor(address _civilizations, address _levels) {
         civilizations = _civilizations;
+        levels = _levels;
         authorized[msg.sender] = true;
     }
 
