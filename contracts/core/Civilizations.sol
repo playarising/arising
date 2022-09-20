@@ -52,7 +52,7 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
      * @param _owner    Owner of the minted token.
      * @param _id       Composed ID of the character.
      */
-    event Summoned(address indexed _owner, bytes indexed _id);
+    event Summoned(address indexed _owner, bytes _id);
 
     /**
      * @notice Event emmited when the [buyUpgrade](#buyUpgrade) function is called.
@@ -61,7 +61,7 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
      * @param _id   Composed ID of the character.
      * @param _upgrade_id   ID of the upgrade purchased.
      */
-    event UpgradePurchased(bytes indexed _id, uint256 indexed _upgrade_id);
+    event UpgradePurchased(bytes _id, uint256 _upgrade_id);
 
     // =============================================== Setters ========================================================
 

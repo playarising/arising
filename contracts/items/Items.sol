@@ -46,7 +46,7 @@ contract Items is IItems, Ownable, ERC1155 {
      * @param _name         Name of the recipe.
      * @param _description  Recipe description
      */
-    event AddItem(uint256 indexed _item_id, string _name, string _description);
+    event AddItem(uint256 _item_id, string _name, string _description);
 
     /**
      * @notice Event emmited when the [enableItem](#enableItem) function is called.
@@ -54,7 +54,7 @@ contract Items is IItems, Ownable, ERC1155 {
      * Requirements:
      * @param _item_id    ID of the item enabled.
      */
-    event EnableItem(uint256 indexed _item_id);
+    event EnableItem(uint256 _item_id);
 
     /**
      * @notice Event emmited when the [disableItem](#disableItem) function is called.
@@ -62,7 +62,7 @@ contract Items is IItems, Ownable, ERC1155 {
      * Requirements:
      * @param _item_id    ID of the the item disabled.
      */
-    event DisableItem(uint256 indexed _item_id);
+    event DisableItem(uint256 _item_id);
 
     // =============================================== Setters ========================================================
 

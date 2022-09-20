@@ -80,7 +80,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * @param _description  Recipe description
      */
     event AddRecipe(
-        uint256 indexed _recipe_id,
+        uint256 _recipe_id,
         string _name,
         string _description
     );
@@ -91,7 +91,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * Requirements:
      * @param _recipe_id    ID of the recipe enabled.
      */
-    event EnableRecipe(uint256 indexed _recipe_id);
+    event EnableRecipe(uint256 _recipe_id);
 
     /**
      * @notice Event emmited when the [disableRecipe](#disableRecipe) function is called.
@@ -99,7 +99,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * Requirements:
      * @param _recipe_id    ID of the recipe disabled.
      */
-    event DisableRecipe(uint256 indexed _recipe_id);
+    event DisableRecipe(uint256 _recipe_id);
 
     /**
      * @notice Event emmited when the [addUpgrade](#addUpgrade) function is called.
@@ -110,7 +110,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * @param _description      Recipe description
      */
     event AddUpgrade(
-        uint256 indexed _upgrade_id,
+        uint256 _upgrade_id,
         string _name,
         string _description
     );
@@ -121,7 +121,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * Requirements:
      * @param _upgrade_id    ID of the the recipe added.
      */
-    event EnableUpgrade(uint256 indexed _upgrade_id);
+    event EnableUpgrade(uint256 _upgrade_id);
 
     /**
      * @notice Event emmited when the [disableUpgrade](#disableUpgrade) function is called.
@@ -129,7 +129,7 @@ contract Craft is ICraft, Ownable, Pausable {
      * Requirements:
      * @param _upgrade_id    ID of the the recipe added.
      */
-    event DisableUpgrade(uint256 indexed _upgrade_id);
+    event DisableUpgrade(uint256 _upgrade_id);
 
     // =============================================== Setters ========================================================
 

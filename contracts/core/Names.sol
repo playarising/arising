@@ -60,7 +60,7 @@ contract Names is INames, Pausable, Ownable {
      * @param _id       Composed ID of the character.
      * @param _name     New name of the character.
      */
-    event ChangeName(bytes indexed _id, string _name);
+    event ChangeName(bytes _id, string _name);
 
     // =============================================== Setters ========================================================
 

@@ -85,7 +85,7 @@ contract Stats is IStats, Ownable, Pausable {
      * @param _base_stats   Pool stat points
      */
     event ChangedPoints(
-        bytes indexed _id,
+        bytes _id,
         BasicStats _base_stats,
         BasicStats _pool_stats
     );

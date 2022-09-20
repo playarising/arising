@@ -77,7 +77,7 @@ contract Forge is IForge, Ownable, Pausable {
      * @param _description  Recipe description
      */
     event AddRecipe(
-        uint256 indexed _recipe_id,
+        uint256 _recipe_id,
         string _name,
         string _description
     );
@@ -88,7 +88,7 @@ contract Forge is IForge, Ownable, Pausable {
      * Requirements:
      * @param _recipe_id    ID of the recipe enabled.
      */
-    event EnableRecipe(uint256 indexed _recipe_id);
+    event EnableRecipe(uint256 _recipe_id);
 
     /**
      * @notice Event emmited when the [disableRecipe](#disableRecipe) function is called.
@@ -96,7 +96,7 @@ contract Forge is IForge, Ownable, Pausable {
      * Requirements:
      * @param _recipe_id    ID of the recipe disabled.
      */
-    event DisableRecipe(uint256 indexed _recipe_id);
+    event DisableRecipe(uint256 _recipe_id);
 
     // =============================================== Setters ========================================================
 

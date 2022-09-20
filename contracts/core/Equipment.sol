@@ -67,7 +67,7 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
      * @param _slot     Slot of the item equiped.
      * @param _item_id  ID of the item equipped.
      */
-    event Equipped(bytes indexed _id, EquipmentSlot _slot, uint256 _item_id);
+    event Equipped(bytes _id, EquipmentSlot _slot, uint256 _item_id);
 
     /**
      * @notice Event emmited when the [unequip](#unequip) function is called.
@@ -76,7 +76,7 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
      * @param _id       Composed ID of the character.
      * @param _slot     Slot of the item unequipped.
      */
-    event Unequipped(bytes indexed _id, EquipmentSlot _slot);
+    event Unequipped(bytes _id, EquipmentSlot _slot);
 
     // =============================================== Setters ========================================================
 

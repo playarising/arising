@@ -75,7 +75,7 @@ contract Quests is IQuests, Ownable, Pausable {
      * @param _description  Quest description
      */
     event AddQuest(
-        uint256 indexed _quest_id,
+        uint256 _quest_id,
         string _name,
         string _description
     );
@@ -86,7 +86,7 @@ contract Quests is IQuests, Ownable, Pausable {
      * Requirements:
      * @param _quest_id    ID of the quest enabled.
      */
-    event EnableQuest(uint256 indexed _quest_id);
+    event EnableQuest(uint256 _quest_id);
 
     /**
      * @notice Event emmited when the [disableQuest](#disableQuest) function is called.
@@ -94,7 +94,7 @@ contract Quests is IQuests, Ownable, Pausable {
      * Requirements:
      * @param _quest_id    ID of the recipe disabled.
      */
-    event DisableQuest(uint256 indexed _quest_id);
+    event DisableQuest(uint256 _quest_id);
 
     // =============================================== Setters ========================================================
 

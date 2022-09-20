@@ -48,7 +48,7 @@ contract Experience is IExperience, Ownable {
      * @param _id           Composed ID of the character.
      * @param _experience   Total experience amount.
      */
-    event ExperienceIncreased(bytes indexed _id, uint256 _experience);
+    event ExperienceIncreased(bytes _id, uint256 _experience);
 
     /**
      * @notice Event emmited when the [assignExperience](#assignExperience) function is called if the character increased a level.
@@ -57,7 +57,7 @@ contract Experience is IExperience, Ownable {
      * @param _id       Composed ID of the character.
      * @param _level    The new level reached.
      */
-    event NewLevel(bytes indexed _id, uint256 _level);
+    event NewLevel(bytes _id, uint256 _level);
 
     // =============================================== Setters ========================================================
 
