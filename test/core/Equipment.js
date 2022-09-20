@@ -87,9 +87,9 @@ describe("Equipment", () => {
         atk_reducer: 2,
         def: 3,
         def_reducer: 2,
-        range: 3,
-        range_reducer: 2,
-        mag_atk: 3,
+        range: 2,
+        range_reducer: 5,
+        mag_atk: 2,
         mag_atk_reducer: 2,
         mag_def: 3,
         mag_def_reducer: 2,
@@ -118,8 +118,8 @@ describe("Equipment", () => {
         def_reducer: 2,
         range: 3,
         range_reducer: 2,
-        mag_atk: 3,
-        mag_atk_reducer: 2,
+        mag_atk: 2,
+        mag_atk_reducer: 0,
         mag_def: 3,
         mag_def_reducer: 2,
         rate: 3,
@@ -147,8 +147,8 @@ describe("Equipment", () => {
         def_reducer: 2,
         range: 3,
         range_reducer: 2,
-        mag_atk: 3,
-        mag_atk_reducer: 2,
+        mag_atk: 0,
+        mag_atk_reducer: 0,
         mag_def: 3,
         mag_def_reducer: 2,
         rate: 3,
@@ -284,25 +284,16 @@ describe("Equipment", () => {
     expect(equipment.helmet.id).to.eq(1);
     expect(equipment.helmet.equiped).to.eq(true);
     const stats = await this.equipment.getCharacterTotalStatsModifiers(id);
-    expect(stats[0].might).to.eq(2);
-    expect(stats[0].speed).to.eq(2);
-    expect(stats[0].intellect).to.eq(2);
-    expect(stats[1].might).to.eq(1);
-    expect(stats[1].speed).to.eq(1);
-    expect(stats[1].intellect).to.eq(1);
+    expect(stats.might).to.eq(1);
+    expect(stats.speed).to.eq(1);
+    expect(stats.intellect).to.eq(1);
     const attributes = await this.equipment.getCharacterTotalAttributes(id);
-    expect(attributes[0].atk).to.eq(2);
-    expect(attributes[0].def).to.eq(2);
-    expect(attributes[0].mag_atk).to.eq(2);
-    expect(attributes[0].mag_def).to.eq(2);
-    expect(attributes[0].range).to.eq(2);
-    expect(attributes[0].rate).to.eq(2);
-    expect(attributes[1].atk).to.eq(1);
-    expect(attributes[1].def).to.eq(1);
-    expect(attributes[1].mag_atk).to.eq(1);
-    expect(attributes[1].mag_def).to.eq(1);
-    expect(attributes[1].range).to.eq(1);
-    expect(attributes[1].rate).to.eq(1);
+    expect(attributes.atk).to.eq(1);
+    expect(attributes.def).to.eq(1);
+    expect(attributes.mag_atk).to.eq(1);
+    expect(attributes.mag_def).to.eq(1);
+    expect(attributes.range).to.eq(1);
+    expect(attributes.rate).to.eq(1);
 
     expect(await this.items.balanceOf(this.owner.address, 1)).to.eq(0);
     expect(await this.items.balanceOf(this.owner.address, 3)).to.eq(1);
@@ -319,25 +310,16 @@ describe("Equipment", () => {
     expect(equipment.helmet.id).to.eq(3);
     expect(equipment.helmet.equiped).to.eq(true);
     const stats = await this.equipment.getCharacterTotalStatsModifiers(id);
-    expect(stats[0].might).to.eq(4);
-    expect(stats[0].speed).to.eq(4);
-    expect(stats[0].intellect).to.eq(4);
-    expect(stats[1].might).to.eq(2);
-    expect(stats[1].speed).to.eq(2);
-    expect(stats[1].intellect).to.eq(2);
+    expect(stats.might).to.eq(2);
+    expect(stats.speed).to.eq(2);
+    expect(stats.intellect).to.eq(2);
     const attributes = await this.equipment.getCharacterTotalAttributes(id);
-    expect(attributes[0].atk).to.eq(3);
-    expect(attributes[0].def).to.eq(3);
-    expect(attributes[0].mag_atk).to.eq(3);
-    expect(attributes[0].mag_def).to.eq(3);
-    expect(attributes[0].range).to.eq(3);
-    expect(attributes[0].rate).to.eq(3);
-    expect(attributes[1].atk).to.eq(2);
-    expect(attributes[1].def).to.eq(2);
-    expect(attributes[1].mag_atk).to.eq(2);
-    expect(attributes[1].mag_def).to.eq(2);
-    expect(attributes[1].range).to.eq(2);
-    expect(attributes[1].rate).to.eq(2);
+    expect(attributes.atk).to.eq(1);
+    expect(attributes.def).to.eq(1);
+    expect(attributes.mag_atk).to.eq(0);
+    expect(attributes.mag_def).to.eq(1);
+    expect(attributes.range).to.eq(0);
+    expect(attributes.rate).to.eq(1);
 
     expect(await this.items.balanceOf(this.owner.address, 1)).to.eq(1);
     expect(await this.items.balanceOf(this.owner.address, 3)).to.eq(0);
@@ -383,24 +365,15 @@ describe("Equipment", () => {
     expect(equipment.right_hand.equiped).to.eq(false);
     expect(await this.items.balanceOf(this.owner.address, 4)).to.eq(2);
     const stats = await this.equipment.getCharacterTotalStatsModifiers(id);
-    expect(stats[0].might).to.eq(8);
-    expect(stats[0].speed).to.eq(8);
-    expect(stats[0].intellect).to.eq(8);
-    expect(stats[1].might).to.eq(4);
-    expect(stats[1].speed).to.eq(4);
-    expect(stats[1].intellect).to.eq(4);
+    expect(stats.might).to.eq(4);
+    expect(stats.speed).to.eq(4);
+    expect(stats.intellect).to.eq(4);
     const attributes = await this.equipment.getCharacterTotalAttributes(id);
-    expect(attributes[0].atk).to.eq(6);
-    expect(attributes[0].def).to.eq(6);
-    expect(attributes[0].mag_atk).to.eq(6);
-    expect(attributes[0].mag_def).to.eq(6);
-    expect(attributes[0].range).to.eq(6);
-    expect(attributes[0].rate).to.eq(6);
-    expect(attributes[1].atk).to.eq(4);
-    expect(attributes[1].def).to.eq(4);
-    expect(attributes[1].mag_atk).to.eq(4);
-    expect(attributes[1].mag_def).to.eq(4);
-    expect(attributes[1].range).to.eq(4);
-    expect(attributes[1].rate).to.eq(4);
+    expect(attributes.atk).to.eq(2);
+    expect(attributes.def).to.eq(2);
+    expect(attributes.mag_atk).to.eq(0);
+    expect(attributes.mag_def).to.eq(2);
+    expect(attributes.range).to.eq(0);
+    expect(attributes.rate).to.eq(2);
   });
 });

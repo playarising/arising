@@ -38,8 +38,24 @@ describe("Forge", () => {
     this.experience = await Experience.deploy(levels.address, this.civ.address);
     await this.experience.deployed();
 
+    const Items = await ethers.getContractFactory("Items");
+    this.items = await Items.deploy();
+    await this.items.deployed();
+
+    const Equipment = await ethers.getContractFactory("Equipment");
+    this.equipment = await Equipment.deploy(
+      this.civ.address,
+      this.experience.address,
+      this.items.address
+    );
+    await this.equipment.deployed();
+
     const Stats = await ethers.getContractFactory("Stats");
-    this.stats = await Stats.deploy(this.civ.address, this.experience.address);
+    this.stats = await Stats.deploy(
+      this.civ.address,
+      this.experience.address,
+      this.equipment.address
+    );
     await this.stats.deployed();
 
     const BaseFungibleItem = await ethers.getContractFactory(

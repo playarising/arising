@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/IExperience.sol";
 import "../interfaces/IStats.sol";
+import "../interfaces/IEquipment.sol";
 
 /**
  * @title Stats
@@ -42,6 +43,9 @@ contract Stats is IStats, Ownable, Pausable {
 
     /** @notice Address of the [Experience](/docs/core/Experience.md) instance. */
     address public experience;
+
+    /** @notice Address of the [Equipment](/docs/core/Equipment.md) instance. */
+    address public equipment;
 
     /** @notice Map to track the amount of points sacrificed by a character. */
     mapping(bytes => uint256) public sacrifices;
@@ -94,10 +98,16 @@ contract Stats is IStats, Ownable, Pausable {
      * Requirements:
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
+     * @param _equipment       The address of the [Equipment](/docs/core/Equipment.md) instance.
      */
-    constructor(address _civilizations, address _experience) {
+    constructor(
+        address _civilizations,
+        address _experience,
+        address _equipment
+    ) {
         civilizations = _civilizations;
         experience = _experience;
+        equipment = _equipment;
         REFRESH_COOLDOWN_SECONDS = 86400; // 1 day
     }
 
@@ -153,23 +163,42 @@ contract Stats is IStats, Ownable, Pausable {
         whenNotPaused
         onlyAllowed(_id)
     {
+        BasicStats memory _modifiers = IEquipment(equipment)
+            .getCharacterTotalStatsModifiers(_id);
+
+        BasicStats memory _consumes;
+
+        if (_modifiers.might < _stats.might) {
+            _consumes.might = _stats.might - _modifiers.might;
+        }
+
+        if (_modifiers.speed <= _stats.speed) {
+            _consumes.speed = _stats.speed - _modifiers.speed;
+        }
+
+        if (_modifiers.intellect <= _stats.intellect) {
+            _consumes.intellect = _stats.intellect - _modifiers.intellect;
+        }
+
         BasicStats storage _pool = pool[_id];
+
         require(
-            _stats.might <= _pool.might,
+            _consumes.might <= _pool.might,
             "Stats: consume() not enough might."
         );
         require(
-            _stats.speed <= _pool.speed,
+            _consumes.speed <= _pool.speed,
             "Stats: consume() not enough speed."
         );
         require(
-            _stats.intellect <= _pool.intellect,
+            _consumes.intellect <= _pool.intellect,
             "Stats: consume() not enough intellect."
         );
 
-        pool[_id].might -= _stats.might;
-        pool[_id].speed -= _stats.speed;
-        pool[_id].intellect -= _stats.intellect;
+        pool[_id].might -= _consumes.might;
+        pool[_id].speed -= _consumes.speed;
+        pool[_id].intellect -= _consumes.intellect;
+
         emit ChangedPoints(_id, base[_id], pool[_id]);
     }
 

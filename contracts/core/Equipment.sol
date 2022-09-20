@@ -241,77 +241,111 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
     }
 
     /**
-     * @notice External function to return the character state modifiers with additions
-     * and reducers counting the full equipment set.
+     * @notice External function to return the character stats modifiers.
      *
      * Requirements:
      * @param _id           Composed ID of the character.
      *
-     * @return _additions   The amount of points increased.
-     * @return _reductions  The amount of points reduced.
+     * @return _modifiers   The total modifiers.
      */
     function getCharacterTotalStatsModifiers(bytes memory _id)
         public
         view
-        returns (
-            IStats.BasicStats memory _additions,
-            IStats.BasicStats memory _reductions
-        )
+        returns (IStats.BasicStats memory _modifiers)
     {
+        IStats.BasicStats memory _additions;
+        IStats.BasicStats memory _reductions;
+
         for (uint256 i = 0; i < 13; i++) {
-            ItemEquiped memory e = character_equipments[_id][EquipmentSlot(i)];
-            if (e.equiped) {
-                IItems.Item memory item = IItems(items).getItem(e.id);
-                _additions.might += item.stats_modifiers.might;
-                _additions.speed += item.stats_modifiers.speed;
-                _additions.intellect += item.stats_modifiers.intellect;
-                _reductions.might += item.stats_modifiers.might_reducer;
-                _reductions.speed += item.stats_modifiers.speed_reducer;
-                _reductions.intellect += item.stats_modifiers.intellect_reducer;
+            ItemEquiped memory _slot = character_equipments[_id][
+                EquipmentSlot(i)
+            ];
+            if (_slot.equiped) {
+                IItems.Item memory _item = IItems(items).getItem(_slot.id);
+
+                _additions.might += _item.stats_modifiers.might;
+                _additions.speed += _item.stats_modifiers.speed;
+                _additions.intellect += _item.stats_modifiers.intellect;
+                _reductions.might += _item.stats_modifiers.might_reducer;
+                _reductions.speed += _item.stats_modifiers.speed_reducer;
+                _reductions.intellect += _item
+                    .stats_modifiers
+                    .intellect_reducer;
             }
         }
 
-        return (_additions, _reductions);
+        if (_reductions.might <= _additions.might) {
+            _modifiers.might = _additions.might - _reductions.might;
+        }
+        if (_reductions.speed <= _additions.speed) {
+            _modifiers.speed = _additions.speed - _reductions.speed;
+        }
+        if (_reductions.intellect <= _additions.intellect) {
+            _modifiers.intellect = _additions.intellect - _reductions.intellect;
+        }
     }
 
     /**
-     * @notice External function to return the character total attributes counting additions
-     * and reducers counting the full equipment set.
+     * @notice External function to return the character total attributes modifiers.
      *
      * Requirements:
      * @param _id           Composed ID of the character.
      *
-     * @return _additions   The amount of points increased.
-     * @return _reductions  The amount of points reduced.
+     * @return _modifiers   The amount of modifiers.
      */
     function getCharacterTotalAttributes(bytes memory _id)
         public
         view
-        returns (
-            IItems.BaseAttributes memory _additions,
-            IItems.BaseAttributes memory _reductions
-        )
+        returns (IItems.BaseAttributes memory _modifiers)
     {
+        IItems.BaseAttributes memory _additions;
+        IItems.BaseAttributes memory _reductions;
         for (uint256 i = 0; i < 13; i++) {
-            ItemEquiped memory e = character_equipments[_id][EquipmentSlot(i)];
-            if (e.equiped) {
-                IItems.Item memory item = IItems(items).getItem(e.id);
-                _additions.atk += item.attributes.atk;
-                _additions.def += item.attributes.def;
-                _additions.range += item.attributes.range;
-                _additions.mag_atk += item.attributes.mag_atk;
-                _additions.mag_def += item.attributes.mag_def;
-                _additions.rate += item.attributes.rate;
+            ItemEquiped memory _slot = character_equipments[_id][
+                EquipmentSlot(i)
+            ];
 
-                _reductions.atk += item.attributes.atk_reducer;
-                _reductions.def += item.attributes.def_reducer;
-                _reductions.range += item.attributes.range_reducer;
-                _reductions.mag_atk += item.attributes.mag_atk_reducer;
-                _reductions.mag_def += item.attributes.mag_def_reducer;
-                _reductions.rate += item.attributes.rate_reducer;
+            if (_slot.equiped) {
+                IItems.Item memory _item = IItems(items).getItem(_slot.id);
+
+                _additions.atk += _item.attributes.atk;
+                _additions.def += _item.attributes.def;
+                _additions.range += _item.attributes.range;
+                _additions.mag_atk += _item.attributes.mag_atk;
+                _additions.mag_def += _item.attributes.mag_def;
+                _additions.rate += _item.attributes.rate;
+
+                _reductions.atk += _item.attributes.atk_reducer;
+                _reductions.def += _item.attributes.def_reducer;
+                _reductions.range += _item.attributes.range_reducer;
+                _reductions.mag_atk += _item.attributes.mag_atk_reducer;
+                _reductions.mag_def += _item.attributes.mag_def_reducer;
+                _reductions.rate += _item.attributes.rate_reducer;
             }
         }
 
-        return (_additions, _reductions);
+        if (_reductions.atk <= _additions.atk) {
+            _modifiers.atk = _additions.atk - _reductions.atk;
+        }
+
+        if (_reductions.def <= _additions.def) {
+            _modifiers.def = _additions.def - _reductions.def;
+        }
+
+        if (_reductions.range <= _additions.range) {
+            _modifiers.range = _additions.range - _reductions.range;
+        }
+
+        if (_reductions.mag_atk <= _additions.mag_atk) {
+            _modifiers.mag_atk = _additions.mag_atk - _reductions.mag_atk;
+        }
+
+        if (_reductions.mag_def <= _additions.mag_def) {
+            _modifiers.mag_def = _additions.mag_def - _reductions.mag_def;
+        }
+
+        if (_reductions.rate <= _additions.rate) {
+            _modifiers.rate = _additions.rate - _reductions.rate;
+        }
     }
 }

@@ -98,7 +98,7 @@ See [Equipment#getCharacterEquipment](/docs/core/Equipment.md#getCharacterEquipm
 ### getCharacterTotalStatsModifiers
 
 ```solidity
-function getCharacterTotalStatsModifiers(bytes _id) external view returns (struct IStats.BasicStats _additions, struct IStats.BasicStats _reductions)
+function getCharacterTotalStatsModifiers(bytes _id) external view returns (struct IStats.BasicStats _modifiers)
 ```
 
 See [Equipment#getCharacterTotalStatsModifiers](/docs/core/Equipment.md#getCharacterTotalStatsModifiers)
@@ -106,7 +106,7 @@ See [Equipment#getCharacterTotalStatsModifiers](/docs/core/Equipment.md#getChara
 ### getCharacterTotalAttributes
 
 ```solidity
-function getCharacterTotalAttributes(bytes _id) external view returns (struct IItems.BaseAttributes _additions, struct IItems.BaseAttributes _reductions)
+function getCharacterTotalAttributes(bytes _id) external view returns (struct IItems.BaseAttributes _modifiers)
 ```
 
 See [Equipment#getCharacterTotalAttributes](/docs/core/Equipment.md#getCharacterTotalAttributes)

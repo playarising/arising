@@ -98,17 +98,11 @@ interface IEquipment {
     function getCharacterTotalStatsModifiers(bytes memory _id)
         external
         view
-        returns (
-            IStats.BasicStats memory _additions,
-            IStats.BasicStats memory _reductions
-        );
+        returns (IStats.BasicStats memory _modifiers);
 
     /** @notice See [Equipment#getCharacterTotalAttributes](/docs/core/Equipment.md#getCharacterTotalAttributes) */
     function getCharacterTotalAttributes(bytes memory _id)
         external
         view
-        returns (
-            IItems.BaseAttributes memory _additions,
-            IItems.BaseAttributes memory _reductions
-        );
+        returns (IItems.BaseAttributes memory _modifiers);
 }

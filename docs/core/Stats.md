@@ -71,6 +71,14 @@ address experience
 
 Address of the [Experience](/docs/core/Experience.md) instance.
 
+### equipment
+
+```solidity
+address equipment
+```
+
+Address of the [Equipment](/docs/core/Equipment.md) instance.
+
 ### sacrifices
 
 ```solidity
@@ -121,7 +129,7 @@ Requirements:
 ### constructor
 
 ```solidity
-constructor(address _civilizations, address _experience) public
+constructor(address _civilizations, address _experience, address _equipment) public
 ```
 
 Constructor.
@@ -132,6 +140,7 @@ Requirements:
 | --------------- | ------- | ------------------------------------------------------------------------- |
 | \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
 | \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.       |
+| \_equipment     | address | The address of the [Equipment](/docs/core/Equipment.md) instance.         |
 
 ### pause
 

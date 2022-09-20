@@ -173,11 +173,10 @@ Requirements:
 ### getCharacterTotalStatsModifiers
 
 ```solidity
-function getCharacterTotalStatsModifiers(bytes _id) public view returns (struct IStats.BasicStats _additions, struct IStats.BasicStats _reductions)
+function getCharacterTotalStatsModifiers(bytes _id) public view returns (struct IStats.BasicStats _modifiers)
 ```
 
-External function to return the character state modifiers with additions
-and reducers counting the full equipment set.
+External function to return the character stats modifiers.
 
 Requirements:
 
@@ -185,19 +184,17 @@ Requirements:
 | ---- | ----- | ----------------------------- |
 | \_id | bytes | Composed ID of the character. |
 
-| Name         | Type                     | Description                     |
-| ------------ | ------------------------ | ------------------------------- |
-| \_additions  | struct IStats.BasicStats | The amount of points increased. |
-| \_reductions | struct IStats.BasicStats | The amount of points reduced.   |
+| Name        | Type                     | Description          |
+| ----------- | ------------------------ | -------------------- |
+| \_modifiers | struct IStats.BasicStats | The total modifiers. |
 
 ### getCharacterTotalAttributes
 
 ```solidity
-function getCharacterTotalAttributes(bytes _id) public view returns (struct IItems.BaseAttributes _additions, struct IItems.BaseAttributes _reductions)
+function getCharacterTotalAttributes(bytes _id) public view returns (struct IItems.BaseAttributes _modifiers)
 ```
 
-External function to return the character total attributes counting additions
-and reducers counting the full equipment set.
+External function to return the character total attributes modifiers.
 
 Requirements:
 
@@ -205,7 +202,6 @@ Requirements:
 | ---- | ----- | ----------------------------- |
 | \_id | bytes | Composed ID of the character. |
 
-| Name         | Type                         | Description                     |
-| ------------ | ---------------------------- | ------------------------------- |
-| \_additions  | struct IItems.BaseAttributes | The amount of points increased. |
-| \_reductions | struct IItems.BaseAttributes | The amount of points reduced.   |
+| Name        | Type                         | Description              |
+| ----------- | ---------------------------- | ------------------------ |
+| \_modifiers | struct IItems.BaseAttributes | The amount of modifiers. |
