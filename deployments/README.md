@@ -4,45 +4,45 @@
 
 | Contract     | Mainnet                                      |
 | ------------ | -------------------------------------------- |
-| **Ard**      | `0x6cC8F0bc23f487498Ad8B9A6FE54592881765ADD` |
-| **Hartheim** | `0xf90618BB1960D47d566f680cE5006CA349a555bA` |
-| **IKarans**  | `0x67b22C0a0Adf01CAF92266C86FDf47D7e0344Df2` |
-| **Shinkari** | `0x418De280F6bffA64f2D446D77B00Ac8CE55a5dF6` |
-| **Tarki**    | `0x8c5e4362b76a087243E5d25C3c9a8cF905FB840B` |
-| **Zhand**    | `0x4BF7169484fe17476B6d7E322D60B7082c524253` |
+| **Ard**      | `0x3BF7785Cc25A1e98Cebe785fB82b7602601d4D73` |
+| **Hartheim** | `0xF31f70a7bA576CDF84DEF9c3B069594cc26Fe183` |
+| **IKarans**  | `0xA86a04b2Bd81A7e766aC874fD6bc9465b81c780a` |
+| **Shinkari** | `0x84541e01faf50111e538B784138655f02356D204` |
+| **Tarki**    | `0x2a2f88C33d306487843AfaBA06df5b7e13c640f8` |
+| **Zhand**    | `0x1b72E048FAD466f40CcB3a398FFe625FDE63c334` |
 
 ### Core
 
 | Contract          | Mainnet                                      |
 | ----------------- | -------------------------------------------- |
-| **Civilizations** | `0xEe77f82B049BB4E94494Cd0228f2f9B6fD1f5f63` |
-| **Craft**         | `0x5369b74F9DCD6506401675daA58fFbBb12e9934b` |
-| **Equipment**     | `0xEFdB83b88cab76800CeA36b87AF3E82Ad4b52590` |
-| **Experience**    | `0x6F9A1703879BF998aAD0ee94EfF9d81EF0614Daf` |
-| **Forge**         | `0x18EF1f5cc08159fdD09C207cdDF47a9aA8370088` |
-| **Names**         | `0xCB29AbF816704bc02581C3e8b8e10bA5a93Db5e0` |
-| **Quests**        | `0xa81fD563cb930cB36a8fe74039f3aD16B47Bb49F` |
-| **Stats**         | `0xeee9DAF4E040f6aaCFE5C010921E41cE71600c70` |
+| **Civilizations** | `0xe9520f498ba1D78B489A7cf3167142060497B1e3` |
+| **Craft**         | `0xc63C478462aBbf100A3470d82CcfF7A5EB95ec0f` |
+| **Equipment**     | `0x84da1e2D3c3169997a80b8988bb0999E9FaCA603` |
+| **Experience**    | `0xa4d363A562bD488dB53922151Ffab664672D52dF` |
+| **Forge**         | `0xc9F34C905F2aFb83b519439DB91110a91f582c9E` |
+| **Names**         | `0xfEab5b56F9531DCBE79db00c237F59D1fd9E9cF6` |
+| **Quests**        | `0xEd57e3eEa88785814737b5615e1966B124807Fbd` |
+| **Stats**         | `0x77513d3671D56707b20d59266A932B0291c17ea2` |
 
 ### Raw Materials
 
 | Contract       | Mainnet                                      |
 | -------------- | -------------------------------------------- |
-| **Wood**       | `0x0E898309BA89440A875DE2A36E6462C539df7362` |
-| **Bones**      | `0x6B6d1E4632F746Ce19037522a38412C8e2f617B5` |
-| **Cooper**     | `0xD8a3cEcAE02410353a72e132A3233c2Fcd6BDe31` |
-| **Bronze**     | `0xDd573e100Fb18bD5eFbb50151E2005414200Cda8` |
-| **Stone**      | `0x606975301212c873Ef6Eb00721941a83e8340b55` |
-| **Iron**       | `0xaEC419a5aE05Fc086F89dc05d6B31D6000FDF68F` |
-| **Leather**    | `0x42ef8A1Ef0bc56a376eb0774404b5A80784d4F75` |
-| **Cotton**     | `0x7b90ecA1453e396280AF79E7Ce1cB68Ed8d71EeD` |
-| **Wool**       | `0x254dE71E31fCE7071d35A0d93465105224218f9c` |
-| **Silk**       | `0xc2F5C977c86d208459C2Dd361BA4c6851C0B4180` |
-| **Silver**     | `0x4154C71b793bd07735223cDB8C84249459B3823B` |
-| **Coal**       | `0xb8ef0E8480f560913D38d1622A96639d83A75964` |
-| **Cobalt**     | `0xc6C6cceDa13aCe3e3d1690C16617f63177bcfd7B` |
-| **Platinum**   | `0xCEdb3035Ead28da98c04149AE7ea98de33De5835` |
-| **Adamantine** | `0xbd21a63D35F7bc9eCcA62d2A4B20999B4bE9660c` |
+| **Wood**       | `0x4dfc08bc48EFd43CfCE1A8379e14Fdc232eDB445` |
+| **Bones**      | `0x526A1743DC9EDd843b461A75359FF73D6021dC97` |
+| **Cooper**     | `0xA95a17eb49A276B4c8f1dB9126731787fDDC85b5` |
+| **Bronze**     | `0x386CC26Cbb411CFeCfC4A4EdbB1df715327086AF` |
+| **Stone**      | `0x0677f56bA58609eEd1540C1F9ad93Af89d82bcB4` |
+| **Iron**       | `0x11c439f125797035301033879B0e0a433A049152` |
+| **Leather**    | `0xacB24Fc0601304F88231c95CD97fc0aCb7e2B53a` |
+| **Cotton**     | `0x29FAE79E2088154bbf7FAE8f6b42Ae144Fbe6f24` |
+| **Wool**       | `0x0E285E863fA4d5107f45C9523f41C86137F5F503` |
+| **Silk**       | `0xcD2B65d17244475485228331d5b9c427Ee1C5Da9` |
+| **Silver**     | `0x925637a52879852fEb0f7C1B0DcD66C72A778E01` |
+| **Coal**       | `0xD5F264A809Fe0bb032C2D08499EcBDD08f3c2697` |
+| **Cobalt**     | `0x20EA7A3212Be22495716f594C2B892b4721B1a1c` |
+| **Platinum**   | `0x61f1519cF64EFc2BFC05dF49C26DF7029dD4358D` |
+| **Adamantine** | `0x88Ec0098B20643475f5F2A2AC5c521CCaF1Bd6Dc` |
 
 ### Basic Materials
 
@@ -53,18 +53,18 @@
 
 | Contract  | Mainnet                                      |
 | --------- | -------------------------------------------- |
-| **Items** | `0xf6C14d26f6E139668D71cdBbD7b03D86a1EC14b0` |
+| **Items** | `0xbBc0CD169b24EeeA734DA21a79f73D6029F929f9` |
 
 ### Gadgets
 
 | Contract      | Mainnet                                      |
 | ------------- | -------------------------------------------- |
-| **Gold**      | `0x0d675cd4c54a0a12afc53a6e39dea9ea318a99ec` |
-| **Refresher** | `0xE7baF62bF51f98792017C5b5d454C81927C17Ef7` |
-| **Vitalizer** | `0xE3a1BDfCcD3e1CDe4a94226A92D709accD4d3CA9` |
+| **Gold**      | `0xF76413f7b200293aB6f0037D50Be6b54a3E53DA1` |
+| **Refresher** | `0xA58509b24755D08B5E3c2aC585141785a761993E` |
+| **Vitalizer** | `0x48eA8521bcFA0F853b08a87316c04fE3C95cc0bB` |
 
 ### Codex
 
 | Contract   | Mainnet                                      |
 | ---------- | -------------------------------------------- |
-| **Levels** | `0xC0f7893e15cC6c3e3d5Bc50bb5EB837825114544` |
+| **Levels** | `0xafA7772b65ACF30F9BD1b07Ed61B4A64EFF8ee0C` |

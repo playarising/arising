@@ -201,23 +201,6 @@ async function main() {
   await (await civ.addCivilization(tarki.address)).wait();
   await (await civ.addCivilization(zhand.address)).wait();
 
-  const BaseFungibleItem = await ethers.getContractFactory("BaseFungibleItem");
-  const gold = BaseFungibleItem.attach(await quests.gold());
-  const gold_wrapper = await gold.wrapper();
-  try {
-    await run("verify:verify", {
-      address: gold_wrapper,
-      constructorArguments: ["Arising: Gold", "GOLD"],
-    });
-  } catch (e) {}
-
-  try {
-    await run("verify:verify", {
-      address: await quests.gold(),
-      constructorArguments: ["Arising: Gold", "GOLD", civ.address],
-    });
-  } catch (e) {}
-
   try {
     await run("verify:verify", {
       address: levels.address,

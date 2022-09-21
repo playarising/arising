@@ -63,8 +63,8 @@ const MATERIALS = [
   },
 ];
 
-const CIVILIZATIONS = "0xEe77f82B049BB4E94494Cd0228f2f9B6fD1f5f63";
-const QUESTS = "0xa81fD563cb930cB36a8fe74039f3aD16B47Bb49F";
+const CIVILIZATIONS = "0xe9520f498ba1D78B489A7cf3167142060497B1e3";
+const QUESTS = "0xEd57e3eEa88785814737b5615e1966B124807Fbd";
 
 async function main() {
   const BaseFungibleItem = await ethers.getContractFactory("BaseFungibleItem");
