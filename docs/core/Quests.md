@@ -94,6 +94,22 @@ Requirements:
 | \_name        | string  | Name of the quest.     |
 | \_description | string  | Quest description      |
 
+### QuestUpdate
+
+```solidity
+event QuestUpdate(uint256 _quest_id, string _name, string _description)
+```
+
+Event emmited when the [updateQuest](#updateQuest) function is called.
+
+Requirements:
+
+| Name          | Type    | Description            |
+| ------------- | ------- | ---------------------- |
+| \_quest_id    | uint256 | ID of the quest added. |
+| \_name        | string  | Name of the quest.     |
+| \_description | string  | Quest description      |
+
 ### EnableQuest
 
 ```solidity
@@ -185,7 +201,7 @@ Requirements:
 ### addQuest
 
 ```solidity
-function addQuest(string _name, string _description, enum IQuests.QuestType _quest_type, uint256 _gold_reward, address[] _resources_reward, uint256[] _resources_amounts, uint256 _experience_reward, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required) public
+function addQuest(string _name, string _description, enum IQuests.QuestType _quest_type, address[] _resources_reward, uint256[] _resources_amounts, uint256 _experience_reward, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required) public
 ```
 
 Adds a new quest for characters.
@@ -197,7 +213,6 @@ Requirements:
 | \_name              | string                   | Name of the quest.                                                                             |
 | \_description       | string                   | Description of the quest.                                                                      |
 | \_quest_type        | enum IQuests.QuestType   | Type of the added quest.                                                                       |
-| \_gold_reward       | uint256                  | Amount of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) tokens to reward.            |
 | \_resources_reward  | address[]                | Array of [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to reward for the quest. |
 | \_resources_amounts | uint256[]                | Array of amounts for each resource reward.                                                     |
 | \_experience_reward | uint256                  | Amount of experience rewarded for the quest.                                                   |

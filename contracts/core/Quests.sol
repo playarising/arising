@@ -77,6 +77,16 @@ contract Quests is IQuests, Ownable, Pausable {
     event AddQuest(uint256 _quest_id, string _name, string _description);
 
     /**
+     * @notice Event emmited when the [updateQuest](#updateQuest) function is called.
+     *
+     * Requirements:
+     * @param _quest_id     ID of the quest added.
+     * @param _name         Name of the quest.
+     * @param _description  Quest description
+     */
+    event QuestUpdate(uint256 _quest_id, string _name, string _description);
+
+    /**
      * @notice Event emmited when the [enableQuest](#enableQuest) function is called.
      *
      * Requirements:
@@ -162,7 +172,6 @@ contract Quests is IQuests, Ownable, Pausable {
      * @param _name                 Name of the quest.
      * @param _description          Description of the quest.
      * @param _quest_type           Type of the added quest.
-     * @param _gold_reward          Amount of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) tokens to reward.
      * @param _resources_reward     Array of [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to reward for the quest.
      * @param _resources_amounts    Array of amounts for each resource reward.
      * @param _experience_reward    Amount of experience rewarded for the quest.
@@ -174,7 +183,6 @@ contract Quests is IQuests, Ownable, Pausable {
         string memory _name,
         string memory _description,
         QuestType _quest_type,
-        uint256 _gold_reward,
         address[] memory _resources_reward,
         uint256[] memory _resources_amounts,
         uint256 _experience_reward,
@@ -192,7 +200,6 @@ contract Quests is IQuests, Ownable, Pausable {
             _name,
             _description,
             _quest_type,
-            _gold_reward,
             _resources_reward,
             _resources_amounts,
             _experience_reward,
@@ -217,6 +224,7 @@ contract Quests is IQuests, Ownable, Pausable {
             "Quests: updateQuest() invalid quest id."
         );
         quests[_quest.id] = _quest;
+        emit QuestUpdate(_quest.id, _quest.name, _quest.description);
     }
 
     /**
@@ -292,10 +300,6 @@ contract Quests is IQuests, Ownable, Pausable {
 
         IExperience(experience).assignExperience(_id, _experience);
 
-        uint256 _gold = (_quest.gold_reward *
-            character_quests[_id].fullfilment) / 100;
-
-        IBaseFungibleItem(gold).mintTo(_id, _gold);
         for (uint256 i = 0; i < _quest.resources_reward.length; i++) {
             uint256 _amount = (_quest.resources_amounts[i] *
                 character_quests[_id].fullfilment) / 100;

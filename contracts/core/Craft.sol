@@ -82,6 +82,16 @@ contract Craft is ICraft, Ownable, Pausable {
     event AddRecipe(uint256 _recipe_id, string _name, string _description);
 
     /**
+     * @notice Event emmited when the [updateRecipe](#updateRecipe) function is called.
+     *
+     * Requirements:
+     * @param _recipe_id    ID of the recipe added.
+     * @param _name         Name of the recipe.
+     * @param _description  Recipe description
+     */
+    event RecipeUpdate(uint256 _recipe_id, string _name, string _description);
+
+    /**
      * @notice Event emmited when the [enableRecipe](#enableRecipe) function is called.
      *
      * Requirements:
@@ -106,6 +116,16 @@ contract Craft is ICraft, Ownable, Pausable {
      * @param _description      Recipe description
      */
     event AddUpgrade(uint256 _upgrade_id, string _name, string _description);
+
+    /**
+     * @notice Event emmited when the [updateUpgrade](#updateUpgrade) function is called.
+     *
+     * Requirements:
+     * @param _upgrade_id       ID of the the upgrade added.
+     * @param _name             Name of the recipe.
+     * @param _description      Recipe description
+     */
+    event UpgradeUpdate(uint256 _upgrade_id, string _name, string _description);
 
     /**
      * @notice Event emmited when the [enableUpgrade](#enableUpgrade) function is called.
@@ -275,6 +295,7 @@ contract Craft is ICraft, Ownable, Pausable {
             "Craft: updateRecipe() invalid recipe id."
         );
         recipes[_recipe.id] = _recipe;
+        emit RecipeUpdate(_recipe.id, _recipe.name, _recipe.description);
     }
 
     /**
@@ -336,6 +357,7 @@ contract Craft is ICraft, Ownable, Pausable {
             "Craft: updateUpgrade() invalid upgrade id."
         );
         upgrades[_upgrade.id] = _upgrade;
+        emit UpgradeUpdate(_upgrade.id, _upgrade.name, _upgrade.description);
     }
 
     /**

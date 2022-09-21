@@ -75,9 +75,18 @@ async function main() {
       CIVILIZATIONS
     );
     await material.deployed();
-    await (await material.transferOwnership(QUESTS)).wait();
+    await (await material.addAuthority(QUESTS)).wait();
     console.log("==> Deployed:", MATERIALS[i].name, material.address);
   }
+
+  const gold = await BaseFungibleItem.deploy(
+    "Arising: Gold",
+    "GOLD",
+    CIVILIZATIONS
+  );
+  await gold.deployed();
+  await (await gold.addAuthority(QUESTS)).wait();
+  console.log("==> Deployed: Arising: Gold", gold.address);
 }
 
 main()

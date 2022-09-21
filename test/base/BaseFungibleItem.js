@@ -60,11 +60,13 @@ describe("BaseFungibleItems", () => {
     expect(await this.token.balanceOf(id)).to.eq(5);
   });
 
-  it("should fail to mint tokens when not owner", async () => {
+  it("should fail to mint tokens when not authorized", async () => {
     const id = await this.civ.getTokenID(1, 1);
     await expect(
       this.token.connect(this.minter).mintTo(id, 10)
-    ).to.revertedWith("Ownable: caller is not the owner");
+    ).to.revertedWith(
+      "BaseFungibleItem: onlyAuthorized() msg.sender not authorized."
+    );
   });
 
   it("should fail consume when not allowed", async () => {
@@ -95,22 +97,61 @@ describe("BaseFungibleItems", () => {
     );
   });
 
+  it("should fail to wrap and unwrap when not enabled", async () => {
+    const id = await this.civ.getTokenID(1, 1);
+    await expect(this.token.wrap(id, 5)).to.revertedWith(
+      "BaseFungibleItem: onlyEnabled() wrap is not enabled."
+    );
+  });
+
+  it("should fail to enable wrap when not owner", async () => {
+    const id = await this.civ.getTokenID(1, 1);
+    await expect(
+      this.token.connect(this.minter).setWrapFunction(true)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should remove an authority and prevent from assigning experience from a non authority", async () => {
+    const id = await this.civ.getTokenID(1, 1);
+    await this.token.removeAuthority(this.owner.address);
+    await expect(this.token.mintTo(id, 1020)).to.revertedWith(
+      "BaseFungibleItem: onlyAuthorized() msg.sender not authorized."
+    );
+  });
+
+  it("should prevent adding an authority from non owner", async () => {
+    await expect(
+      this.token.connect(this.minter).addAuthority(this.owner.address)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should add a second authority and mint items", async () => {
+    const id = await this.civ.getTokenID(1, 1);
+    await this.token.addAuthority(this.owner.address);
+    await this.token.mintTo(id, 500);
+    const balance = await this.token.balanceOf(id);
+    expect(balance).to.eq(500);
+    await this.token.addAuthority(this.minter.address);
+    await this.token.connect(this.minter).mintTo(id, 540);
+    expect(await this.token.balanceOf(id)).to.eq(1040);
+  });
+
   it("should wrap and unwrap tokens correctly", async () => {
     const id = await this.civ.getTokenID(1, 1);
     expect(await this.wrapped_token.balanceOf(this.owner.address)).to.eq(0);
-    await this.token.mintTo(id, 10);
-    expect(await this.token.balanceOf(id)).to.eq(10);
+    await this.token.setWrapFunction(true);
+    expect(await this.token.balanceOf(id)).to.eq(1040);
     await this.token.wrap(id, 5);
     expect(await this.wrapped_token.balanceOf(this.owner.address)).to.eq(
       ethers.utils.parseEther("5")
     );
-    expect(await this.token.balanceOf(id)).to.eq(5);
+    expect(await this.token.balanceOf(id)).to.eq(1035);
     await this.wrapped_token.approve(
       this.token.address,
       ethers.utils.parseEther("10")
     );
     await this.token.unwrap(id, 5);
     expect(await this.wrapped_token.balanceOf(this.owner.address)).to.eq(0);
-    expect(await this.token.balanceOf(id)).to.eq(10);
+    expect(await this.token.balanceOf(id)).to.eq(1040);
   });
 });

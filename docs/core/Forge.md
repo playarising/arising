@@ -102,6 +102,22 @@ Requirements:
 | \_name        | string  | Name of the recipe.     |
 | \_description | string  | Recipe description      |
 
+### RecipeUpdate
+
+```solidity
+event RecipeUpdate(uint256 _recipe_id, string _name, string _description)
+```
+
+Event emmited when the [updateRecipe](#updateRecipe) function is called.
+
+Requirements:
+
+| Name          | Type    | Description             |
+| ------------- | ------- | ----------------------- |
+| \_recipe_id   | uint256 | ID of the recipe added. |
+| \_name        | string  | Name of the recipe.     |
+| \_description | string  | Recipe description      |
+
 ### EnableRecipe
 
 ```solidity

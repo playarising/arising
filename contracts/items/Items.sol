@@ -27,7 +27,7 @@ contract Items is IItems, Ownable, ERC1155 {
 
     // =============================================== Modifiers ======================================================
 
-    /** @notice Checks against if the `msg.sender` is authorized to mint items. */
+    /** @notice Checks if the `msg.sender` is authorized to mint items. */
     modifier onlyAuthorized() {
         require(
             authorized[msg.sender],
@@ -47,6 +47,16 @@ contract Items is IItems, Ownable, ERC1155 {
      * @param _description  Recipe description
      */
     event AddItem(uint256 _item_id, string _name, string _description);
+
+    /**
+     * @notice Event emmited when the [updateItem](#updateItem) function is called.
+     *
+     * Requirements:
+     * @param _item_id    ID of the item added.
+     * @param _name         Name of the recipe.
+     * @param _description  Recipe description
+     */
+    event ItemUpdate(uint256 _item_id, string _name, string _description);
 
     /**
      * @notice Event emmited when the [enableItem](#enableItem) function is called.
@@ -173,6 +183,7 @@ contract Items is IItems, Ownable, ERC1155 {
             "Items: updateItem() invalid item id."
         );
         items[_item.id] = _item;
+        emit ItemUpdate(_item.id, _item.name, _item.description);
     }
 
     /**

@@ -79,7 +79,7 @@ Requirements:
 ### constructor
 
 ```solidity
-constructor(address _levels, address _civilizations) public
+constructor(address _civilizations, address _levels) public
 ```
 
 Constructor.
@@ -88,8 +88,8 @@ Requirements:
 
 | Name            | Type    | Description                                                               |
 | --------------- | ------- | ------------------------------------------------------------------------- |
-| \_levels        | address | The address of the [Levels](/docs/codex/Levels.md) instance.              |
 | \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
+| \_levels        | address | The address of the [Levels](/docs/codex/Levels.md) instance.              |
 
 ### setLevels
 

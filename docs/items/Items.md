@@ -37,7 +37,7 @@ Map to store the list of authorized addresses to mint tokens.
 modifier onlyAuthorized()
 ```
 
-Checks against if the `msg.sender` is authorized to mint items.
+Checks if the `msg.sender` is authorized to mint items.
 
 ### AddItem
 
@@ -46,6 +46,22 @@ event AddItem(uint256 _item_id, string _name, string _description)
 ```
 
 Event emmited when the [addItem](#addItem) function is called.
+
+Requirements:
+
+| Name          | Type    | Description           |
+| ------------- | ------- | --------------------- |
+| \_item_id     | uint256 | ID of the item added. |
+| \_name        | string  | Name of the recipe.   |
+| \_description | string  | Recipe description    |
+
+### ItemUpdate
+
+```solidity
+event ItemUpdate(uint256 _item_id, string _name, string _description)
+```
+
+Event emmited when the [updateItem](#updateItem) function is called.
 
 Requirements:
 

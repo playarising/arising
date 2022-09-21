@@ -36,7 +36,7 @@ describe("Forge", () => {
     await this.civ.connect(this.receiver).mint(1);
 
     const Experience = await ethers.getContractFactory("Experience");
-    this.experience = await Experience.deploy(levels.address, this.civ.address);
+    this.experience = await Experience.deploy(this.civ.address, levels.address);
     await this.experience.deployed();
 
     const Items = await ethers.getContractFactory("Items");
@@ -93,7 +93,7 @@ describe("Forge", () => {
       ethers.utils.parseEther("49.99")
     );
     await this.forge.deployed();
-    await this.wood_plank.transferOwnership(this.forge.address);
+    await this.wood_plank.addAuthority(this.forge.address);
 
     await this.experience.addAuthority(this.forge.address);
   });

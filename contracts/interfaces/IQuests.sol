@@ -27,7 +27,6 @@ interface IQuests {
      * @param name                  Name of the quest.
      * @param description           Description of the quest.
      * @param quest_type            Type of the added quest.
-     * @param gold_reward           Amount of Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) tokens to reward.
      * @param resources_reward      Array of [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instances to reward for the quest.
      * @param resources_amounts     Array of amounts for each resource reward.
      * @param experience_reward     Amount of experience rewarded for the quest.
@@ -41,7 +40,6 @@ interface IQuests {
         string name;
         string description;
         QuestType quest_type;
-        uint256 gold_reward;
         address[] resources_reward;
         uint256[] resources_amounts;
         uint256 experience_reward;
@@ -84,7 +82,6 @@ interface IQuests {
         string memory _name,
         string memory _description,
         QuestType _quest_type,
-        uint256 _gold_reward,
         address[] memory _resources_reward,
         uint256[] memory _resources_amounts,
         uint256 _experience_reward,

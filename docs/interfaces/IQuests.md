@@ -23,7 +23,6 @@ struct Quest {
   string name;
   string description;
   enum IQuests.QuestType quest_type;
-  uint256 gold_reward;
   address[] resources_reward;
   uint256[] resources_amounts;
   uint256 experience_reward;
@@ -81,7 +80,7 @@ See [Quests#enableQuest](/docs/core/Quests.md#enableQuest)
 ### addQuest
 
 ```solidity
-function addQuest(string _name, string _description, enum IQuests.QuestType _quest_type, uint256 _gold_reward, address[] _resources_reward, uint256[] _resources_amounts, uint256 _experience_reward, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required) external
+function addQuest(string _name, string _description, enum IQuests.QuestType _quest_type, address[] _resources_reward, uint256[] _resources_amounts, uint256 _experience_reward, struct IStats.BasicStats _stats, uint256 _cooldown, uint256 _level_required) external
 ```
 
 See [Quests#addQuest](/docs/core/Quests.md#addQuest)

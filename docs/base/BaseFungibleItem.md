@@ -48,6 +48,22 @@ address wrapper
 
 Constant for the address of the [BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.md) instance.
 
+### enable_wrap
+
+```solidity
+bool enable_wrap
+```
+
+Constant to enable/disable the token wrap.
+
+### authorized
+
+```solidity
+mapping(address => bool) authorized
+```
+
+Map to store the list of authorized addresses to mint items.
+
 ### onlyAllowed
 
 ```solidity
@@ -62,6 +78,22 @@ Requirements:
 | Name | Type  | Description                   |
 | ---- | ----- | ----------------------------- |
 | \_id | bytes | Composed ID of the character. |
+
+### onlyEnabled
+
+```solidity
+modifier onlyEnabled()
+```
+
+Checks if the wrap functionality is enabled.
+
+### onlyAuthorized
+
+```solidity
+modifier onlyAuthorized()
+```
+
+Checks if the `msg.sender` is authorized to mint items.
 
 ### constructor
 
@@ -78,6 +110,48 @@ Requirements:
 | \_name          | string  | Name of the `ERC20` token.                                            |
 | \_symbol        | string  | Symbol of the `ERC20` token.                                          |
 | \_civilizations | address | Address of the [Civilizations](/docs/core/Civilizations.md) instance. |
+
+### addAuthority
+
+```solidity
+function addAuthority(address _authority) public
+```
+
+Assigns a new address as an authority to mint items.
+
+Requirements:
+
+| Name        | Type    | Description                |
+| ----------- | ------- | -------------------------- |
+| \_authority | address | Address to give authority. |
+
+### removeAuthority
+
+```solidity
+function removeAuthority(address _authority) public
+```
+
+Removes an authority to mint items.
+
+Requirements:
+
+| Name        | Type    | Description                |
+| ----------- | ------- | -------------------------- |
+| \_authority | address | Address to give authority. |
+
+### setWrapFunction
+
+```solidity
+function setWrapFunction(bool _enabled) public
+```
+
+Enables or disables the wrap function for the token.
+
+Requirements:
+
+| Name      | Type | Description                     |
+| --------- | ---- | ------------------------------- |
+| \_enabled | bool | Enable or diable wrap function. |
 
 ### mintTo
 

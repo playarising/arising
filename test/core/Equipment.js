@@ -190,7 +190,7 @@ describe("Equipment", () => {
     await levels.deployed();
 
     const Experience = await ethers.getContractFactory("Experience");
-    this.experience = await Experience.deploy(levels.address, this.civ.address);
+    this.experience = await Experience.deploy(this.civ.address, levels.address);
     await this.experience.deployed();
 
     const Equipment = await ethers.getContractFactory("Equipment");

@@ -36,7 +36,7 @@ describe("Quests", () => {
     await this.civ.connect(this.receiver).mint(1);
 
     const Experience = await ethers.getContractFactory("Experience");
-    this.experience = await Experience.deploy(levels.address, this.civ.address);
+    this.experience = await Experience.deploy(this.civ.address, levels.address);
     await this.experience.deployed();
 
     const Items = await ethers.getContractFactory("Items");
@@ -77,10 +77,8 @@ describe("Quests", () => {
       this.stats.address
     );
 
-    this.gold = BaseFungibleItem.attach(await this.quests.gold());
-
     await this.quests.deployed();
-    await this.resource.transferOwnership(this.quests.address);
+    await this.resource.addAuthority(this.quests.address);
     await this.experience.addAuthority(this.quests.address);
   });
 
@@ -137,7 +135,6 @@ describe("Quests", () => {
           "test",
           "test 2",
           0,
-          0,
           [],
           [],
           1,
@@ -154,7 +151,6 @@ describe("Quests", () => {
         "test",
         "test 2",
         0,
-        0,
         [this.resource.address],
         [],
         1,
@@ -170,7 +166,6 @@ describe("Quests", () => {
       "test",
       "test 2",
       0,
-      10,
       [this.resource.address],
       [10],
       100,
@@ -273,7 +268,6 @@ describe("Quests", () => {
     await ethers.provider.send("evm_mine", [quest.cooldown.toNumber()]);
     await this.quests.claimQuest(id);
     expect(await this.resource.balanceOf(id)).to.eq(3);
-    expect(await this.gold.balanceOf(id)).to.eq(3);
     expect(await this.experience.getExperience(id)).to.eq(10035);
     quest = await this.quests.getCharacterCurrentQuest(id);
     expect(quest.claimed_reward).to.eq(true);
@@ -286,7 +280,6 @@ describe("Quests", () => {
         "test",
         "test 2",
         0,
-        10,
         [this.resource.address],
         [10],
         100,
@@ -302,7 +295,6 @@ describe("Quests", () => {
     await ethers.provider.send("evm_mine", [quest.cooldown.toNumber()]);
     await this.quests.claimQuest(id);
     expect(await this.resource.balanceOf(id)).to.eq(13);
-    expect(await this.gold.balanceOf(id)).to.eq(13);
     expect(await this.experience.getExperience(id)).to.eq(10135);
   });
 

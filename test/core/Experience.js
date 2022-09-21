@@ -36,9 +36,10 @@ describe("Experience", () => {
     await this.civ.mint(1);
     const Experience = await ethers.getContractFactory("Experience");
     this.experience = await Experience.deploy(
-      this.levels.address,
-      this.civ.address
+      this.civ.address,
+      this.levels.address
     );
+
     await this.experience.deployed();
   });
 

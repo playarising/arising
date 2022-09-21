@@ -36,6 +36,12 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     /** @notice Constant for the address of the [BaseERC20Wrapper](/docs/base/BaseERC20Wrapper.md) instance. */
     address public wrapper;
 
+    /** @notice Constant to enable/disable the token wrap. */
+    bool public enable_wrap;
+
+    /** @notice Map to store the list of authorized addresses to mint items. */
+    mapping(address => bool) authorized;
+
     // =============================================== Modifiers ======================================================
 
     /**
@@ -53,6 +59,24 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
         require(
             ICivilizations(civilizations).isAllowed(msg.sender, _id),
             "BaseFungibleItem: onlyAllowed() msg.sender is not allowed to access this token."
+        );
+        _;
+    }
+
+    /** @notice Checks if the wrap functionality is enabled. */
+    modifier onlyEnabled() {
+        require(
+            enable_wrap,
+            "BaseFungibleItem: onlyEnabled() wrap is not enabled."
+        );
+        _;
+    }
+
+    /** @notice Checks if the `msg.sender` is authorized to mint items. */
+    modifier onlyAuthorized() {
+        require(
+            authorized[msg.sender],
+            "BaseFungibleItem: onlyAuthorized() msg.sender not authorized."
         );
         _;
     }
@@ -76,6 +100,42 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
         symbol = _symbol;
         civilizations = _civilizations;
         wrapper = address(new BaseERC20Wrapper(_name, _symbol));
+        enable_wrap = false;
+        authorized[msg.sender] = true;
+    }
+
+    /**
+     * @notice Assigns a new address as an authority to mint items.
+     *
+     * Requirements:
+     * @param _authority    Address to give authority.
+     */
+    function addAuthority(address _authority) public onlyOwner {
+        authorized[_authority] = true;
+    }
+
+    /**
+     * @notice Removes an authority to mint items.
+     *
+     * Requirements:
+     * @param _authority    Address to give authority.
+     */
+    function removeAuthority(address _authority) public onlyOwner {
+        require(
+            authorized[_authority],
+            "BaseFungibleItem: removeAuthority() address is not authorized."
+        );
+        authorized[_authority] = false;
+    }
+
+    /**
+     * @notice Enables or disables the wrap function for the token.
+     *
+     * Requirements:
+     * @param _enabled    Enable or diable wrap function.
+     */
+    function setWrapFunction(bool _enabled) public onlyOwner {
+        enable_wrap = _enabled;
     }
 
     /**
@@ -85,7 +145,7 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
      * @param _id       Composed ID of the character.
      * @param _amount   Amount of tokens to create.
      */
-    function mintTo(bytes memory _id, uint256 _amount) public onlyOwner {
+    function mintTo(bytes memory _id, uint256 _amount) public onlyAuthorized {
         _mint(_id, _amount);
     }
 
@@ -114,7 +174,11 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
      * @param _id       Composed ID of the character.
      * @param _amount   Amount of tokens to create.
      */
-    function wrap(bytes memory _id, uint256 _amount) public onlyAllowed(_id) {
+    function wrap(bytes memory _id, uint256 _amount)
+        public
+        onlyAllowed(_id)
+        onlyEnabled
+    {
         consume(_id, _amount);
         IBaseERC20Wrapper(wrapper).mint(
             ICivilizations(civilizations).ownerOf(_id),
@@ -129,7 +193,11 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
      * @param _id       Composed ID of the character.
      * @param _amount   Amount of tokens to create.
      */
-    function unwrap(bytes memory _id, uint256 _amount) public onlyAllowed(_id) {
+    function unwrap(bytes memory _id, uint256 _amount)
+        public
+        onlyAllowed(_id)
+        onlyEnabled
+    {
         ERC20Burnable(wrapper).burnFrom(msg.sender, _amount * 1 ether);
         _mint(_id, _amount);
     }

@@ -110,6 +110,22 @@ Requirements:
 | \_name        | string  | Name of the recipe.     |
 | \_description | string  | Recipe description      |
 
+### RecipeUpdate
+
+```solidity
+event RecipeUpdate(uint256 _recipe_id, string _name, string _description)
+```
+
+Event emmited when the [updateRecipe](#updateRecipe) function is called.
+
+Requirements:
+
+| Name          | Type    | Description             |
+| ------------- | ------- | ----------------------- |
+| \_recipe_id   | uint256 | ID of the recipe added. |
+| \_name        | string  | Name of the recipe.     |
+| \_description | string  | Recipe description      |
+
 ### EnableRecipe
 
 ```solidity
@@ -145,6 +161,22 @@ event AddUpgrade(uint256 _upgrade_id, string _name, string _description)
 ```
 
 Event emmited when the [addUpgrade](#addUpgrade) function is called.
+
+Requirements:
+
+| Name          | Type    | Description                  |
+| ------------- | ------- | ---------------------------- |
+| \_upgrade_id  | uint256 | ID of the the upgrade added. |
+| \_name        | string  | Name of the recipe.          |
+| \_description | string  | Recipe description           |
+
+### UpgradeUpdate
+
+```solidity
+event UpgradeUpdate(uint256 _upgrade_id, string _name, string _description)
+```
+
+Event emmited when the [updateUpgrade](#updateUpgrade) function is called.
 
 Requirements:
 
