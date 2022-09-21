@@ -31,14 +31,6 @@ address stats
 
 Address of the [Stats](/docs/core/Stats.md) instance.
 
-### gold
-
-```solidity
-address gold
-```
-
-Address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance.
-
 ### quests
 
 ```solidity

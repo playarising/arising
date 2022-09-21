@@ -31,9 +31,6 @@ contract Quests is IQuests, Ownable, Pausable {
     /** @notice Address of the [Stats](/docs/core/Stats.md) instance. */
     address public stats;
 
-    /** @notice Address of the Gold [BaseFungibleItem](/docs/base/BaseFungibleItem.md) instance. */
-    address public gold;
-
     /** @notice Map to track all the available quests. */
     mapping(uint256 => Quest) quests;
 
@@ -120,9 +117,6 @@ contract Quests is IQuests, Ownable, Pausable {
         civilizations = _civilizations;
         experience = _experience;
         stats = _stats;
-        gold = address(
-            new BaseFungibleItem("Arising: Gold", "GOLD", civilizations)
-        );
     }
 
     /** @notice Pauses the contract */
