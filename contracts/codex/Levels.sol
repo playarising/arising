@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
 import "../interfaces/ILevels.sol";
 
 /**
@@ -10,7 +14,7 @@ import "../interfaces/ILevels.sol";
  *
  * @notice Implementation of the [ILevels](/docs/interfaces/ILevels.md) interface.
  */
-contract Levels is ILevels {
+contract Levels is ILevels, Initializable, OwnableUpgradeable, UUPSUpgradeable {
     // =============================================== Storage ========================================================
 
     /** @notice Map to track the levels. */
@@ -19,10 +23,12 @@ contract Levels is ILevels {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      * @notice Initializes the lable table.
      */
-    constructor() {
+    function initialize() public initializer {
+        __UUPSUpgradeable_init();
+
         levels[0] = Level(0, 1000);
         levels[1] = Level(1000, 2020);
         levels[2] = Level(2020, 3060);
@@ -244,4 +250,12 @@ contract Levels is ILevels {
     {
         return levels[_level].max;
     }
+
+    /** @notice Internal function make sure upgrade proxy caller is the owner. */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        virtual
+        override
+        onlyOwner
+    {}
 }

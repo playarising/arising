@@ -4,6 +4,22 @@
 
 Interface for the [BaseERC721](/docs/base/BaseERC721.md) contract.
 
+### addAuthority
+
+```solidity
+function addAuthority(address _authority) external
+```
+
+See [BaseERC721#addAuthority](/docs/base/BaseERC721.md#addAuthority)
+
+### removeAuthority
+
+```solidity
+function removeAuthority(address _authority) external
+```
+
+See [BaseERC721#removeAuthority](/docs/base/BaseERC721.md#removeAuthority)
+
 ### mint
 
 ```solidity

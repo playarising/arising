@@ -70,13 +70,13 @@ Requirements:
 | \_id   | bytes  | Composed ID of the character. |
 | \_name | string | New name of the character.    |
 
-### constructor
+### initialize
 
 ```solidity
-constructor(address _civilizations, address _experience) public
+function initialize(address _civilizations, address _experience) public
 ```
 
-Constructor.
+Initialize.
 
 Requirements:
 
@@ -216,3 +216,11 @@ Requirements:
 | Name         | Type   | Description                               |
 | ------------ | ------ | ----------------------------------------- |
 | \_lower_case | string | The provided name as a lower case string. |
+
+### \_authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(address newImplementation) internal virtual
+```
+
+Internal function make sure upgrade proxy caller is the owner.

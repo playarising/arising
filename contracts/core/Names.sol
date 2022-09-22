@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/INames.sol";
@@ -16,7 +18,13 @@ import "../interfaces/IExperience.sol";
  *
  * @notice Implementation of the [INames](/docs/interfaces/INames.md) interface.
  */
-contract Names is INames, Pausable, Ownable {
+contract Names is
+    INames,
+    Initializable,
+    PausableUpgradeable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
     // =============================================== Storage ========================================================
     /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
     address public civilizations;
@@ -65,13 +73,20 @@ contract Names is INames, Pausable, Ownable {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      *
      * Requirements:
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      */
-    constructor(address _civilizations, address _experience) {
+    function initialize(address _civilizations, address _experience)
+        public
+        initializer
+    {
+        __Ownable_init();
+        __Pausable_init();
+        __UUPSUpgradeable_init();
+
         civilizations = _civilizations;
         experience = _experience;
     }
@@ -263,4 +278,14 @@ contract Names is INames, Pausable, Ownable {
         }
         return string(b_lower);
     }
+
+    // =============================================== Internal =======================================================
+
+    /** @notice Internal function make sure upgrade proxy caller is the owner. */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        virtual
+        override
+        onlyOwner
+    {}
 }

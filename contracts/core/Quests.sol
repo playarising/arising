@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "../base/BaseFungibleItem.sol";
 
@@ -19,7 +21,13 @@ import "../interfaces/IBaseFungibleItem.sol";
  *
  * @notice Implementation of the [IQuests](/docs/interfaces/IQuests.md) interface.
  */
-contract Quests is IQuests, Ownable, Pausable {
+contract Quests is
+    IQuests,
+    Initializable,
+    PausableUpgradeable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
     // =============================================== Storage ========================================================
 
     /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
@@ -109,11 +117,15 @@ contract Quests is IQuests, Ownable, Pausable {
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      * @param _stats            The address of the [Stats](/docs/core/Stats.md) instance.
      */
-    constructor(
+    function initialize(
         address _civilizations,
         address _experience,
         address _stats
-    ) {
+    ) public initializer {
+        __Ownable_init();
+        __Pausable_init();
+        __UUPSUpgradeable_init();
+
         civilizations = _civilizations;
         experience = _experience;
         stats = _stats;
@@ -378,4 +390,12 @@ contract Quests is IQuests, Ownable, Pausable {
             !character_quests[_id].claimed_reward &&
             character_quests[_id].last_quest_id != 0;
     }
+
+    /** @notice Internal function make sure upgrade proxy caller is the owner. */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        virtual
+        override
+        onlyOwner
+    {}
 }

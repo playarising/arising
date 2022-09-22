@@ -99,13 +99,13 @@ Requirements:
 | --------- | ------- | ---------------------------- |
 | \_item_id | uint256 | ID of the the item disabled. |
 
-### constructor
+### initialize
 
 ```solidity
-constructor() public
+function initialize() public
 ```
 
-Constructor.
+Initializer.
 
 ### mint
 
@@ -243,3 +243,11 @@ Requirements:
 | Name   | Type               | Description            |
 | ------ | ------------------ | ---------------------- |
 | \_item | struct IItems.Item | Full item information. |
+
+### \_authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(address newImplementation) internal virtual
+```
+
+Internal function make sure upgrade proxy caller is the owner.

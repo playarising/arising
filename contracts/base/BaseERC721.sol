@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "../interfaces/IBaseERC721.sol";
@@ -14,7 +17,12 @@ import "../interfaces/ICivilizations.sol";
  *
  * @notice Implementation of the [IBaseERC721](/docs/interfaces/IBaseERC721.md) interface.
  */
-contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
+contract BaseERC721 is
+    IBaseERC721,
+    Initializable,
+    ERC721EnumerableUpgradeable,
+    OwnableUpgradeable
+{
     // =============================================== Storage ========================================================
 
     /** @notice Constant for the base url of the token metadata. */
@@ -23,10 +31,24 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
     /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
     address public civilizations;
 
+    /** @notice Map to store the list of authorized addresses to mint tokens. */
+    mapping(address => bool) authorized;
+
+    // ============================================== Modifiers =======================================================
+
+    /** @notice Checks against if the `msg.sender` is authorized to mint tokens. */
+    modifier onlyAuthorized() {
+        require(
+            authorized[msg.sender],
+            "BaseERC721: onlyAuthorized() msg.sender not authorized."
+        );
+        _;
+    }
+
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      *
      * Requirements:
      * @param _name             Name of the `ERC721` token.
@@ -34,14 +56,42 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
      * @param _uri              Base url for the tokens metadata.
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      */
-    constructor(
+    function initialize(
         string memory _name,
         string memory _symbol,
         string memory _uri,
         address _civilizations
-    ) ERC721(_name, _symbol) {
+    ) public initializer {
+        __Ownable_init();
+        __ERC721_init(_name, _symbol);
+        __ERC721Enumerable_init();
         baseURI = _uri;
         civilizations = _civilizations;
+        authorized[msg.sender] = true;
+    }
+
+    /**
+     * @notice Assigns a new address as an authority to mint tokens.
+     *
+     * Requirements:
+     * @param _authority    Address to give authority.
+     */
+    function addAuthority(address _authority) public onlyOwner {
+        authorized[_authority] = true;
+    }
+
+    /**
+     * @notice Removes an authority to mint tokens.
+     *
+     * Requirements:
+     * @param _authority    Address to give authority.
+     */
+    function removeAuthority(address _authority) public onlyOwner {
+        require(
+            authorized[_authority],
+            "Experience: removeAuthority() address is not authorized."
+        );
+        authorized[_authority] = false;
     }
 
     /**
@@ -52,7 +102,7 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
      *
      * @return _token_id    The ID of the new token.
      */
-    function mint(address _to) public onlyOwner returns (uint256) {
+    function mint(address _to) public onlyAuthorized returns (uint256) {
         uint256 _token_id = totalSupply() + 1;
         _safeMint(_to, _token_id);
         return _token_id;
@@ -118,7 +168,6 @@ contract BaseERC721 is IBaseERC721, Ownable, ERC721Enumerable {
         uint256 tokenId
     ) internal virtual override {
         super._afterTokenTransfer(from, to, tokenId);
-
         ICivilizations(civilizations).transfer(from, to, tokenId);
     }
 }

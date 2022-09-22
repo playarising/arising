@@ -13,13 +13,14 @@ describe("BaseERC721", () => {
     await this.mock.deployed();
 
     const BaseERC721 = await ethers.getContractFactory("BaseERC721");
-    this.token = await BaseERC721.deploy(
+    this.token = await BaseERC721.deploy();
+    await this.token.deployed();
+    await this.token.initialize(
       "Test",
       "TEST",
       "https://test.uri/",
       this.mock.address
     );
-    await this.token.deployed();
   });
 
   it("should mint a token using the owner address", async () => {
@@ -34,7 +35,9 @@ describe("BaseERC721", () => {
   it("should fail when trying to mint as a non owner", async () => {
     await expect(
       this.token.connect(this.minter).mint(this.minter.address)
-    ).to.revertedWith("Ownable: caller is not the owner");
+    ).to.revertedWith(
+      "BaseERC721: onlyAuthorized() msg.sender not authorized."
+    );
   });
 
   it("should check if a token exists", async () => {
@@ -57,6 +60,30 @@ describe("BaseERC721", () => {
     await this.token.setApprovalForAll(this.minter.address, true);
     expect(await this.token.isApprovedOrOwner(this.minter.address, 2)).to.eq(
       true
+    );
+  });
+
+  it("should prevent adding or removing an authority from non owner", async () => {
+    await expect(
+      this.token.connect(this.minter).addAuthority(this.owner.address)
+    ).to.revertedWith("Ownable: caller is not the owner");
+    await expect(
+      this.token.connect(this.minter).removeAuthority(this.owner.address)
+    ).to.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("should add a second authority and mint tokens correctly", async () => {
+    await this.token.addAuthority(this.minter.address);
+    await this.token.connect(this.minter).mint(this.minter.address);
+    expect(await this.token.balanceOf(this.minter.address)).to.eq(1);
+  });
+
+  it("should remove the authority and prevent minting", async () => {
+    await this.token.removeAuthority(this.minter.address);
+    await expect(
+      this.token.connect(this.minter).mint(this.minter.address)
+    ).to.revertedWith(
+      "BaseERC721: onlyAuthorized() msg.sender not authorized."
     );
   });
 });

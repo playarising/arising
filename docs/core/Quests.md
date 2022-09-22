@@ -130,10 +130,10 @@ Requirements:
 | ---------- | ------- | -------------------------- |
 | \_quest_id | uint256 | ID of the recipe disabled. |
 
-### constructor
+### initialize
 
 ```solidity
-constructor(address _civilizations, address _experience, address _stats) public
+function initialize(address _civilizations, address _experience, address _stats) public
 ```
 
 Constructor.
@@ -327,3 +327,11 @@ Requirements:
 | Name        | Type | Description                                     |
 | ----------- | ---- | ----------------------------------------------- |
 | \_claimable | bool | Boolean to know if the last quest is claimable. |
+
+### \_authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(address newImplementation) internal virtual
+```
+
+Internal function make sure upgrade proxy caller is the owner.

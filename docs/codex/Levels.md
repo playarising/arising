@@ -15,13 +15,13 @@ mapping(uint256 => struct ILevels.Level) levels
 
 Map to track the levels.
 
-### constructor
+### initialize
 
 ```solidity
-constructor() public
+function initialize() public
 ```
 
-Constructor.
+Initialize.
 Initializes the lable table.
 
 ### getLevel
@@ -59,3 +59,11 @@ Requirements:
 | Name         | Type    | Description                                      |
 | ------------ | ------- | ------------------------------------------------ |
 | \_experience | uint256 | Experience required to reach the level provided. |
+
+### \_authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(address newImplementation) internal virtual
+```
+
+Internal function make sure upgrade proxy caller is the owner.

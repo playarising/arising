@@ -92,13 +92,13 @@ Requirements:
 | \_id   | bytes                         | Composed ID of the character. |
 | \_slot | enum IEquipment.EquipmentSlot | Slot of the item unequipped.  |
 
-### constructor
+### initialize
 
 ```solidity
-constructor(address _civilizations, address _experience, address _items) public
+function initialize(address _civilizations, address _experience, address _items) public
 ```
 
-Constructor.
+Initializer.
 
 Requirements:
 
@@ -205,3 +205,11 @@ Requirements:
 | Name        | Type                         | Description              |
 | ----------- | ---------------------------- | ------------------------ |
 | \_modifiers | struct IItems.BaseAttributes | The amount of modifiers. |
+
+### \_authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(address newImplementation) internal virtual
+```
+
+Internal function make sure upgrade proxy caller is the owner.

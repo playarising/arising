@@ -214,13 +214,13 @@ Requirements:
 | ------------ | ------- | --------------------------- |
 | \_upgrade_id | uint256 | ID of the the recipe added. |
 
-### constructor
+### initialize
 
 ```solidity
-constructor(address _civilizations, address _experience, address _stats, address _items) public
+function initialize(address _civilizations, address _experience, address _stats, address _items) public
 ```
 
-Constructor.
+Initialize.
 
 Requirements:
 
@@ -508,3 +508,11 @@ Requirements:
 | Name | Type | Description                                           |
 | ---- | ---- | ----------------------------------------------------- |
 | [0]  | bool | \_available Boolean to know if the slot is claimable. |
+
+### \_authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(address newImplementation) internal virtual
+```
+
+Internal function make sure upgrade proxy caller is the owner.

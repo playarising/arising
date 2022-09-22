@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "../interfaces/ILevels.sol";
 import "../interfaces/IExperience.sol";
@@ -13,7 +16,13 @@ import "../interfaces/ICivilizations.sol";
  *
  * @notice Implementation of the [IExperience](/docs/interfaces/IExperience.md) interface.
  */
-contract Experience is IExperience, Ownable {
+contract Experience is
+    IExperience,
+    Initializable,
+    PausableUpgradeable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
     // =============================================== Storage ========================================================
 
     /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
@@ -62,26 +71,23 @@ contract Experience is IExperience, Ownable {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      *
      * Requirements:
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _levels           The address of the [Levels](/docs/codex/Levels.md) instance.
      */
-    constructor(address _civilizations, address _levels) {
+    function initialize(address _civilizations, address _levels)
+        public
+        initializer
+    {
+        __Ownable_init();
+        __Pausable_init();
+        __UUPSUpgradeable_init();
+
         civilizations = _civilizations;
         levels = _levels;
         authorized[msg.sender] = true;
-    }
-
-    /**
-     * @notice Replaces the address of the [Levels](/docs/codex/Levels.md) instance to determine character levels.
-     *
-     * Requirements:
-     * @param _levels    Address of the [Levels](/docs/codex/Levels.md) instance.
-     */
-    function setLevels(address _levels) public onlyOwner {
-        levels = _levels;
     }
 
     /**
@@ -177,4 +183,14 @@ contract Experience is IExperience, Ownable {
     {
         return ILevels(levels).getExperience(getLevel(_id)) - experience[_id];
     }
+
+    // =============================================== Internal =======================================================
+
+    /** @notice Internal function make sure upgrade proxy caller is the owner. */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        virtual
+        override
+        onlyOwner
+    {}
 }

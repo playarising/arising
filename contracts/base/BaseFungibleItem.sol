@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/IBaseFungibleItem.sol";
@@ -18,7 +19,11 @@ import "./BaseERC20Wrapper.sol";
  *
  * @notice Implementation of the [IBaseFungibleItem](/docs/interfaces/IBaseFungibleItem.md) interface.
  */
-contract BaseFungibleItem is IBaseFungibleItem, Ownable {
+contract BaseFungibleItem is
+    IBaseFungibleItem,
+    Initializable,
+    OwnableUpgradeable
+{
     // =============================================== Storage ========================================================
 
     /** @notice Constant for the name of the item. */
@@ -84,18 +89,19 @@ contract BaseFungibleItem is IBaseFungibleItem, Ownable {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      *
      * Requirements:
      * @param _name             Name of the `ERC20` token.
      * @param _symbol           Symbol of the `ERC20` token.
      * @param _civilizations    Address of the [Civilizations](/docs/core/Civilizations.md) instance.
      */
-    constructor(
+    function initialize(
         string memory _name,
         string memory _symbol,
         address _civilizations
-    ) {
+    ) public initializer {
+        __Ownable_init();
         name = _name;
         symbol = _symbol;
         civilizations = _civilizations;

@@ -16,13 +16,15 @@ describe("BaseGadgetToken", () => {
     await this.mock2.deployed();
 
     const BaseGadgetToken = await ethers.getContractFactory("BaseGadgetToken");
-    this.token = await BaseGadgetToken.deploy(
+    this.token = await BaseGadgetToken.deploy();
+
+    await this.token.deployed();
+    await this.token.initialize(
       "Test",
       "TEST",
       this.mock.address,
       ethers.utils.parseEther("1")
     );
-    await this.token.deployed();
   });
 
   it("should deploy everything correctly", async () => {

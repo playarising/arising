@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "../interfaces/IBaseERC721.sol";
 import "../interfaces/ICivilizations.sol";
@@ -18,7 +20,13 @@ import "../interfaces/ICivilizations.sol";
  * @notice Implementation of the [ICivilizations](/docs/interfaces/ICivilizations.md) interface.
  */
 
-contract Civilizations is ICivilizations, Ownable, Pausable {
+contract Civilizations is
+    ICivilizations,
+    Initializable,
+    PausableUpgradeable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
     using Address for address;
 
     // =============================================== Storage ========================================================
@@ -90,12 +98,15 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      *
      * Requirements:
      * @param _token    Address of the token used to purchase upgrades.
      */
-    constructor(address _token) {
+    function initialize(address _token) public initializer {
+        __Ownable_init();
+        __Pausable_init();
+        __UUPSUpgradeable_init();
         token = _token;
         upgrades[1] = Upgrade(0, false);
         upgrades[2] = Upgrade(0, false);
@@ -199,10 +210,6 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
         require(
             _civilization != address(0),
             "Civilizations: addCivilization() civilization address is empty."
-        );
-        require(
-            address(this) == Ownable(_civilization).owner(),
-            "Civilizations: addCivilization() missing civilization ownership."
         );
         uint256 _civilization_id = _civilizations.length + 1;
         civilizations[_civilization_id] = _civilization;
@@ -461,4 +468,12 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     {
         return abi.decode(_id, (uint256, uint256));
     }
+
+    /** @notice Internal function make sure upgrade proxy caller is the owner. */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        virtual
+        override
+        onlyOwner
+    {}
 }

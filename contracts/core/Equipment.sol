@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/IExperience.sol";
@@ -18,7 +20,14 @@ import "../interfaces/IStats.sol";
  *
  * @notice Implementation of the [IEquipment](/docs/interfaces/IEquipment.md) interface.
  */
-contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
+contract Equipment is
+    IEquipment,
+    ERC1155Holder,
+    Initializable,
+    PausableUpgradeable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
     // =============================================== Storage ========================================================
 
     /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
@@ -81,18 +90,22 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initializer.
      *
      * Requirements:
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      * @param _items            The address of the [Items](/docs/items/Items.md) instance.
      */
-    constructor(
+    function initialize(
         address _civilizations,
         address _experience,
         address _items
-    ) {
+    ) public initializer {
+        __Ownable_init();
+        __Pausable_init();
+        __UUPSUpgradeable_init();
+
         civilizations = _civilizations;
         experience = _experience;
         items = _items;
@@ -348,4 +361,14 @@ contract Equipment is IEquipment, Ownable, ERC1155Holder, Pausable {
             _modifiers.rate = _additions.rate - _reductions.rate;
         }
     }
+
+    // =============================================== Internal =======================================================
+
+    /** @notice Internal function make sure upgrade proxy caller is the owner. */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        virtual
+        override
+        onlyOwner
+    {}
 }

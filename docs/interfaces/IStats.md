@@ -39,22 +39,6 @@ function setRefreshCooldown(uint256 _cooldown) external
 
 See [Stats#setRefreshCooldown](/docs/codex/Stats.md#setRefreshCooldown)
 
-### setRefreshToken
-
-```solidity
-function setRefreshToken(address _refresher) external
-```
-
-See [Stats#setRefreshToken](/docs/codex/Stats.md#setRefreshToken)
-
-### setVitalizerToken
-
-```solidity
-function setVitalizerToken(address _vitalizer) external
-```
-
-See [Stats#setVitalizerToken](/docs/codex/Stats.md#setVitalizerToken)
-
 ### consume
 
 ```solidity

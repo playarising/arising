@@ -4,14 +4,6 @@
 
 Interface for the [Experience](/docs/core/Experience.md) contract.
 
-### setLevels
-
-```solidity
-function setLevels(address _levels) external
-```
-
-See [Experience#setLevel](/docs/core/Experience.md#setLevel)
-
 ### assignExperience
 
 ```solidity

@@ -125,13 +125,13 @@ Requirements:
 | \_to   | address | New owner of the character.                         |
 | \_id   | bytes   | Composed ID of the character                        |
 
-### constructor
+### initialize
 
 ```solidity
-constructor(address _token) public
+function initialize(address _token) public
 ```
 
-Constructor.
+Initialize.
 
 Requirements:
 
@@ -428,3 +428,11 @@ Requirements:
 | -------------- | ------- | ------------------------------------ |
 | \_civilization | uint256 | The internal ID of the civilization. |
 | \_token_id     | uint256 | The token id of the composed ID.     |
+
+### \_authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(address newImplementation) internal virtual
+```
+
+Internal function make sure upgrade proxy caller is the owner.

@@ -188,12 +188,12 @@ async function main() {
   await (await items.addAuthority(craft.address)).wait();
   await (await experience.addAuthority(quests.address)).wait();
 
-  await (await ard.transferOwnership(civ.address)).wait();
-  await (await hartheim.transferOwnership(civ.address)).wait();
-  await (await ikarans.transferOwnership(civ.address)).wait();
-  await (await shinkari.transferOwnership(civ.address)).wait();
-  await (await tarki.transferOwnership(civ.address)).wait();
-  await (await zhand.transferOwnership(civ.address)).wait();
+  await (await ard.addAuthority(civ.address)).wait();
+  await (await hartheim.addAuthority(civ.address)).wait();
+  await (await ikarans.addAuthority(civ.address)).wait();
+  await (await shinkari.addAuthority(civ.address)).wait();
+  await (await tarki.addAuthority(civ.address)).wait();
+  await (await zhand.addAuthority(civ.address)).wait();
 
   await (await civ.addCivilization(ard.address)).wait();
   await (await civ.addCivilization(hartheim.address)).wait();

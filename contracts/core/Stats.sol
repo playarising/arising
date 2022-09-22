@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/IExperience.sol";
@@ -17,7 +19,13 @@ import "../interfaces/IEquipment.sol";
  *
  * @notice Implementation of the [IStats](/docs/interfaces/IStats.md) interface.
  */
-contract Stats is IStats, Ownable, Pausable {
+contract Stats is
+    IStats,
+    Initializable,
+    PausableUpgradeable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
     // =============================================== Storage ========================================================
 
     /** @notice Constant amount of seconds for refresh cooldown.  **/
@@ -93,21 +101,31 @@ contract Stats is IStats, Ownable, Pausable {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      *
      * Requirements:
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      * @param _equipment       The address of the [Equipment](/docs/core/Equipment.md) instance.
+     * @param _refresher    Address of the Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance.
+     * @param _vitalizer    Address of the Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance.
      */
-    constructor(
+    function initialize(
         address _civilizations,
         address _experience,
-        address _equipment
-    ) {
+        address _equipment,
+        address _refresher,
+        address _vitalizer
+    ) public initializer {
+        __Ownable_init();
+        __Pausable_init();
+        __UUPSUpgradeable_init();
+
         civilizations = _civilizations;
         experience = _experience;
         equipment = _equipment;
+        refresher = _refresher;
+        vitalizer = _vitalizer;
         REFRESH_COOLDOWN_SECONDS = 86400; // 1 day
     }
 
@@ -129,26 +147,6 @@ contract Stats is IStats, Ownable, Pausable {
      */
     function setRefreshCooldown(uint256 _cooldown) public onlyOwner {
         REFRESH_COOLDOWN_SECONDS = _cooldown;
-    }
-
-    /**
-     * @notice Changes the Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance to use for paid refreshes.
-     *
-     * Requirements:
-     * @param _refresher    Address of the new Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance.
-     */
-    function setRefreshToken(address _refresher) public onlyOwner {
-        refresher = _refresher;
-    }
-
-    /**
-     * @notice Changes the Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance to use for sacrifice points recover.
-     *
-     * Requirements:
-     * @param _vitalizer    Address of the new Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance.
-     */
-    function setVitalizerToken(address _vitalizer) public onlyOwner {
-        vitalizer = _vitalizer;
     }
 
     /**
@@ -488,4 +486,12 @@ contract Stats is IStats, Ownable, Pausable {
         uint256 points = 6;
         return points + _level;
     }
+
+    /** @notice Internal function make sure upgrade proxy caller is the owner. */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        virtual
+        override
+        onlyOwner
+    {}
 }

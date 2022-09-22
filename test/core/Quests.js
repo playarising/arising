@@ -11,24 +11,25 @@ describe("Quests", () => {
     const Levels = await ethers.getContractFactory("Levels");
     const levels = await Levels.deploy();
     await levels.deployed();
-
+    await levels.initialize();
     const MockToken = await ethers.getContractFactory("MockToken");
     this.mock = await MockToken.deploy(ethers.utils.parseEther("1000"));
     await this.mock.deployed();
 
     const Civilizations = await ethers.getContractFactory("Civilizations");
-    this.civ = await Civilizations.deploy(this.mock.address);
+    this.civ = await Civilizations.deploy();
     await this.civ.deployed();
-
+    await this.civ.initialize(this.mock.address);
     const BaseERC721 = await ethers.getContractFactory("BaseERC721");
-    this.collection = await BaseERC721.deploy(
+    this.collection = await BaseERC721.deploy();
+    await this.collection.deployed();
+    await this.collection.initialize(
       "Test Collection",
       "TEST",
       "https://test.uri/",
       this.civ.address
     );
-    await this.collection.deployed();
-    await this.collection.transferOwnership(this.civ.address);
+    await this.collection.addAuthority(this.civ.address);
 
     await this.civ.addCivilization(this.collection.address);
 
@@ -36,48 +37,66 @@ describe("Quests", () => {
     await this.civ.connect(this.receiver).mint(1);
 
     const Experience = await ethers.getContractFactory("Experience");
-    this.experience = await Experience.deploy(this.civ.address, levels.address);
+    this.experience = await Experience.deploy();
     await this.experience.deployed();
-
+    await this.experience.initialize(this.civ.address, levels.address);
     const Items = await ethers.getContractFactory("Items");
     this.items = await Items.deploy();
     await this.items.deployed();
-
+    await this.items.initialize();
     const Equipment = await ethers.getContractFactory("Equipment");
-    this.equipment = await Equipment.deploy(
+    this.equipment = await Equipment.deploy();
+    await this.equipment.deployed();
+    await this.equipment.initialize(
       this.civ.address,
       this.experience.address,
       this.items.address
     );
-    await this.equipment.deployed();
+    const BaseGadgetToken = await ethers.getContractFactory("BaseGadgetToken");
+    this.refresher = await BaseGadgetToken.deploy();
+    await this.refresher.deployed();
+    await this.refresher.initialize(
+      "Arising: Refresher",
+      "REFRESER",
+      this.mock.address,
+      ethers.utils.parseEther("1")
+    );
+    this.vitalizer = await BaseGadgetToken.deploy();
+    await this.vitalizer.deployed();
+    await this.vitalizer.initialize(
+      "Arising: Vitalizer",
+      "VITALIZER",
+      this.mock.address,
+      ethers.utils.parseEther("1")
+    );
 
     const Stats = await ethers.getContractFactory("Stats");
-    this.stats = await Stats.deploy(
+    this.stats = await Stats.deploy();
+    await this.stats.deployed();
+    await this.stats.initialize(
       this.civ.address,
       this.experience.address,
-      this.equipment.address
+      this.equipment.address,
+      this.refresher.address,
+      this.vitalizer.address
     );
-    await this.stats.deployed();
-
     const BaseFungibleItem = await ethers.getContractFactory(
       "BaseFungibleItem"
     );
 
-    this.resource = await BaseFungibleItem.deploy(
-      "Ard: Resource",
-      "WOOD",
-      this.civ.address
-    );
+    this.resource = await BaseFungibleItem.deploy();
     await this.resource.deployed();
-
+    await this.resource.initialize("Ard: Resource", "WOOD", this.civ.address);
     const Quests = await ethers.getContractFactory("Quests");
-    this.quests = await Quests.deploy(
+    this.quests = await Quests.deploy();
+
+    await this.quests.deployed();
+
+    await this.quests.initialize(
       this.civ.address,
       this.experience.address,
       this.stats.address
     );
-
-    await this.quests.deployed();
     await this.resource.addAuthority(this.quests.address);
     await this.experience.addAuthority(this.quests.address);
   });
