@@ -283,6 +283,7 @@ async function main() {
     }
   );
   await quests.deployed();
+  await (await experience.addAuthority(quests.address)).wait();
   console.log("==> Quests deployed:", quests.address);
 
   const BaseFungibleItem = await ethers.getContractFactory("BaseFungibleItem");
