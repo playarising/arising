@@ -36,6 +36,7 @@
 
 | Contract       | Mainnet                                      |
 | -------------- | -------------------------------------------- |
+| **Gold**       | `0xBd0630DBAF2FFbc35Db62f8D4a445DA3c5EA5EDF` |
 | **Wood**       | `0xac13480D98b223d3AA08AC4C407122C5F1d53B0C` |
 | **Bones**      | `0xbB38384400726F679Dbc2AED5D42A1e8C430b30C` |
 | **Cooper**     | `0xB135291711CA13D543cc540a4FF8d971Cc7E433b` |
@@ -67,7 +68,6 @@
 
 | Contract      | Mainnet                                      |
 | ------------- | -------------------------------------------- |
-| **Gold**      | `0xBd0630DBAF2FFbc35Db62f8D4a445DA3c5EA5EDF` |
 | **Refresher** | `0x97E23E2Cea2111e279AA287Bb61206c3db651875` |
 | **Vitalizer** | `0xB9eD06013c95DFc79Fd55Ca71860C2938Fb82b97` |
 
