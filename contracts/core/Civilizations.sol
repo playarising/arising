@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -27,7 +27,7 @@ contract Civilizations is
     OwnableUpgradeable,
     UUPSUpgradeable
 {
-    using Address for address;
+    using AddressUpgradeable for address;
 
     // =============================================== Storage ========================================================
     /** @notice Map to track the supported [BaseERC721](/docs/base/BaseERC721.md) instances. */
@@ -446,7 +446,7 @@ contract Civilizations is
      */
     function _canMint(address _minter) internal view returns (bool) {
         require(
-            !Address.isContract(_minter),
+            !_minter.isContract(),
             "Civilizations: _canMint() contract cannot mint."
         );
         return _minters[_minter] < 5;
