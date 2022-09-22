@@ -185,7 +185,8 @@ async function main() {
   await (await stats.setRefreshToken(refresher.address)).wait();
   await (await stats.setVitalizerToken(vitalizer.address)).wait();
 
-  await (await items.transferOwnership(craft.address)).wait();
+  await (await items.addAuthority(craft.address)).wait();
+  await (await experience.addAuthority(quests.address)).wait();
 
   await (await ard.transferOwnership(civ.address)).wait();
   await (await hartheim.transferOwnership(civ.address)).wait();
