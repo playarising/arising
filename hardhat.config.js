@@ -34,11 +34,7 @@ require("solidity-docgen");
 module.exports = {
   defaultNetwork: "hardhat",
   networks: {
-    mainnet: {
-      url: process.env.RPC_URL,
-      gasPrice: 60000000000,
-      accounts: [process.env.PRIVATE_KEY],
-    },
+   hardhat: {}
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API,
