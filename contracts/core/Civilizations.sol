@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "../interfaces/IBaseERC721.sol";
 import "../interfaces/ICivilizations.sol";
@@ -25,7 +26,8 @@ contract Civilizations is
     ICivilizations,
     Initializable,
     PausableUpgradeable,
-    OwnableUpgradeable
+    OwnableUpgradeable,
+    UUPSUpgradeable
 {
     using Address for address;
 
@@ -106,6 +108,7 @@ contract Civilizations is
     function initialize(address _token) public initializer {
         __Ownable_init();
         __Pausable_init();
+        __UUPSUpgradeable_init();
         token = _token;
         upgrades[1] = Upgrade(0, false);
         upgrades[2] = Upgrade(0, false);
@@ -471,4 +474,12 @@ contract Civilizations is
     {
         return abi.decode(_id, (uint256, uint256));
     }
+
+    /** @notice Internal function make sure upgrade proxy caller is the owner. */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        virtual
+        override
+        onlyOwner
+    {}
 }

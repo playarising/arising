@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/INames.sol";
@@ -23,7 +24,8 @@ contract Names is
     INames,
     Initializable,
     PausableUpgradeable,
-    OwnableUpgradeable
+    OwnableUpgradeable,
+    UUPSUpgradeable
 {
     // =============================================== Storage ========================================================
     /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
@@ -85,6 +87,8 @@ contract Names is
     {
         __Ownable_init();
         __Pausable_init();
+        __UUPSUpgradeable_init();
+
         civilizations = _civilizations;
         experience = _experience;
     }
@@ -276,4 +280,14 @@ contract Names is
         }
         return string(b_lower);
     }
+
+    // =============================================== Internal =======================================================
+
+    /** @notice Internal function make sure upgrade proxy caller is the owner. */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        virtual
+        override
+        onlyOwner
+    {}
 }

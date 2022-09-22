@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/IExperience.sol";
@@ -24,7 +25,8 @@ contract Stats is
     IStats,
     Initializable,
     PausableUpgradeable,
-    OwnableUpgradeable
+    OwnableUpgradeable,
+    UUPSUpgradeable
 {
     // =============================================== Storage ========================================================
 
@@ -115,6 +117,8 @@ contract Stats is
     ) public initializer {
         __Ownable_init();
         __Pausable_init();
+        __UUPSUpgradeable_init();
+
         civilizations = _civilizations;
         experience = _experience;
         equipment = _equipment;
@@ -498,4 +502,12 @@ contract Stats is
         uint256 points = 6;
         return points + _level;
     }
+
+    /** @notice Internal function make sure upgrade proxy caller is the owner. */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        virtual
+        override
+        onlyOwner
+    {}
 }

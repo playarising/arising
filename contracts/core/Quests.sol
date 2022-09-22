@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "../base/BaseFungibleItem.sol";
 
@@ -26,7 +27,8 @@ contract Quests is
     IQuests,
     Initializable,
     PausableUpgradeable,
-    OwnableUpgradeable
+    OwnableUpgradeable,
+    UUPSUpgradeable
 {
     // =============================================== Storage ========================================================
 
@@ -124,6 +126,8 @@ contract Quests is
     ) public initializer {
         __Ownable_init();
         __Pausable_init();
+        __UUPSUpgradeable_init();
+
         civilizations = _civilizations;
         experience = _experience;
         stats = _stats;
@@ -388,4 +392,12 @@ contract Quests is
             !character_quests[_id].claimed_reward &&
             character_quests[_id].last_quest_id != 0;
     }
+
+    /** @notice Internal function make sure upgrade proxy caller is the owner. */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        virtual
+        override
+        onlyOwner
+    {}
 }

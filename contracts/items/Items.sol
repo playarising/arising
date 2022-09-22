@@ -7,6 +7,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "../interfaces/IItems.sol";
 
@@ -17,7 +18,12 @@ import "../interfaces/IItems.sol";
  *
  * @notice Implementation of the [IItems](/docs/interfaces/IItems.md) interface.
  */
-contract Items is IItems, ERC1155Upgradeable, OwnableUpgradeable {
+contract Items is
+    IItems,
+    ERC1155Upgradeable,
+    OwnableUpgradeable,
+    UUPSUpgradeable
+{
     // =============================================== Storage ========================================================
 
     /** @notice Map to track the extra items data. */
@@ -85,6 +91,8 @@ contract Items is IItems, ERC1155Upgradeable, OwnableUpgradeable {
      */
     function initialize() public initializer {
         __Ownable_init();
+        __UUPSUpgradeable_init();
+
         __ERC1155_init("https://items.playarising.com/{id}");
         authorized[msg.sender] = true;
     }
@@ -239,4 +247,14 @@ contract Items is IItems, ERC1155Upgradeable, OwnableUpgradeable {
         );
         return items[_item_id];
     }
+
+    // =============================================== Internal =======================================================
+
+    /** @notice Internal function make sure upgrade proxy caller is the owner. */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        virtual
+        override
+        onlyOwner
+    {}
 }

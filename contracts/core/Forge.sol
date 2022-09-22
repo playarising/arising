@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "../interfaces/IForge.sol";
 import "../interfaces/ICivilizations.sol";
@@ -25,7 +26,8 @@ contract Forge is
     IForge,
     Initializable,
     PausableUpgradeable,
-    OwnableUpgradeable
+    OwnableUpgradeable,
+    UUPSUpgradeable
 {
     // =============================================== Storage ========================================================
 
@@ -133,6 +135,8 @@ contract Forge is
     ) public initializer {
         __Ownable_init();
         __Pausable_init();
+        __UUPSUpgradeable_init();
+
         civilizations = _civilizations;
         experience = _experience;
         stats = _stats;
@@ -523,4 +527,12 @@ contract Forge is
             !forges[_id][_forge_id].last_recipe_claimed &&
             forges[_id][_forge_id].last_recipe != 0;
     }
+
+    /** @notice Internal function make sure upgrade proxy caller is the owner. */
+    function _authorizeUpgrade(address newImplementation)
+        internal
+        virtual
+        override
+        onlyOwner
+    {}
 }
