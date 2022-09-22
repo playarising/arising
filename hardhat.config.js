@@ -29,12 +29,17 @@ if (argv.enableGasReport) {
 
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
+require("@openzeppelin/hardhat-upgrades");
 require("solidity-docgen");
 
 module.exports = {
   defaultNetwork: "hardhat",
   networks: {
-   hardhat: {}
+    mainnet: {
+      url: process.env.RPC_URL,
+      gasPrice: 60000000000,
+      accounts: [process.env.PRIVATE_KEY],
+    },
   },
   etherscan: {
     apiKey: process.env.ETHERSCAN_API,
