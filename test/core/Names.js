@@ -14,9 +14,9 @@ describe("Names", () => {
     await this.mock.deployed();
 
     const Civilizations = await ethers.getContractFactory("Civilizations");
-    this.civ = await Civilizations.deploy(this.mock.address);
+    this.civ = await Civilizations.deploy();
     await this.civ.deployed();
-
+    await this.civ.initialize(this.mock.address);
     const BaseERC721 = await ethers.getContractFactory("BaseERC721");
     this.collection = await BaseERC721.deploy(
       "Test Collection",
@@ -36,14 +36,15 @@ describe("Names", () => {
     const Levels = await ethers.getContractFactory("Levels");
     const levels = await Levels.deploy();
     await levels.deployed();
-
+    await levels.initialize();
     const Experience = await ethers.getContractFactory("Experience");
-    this.experience = await Experience.deploy(this.civ.address, levels.address);
+    this.experience = await Experience.deploy();
     await this.experience.deployed();
-
+    await this.experience.initialize(this.civ.address, levels.address);
     const Names = await ethers.getContractFactory("Names");
-    this.names = await Names.deploy(this.civ.address, this.experience.address);
+    this.names = await Names.deploy();
     await this.names.deployed();
+    await this.names.initialize(this.civ.address, this.experience.address);
   });
 
   it("should not be able to claim a name when paused", async () => {

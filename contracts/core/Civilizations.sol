@@ -6,6 +6,9 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 import "../interfaces/IBaseERC721.sol";
 import "../interfaces/ICivilizations.sol";
@@ -18,7 +21,12 @@ import "../interfaces/ICivilizations.sol";
  * @notice Implementation of the [ICivilizations](/docs/interfaces/ICivilizations.md) interface.
  */
 
-contract Civilizations is ICivilizations, Ownable, Pausable {
+contract Civilizations is
+    ICivilizations,
+    Initializable,
+    PausableUpgradeable,
+    OwnableUpgradeable
+{
     using Address for address;
 
     // =============================================== Storage ========================================================
@@ -90,12 +98,14 @@ contract Civilizations is ICivilizations, Ownable, Pausable {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      *
      * Requirements:
      * @param _token    Address of the token used to purchase upgrades.
      */
-    constructor(address _token) {
+    function initialize(address _token) public initializer {
+        __Ownable_init();
+        __Pausable_init();
         token = _token;
         upgrades[1] = Upgrade(0, false);
         upgrades[2] = Upgrade(0, false);

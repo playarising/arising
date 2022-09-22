@@ -12,15 +12,15 @@ describe("Experience", () => {
     const Levels = await ethers.getContractFactory("Levels");
     this.levels = await Levels.deploy();
     await this.levels.deployed();
-
+    await this.levels.initialize();
     const MockToken = await ethers.getContractFactory("MockToken");
     this.mock = await MockToken.deploy(ethers.utils.parseEther("100"));
     await this.mock.deployed();
 
     const Civilizations = await ethers.getContractFactory("Civilizations");
-    this.civ = await Civilizations.deploy(this.mock.address);
+    this.civ = await Civilizations.deploy();
     await this.civ.deployed();
-
+    await this.civ.initialize(this.mock.address);
     const BaseERC721 = await ethers.getContractFactory("BaseERC721");
     this.collection = await BaseERC721.deploy(
       "Test Collection",
@@ -35,12 +35,10 @@ describe("Experience", () => {
 
     await this.civ.mint(1);
     const Experience = await ethers.getContractFactory("Experience");
-    this.experience = await Experience.deploy(
-      this.civ.address,
-      this.levels.address
-    );
+    this.experience = await Experience.deploy();
 
     await this.experience.deployed();
+    await this.experience.initialize(this.civ.address, this.levels.address);
   });
 
   it("should deploy everything correctly", async () => {

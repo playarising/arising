@@ -125,13 +125,13 @@ Requirements:
 | \_to   | address | New owner of the character.                         |
 | \_id   | bytes   | Composed ID of the character                        |
 
-### constructor
+### initialize
 
 ```solidity
-constructor(address _token) public
+function initialize(address _token) public
 ```
 
-Constructor.
+Initialize.
 
 Requirements:
 

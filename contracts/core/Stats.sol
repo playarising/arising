@@ -4,6 +4,9 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 import "../interfaces/ICivilizations.sol";
 import "../interfaces/IExperience.sol";
@@ -17,7 +20,12 @@ import "../interfaces/IEquipment.sol";
  *
  * @notice Implementation of the [IStats](/docs/interfaces/IStats.md) interface.
  */
-contract Stats is IStats, Ownable, Pausable {
+contract Stats is
+    IStats,
+    Initializable,
+    PausableUpgradeable,
+    OwnableUpgradeable
+{
     // =============================================== Storage ========================================================
 
     /** @notice Constant amount of seconds for refresh cooldown.  **/
@@ -93,18 +101,20 @@ contract Stats is IStats, Ownable, Pausable {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      *
      * Requirements:
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      * @param _equipment       The address of the [Equipment](/docs/core/Equipment.md) instance.
      */
-    constructor(
+    function initialize(
         address _civilizations,
         address _experience,
         address _equipment
-    ) {
+    ) public initializer {
+        __Ownable_init();
+        __Pausable_init();
         civilizations = _civilizations;
         experience = _experience;
         equipment = _equipment;

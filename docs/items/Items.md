@@ -99,13 +99,13 @@ Requirements:
 | --------- | ------- | ---------------------------- |
 | \_item_id | uint256 | ID of the the item disabled. |
 
-### constructor
+### initialize
 
 ```solidity
-constructor() public
+function initialize() public
 ```
 
-Constructor.
+Initializer.
 
 ### mint
 

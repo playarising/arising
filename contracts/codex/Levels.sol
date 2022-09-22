@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
 import "../interfaces/ILevels.sol";
 
 /**
@@ -10,7 +12,7 @@ import "../interfaces/ILevels.sol";
  *
  * @notice Implementation of the [ILevels](/docs/interfaces/ILevels.md) interface.
  */
-contract Levels is ILevels {
+contract Levels is ILevels, Initializable {
     // =============================================== Storage ========================================================
 
     /** @notice Map to track the levels. */
@@ -19,10 +21,10 @@ contract Levels is ILevels {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      * @notice Initializes the lable table.
      */
-    constructor() {
+    function initialize() public initializer {
         levels[0] = Level(0, 1000);
         levels[1] = Level(1000, 2020);
         levels[2] = Level(2020, 3060);

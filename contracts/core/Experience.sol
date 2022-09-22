@@ -2,6 +2,9 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 import "../interfaces/ILevels.sol";
 import "../interfaces/IExperience.sol";
@@ -13,7 +16,12 @@ import "../interfaces/ICivilizations.sol";
  *
  * @notice Implementation of the [IExperience](/docs/interfaces/IExperience.md) interface.
  */
-contract Experience is IExperience, Ownable {
+contract Experience is
+    IExperience,
+    Initializable,
+    PausableUpgradeable,
+    OwnableUpgradeable
+{
     // =============================================== Storage ========================================================
 
     /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
@@ -62,13 +70,18 @@ contract Experience is IExperience, Ownable {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      *
      * Requirements:
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _levels           The address of the [Levels](/docs/codex/Levels.md) instance.
      */
-    constructor(address _civilizations, address _levels) {
+    function initialize(address _civilizations, address _levels)
+        public
+        initializer
+    {
+        __Ownable_init();
+        __Pausable_init();
         civilizations = _civilizations;
         levels = _levels;
         authorized[msg.sender] = true;

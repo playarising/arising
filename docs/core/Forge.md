@@ -146,13 +146,13 @@ Requirements:
 | ----------- | ------- | -------------------------- |
 | \_recipe_id | uint256 | ID of the recipe disabled. |
 
-### constructor
+### initialize
 
 ```solidity
-constructor(address _civilizations, address _experience, address _stats, address _token, uint256 _price) public
+function initialize(address _civilizations, address _experience, address _stats, address _token, uint256 _price) public
 ```
 
-Constructor.
+Initialize.
 
 Requirements:
 

@@ -3,6 +3,9 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 import "../interfaces/ICraft.sol";
 import "../interfaces/ICivilizations.sol";
@@ -18,7 +21,12 @@ import "../interfaces/IBaseFungibleItem.sol";
  *
  * @notice Implementation of the [ICraft](/docs/interfaces/ICraft.md) interface.
  */
-contract Craft is ICraft, Ownable, Pausable {
+contract Craft is
+    ICraft,
+    Initializable,
+    PausableUpgradeable,
+    OwnableUpgradeable
+{
     // =============================================== Storage ========================================================
 
     /** @notice Map to track available recipes for craft. */
@@ -146,7 +154,7 @@ contract Craft is ICraft, Ownable, Pausable {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      *
      * Requirements:
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
@@ -154,12 +162,14 @@ contract Craft is ICraft, Ownable, Pausable {
      * @param _stats            The address of the [Stats](/docs/core/Stats.md) instance.
      * @param _items            The address of the [Items](/docs/items/Items.md) instance.
      */
-    constructor(
+    function initialize(
         address _civilizations,
         address _experience,
         address _stats,
         address _items
-    ) {
+    ) public initializer {
+        __Ownable_init();
+        __Pausable_init();
         civilizations = _civilizations;
         experience = _experience;
         stats = _stats;

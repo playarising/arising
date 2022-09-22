@@ -11,6 +11,7 @@ describe("Items", () => {
     const Items = await ethers.getContractFactory("Items");
     this.items = await Items.deploy();
     await this.items.deployed();
+    await this.items.initialize();
   });
 
   it("should fail to mint an invalid item", async () => {

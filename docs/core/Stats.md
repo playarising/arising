@@ -126,13 +126,13 @@ Requirements:
 | \_base_stats | struct IStats.BasicStats | Pool stat points              |
 | \_pool_stats | struct IStats.BasicStats | Pool stat points.             |
 
-### constructor
+### initialize
 
 ```solidity
-constructor(address _civilizations, address _experience, address _equipment) public
+function initialize(address _civilizations, address _experience, address _equipment) public
 ```
 
-Constructor.
+Initialize.
 
 Requirements:
 

@@ -70,13 +70,13 @@ Requirements:
 | \_id   | bytes  | Composed ID of the character. |
 | \_name | string | New name of the character.    |
 
-### constructor
+### initialize
 
 ```solidity
-constructor(address _civilizations, address _experience) public
+function initialize(address _civilizations, address _experience) public
 ```
 
-Constructor.
+Initialize.
 
 Requirements:
 

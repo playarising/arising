@@ -15,9 +15,10 @@ describe("Civilizations", () => {
     await this.mock.deployed();
 
     const Civilizations = await ethers.getContractFactory("Civilizations");
-    this.civ = await Civilizations.deploy(this.mock.address);
+    this.civ = await Civilizations.deploy();
     await this.civ.deployed();
 
+    await this.civ.initialize(this.mock.address);
     const BaseERC721 = await ethers.getContractFactory("BaseERC721");
     this.collection = await BaseERC721.deploy(
       "Test Collection",

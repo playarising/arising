@@ -15,13 +15,13 @@ mapping(uint256 => struct ILevels.Level) levels
 
 Map to track the levels.
 
-### constructor
+### initialize
 
 ```solidity
-constructor() public
+function initialize() public
 ```
 
-Constructor.
+Initialize.
 Initializes the lable table.
 
 ### getLevel

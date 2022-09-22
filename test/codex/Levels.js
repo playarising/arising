@@ -44,6 +44,7 @@ describe("Levels", () => {
     const Levels = await ethers.getContractFactory("Levels");
     this.levels = await Levels.deploy();
     await this.levels.deployed();
+    await this.levels.initialize();
   });
 
   it("should match the levels correctly", async () => {

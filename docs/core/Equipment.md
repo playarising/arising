@@ -92,13 +92,13 @@ Requirements:
 | \_id   | bytes                         | Composed ID of the character. |
 | \_slot | enum IEquipment.EquipmentSlot | Slot of the item unequipped.  |
 
-### constructor
+### initialize
 
 ```solidity
-constructor(address _civilizations, address _experience, address _items) public
+function initialize(address _civilizations, address _experience, address _items) public
 ```
 
-Constructor.
+Initializer.
 
 Requirements:
 

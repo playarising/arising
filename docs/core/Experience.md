@@ -76,13 +76,13 @@ Requirements:
 | \_id    | bytes   | Composed ID of the character. |
 | \_level | uint256 | The new level reached.        |
 
-### constructor
+### initialize
 
 ```solidity
-constructor(address _civilizations, address _levels) public
+function initialize(address _civilizations, address _levels) public
 ```
 
-Constructor.
+Initialize.
 
 Requirements:
 

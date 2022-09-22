@@ -4,6 +4,9 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 import "../interfaces/IForge.sol";
 import "../interfaces/ICivilizations.sol";
@@ -18,7 +21,12 @@ import "../interfaces/IBaseFungibleItem.sol";
  *
  * @notice Implementation of the [IForge](/docs/interfaces/IForge.md) interface.
  */
-contract Forge is IForge, Ownable, Pausable {
+contract Forge is
+    IForge,
+    Initializable,
+    PausableUpgradeable,
+    OwnableUpgradeable
+{
     // =============================================== Storage ========================================================
 
     /** @notice Address of the [Civilizations](/docs/core/Civilizations.md) instance. */
@@ -107,7 +115,7 @@ contract Forge is IForge, Ownable, Pausable {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      *
      * Requirements:
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
@@ -116,13 +124,15 @@ contract Forge is IForge, Ownable, Pausable {
      * @param _token            Address of the token used to purchase.
      * @param _price            Price for each upgrade.
      */
-    constructor(
+    function initialize(
         address _civilizations,
         address _experience,
         address _stats,
         address _token,
         uint256 _price
-    ) {
+    ) public initializer {
+        __Ownable_init();
+        __Pausable_init();
         civilizations = _civilizations;
         experience = _experience;
         stats = _stats;

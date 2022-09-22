@@ -130,10 +130,10 @@ Requirements:
 | ---------- | ------- | -------------------------- |
 | \_quest_id | uint256 | ID of the recipe disabled. |
 
-### constructor
+### initialize
 
 ```solidity
-constructor(address _civilizations, address _experience, address _stats) public
+function initialize(address _civilizations, address _experience, address _stats) public
 ```
 
 Constructor.

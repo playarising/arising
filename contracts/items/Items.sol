@@ -3,6 +3,10 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 import "../interfaces/IItems.sol";
 
@@ -13,7 +17,7 @@ import "../interfaces/IItems.sol";
  *
  * @notice Implementation of the [IItems](/docs/interfaces/IItems.md) interface.
  */
-contract Items is IItems, Ownable, ERC1155 {
+contract Items is IItems, ERC1155Upgradeable, OwnableUpgradeable {
     // =============================================== Storage ========================================================
 
     /** @notice Map to track the extra items data. */
@@ -77,9 +81,11 @@ contract Items is IItems, Ownable, ERC1155 {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initializer.
      */
-    constructor() ERC1155("https://items.playarising.com/{id}") {
+    function initialize() public initializer {
+        __Ownable_init();
+        __ERC1155_init("https://items.playarising.com/{id}");
         authorized[msg.sender] = true;
     }
 
