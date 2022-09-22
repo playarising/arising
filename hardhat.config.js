@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const argv = require("yargs/yargs")()
   .env("")
   .options({
@@ -32,7 +34,14 @@ require("solidity-docgen");
 module.exports = {
   defaultNetwork: "hardhat",
   networks: {
-    hardhat: {},
+    mainnet: {
+      url: process.env.RPC_URL,
+      gasPrice: 60000000000,
+      accounts: [process.env.PRIVATE_KEY],
+    },
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API,
   },
   solidity: {
     compilers: [
