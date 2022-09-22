@@ -205,3 +205,11 @@ Requirements:
 | Name        | Type                         | Description              |
 | ----------- | ---------------------------- | ------------------------ |
 | \_modifiers | struct IItems.BaseAttributes | The amount of modifiers. |
+
+### \_authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(address newImplementation) internal virtual
+```
+
+Internal function make sure upgrade proxy caller is the owner.

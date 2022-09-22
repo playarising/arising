@@ -22,14 +22,15 @@ describe("Experience", () => {
     await this.civ.deployed();
     await this.civ.initialize(this.mock.address);
     const BaseERC721 = await ethers.getContractFactory("BaseERC721");
-    this.collection = await BaseERC721.deploy(
+    this.collection = await BaseERC721.deploy();
+    await this.collection.deployed();
+    await this.collection.initialize(
       "Test Collection",
       "TEST",
       "https://test.uri/",
       this.civ.address
     );
-    await this.collection.deployed();
-    await this.collection.transferOwnership(this.civ.address);
+    await this.collection.addAuthority(this.civ.address);
 
     await this.civ.addCivilization(this.collection.address);
 
@@ -43,19 +44,6 @@ describe("Experience", () => {
 
   it("should deploy everything correctly", async () => {
     expect(await this.experience.owner()).to.eq(this.owner.address);
-  });
-
-  it("should change the level address correctly", async () => {
-    expect(await this.experience.levels()).to.eq(this.levels.address);
-    await this.experience.setLevels(this.owner.address);
-    expect(await this.experience.levels()).to.eq(this.owner.address);
-    await this.experience.setLevels(this.levels.address);
-  });
-
-  it("should fail when trying to change the level address without owner", async () => {
-    await expect(
-      this.experience.connect(this.receiver).setLevels(this.owner.address)
-    ).to.revertedWith("Ownable: caller is not the owner");
   });
 
   it("should assign the experience correctly", async () => {

@@ -172,14 +172,15 @@ describe("Equipment", () => {
     await this.civ.deployed();
     await this.civ.initialize(this.mock.address);
     const BaseERC721 = await ethers.getContractFactory("BaseERC721");
-    this.collection = await BaseERC721.deploy(
+    this.collection = await BaseERC721.deploy();
+    await this.collection.deployed();
+    await this.collection.initialize(
       "Test Collection",
       "TEST",
       "https://test.uri/",
       this.civ.address
     );
-    await this.collection.deployed();
-    await this.collection.transferOwnership(this.civ.address);
+    await this.collection.addAuthority(this.civ.address);
 
     await this.civ.addCivilization(this.collection.address);
 

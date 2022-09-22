@@ -23,13 +23,29 @@ address civilizations
 
 Address of the [Civilizations](/docs/core/Civilizations.md) instance.
 
-### constructor
+### authorized
 
 ```solidity
-constructor(string _name, string _symbol, string _uri, address _civilizations) public
+mapping(address => bool) authorized
 ```
 
-Constructor.
+Map to store the list of authorized addresses to mint tokens.
+
+### onlyAuthorized
+
+```solidity
+modifier onlyAuthorized()
+```
+
+Checks against if the `msg.sender` is authorized to mint tokens.
+
+### initialize
+
+```solidity
+function initialize(string _name, string _symbol, string _uri, address _civilizations) public
+```
+
+Initialize.
 
 Requirements:
 
@@ -39,6 +55,34 @@ Requirements:
 | \_symbol        | string  | Symbol of the `ERC721` token.                                             |
 | \_uri           | string  | Base url for the tokens metadata.                                         |
 | \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
+
+### addAuthority
+
+```solidity
+function addAuthority(address _authority) public
+```
+
+Assigns a new address as an authority to mint tokens.
+
+Requirements:
+
+| Name        | Type    | Description                |
+| ----------- | ------- | -------------------------- |
+| \_authority | address | Address to give authority. |
+
+### removeAuthority
+
+```solidity
+function removeAuthority(address _authority) public
+```
+
+Removes an authority to mint tokens.
+
+Requirements:
+
+| Name        | Type    | Description                |
+| ----------- | ------- | -------------------------- |
+| \_authority | address | Address to give authority. |
 
 ### mint
 

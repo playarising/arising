@@ -91,20 +91,6 @@ Requirements:
 | \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
 | \_levels        | address | The address of the [Levels](/docs/codex/Levels.md) instance.              |
 
-### setLevels
-
-```solidity
-function setLevels(address _levels) public
-```
-
-Replaces the address of the [Levels](/docs/codex/Levels.md) instance to determine character levels.
-
-Requirements:
-
-| Name     | Type    | Description                                              |
-| -------- | ------- | -------------------------------------------------------- |
-| \_levels | address | Address of the [Levels](/docs/codex/Levels.md) instance. |
-
 ### assignExperience
 
 ```solidity
@@ -201,3 +187,11 @@ Requirements:
 | Name         | Type    | Description                                        |
 | ------------ | ------- | -------------------------------------------------- |
 | \_experience | uint256 | Total experience required to reach the next level. |
+
+### \_authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(address newImplementation) internal virtual
+```
+
+Internal function make sure upgrade proxy caller is the owner.

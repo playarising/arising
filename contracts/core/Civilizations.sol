@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -212,10 +210,6 @@ contract Civilizations is
         require(
             _civilization != address(0),
             "Civilizations: addCivilization() civilization address is empty."
-        );
-        require(
-            address(this) == Ownable(_civilization).owner(),
-            "Civilizations: addCivilization() missing civilization ownership."
         );
         uint256 _civilization_id = _civilizations.length + 1;
         civilizations[_civilization_id] = _civilization;

@@ -23,14 +23,15 @@ describe("Craft", () => {
     await this.civ.initialize(this.mock.address);
 
     const BaseERC721 = await ethers.getContractFactory("BaseERC721");
-    this.collection = await BaseERC721.deploy(
+    this.collection = await BaseERC721.deploy();
+    await this.collection.deployed();
+    await this.collection.initialize(
       "Test Collection",
       "TEST",
       "https://test.uri/",
       this.civ.address
     );
-    await this.collection.deployed();
-    await this.collection.transferOwnership(this.civ.address);
+    await this.collection.addAuthority(this.civ.address);
 
     await this.civ.addCivilization(this.collection.address);
 
@@ -55,32 +56,46 @@ describe("Craft", () => {
       this.experience.address,
       this.items.address
     );
+
+    const BaseGadgetToken = await ethers.getContractFactory("BaseGadgetToken");
+    this.refresher = await BaseGadgetToken.deploy();
+    await this.refresher.deployed();
+    await this.refresher.initialize(
+      "Arising: Refresher",
+      "REFRESER",
+      this.mock.address,
+      ethers.utils.parseEther("1")
+    );
+    this.vitalizer = await BaseGadgetToken.deploy();
+    await this.vitalizer.deployed();
+    await this.vitalizer.initialize(
+      "Arising: Vitalizer",
+      "VITALIZER",
+      this.mock.address,
+      ethers.utils.parseEther("1")
+    );
+
     const Stats = await ethers.getContractFactory("Stats");
     this.stats = await Stats.deploy();
     await this.stats.deployed();
     await this.stats.initialize(
       this.civ.address,
       this.experience.address,
-      this.equipment.address
+      this.equipment.address,
+      this.refresher.address,
+      this.vitalizer.address
     );
     const BaseFungibleItem = await ethers.getContractFactory(
       "BaseFungibleItem"
     );
 
-    this.gold = await BaseFungibleItem.deploy(
-      "Ard: Gold",
-      "GOLD",
-      this.civ.address
-    );
+    this.gold = await BaseFungibleItem.deploy();
     await this.gold.deployed();
+    await this.gold.initialize("Ard: Gold", "GOLD", this.civ.address);
 
-    this.resource = await BaseFungibleItem.deploy(
-      "Ard: Resource",
-      "WOOD",
-      this.civ.address
-    );
+    this.resource = await BaseFungibleItem.deploy();
     await this.resource.deployed();
-
+    await this.resource.initialize("Ard: Resource", "WOOD", this.civ.address);
     const Craft = await ethers.getContractFactory("Craft");
     this.craft = await Craft.deploy();
     await this.craft.deployed();

@@ -243,3 +243,11 @@ Requirements:
 | Name   | Type               | Description            |
 | ------ | ------------------ | ---------------------- |
 | \_item | struct IItems.Item | Full item information. |
+
+### \_authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(address newImplementation) internal virtual
+```
+
+Internal function make sure upgrade proxy caller is the owner.

@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
@@ -109,11 +107,15 @@ contract Stats is
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      * @param _equipment       The address of the [Equipment](/docs/core/Equipment.md) instance.
+     * @param _refresher    Address of the Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance.
+     * @param _vitalizer    Address of the Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance.
      */
     function initialize(
         address _civilizations,
         address _experience,
-        address _equipment
+        address _equipment,
+        address _refresher,
+        address _vitalizer
     ) public initializer {
         __Ownable_init();
         __Pausable_init();
@@ -122,6 +124,8 @@ contract Stats is
         civilizations = _civilizations;
         experience = _experience;
         equipment = _equipment;
+        refresher = _refresher;
+        vitalizer = _vitalizer;
         REFRESH_COOLDOWN_SECONDS = 86400; // 1 day
     }
 
@@ -143,26 +147,6 @@ contract Stats is
      */
     function setRefreshCooldown(uint256 _cooldown) public onlyOwner {
         REFRESH_COOLDOWN_SECONDS = _cooldown;
-    }
-
-    /**
-     * @notice Changes the Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance to use for paid refreshes.
-     *
-     * Requirements:
-     * @param _refresher    Address of the new Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance.
-     */
-    function setRefreshToken(address _refresher) public onlyOwner {
-        refresher = _refresher;
-    }
-
-    /**
-     * @notice Changes the Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance to use for sacrifice points recover.
-     *
-     * Requirements:
-     * @param _vitalizer    Address of the new Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance.
-     */
-    function setVitalizerToken(address _vitalizer) public onlyOwner {
-        vitalizer = _vitalizer;
     }
 
     /**

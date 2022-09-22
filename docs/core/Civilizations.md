@@ -428,3 +428,11 @@ Requirements:
 | -------------- | ------- | ------------------------------------ |
 | \_civilization | uint256 | The internal ID of the civilization. |
 | \_token_id     | uint256 | The token id of the composed ID.     |
+
+### \_authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(address newImplementation) internal virtual
+```
+
+Internal function make sure upgrade proxy caller is the owner.

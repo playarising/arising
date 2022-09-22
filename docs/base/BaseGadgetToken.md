@@ -2,7 +2,7 @@
 
 ## BaseGadgetToken
 
-This contract implements an `ERC20Burnable` token to serve as utility tokens that
+This contract implements an `ERC20BurnableUpgradeable` token to serve as utility tokens that
 can be purchased by themselves.
 
 Implementation of the [IBaseGadgetToken](/docs/interfaces/IBaseGadgetToken.md) interface.
@@ -23,13 +23,13 @@ uint256 price
 
 Constant for the price of each token (in wei).
 
-### constructor
+### initialize
 
 ```solidity
-constructor(string _name, string _symbol, address _token, uint256 _price) public
+function initialize(string _name, string _symbol, address _token, uint256 _price) public
 ```
 
-Constructor.
+Initialize.
 
 Requirements:
 

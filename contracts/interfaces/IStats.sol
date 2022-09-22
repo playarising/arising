@@ -29,12 +29,6 @@ interface IStats {
     /** @notice See [Stats#setRefreshCooldown](/docs/codex/Stats.md#setRefreshCooldown) */
     function setRefreshCooldown(uint256 _cooldown) external;
 
-    /** @notice See [Stats#setRefreshToken](/docs/codex/Stats.md#setRefreshToken) */
-    function setRefreshToken(address _refresher) external;
-
-    /** @notice See [Stats#setVitalizerToken](/docs/codex/Stats.md#setVitalizerToken) */
-    function setVitalizerToken(address _vitalizer) external;
-
     /** @notice See [Stats#consume](/docs/codex/Stats.md#consume) */
     function consume(bytes memory _id, BasicStats memory _stats) external;
 

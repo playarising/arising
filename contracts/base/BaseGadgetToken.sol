@@ -1,21 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 import "../interfaces/IBaseGadgetToken.sol";
 
 /**
  * @title BaseGadgetToken
- * @notice This contract implements an `ERC20Burnable` token to serve as utility tokens that
+ * @notice This contract implements an `ERC20BurnableUpgradeable` token to serve as utility tokens that
  * can be purchased by themselves.
  *
  * @notice Implementation of the [IBaseGadgetToken](/docs/interfaces/IBaseGadgetToken.md) interface.
  */
-contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
+contract BaseGadgetToken is
+    IBaseGadgetToken,
+    OwnableUpgradeable,
+    ERC20BurnableUpgradeable,
+    PausableUpgradeable
+{
     // =============================================== Storage ========================================================
     /** @notice Constant for address of the `ERC20` token used to purchase. */
     address public token;
@@ -26,7 +33,7 @@ contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
     // =============================================== Setters ========================================================
 
     /**
-     * @notice Constructor.
+     * @notice Initialize.
      *
      * Requirements:
      * @param _name     Name of the `ERC20` token.
@@ -34,12 +41,16 @@ contract BaseGadgetToken is IBaseGadgetToken, Ownable, ERC20Burnable, Pausable {
      * @param _token    Address of the token used to purchase.
      * @param _price    Price for each token.
      */
-    constructor(
+    function initialize(
         string memory _name,
         string memory _symbol,
         address _token,
         uint256 _price
-    ) ERC20(_name, _symbol) {
+    ) public initializer {
+        __ERC20_init(_name, _symbol);
+        __ERC20Burnable_init();
+        __Ownable_init();
+        __Pausable_init();
         token = _token;
         price = _price;
     }

@@ -95,13 +95,13 @@ modifier onlyAuthorized()
 
 Checks if the `msg.sender` is authorized to mint items.
 
-### constructor
+### initialize
 
 ```solidity
-constructor(string _name, string _symbol, address _civilizations) public
+function initialize(string _name, string _symbol, address _civilizations) public
 ```
 
-Constructor.
+Initialize.
 
 Requirements:
 

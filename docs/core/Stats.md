@@ -129,18 +129,20 @@ Requirements:
 ### initialize
 
 ```solidity
-function initialize(address _civilizations, address _experience, address _equipment) public
+function initialize(address _civilizations, address _experience, address _equipment, address _refresher, address _vitalizer) public
 ```
 
 Initialize.
 
 Requirements:
 
-| Name            | Type    | Description                                                               |
-| --------------- | ------- | ------------------------------------------------------------------------- |
-| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance. |
-| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.       |
-| \_equipment     | address | The address of the [Equipment](/docs/core/Equipment.md) instance.         |
+| Name            | Type    | Description                                                                         |
+| --------------- | ------- | ----------------------------------------------------------------------------------- |
+| \_civilizations | address | The address of the [Civilizations](/docs/core/Civilizations.md) instance.           |
+| \_experience    | address | The address of the [Experience](/docs/core/Experience.md) instance.                 |
+| \_equipment     | address | The address of the [Equipment](/docs/core/Equipment.md) instance.                   |
+| \_refresher     | address | Address of the Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance. |
+| \_vitalizer     | address | Address of the Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance. |
 
 ### pause
 
@@ -171,34 +173,6 @@ Requirements:
 | Name       | Type    | Description                                  |
 | ---------- | ------- | -------------------------------------------- |
 | \_cooldown | uint256 | Amount of seconds to wait between refreshes. |
-
-### setRefreshToken
-
-```solidity
-function setRefreshToken(address _refresher) public
-```
-
-Changes the Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance to use for paid refreshes.
-
-Requirements:
-
-| Name        | Type    | Description                                                                             |
-| ----------- | ------- | --------------------------------------------------------------------------------------- |
-| \_refresher | address | Address of the new Refresher [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance. |
-
-### setVitalizerToken
-
-```solidity
-function setVitalizerToken(address _vitalizer) public
-```
-
-Changes the Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance to use for sacrifice points recover.
-
-Requirements:
-
-| Name        | Type    | Description                                                                             |
-| ----------- | ------- | --------------------------------------------------------------------------------------- |
-| \_vitalizer | address | Address of the new Vitalizer [BaseGadgetToken](/docs/base/BaseGadgetToken.md) instance. |
 
 ### consume
 
@@ -395,3 +369,11 @@ Requirements:
 | Name     | Type    | Description                                |
 | -------- | ------- | ------------------------------------------ |
 | \_points | uint256 | Amount of points spendable for this level. |
+
+### \_authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(address newImplementation) internal virtual
+```
+
+Internal function make sure upgrade proxy caller is the owner.

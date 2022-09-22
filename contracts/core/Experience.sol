@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
@@ -89,16 +88,6 @@ contract Experience is
         civilizations = _civilizations;
         levels = _levels;
         authorized[msg.sender] = true;
-    }
-
-    /**
-     * @notice Replaces the address of the [Levels](/docs/codex/Levels.md) instance to determine character levels.
-     *
-     * Requirements:
-     * @param _levels    Address of the [Levels](/docs/codex/Levels.md) instance.
-     */
-    function setLevels(address _levels) public onlyOwner {
-        levels = _levels;
     }
 
     /**

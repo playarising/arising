@@ -216,3 +216,11 @@ Requirements:
 | Name         | Type   | Description                               |
 | ------------ | ------ | ----------------------------------------- |
 | \_lower_case | string | The provided name as a lower case string. |
+
+### \_authorizeUpgrade
+
+```solidity
+function _authorizeUpgrade(address newImplementation) internal virtual
+```
+
+Internal function make sure upgrade proxy caller is the owner.
