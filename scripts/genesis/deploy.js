@@ -62,8 +62,8 @@ const RESOURCES = [
     symbol: "BONES",
   },
   {
-    name: "Arising: Cooper",
-    symbol: "COOPER",
+    name: "Arising: Copper",
+    symbol: "COPPER",
   },
   {
     name: "Arising: Bronze",
