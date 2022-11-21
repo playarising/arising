@@ -198,11 +198,10 @@ contract Equipment is
      * @param _id   Composed ID of the character.
      * @param _slot Slot to equip the item.
      */
-    function unequip(bytes memory _id, EquipmentSlot _slot)
-        public
-        whenNotPaused
-        onlyAllowed(_id)
-    {
+    function unequip(
+        bytes memory _id,
+        EquipmentSlot _slot
+    ) public whenNotPaused onlyAllowed(_id) {
         require(
             character_equipments[_id][_slot].equiped,
             "Equipment: unequip() item slot not equiped."
@@ -230,11 +229,9 @@ contract Equipment is
      * Requirements:
      * @param _id   Composed ID of the character.
      */
-    function getCharacterEquipment(bytes memory _id)
-        public
-        view
-        returns (CharacterEquipment memory)
-    {
+    function getCharacterEquipment(
+        bytes memory _id
+    ) public view returns (CharacterEquipment memory) {
         return
             CharacterEquipment(
                 character_equipments[_id][EquipmentSlot.HELMET],
@@ -261,11 +258,9 @@ contract Equipment is
      *
      * @return _modifiers   The total modifiers.
      */
-    function getCharacterTotalStatsModifiers(bytes memory _id)
-        public
-        view
-        returns (IStats.BasicStats memory _modifiers)
-    {
+    function getCharacterTotalStatsModifiers(
+        bytes memory _id
+    ) public view returns (IStats.BasicStats memory _modifiers) {
         IStats.BasicStats memory _additions;
         IStats.BasicStats memory _reductions;
 
@@ -306,11 +301,9 @@ contract Equipment is
      *
      * @return _modifiers   The amount of modifiers.
      */
-    function getCharacterTotalAttributes(bytes memory _id)
-        public
-        view
-        returns (IItems.BaseAttributes memory _modifiers)
-    {
+    function getCharacterTotalAttributes(
+        bytes memory _id
+    ) public view returns (IItems.BaseAttributes memory _modifiers) {
         IItems.BaseAttributes memory _additions;
         IItems.BaseAttributes memory _reductions;
         for (uint256 i = 0; i < 13; i++) {
@@ -365,10 +358,7 @@ contract Equipment is
     // =============================================== Internal =======================================================
 
     /** @notice Internal function make sure upgrade proxy caller is the owner. */
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        virtual
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal virtual override onlyOwner {}
 }

@@ -156,11 +156,10 @@ contract Stats is
      * @param _id       Composed ID of the character.
      * @param _stats    Stats to consume.
      */
-    function consume(bytes memory _id, BasicStats memory _stats)
-        public
-        whenNotPaused
-        onlyAllowed(_id)
-    {
+    function consume(
+        bytes memory _id,
+        BasicStats memory _stats
+    ) public whenNotPaused onlyAllowed(_id) {
         BasicStats memory _modifiers = IEquipment(equipment)
             .getCharacterTotalStatsModifiers(_id);
 
@@ -207,11 +206,10 @@ contract Stats is
      * @param _id       Composed ID of the character.
      * @param _stats    Stats to consume.
      */
-    function sacrifice(bytes memory _id, BasicStats memory _stats)
-        public
-        whenNotPaused
-        onlyAllowed(_id)
-    {
+    function sacrifice(
+        bytes memory _id,
+        BasicStats memory _stats
+    ) public whenNotPaused onlyAllowed(_id) {
         BasicStats storage _base = base[_id];
         require(
             _stats.might <= _base.might,
@@ -273,11 +271,9 @@ contract Stats is
      * Requirements:
      * @param _id   Composed ID of the character.
      */
-    function refreshWithToken(bytes memory _id)
-        public
-        whenNotPaused
-        onlyAllowed(_id)
-    {
+    function refreshWithToken(
+        bytes memory _id
+    ) public whenNotPaused onlyAllowed(_id) {
         require(
             IERC20(refresher).balanceOf(msg.sender) >= 1,
             "Stats: refreshWithToken() not enough refresh tokens balance."
@@ -322,11 +318,10 @@ contract Stats is
      * @param _id       Composed ID of the character.
      * @param _stats    Stats to sacrifice.
      */
-    function vitalize(bytes memory _id, BasicStats memory _stats)
-        public
-        whenNotPaused
-        onlyAllowed(_id)
-    {
+    function vitalize(
+        bytes memory _id,
+        BasicStats memory _stats
+    ) public whenNotPaused onlyAllowed(_id) {
         require(
             sacrifices[_id] > 0,
             "Stats: vitalize() not enough sacrificed points."
@@ -362,11 +357,10 @@ contract Stats is
      * @param _id       Composed ID of the character.
      * @param _stats    Stats to increase.
      */
-    function assignPoints(bytes memory _id, BasicStats memory _stats)
-        public
-        whenNotPaused
-        onlyAllowed(_id)
-    {
+    function assignPoints(
+        bytes memory _id,
+        BasicStats memory _stats
+    ) public whenNotPaused onlyAllowed(_id) {
         uint256 sum = _stats.might + _stats.speed + _stats.intellect;
         uint256 available = getAvailablePoints(_id);
         require(
@@ -392,11 +386,9 @@ contract Stats is
      *
      * @return _stats   Base stats of the character.
      */
-    function getBaseStats(bytes memory _id)
-        public
-        view
-        returns (BasicStats memory _stats)
-    {
+    function getBaseStats(
+        bytes memory _id
+    ) public view returns (BasicStats memory _stats) {
         return base[_id];
     }
 
@@ -408,11 +400,9 @@ contract Stats is
      *
      * @return _stats   Available pool stats of the character.
      */
-    function getPoolStats(bytes memory _id)
-        public
-        view
-        returns (BasicStats memory _stats)
-    {
+    function getPoolStats(
+        bytes memory _id
+    ) public view returns (BasicStats memory _stats) {
         return pool[_id];
     }
 
@@ -424,11 +414,9 @@ contract Stats is
      *
      * @return _points      Number of points available to assign.
      */
-    function getAvailablePoints(bytes memory _id)
-        public
-        view
-        returns (uint256 _points)
-    {
+    function getAvailablePoints(
+        bytes memory _id
+    ) public view returns (uint256 _points) {
         BasicStats memory _base = base[_id];
         uint256 _sum = _base.intellect + _base.might + _base.speed;
         uint256 level = IExperience(experience).getLevel(_id);
@@ -444,11 +432,9 @@ contract Stats is
      *
      * @return _timestamp   Timestamp when the next refresh is available.
      */
-    function getNextRefreshTime(bytes memory _id)
-        public
-        view
-        returns (uint256 _timestamp)
-    {
+    function getNextRefreshTime(
+        bytes memory _id
+    ) public view returns (uint256 _timestamp) {
         return last_refresh[_id] + REFRESH_COOLDOWN_SECONDS;
     }
 
@@ -460,11 +446,9 @@ contract Stats is
      *
      * @return _timestamp   Timestamp when the next refresh is available.
      */
-    function getNextRefreshWithTokenTime(bytes memory _id)
-        public
-        view
-        returns (uint256 _timestamp)
-    {
+    function getNextRefreshWithTokenTime(
+        bytes memory _id
+    ) public view returns (uint256 _timestamp) {
         return refresher_usage_time[_id] + REFRESH_COOLDOWN_SECONDS;
     }
 
@@ -478,20 +462,15 @@ contract Stats is
      *
      * @return _points   Amount of points spendable for this level.
      */
-    function _assignablePointsByLevel(uint256 _level)
-        internal
-        pure
-        returns (uint256 _points)
-    {
+    function _assignablePointsByLevel(
+        uint256 _level
+    ) internal pure returns (uint256 _points) {
         uint256 points = 6;
         return points + _level;
     }
 
     /** @notice Internal function make sure upgrade proxy caller is the owner. */
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        virtual
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal virtual override onlyOwner {}
 }

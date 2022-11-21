@@ -147,10 +147,10 @@ contract Civilizations is
      * @param _upgrade_id   ID of the upgrade to change.
      * @param _available     Boolean to activate/deactivate.
      */
-    function setInitializeUpgrade(uint256 _upgrade_id, bool _available)
-        public
-        onlyOwner
-    {
+    function setInitializeUpgrade(
+        uint256 _upgrade_id,
+        bool _available
+    ) public onlyOwner {
         require(
             _upgrade_id > 0 && _upgrade_id <= 3,
             "Civilizations: setInitializeUpgrade() invalid upgrade id."
@@ -169,10 +169,10 @@ contract Civilizations is
      * @param _upgrade_id   ID of the upgrade to change.
      * @param _price     Amount of tokens to pay for the upgrade.
      */
-    function setUpgradePrice(uint256 _upgrade_id, uint256 _price)
-        public
-        onlyOwner
-    {
+    function setUpgradePrice(
+        uint256 _upgrade_id,
+        uint256 _price
+    ) public onlyOwner {
         require(
             _upgrade_id > 0 && _upgrade_id <= 3,
             "Civilizations: setUpgradePrice() invalid upgrade id."
@@ -254,10 +254,10 @@ contract Civilizations is
      * @param _id           Composed ID of the character.
      * @param _upgrade_id   ID of the upgrade to purchase.
      */
-    function buyUpgrade(bytes memory _id, uint256 _upgrade_id)
-        public
-        whenNotPaused
-    {
+    function buyUpgrade(
+        bytes memory _id,
+        uint256 _upgrade_id
+    ) public whenNotPaused {
         require(
             _upgrade_id > 0 && _upgrade_id <= 3,
             "Civilizations: buyUpgrade() invalid upgrade id."
@@ -295,11 +295,9 @@ contract Civilizations is
      *
      * @return _upgrades    Array of booleans for each upgrade.
      */
-    function getCharacterUpgrades(bytes memory _id)
-        public
-        view
-        returns (bool[3] memory _upgrades)
-    {
+    function getCharacterUpgrades(
+        bytes memory _id
+    ) public view returns (bool[3] memory _upgrades) {
         return (
             [
                 character_upgrades[_id][1],
@@ -317,11 +315,9 @@ contract Civilizations is
      *
      * @return _upgrade     Upgrade information.
      */
-    function getUpgradeInformation(uint256 _upgrade_id)
-        public
-        view
-        returns (Upgrade memory _upgrade)
-    {
+    function getUpgradeInformation(
+        uint256 _upgrade_id
+    ) public view returns (Upgrade memory _upgrade) {
         require(
             _upgrade_id > 0 && _upgrade_id <= 3,
             "Civilizations: getUpgradeInformation() invalid upgrade id."
@@ -338,11 +334,10 @@ contract Civilizations is
      *
      * @return _id              Composed ID of the character.
      */
-    function getTokenID(uint256 _civilization_id, uint256 _token_id)
-        public
-        view
-        returns (bytes memory _id)
-    {
+    function getTokenID(
+        uint256 _civilization_id,
+        uint256 _token_id
+    ) public view returns (bytes memory _id) {
         require(
             _civilization_id != 0 && _civilization_id <= _civilizations.length,
             "Civilizations: getTokenID() invalid civilization id."
@@ -363,11 +358,10 @@ contract Civilizations is
      *
      * @return _allowed     Boolean to check if access is valid.
      */
-    function isAllowed(address _spender, bytes memory _id)
-        public
-        view
-        returns (bool _allowed)
-    {
+    function isAllowed(
+        address _spender,
+        bytes memory _id
+    ) public view returns (bool _allowed) {
         (uint256 _civilization_id, uint256 _token_id) = _decodeID(_id);
         require(
             _civilization_id != 0 && _civilization_id <= _civilizations.length,
@@ -461,19 +455,14 @@ contract Civilizations is
      * @return _civilization    The internal ID of the civilization.
      * @return _token_id        The token id of the composed ID.
      */
-    function _decodeID(bytes memory _id)
-        internal
-        pure
-        returns (uint256 _civilization, uint256 _token_id)
-    {
+    function _decodeID(
+        bytes memory _id
+    ) internal pure returns (uint256 _civilization, uint256 _token_id) {
         return abi.decode(_id, (uint256, uint256));
     }
 
     /** @notice Internal function make sure upgrade proxy caller is the owner. */
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        virtual
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal virtual override onlyOwner {}
 }

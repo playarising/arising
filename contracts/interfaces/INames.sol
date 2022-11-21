@@ -22,26 +22,22 @@ interface INames {
     function clearName(bytes memory _id) external;
 
     /** @notice See [Names#getCharacterName](/docs/codex/Names.md#getCharacterName) */
-    function getCharacterName(bytes memory _id)
-        external
-        view
-        returns (string memory _name);
+    function getCharacterName(
+        bytes memory _id
+    ) external view returns (string memory _name);
 
     /** @notice See [Names#isNameAvailable](/docs/codex/Names.md#isNameAvailable) */
-    function isNameAvailable(string memory _name)
-        external
-        view
-        returns (bool _available);
+    function isNameAvailable(
+        string memory _name
+    ) external view returns (bool _available);
 
     /** @notice See [Names#isNameValid](/docs/codex/Names.md#isNameValid) */
-    function isNameValid(string memory _name)
-        external
-        pure
-        returns (bool _available);
+    function isNameValid(
+        string memory _name
+    ) external pure returns (bool _available);
 
     /** @notice See [Names#toLowerCase](/docs/codex/Names.md#toLowerCase) */
-    function toLowerCase(string memory _name)
-        external
-        pure
-        returns (string memory _lower_case);
+    function toLowerCase(
+        string memory _name
+    ) external pure returns (string memory _lower_case);
 }

@@ -25,15 +25,13 @@ interface ICivilizations {
     function unpause() external;
 
     /** @notice See [Civilizations#transfer](/docs/core/Civilizations.md#transfer) */
-    function transfer(
-        address _from,
-        address _to,
-        uint256 _token_id
-    ) external;
+    function transfer(address _from, address _to, uint256 _token_id) external;
 
     /** @notice See [Civilizations#setInitializeUpgrade](/docs/core/Civilizations.md#setInitializeUpgrade) */
-    function setInitializeUpgrade(uint256 _upgrade_id, bool _available)
-        external;
+    function setInitializeUpgrade(
+        uint256 _upgrade_id,
+        bool _available
+    ) external;
 
     /** @notice See [Civilizations#setUpgradePrice](/docs/core/Civilizations.md#setUpgradePrice) */
     function setUpgradePrice(uint256 _upgrade_id, uint256 _price) external;
@@ -54,28 +52,26 @@ interface ICivilizations {
     function buyUpgrade(bytes memory _id, uint256 _upgrade_id) external;
 
     /** @notice See [Civilizations#getCharacterUpgrades](/docs/core/Civilizations.md#getCharacterUpgrades) */
-    function getCharacterUpgrades(bytes memory _id)
-        external
-        view
-        returns (bool[3] memory _upgrades);
+    function getCharacterUpgrades(
+        bytes memory _id
+    ) external view returns (bool[3] memory _upgrades);
 
     /** @notice See [Civilizations#getUpgradeInformation](/docs/core/Civilizations.md#getUpgradeInformation) */
-    function getUpgradeInformation(uint256 _upgrade_id)
-        external
-        view
-        returns (Upgrade memory _upgrade);
+    function getUpgradeInformation(
+        uint256 _upgrade_id
+    ) external view returns (Upgrade memory _upgrade);
 
     /** @notice See [Civilizations#getTokenID](/docs/core/Civilizations.md#getTokenID) */
-    function getTokenID(uint256 _civilization_id, uint256 _token_id)
-        external
-        view
-        returns (bytes memory _id);
+    function getTokenID(
+        uint256 _civilization_id,
+        uint256 _token_id
+    ) external view returns (bytes memory _id);
 
     /** @notice See [Civilizations#isAllowed](/docs/core/Civilizations.md#isAllowed) */
-    function isAllowed(address _spender, bytes memory _id)
-        external
-        view
-        returns (bool _allowed);
+    function isAllowed(
+        address _spender,
+        bytes memory _id
+    ) external view returns (bool _allowed);
 
     /** @notice See [Civilizations#exists](/docs/core/Civilizations.md#exists) */
     function exists(bytes memory _id) external view returns (bool _exist);

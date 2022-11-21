@@ -151,8 +151,7 @@ interface IItems {
     function enableItem(uint256 _item_id) external;
 
     /** @notice See [Items#getItem](/docs/items/Items.md#getItem) */
-    function getItem(uint256 _item_id)
-        external
-        view
-        returns (Item memory _item);
+    function getItem(
+        uint256 _item_id
+    ) external view returns (Item memory _item);
 }

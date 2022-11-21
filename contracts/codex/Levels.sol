@@ -192,11 +192,9 @@ contract Levels is ILevels, Initializable, OwnableUpgradeable, UUPSUpgradeable {
      *
      * @return _level       Level number of the provided experience.
      */
-    function getLevel(uint256 _experience)
-        public
-        view
-        returns (uint256 _level)
-    {
+    function getLevel(
+        uint256 _experience
+    ) public view returns (uint256 _level) {
         uint256 i = 0;
 
         if (_experience < levels[25].min) {
@@ -243,19 +241,14 @@ contract Levels is ILevels, Initializable, OwnableUpgradeable, UUPSUpgradeable {
      *
      * @return _experience  Experience required to reach the level provided.
      */
-    function getExperience(uint256 _level)
-        public
-        view
-        returns (uint256 _experience)
-    {
+    function getExperience(
+        uint256 _level
+    ) public view returns (uint256 _experience) {
         return levels[_level].max;
     }
 
     /** @notice Internal function make sure upgrade proxy caller is the owner. */
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        virtual
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal virtual override onlyOwner {}
 }

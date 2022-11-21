@@ -112,11 +112,10 @@ contract BaseGadgetToken is
      * @param _receiver     Address that receives the tokens.
      * @param _amount       Amount of tokens to create.
      */
-    function mintFree(address _receiver, uint256 _amount)
-        public
-        whenNotPaused
-        onlyOwner
-    {
+    function mintFree(
+        address _receiver,
+        uint256 _amount
+    ) public whenNotPaused onlyOwner {
         _mint(_receiver, _amount);
     }
 

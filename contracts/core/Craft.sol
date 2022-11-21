@@ -379,11 +379,10 @@ contract Craft is
      * @param _id           Composed ID of the character.
      * @param _recipe_id    ID of the recipe.
      */
-    function craft(bytes memory _id, uint256 _recipe_id)
-        public
-        whenNotPaused
-        onlyAllowed(_id)
-    {
+    function craft(
+        bytes memory _id,
+        uint256 _recipe_id
+    ) public whenNotPaused onlyAllowed(_id) {
         require(
             _recipe_id != 0 && _recipe_id <= _recipes.length,
             "Craft: craft() invalid recipe id."
@@ -440,11 +439,10 @@ contract Craft is
      * @param _id           Composed ID of the character.
      * @param _upgrade_id   ID of the upgrade to perform.
      */
-    function upgrade(bytes memory _id, uint256 _upgrade_id)
-        public
-        whenNotPaused
-        onlyAllowed(_id)
-    {
+    function upgrade(
+        bytes memory _id,
+        uint256 _upgrade_id
+    ) public whenNotPaused onlyAllowed(_id) {
         require(
             _upgrade_id != 0 && _upgrade_id <= _recipes.length,
             "Craft: upgrade() invalid recipe id."
@@ -493,11 +491,9 @@ contract Craft is
      *
      * @return _recipe     Full information of the recipe
      */
-    function getRecipe(uint256 _recipe_id)
-        public
-        view
-        returns (Recipe memory _recipe)
-    {
+    function getRecipe(
+        uint256 _recipe_id
+    ) public view returns (Recipe memory _recipe) {
         require(
             _recipe_id != 0 && _recipe_id <= _recipes.length,
             "Craft: getRecipe() invalid recipe id."
@@ -513,11 +509,9 @@ contract Craft is
      *
      * @return _upgrade     Full information of the upgrade
      */
-    function getUpgrade(uint256 _upgrade_id)
-        public
-        view
-        returns (Upgrade memory _upgrade)
-    {
+    function getUpgrade(
+        uint256 _upgrade_id
+    ) public view returns (Upgrade memory _upgrade) {
         require(
             _upgrade_id != 0 && _upgrade_id <= _recipes.length,
             "Craft: getUpgrade() invalid recipe id."
@@ -533,11 +527,9 @@ contract Craft is
      *
      * @return _slot    Full information of character crafting slot.
      */
-    function getCharacterCrafSlot(bytes memory _id)
-        public
-        view
-        returns (Slot memory _slot)
-    {
+    function getCharacterCrafSlot(
+        bytes memory _id
+    ) public view returns (Slot memory _slot) {
         return craft_slots[_id];
     }
 
@@ -551,11 +543,9 @@ contract Craft is
      *
      * @return _available   Boolean to know if the slot is available.
      */
-    function _isSlotAvailable(bytes memory _id)
-        internal
-        view
-        returns (bool _available)
-    {
+    function _isSlotAvailable(
+        bytes memory _id
+    ) internal view returns (bool _available) {
         Slot memory s = craft_slots[_id];
 
         if (s.cooldown == 0) {
@@ -580,10 +570,7 @@ contract Craft is
     }
 
     /** @notice Internal function make sure upgrade proxy caller is the owner. */
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        virtual
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal virtual override onlyOwner {}
 }

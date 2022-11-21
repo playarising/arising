@@ -87,26 +87,23 @@ interface IForge {
     function claim(bytes memory _id, uint256 _forge_id) external;
 
     /** @notice See [Forge#getRecipe](/docs/core/Forge.md#getRecipe) */
-    function getRecipe(uint256 _recipe_id)
-        external
-        view
-        returns (Recipe memory _recipe);
+    function getRecipe(
+        uint256 _recipe_id
+    ) external view returns (Recipe memory _recipe);
 
     /** @notice See [Forge#getCharacterForge](/docs/core/Forge.md#getCharacterForge) */
-    function getCharacterForge(bytes memory _id, uint256 _forge_id)
-        external
-        view
-        returns (Forge memory _forge);
+    function getCharacterForge(
+        bytes memory _id,
+        uint256 _forge_id
+    ) external view returns (Forge memory _forge);
 
     /** @notice See [Forge#getCharacterForgesUpgrades](/docs/core/Forge.md#getCharacterForgesUpgrades) */
-    function getCharacterForgesUpgrades(bytes memory _id)
-        external
-        view
-        returns (bool[3] memory _upgrades);
+    function getCharacterForgesUpgrades(
+        bytes memory _id
+    ) external view returns (bool[3] memory _upgrades);
 
     /** @notice See [Forge#getCharacterForgesAvailability](/docs/core/Forge.md#getCharacterForgesAvailability) */
-    function getCharacterForgesAvailability(bytes memory _id)
-        external
-        view
-        returns (bool[3] memory _availability);
+    function getCharacterForgesAvailability(
+        bytes memory _id
+    ) external view returns (bool[3] memory _availability);
 }

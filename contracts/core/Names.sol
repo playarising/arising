@@ -79,10 +79,10 @@ contract Names is
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _experience       The address of the [Experience](/docs/core/Experience.md) instance.
      */
-    function initialize(address _civilizations, address _experience)
-        public
-        initializer
-    {
+    function initialize(
+        address _civilizations,
+        address _experience
+    ) public initializer {
         __Ownable_init();
         __Pausable_init();
         __UUPSUpgradeable_init();
@@ -108,11 +108,10 @@ contract Names is
      * @param _id       Composed ID of the character.
      * @param _name     Name to assign and claim.
      */
-    function claimName(bytes memory _id, string memory _name)
-        public
-        whenNotPaused
-        onlyAllowed(_id)
-    {
+    function claimName(
+        bytes memory _id,
+        string memory _name
+    ) public whenNotPaused onlyAllowed(_id) {
         require(
             IExperience(experience).getLevel(_id) >= 5,
             "Name: claimName() not enough level."
@@ -138,11 +137,10 @@ contract Names is
      * @param _id           Composed ID of the character.
      * @param _new_name     Name to replace for the character.
      */
-    function replaceName(bytes memory _id, string memory _new_name)
-        public
-        whenNotPaused
-        onlyAllowed(_id)
-    {
+    function replaceName(
+        bytes memory _id,
+        string memory _new_name
+    ) public whenNotPaused onlyAllowed(_id) {
         require(
             IExperience(experience).getLevel(_id) >= 5,
             "Name: replaceName() not enough level."
@@ -191,11 +189,9 @@ contract Names is
      *
      * @return _name    The assigned name of the character.
      */
-    function getCharacterName(bytes memory _id)
-        public
-        view
-        returns (string memory _name)
-    {
+    function getCharacterName(
+        bytes memory _id
+    ) public view returns (string memory _name) {
         return names[_id];
     }
 
@@ -207,11 +203,9 @@ contract Names is
      *
      * @return _available   Boolean to know if the name is available.
      */
-    function isNameAvailable(string memory _name)
-        public
-        view
-        returns (bool _available)
-    {
+    function isNameAvailable(
+        string memory _name
+    ) public view returns (bool _available) {
         return !claimed_names[toLowerCase(_name)];
     }
 
@@ -223,11 +217,9 @@ contract Names is
      *
      * @return _available   Boolean to know if the name is valid.
      */
-    function isNameValid(string memory _name)
-        public
-        pure
-        returns (bool _available)
-    {
+    function isNameValid(
+        string memory _name
+    ) public pure returns (bool _available) {
         bytes memory b = bytes(_name);
         if (b.length < 1) return false;
         if (b.length > 25) return false;
@@ -262,11 +254,9 @@ contract Names is
      *
      * @return _lower_case   The provided name as a lower case string.
      */
-    function toLowerCase(string memory _name)
-        public
-        pure
-        returns (string memory _lower_case)
-    {
+    function toLowerCase(
+        string memory _name
+    ) public pure returns (string memory _lower_case) {
         bytes memory b_str = bytes(_name);
         bytes memory b_lower = new bytes(b_str.length);
         for (uint256 i = 0; i < b_str.length; i++) {
@@ -282,10 +272,7 @@ contract Names is
     // =============================================== Internal =======================================================
 
     /** @notice Internal function make sure upgrade proxy caller is the owner. */
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        virtual
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal virtual override onlyOwner {}
 }

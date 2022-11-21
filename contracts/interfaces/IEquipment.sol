@@ -89,20 +89,17 @@ interface IEquipment {
     function unequip(bytes memory _id, EquipmentSlot _slot) external;
 
     /** @notice See [Equipment#getCharacterEquipment](/docs/core/Equipment.md#getCharacterEquipment) */
-    function getCharacterEquipment(bytes memory _id)
-        external
-        view
-        returns (CharacterEquipment memory);
+    function getCharacterEquipment(
+        bytes memory _id
+    ) external view returns (CharacterEquipment memory);
 
     /** @notice See [Equipment#getCharacterTotalStatsModifiers](/docs/core/Equipment.md#getCharacterTotalStatsModifiers) */
-    function getCharacterTotalStatsModifiers(bytes memory _id)
-        external
-        view
-        returns (IStats.BasicStats memory _modifiers);
+    function getCharacterTotalStatsModifiers(
+        bytes memory _id
+    ) external view returns (IStats.BasicStats memory _modifiers);
 
     /** @notice See [Equipment#getCharacterTotalAttributes](/docs/core/Equipment.md#getCharacterTotalAttributes) */
-    function getCharacterTotalAttributes(bytes memory _id)
-        external
-        view
-        returns (IItems.BaseAttributes memory _modifiers);
+    function getCharacterTotalAttributes(
+        bytes memory _id
+    ) external view returns (IItems.BaseAttributes memory _modifiers);
 }

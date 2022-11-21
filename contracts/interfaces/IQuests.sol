@@ -104,14 +104,12 @@ interface IQuests {
     function claimQuest(bytes memory _id) external;
 
     /** @notice See [Quests#getQuest](/docs/core/Quests.md#getQuest) */
-    function getQuest(uint256 _quest_id)
-        external
-        view
-        returns (Quest memory _quest);
+    function getQuest(
+        uint256 _quest_id
+    ) external view returns (Quest memory _quest);
 
     /** @notice See [Quests#getCharacterCurrentQuest](/docs/core/Quests.md#getCharacterCurrentQuest) */
-    function getCharacterCurrentQuest(bytes memory _id)
-        external
-        view
-        returns (CurrentQuest memory _quest);
+    function getCharacterCurrentQuest(
+        bytes memory _id
+    ) external view returns (CurrentQuest memory _quest);
 }

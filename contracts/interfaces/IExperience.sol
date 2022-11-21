@@ -16,17 +16,15 @@ interface IExperience {
     function removeAuthority(address _authority) external;
 
     /** @notice See [Experience#getExperience](/docs/core/Experience.md#getExperience) */
-    function getExperience(bytes memory _id)
-        external
-        view
-        returns (uint256 _experience);
+    function getExperience(
+        bytes memory _id
+    ) external view returns (uint256 _experience);
 
     /** @notice See [Experience#getLevel](/docs/core/Experience.md#getLevel) */
     function getLevel(bytes memory _id) external view returns (uint256 _level);
 
     /** @notice See [Experience#getExperienceForNextLevel](/docs/core/Experience.md#getExperienceForNextLevel) */
-    function getExperienceForNextLevel(bytes memory _id)
-        external
-        view
-        returns (uint256 _experience);
+    function getExperienceForNextLevel(
+        bytes memory _id
+    ) external view returns (uint256 _experience);
 }

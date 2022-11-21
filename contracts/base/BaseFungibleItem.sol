@@ -162,10 +162,10 @@ contract BaseFungibleItem is
      * @param _id       Composed ID of the character.
      * @param _amount   Amount of tokens to create.
      */
-    function consume(bytes memory _id, uint256 _amount)
-        public
-        onlyAllowed(_id)
-    {
+    function consume(
+        bytes memory _id,
+        uint256 _amount
+    ) public onlyAllowed(_id) {
         require(
             balances[_id] >= _amount,
             "BaseFungibleItem: consume() not enough balance."
@@ -180,11 +180,10 @@ contract BaseFungibleItem is
      * @param _id       Composed ID of the character.
      * @param _amount   Amount of tokens to create.
      */
-    function wrap(bytes memory _id, uint256 _amount)
-        public
-        onlyAllowed(_id)
-        onlyEnabled
-    {
+    function wrap(
+        bytes memory _id,
+        uint256 _amount
+    ) public onlyAllowed(_id) onlyEnabled {
         consume(_id, _amount);
         IBaseERC20Wrapper(wrapper).mint(
             ICivilizations(civilizations).ownerOf(_id),
@@ -199,11 +198,10 @@ contract BaseFungibleItem is
      * @param _id       Composed ID of the character.
      * @param _amount   Amount of tokens to create.
      */
-    function unwrap(bytes memory _id, uint256 _amount)
-        public
-        onlyAllowed(_id)
-        onlyEnabled
-    {
+    function unwrap(
+        bytes memory _id,
+        uint256 _amount
+    ) public onlyAllowed(_id) onlyEnabled {
         ERC20Burnable(wrapper).burnFrom(msg.sender, _amount * 1 ether);
         _mint(_id, _amount);
     }
@@ -218,11 +216,9 @@ contract BaseFungibleItem is
      *
      * @return _balance     Amount of tokens of the character from the composed ID.
      */
-    function balanceOf(bytes memory _id)
-        public
-        view
-        returns (uint256 _balance)
-    {
+    function balanceOf(
+        bytes memory _id
+    ) public view returns (uint256 _balance) {
         return balances[_id];
     }
 

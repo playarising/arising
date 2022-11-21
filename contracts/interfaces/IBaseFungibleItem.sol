@@ -19,8 +19,7 @@ interface IBaseFungibleItem {
     function unwrap(bytes memory _id, uint256 _amount) external;
 
     /** @notice See [BaseFungibleItem#balanceOf](/docs/base/BaseFungibleItem.md#balanceOf) */
-    function balanceOf(bytes memory _id)
-        external
-        view
-        returns (uint256 _balance);
+    function balanceOf(
+        bytes memory _id
+    ) external view returns (uint256 _balance);
 }

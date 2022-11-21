@@ -25,9 +25,10 @@ contract BaseERC20Wrapper is IBaseERC20Wrapper, Ownable, ERC20Burnable {
      * @param _name     Name of the `ERC20` token.
      * @param _symbol   Symbol of the `ERC20` token.
      */
-    constructor(string memory _name, string memory _symbol)
-        ERC20(_name, _symbol)
-    {}
+    constructor(
+        string memory _name,
+        string memory _symbol
+    ) ERC20(_name, _symbol) {}
 
     /**
      * @notice Creates tokens to the address provided.

@@ -48,32 +48,27 @@ interface IStats {
     function assignPoints(bytes memory _id, BasicStats memory _stats) external;
 
     /** @notice See [Stats#getBaseStats](/docs/codex/Stats.md#getBaseStats) */
-    function getBaseStats(bytes memory _id)
-        external
-        view
-        returns (BasicStats memory _stats);
+    function getBaseStats(
+        bytes memory _id
+    ) external view returns (BasicStats memory _stats);
 
     /** @notice See [Stats#getPoolStats](/docs/codex/Stats.md#getPoolStats) */
-    function getPoolStats(bytes memory _id)
-        external
-        view
-        returns (BasicStats memory _stats);
+    function getPoolStats(
+        bytes memory _id
+    ) external view returns (BasicStats memory _stats);
 
     /** @notice See [Stats#getAvailablePoints](/docs/codex/Stats.md#getAvailablePoints) */
-    function getAvailablePoints(bytes memory _id)
-        external
-        view
-        returns (uint256 _points);
+    function getAvailablePoints(
+        bytes memory _id
+    ) external view returns (uint256 _points);
 
     /** @notice See [Stats#getNextRefreshTime](/docs/codex/Stats.md#getNextRefreshTime) */
-    function getNextRefreshTime(bytes memory _id)
-        external
-        view
-        returns (uint256 _timestamp);
+    function getNextRefreshTime(
+        bytes memory _id
+    ) external view returns (uint256 _timestamp);
 
     /** @notice See [Stats#getNextRefreshWithTokenTime](/docs/codex/Stats.md#getNextRefreshWithTokenTime) */
-    function getNextRefreshWithTokenTime(bytes memory _id)
-        external
-        view
-        returns (uint256 _timestamp);
+    function getNextRefreshWithTokenTime(
+        bytes memory _id
+    ) external view returns (uint256 _timestamp);
 }

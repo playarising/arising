@@ -260,11 +260,9 @@ contract Forge is
      * Requirements:
      * @param _id  Composed ID of the characrter.
      */
-    function buyUpgrade(bytes memory _id)
-        public
-        whenNotPaused
-        onlyAllowed(_id)
-    {
+    function buyUpgrade(
+        bytes memory _id
+    ) public whenNotPaused onlyAllowed(_id) {
         require(
             IERC20(token).balanceOf(msg.sender) >= price,
             "Forge: buyUpgrade() not enough balance to buy upgrade."
@@ -361,11 +359,10 @@ contract Forge is
      * @param _id           Composed ID of the character.
      * @param _forge_id     ID of the forge to assign the recipe.
      */
-    function claim(bytes memory _id, uint256 _forge_id)
-        public
-        whenNotPaused
-        onlyAllowed(_id)
-    {
+    function claim(
+        bytes memory _id,
+        uint256 _forge_id
+    ) public whenNotPaused onlyAllowed(_id) {
         require(
             _forge_id > 0 && _forge_id <= 3,
             "Forge: claim() invalid forge id."
@@ -403,11 +400,9 @@ contract Forge is
      *
      * @return _recipe      Full information of the recipe.
      */
-    function getRecipe(uint256 _recipe_id)
-        public
-        view
-        returns (Recipe memory _recipe)
-    {
+    function getRecipe(
+        uint256 _recipe_id
+    ) public view returns (Recipe memory _recipe) {
         require(
             _recipe_id != 0 && _recipe_id <= _recipes.length,
             "Forge: getRecipe() invalid recipe id."
@@ -424,11 +419,10 @@ contract Forge is
      *
      * @return _forge       Full information of the forge.
      */
-    function getCharacterForge(bytes memory _id, uint256 _forge_id)
-        public
-        view
-        returns (Forge memory _forge)
-    {
+    function getCharacterForge(
+        bytes memory _id,
+        uint256 _forge_id
+    ) public view returns (Forge memory _forge) {
         require(
             _forge_id > 0 && _forge_id <= 3,
             "Forge: getCharacterForge() invalid forge id."
@@ -444,11 +438,9 @@ contract Forge is
      *
      * @return _upgrades    Array of booleans of upgrades purchases.
      */
-    function getCharacterForgesUpgrades(bytes memory _id)
-        public
-        view
-        returns (bool[3] memory _upgrades)
-    {
+    function getCharacterForgesUpgrades(
+        bytes memory _id
+    ) public view returns (bool[3] memory _upgrades) {
         return [true, forges[_id][2].available, forges[_id][3].available];
     }
 
@@ -460,11 +452,9 @@ contract Forge is
      *
      * @return _availability    Array of booleans of forge availability.
      */
-    function getCharacterForgesAvailability(bytes memory _id)
-        public
-        view
-        returns (bool[3] memory _availability)
-    {
+    function getCharacterForgesAvailability(
+        bytes memory _id
+    ) public view returns (bool[3] memory _availability) {
         bool[3] memory upgrades = getCharacterForgesUpgrades(_id);
         return [
             upgrades[0] && _isForgeAvailable(_id, 1),
@@ -484,11 +474,10 @@ contract Forge is
      *
      * @return _available   Boolean to know if the forge is available.
      */
-    function _isForgeAvailable(bytes memory _id, uint256 _forge_id)
-        internal
-        view
-        returns (bool _available)
-    {
+    function _isForgeAvailable(
+        bytes memory _id,
+        uint256 _forge_id
+    ) internal view returns (bool _available) {
         require(
             _forge_id > 0 && _forge_id <= 3,
             "Forge: _isForgeAvailable() invalid forge id."
@@ -511,11 +500,10 @@ contract Forge is
      *
      * @return _claimable   Boolean to know if the forge is claimable.
      */
-    function _isForgeClaimable(bytes memory _id, uint256 _forge_id)
-        internal
-        view
-        returns (bool _claimable)
-    {
+    function _isForgeClaimable(
+        bytes memory _id,
+        uint256 _forge_id
+    ) internal view returns (bool _claimable) {
         require(
             _forge_id > 0 && _forge_id <= 3,
             "Forge: _isForgeClaimable() invalid forge id."
@@ -527,10 +515,7 @@ contract Forge is
     }
 
     /** @notice Internal function make sure upgrade proxy caller is the owner. */
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        virtual
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal virtual override onlyOwner {}
 }

@@ -140,20 +140,17 @@ interface ICraft {
     function upgrade(bytes memory _id, uint256 _upgrade_id) external;
 
     /** @notice See [Craft#getRecipe](/docs/core/Craft.md#getRecipe) */
-    function getRecipe(uint256 _recipe_id)
-        external
-        view
-        returns (Recipe memory _recipe);
+    function getRecipe(
+        uint256 _recipe_id
+    ) external view returns (Recipe memory _recipe);
 
     /** @notice See [Craft#getUpgrade](/docs/core/Craft.md#getUpgrade) */
-    function getUpgrade(uint256 _upgrade_id)
-        external
-        view
-        returns (Upgrade memory _upgrade);
+    function getUpgrade(
+        uint256 _upgrade_id
+    ) external view returns (Upgrade memory _upgrade);
 
     /** @notice See [Craft#getCharacterCrafSlot](/docs/core/Craft.md#getCharacterCrafSlot) */
-    function getCharacterCrafSlot(bytes memory _id)
-        external
-        view
-        returns (Slot memory _slot);
+    function getCharacterCrafSlot(
+        bytes memory _id
+    ) external view returns (Slot memory _slot);
 }

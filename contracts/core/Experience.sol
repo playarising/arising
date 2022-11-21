@@ -77,10 +77,10 @@ contract Experience is
      * @param _civilizations    The address of the [Civilizations](/docs/core/Civilizations.md) instance.
      * @param _levels           The address of the [Levels](/docs/codex/Levels.md) instance.
      */
-    function initialize(address _civilizations, address _levels)
-        public
-        initializer
-    {
+    function initialize(
+        address _civilizations,
+        address _levels
+    ) public initializer {
         __Ownable_init();
         __Pausable_init();
         __UUPSUpgradeable_init();
@@ -97,10 +97,10 @@ contract Experience is
      * @param _id       Composed ID of the character.
      * @param _amount   The amount of experience to add.
      */
-    function assignExperience(bytes memory _id, uint256 _amount)
-        public
-        onlyAuthorized
-    {
+    function assignExperience(
+        bytes memory _id,
+        uint256 _amount
+    ) public onlyAuthorized {
         require(
             ICivilizations(civilizations).exists(_id),
             "Experience: assignExperience() token not minted."
@@ -148,11 +148,9 @@ contract Experience is
      *
      * @return _experience  Total experience of the character.
      */
-    function getExperience(bytes memory _id)
-        public
-        view
-        returns (uint256 _experience)
-    {
+    function getExperience(
+        bytes memory _id
+    ) public view returns (uint256 _experience) {
         return experience[_id];
     }
 
@@ -176,21 +174,16 @@ contract Experience is
      *
      * @return _experience  Total experience required to reach the next level.
      */
-    function getExperienceForNextLevel(bytes memory _id)
-        public
-        view
-        returns (uint256 _experience)
-    {
+    function getExperienceForNextLevel(
+        bytes memory _id
+    ) public view returns (uint256 _experience) {
         return ILevels(levels).getExperience(getLevel(_id)) - experience[_id];
     }
 
     // =============================================== Internal =======================================================
 
     /** @notice Internal function make sure upgrade proxy caller is the owner. */
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        virtual
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal virtual override onlyOwner {}
 }

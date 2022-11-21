@@ -287,11 +287,9 @@ contract Quests is
      * Requirements:
      * @param _id   Composed ID of the character.
      */
-    function claimQuest(bytes memory _id)
-        public
-        whenNotPaused
-        onlyAllowed(_id)
-    {
+    function claimQuest(
+        bytes memory _id
+    ) public whenNotPaused onlyAllowed(_id) {
         require(
             _isQuestClaimable(_id),
             "Quest: claimQuest() not available to claim."
@@ -324,11 +322,9 @@ contract Quests is
      *
      * @return _quest    Full quest information.
      */
-    function getQuest(uint256 _quest_id)
-        public
-        view
-        returns (Quest memory _quest)
-    {
+    function getQuest(
+        uint256 _quest_id
+    ) public view returns (Quest memory _quest) {
         return quests[_quest_id];
     }
 
@@ -340,11 +336,9 @@ contract Quests is
      *
      * @return _quest    Current character quest information.
      */
-    function getCharacterCurrentQuest(bytes memory _id)
-        public
-        view
-        returns (CurrentQuest memory _quest)
-    {
+    function getCharacterCurrentQuest(
+        bytes memory _id
+    ) public view returns (CurrentQuest memory _quest) {
         return character_quests[_id];
     }
 
@@ -358,11 +352,9 @@ contract Quests is
      *
      * @return _available   Boolean to know if the character is available to start a quest.
      */
-    function _isAvailableForQuest(bytes memory _id)
-        internal
-        view
-        returns (bool _available)
-    {
+    function _isAvailableForQuest(
+        bytes memory _id
+    ) internal view returns (bool _available) {
         if (character_quests[_id].cooldown == 0) {
             return true;
         }
@@ -380,11 +372,9 @@ contract Quests is
      *
      * @return _claimable   Boolean to know if the last quest is claimable.
      */
-    function _isQuestClaimable(bytes memory _id)
-        internal
-        view
-        returns (bool _claimable)
-    {
+    function _isQuestClaimable(
+        bytes memory _id
+    ) internal view returns (bool _claimable) {
         return
             character_quests[_id].cooldown <= block.timestamp &&
             !character_quests[_id].claimed_reward &&
@@ -392,10 +382,7 @@ contract Quests is
     }
 
     /** @notice Internal function make sure upgrade proxy caller is the owner. */
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        virtual
-        override
-        onlyOwner
-    {}
+    function _authorizeUpgrade(
+        address newImplementation
+    ) internal virtual override onlyOwner {}
 }
