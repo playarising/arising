@@ -101,13 +101,13 @@ contract BaseFungibleItem is
         string memory _symbol,
         address _civilizations
     ) public initializer {
-        __Ownable_init();
+        __Ownable_init(_msgSender());
         name = _name;
         symbol = _symbol;
         civilizations = _civilizations;
         wrapper = address(new BaseERC20Wrapper(_name, _symbol));
         enable_wrap = false;
-        authorized[msg.sender] = true;
+        authorized[_msgSender()] = true;
     }
 
     /**

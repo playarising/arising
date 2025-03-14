@@ -49,7 +49,7 @@ contract BaseGadgetToken is
     ) public initializer {
         __ERC20_init(_name, _symbol);
         __ERC20Burnable_init();
-        __Ownable_init();
+        __Ownable_init(_msgSender());
         __Pausable_init();
         token = _token;
         price = _price;
