@@ -9,6 +9,8 @@ on:
 env:
   RUST_TOOLCHAIN: "1.89.0"
   BUN_VERSION: "1.1.9"
+  SOLANA_CLI_VERSION: "v1.18.17"
+  ANCHOR_CLI_VERSION: "0.32.1"
 
 jobs:
   build-and-test:
@@ -29,11 +31,18 @@ jobs:
         with:
           cache-on-failure: true
 
-      - name: Set up Solana CLI
-        uses: metadaoproject/setup-solana@v1.2
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev libudev-dev build-essential
 
-      - name: Set up Anchor CLI
-        uses: metadaoproject/setup-anchor@v3.4
+      - name: Install Solana CLI
+        run: |
+          sh -c "$(curl -sSfL https://release.solana.com/${SOLANA_CLI_VERSION}/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> "$GITHUB_PATH"
+
+      - name: Install Anchor CLI
+        run: cargo install --locked anchor-cli --version "${ANCHOR_CLI_VERSION}"
 
       - name: Set up Bun toolchain
         uses: oven-sh/setup-bun@v1
