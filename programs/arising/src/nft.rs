@@ -139,6 +139,19 @@ pub fn mint_character_nft<'info>(
     ];
     invoke_signed(&metadata_ix, &metadata_infos, signer_seeds)?;
 
+    token::mint_to(
+        CpiContext::new_with_signer(
+            accounts.token_program.to_account_info(),
+            token::MintTo {
+                mint: accounts.character_mint.to_account_info(),
+                to: accounts.character_token_account.to_account_info(),
+                authority: accounts.mint_state.to_account_info(),
+            },
+            signer_seeds,
+        ),
+        1,
+    )?;
+
     let master_ix = CreateMasterEditionV3 {
         edition: accounts.master_edition.key(),
         mint: mint_key,
@@ -167,19 +180,6 @@ pub fn mint_character_nft<'info>(
         accounts.token_metadata_program.to_account_info(),
     ];
     invoke_signed(&master_ix, &master_infos, signer_seeds)?;
-
-    token::mint_to(
-        CpiContext::new_with_signer(
-            accounts.token_program.to_account_info(),
-            token::MintTo {
-                mint: accounts.character_mint.to_account_info(),
-                to: accounts.character_token_account.to_account_info(),
-                authority: accounts.mint_state.to_account_info(),
-            },
-            signer_seeds,
-        ),
-        1,
-    )?;
 
     let verify_ix = SetAndVerifySizedCollectionItem {
         metadata: metadata_key,

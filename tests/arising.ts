@@ -6,20 +6,17 @@ import { SystemProgram } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 import { Arising } from "../target/types/arising";
+import { BASE_ENERGY, CIVILIZATIONS, TOKEN_METADATA_PROGRAM_ID } from "./constants";
 import {
-  BASE_ENERGY,
-  CIVILIZATIONS,
-  CollectionSetup,
-  TOKEN_METADATA_PROGRAM_ID,
-} from "./constants";
-import {
-  createCollectionNft,
   deriveCharacterMintPda,
   deriveCharacterPda,
   deriveCharacterTokenPda,
+  deriveCollectionMintPda,
+  deriveCollectionTokenPda,
   deriveMintStatePda,
   findMasterEditionPda,
   findMetadataPda,
+  ensureWalletHasLamports,
 } from "./helpers";
 
 const toNumber = (value: BN | number): number =>
@@ -32,6 +29,16 @@ describe("arising defaults", () => {
   const program = anchor.workspace.arising as Program<Arising>;
   const wallet = provider.wallet as anchor.Wallet & { payer: anchor.web3.Keypair };
   const mintStatePda = deriveMintStatePda(program.programId);
+  const collectionMintPda = deriveCollectionMintPda(program.programId);
+  const collectionTokenPda = deriveCollectionTokenPda(program.programId);
+  const collectionMetadataPda = findMetadataPda(
+    collectionMintPda,
+    TOKEN_METADATA_PROGRAM_ID
+  );
+  const collectionEditionPda = findMasterEditionPda(
+    collectionMintPda,
+    TOKEN_METADATA_PROGRAM_ID
+  );
 
   type ProgramMethods = Program<Arising>["methods"];
   type InitializeAccounts = Parameters<
@@ -41,22 +48,30 @@ describe("arising defaults", () => {
     ReturnType<ProgramMethods["mintCharacter"]>["accounts"]
   >[0];
 
-  let collection: CollectionSetup;
-
   before(async () => {
-    collection = await createCollectionNft(provider);
+    await ensureWalletHasLamports(provider, wallet);
 
     const initializeAccounts = {
       mintState: mintStatePda,
       authority: wallet.publicKey,
-      collectionMint: collection.mint,
-      collectionMetadata: collection.metadata,
-      collectionMasterEdition: collection.edition,
+      collectionMint: collectionMintPda,
+      collectionTokenAccount: collectionTokenPda,
+      collectionMetadata: collectionMetadataPda,
+      collectionMasterEdition: collectionEditionPda,
       tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+      tokenProgram: TOKEN_PROGRAM_ID,
       systemProgram: SystemProgram.programId,
+      rent: anchor.web3.SYSVAR_RENT_PUBKEY,
     } as InitializeAccounts;
 
-    await program.methods.initialize().accounts(initializeAccounts).rpc();
+    await program.methods
+      .initialize(
+        "Arising Collection",
+        "ARISE",
+        "https://mints.playarising.com/collection.json"
+      )
+      .accounts(initializeAccounts)
+      .rpc();
   });
 
   CIVILIZATIONS.forEach((civilization, index) => {
@@ -93,9 +108,9 @@ describe("arising defaults", () => {
         characterTokenAccount,
         metadata,
         masterEdition,
-        collectionMint: collection.mint,
-        collectionMetadata: collection.metadata,
-        collectionMasterEdition: collection.edition,
+        collectionMint: collectionMintPda,
+        collectionMetadata: collectionMetadataPda,
+        collectionMasterEdition: collectionEditionPda,
         tokenProgram: TOKEN_PROGRAM_ID,
         tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
         rent: anchor.web3.SYSVAR_RENT_PUBKEY,

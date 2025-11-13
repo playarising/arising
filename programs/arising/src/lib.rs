@@ -1,6 +1,16 @@
-use anchor_lang::prelude::*;
-use anchor_spl::token::{Mint, Token, TokenAccount};
-use mpl_token_metadata::ID as TOKEN_METADATA_PROGRAM_ID;
+use anchor_lang::{
+    prelude::*,
+    solana_program::{program::invoke_signed, system_program, sysvar},
+};
+use anchor_spl::token::{self, Mint, Token, TokenAccount};
+use mpl_token_metadata::{
+    instructions::{
+        CreateMasterEditionV3, CreateMasterEditionV3InstructionArgs, CreateMetadataAccountV3,
+        CreateMetadataAccountV3InstructionArgs,
+    },
+    types::{CollectionDetails, Creator, DataV2},
+    ID as TOKEN_METADATA_PROGRAM_ID,
+};
 
 pub mod character;
 pub mod codex;
@@ -16,13 +26,18 @@ use codex::{Attributes, CharacterClass, Civilization, CoreStats, Gender, Passive
 use errors::ArisingError;
 use nft::{master_edition_pda, metadata_pda, mint_character_nft, CharacterMetadataArgs};
 
-declare_id!("aris36Gz3rvSvgdDxwfBcveTN449VssKQipM5XJBuip");
+declare_id!("D8238NRhqaPfPQfuiZSXVvxtLzBP4bVFLrd43TSo24X9");
 
 #[program]
 pub mod arising {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
+    pub fn initialize(
+        ctx: Context<Initialize>,
+        collection_name: String,
+        collection_symbol: String,
+        collection_uri: String,
+    ) -> Result<()> {
         let metadata_program = Pubkey::new_from_array(TOKEN_METADATA_PROGRAM_ID.to_bytes());
         require_keys_eq!(
             ctx.accounts.token_metadata_program.key(),
@@ -32,19 +47,167 @@ pub mod arising {
 
         let expected_metadata =
             metadata_pda(&ctx.accounts.collection_mint.key(), &metadata_program);
-        require_keys_eq!(
-            ctx.accounts.collection_metadata.key(),
-            expected_metadata,
-            ArisingError::InvalidCollectionMetadata
-        );
-
         let expected_master_edition =
             master_edition_pda(&ctx.accounts.collection_mint.key(), &metadata_program);
-        require_keys_eq!(
-            ctx.accounts.collection_master_edition.key(),
-            expected_master_edition,
-            ArisingError::InvalidCollectionMasterEdition
-        );
+
+        let mint_state_bump = ctx.bumps.mint_state;
+        let signer_seeds: &[&[&[u8]]] = &[&[CHARACTER_MINT_STATE_SEED, &[mint_state_bump]]];
+
+        token::mint_to(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                token::MintTo {
+                    mint: ctx.accounts.collection_mint.to_account_info(),
+                    to: ctx.accounts.collection_token_account.to_account_info(),
+                    authority: ctx.accounts.mint_state.to_account_info(),
+                },
+                signer_seeds,
+            ),
+            1,
+        )?;
+
+        if ctx.accounts.collection_mint.data_is_empty() {
+            let rent = Rent::get()?;
+            let lamports = rent.minimum_balance(spl_token::state::Mint::LEN);
+
+            let create_ix = system_instruction::create_account(
+                &ctx.accounts.authority.key(),
+                &ctx.accounts.collection_mint.key(),
+                lamports,
+                spl_token::state::Mint::LEN as u64,
+                &ctx.accounts.token_program.key(),
+            );
+            invoke(
+                &create_ix,
+                &[
+                    ctx.accounts.authority.to_account_info(),
+                    ctx.accounts.collection_mint.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+            )?;
+
+            token::initialize_mint(
+                CpiContext::new(
+                    ctx.accounts.token_program.to_account_info(),
+                    token::InitializeMint {
+                        mint: ctx.accounts.collection_mint.to_account_info(),
+                        rent: ctx.accounts.rent.to_account_info(),
+                    },
+                ),
+                0,
+                &ctx.accounts.mint_state.key(),
+                Some(&ctx.accounts.mint_state.key()),
+            )?;
+        }
+
+        if ctx.accounts.collection_token_account.data_is_empty() {
+            let rent = Rent::get()?;
+            let lamports = rent.minimum_balance(spl_token::state::Account::LEN);
+
+            let create_ix = system_instruction::create_account(
+                &ctx.accounts.authority.key(),
+                &ctx.accounts.collection_token_account.key(),
+                lamports,
+                spl_token::state::Account::LEN as u64,
+                &ctx.accounts.token_program.key(),
+            );
+            invoke(
+                &create_ix,
+                &[
+                    ctx.accounts.authority.to_account_info(),
+                    ctx.accounts.collection_token_account.to_account_info(),
+                    ctx.accounts.system_program.to_account_info(),
+                ],
+            )?;
+
+            token::initialize_account(
+                CpiContext::new(
+                    ctx.accounts.token_program.to_account_info(),
+                    token::InitializeAccount {
+                        account: ctx.accounts.collection_token_account.to_account_info(),
+                        mint: ctx.accounts.collection_mint.to_account_info(),
+                        authority: ctx.accounts.authority.to_account_info(),
+                        rent: ctx.accounts.rent.to_account_info(),
+                    },
+                ),
+                &ctx.accounts.collection_mint.key(),
+                &ctx.accounts.authority.key(),
+            )?;
+        }
+
+        let metadata_data = DataV2 {
+            name: collection_name,
+            symbol: collection_symbol,
+            uri: collection_uri,
+            seller_fee_basis_points: 0,
+            creators: Some(vec![Creator {
+                address: ctx.accounts.mint_state.key(),
+                verified: true,
+                share: 100,
+            }]),
+            collection: None,
+            uses: None,
+        };
+
+        if ctx.accounts.collection_metadata.data_is_empty() {
+            let metadata_ix = CreateMetadataAccountV3 {
+                metadata: ctx.accounts.collection_metadata.key(),
+                mint: ctx.accounts.collection_mint.key(),
+                mint_authority: ctx.accounts.mint_state.key(),
+                payer: ctx.accounts.authority.key(),
+                update_authority: (ctx.accounts.mint_state.key(), true),
+                system_program: system_program::ID,
+                rent: Some(sysvar::rent::id()),
+            }
+            .instruction(CreateMetadataAccountV3InstructionArgs {
+                data: metadata_data,
+                is_mutable: false,
+                collection_details: Some(CollectionDetails::V1 { size: 0 }),
+            });
+
+            let metadata_infos = [
+                ctx.accounts.collection_metadata.to_account_info(),
+                ctx.accounts.collection_mint.to_account_info(),
+                ctx.accounts.mint_state.to_account_info(),
+                ctx.accounts.authority.to_account_info(),
+                ctx.accounts.mint_state.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+                ctx.accounts.rent.to_account_info(),
+                ctx.accounts.token_metadata_program.to_account_info(),
+            ];
+            invoke_signed(&metadata_ix, &metadata_infos, signer_seeds)?;
+        }
+
+        if ctx.accounts.collection_master_edition.data_is_empty() {
+            let master_ix = CreateMasterEditionV3 {
+                edition: ctx.accounts.collection_master_edition.key(),
+                mint: ctx.accounts.collection_mint.key(),
+                update_authority: ctx.accounts.mint_state.key(),
+                mint_authority: ctx.accounts.mint_state.key(),
+                payer: ctx.accounts.authority.key(),
+                metadata: ctx.accounts.collection_metadata.key(),
+                token_program: ctx.accounts.token_program.key(),
+                system_program: system_program::ID,
+                rent: Some(sysvar::rent::id()),
+            }
+            .instruction(CreateMasterEditionV3InstructionArgs {
+                max_supply: Some(0),
+            });
+
+            let master_infos = [
+                ctx.accounts.collection_master_edition.to_account_info(),
+                ctx.accounts.collection_mint.to_account_info(),
+                ctx.accounts.mint_state.to_account_info(),
+                ctx.accounts.mint_state.to_account_info(),
+                ctx.accounts.authority.to_account_info(),
+                ctx.accounts.collection_metadata.to_account_info(),
+                ctx.accounts.token_program.to_account_info(),
+                ctx.accounts.system_program.to_account_info(),
+                ctx.accounts.rent.to_account_info(),
+                ctx.accounts.token_metadata_program.to_account_info(),
+            ];
+            invoke_signed(&master_ix, &master_infos, signer_seeds)?;
+        }
 
         ctx.accounts.mint_state.initialize(
             ctx.bumps.mint_state,
@@ -302,15 +465,23 @@ pub struct Initialize<'info> {
     pub mint_state: Account<'info, CharacterMintState>,
     #[account(mut)]
     pub authority: Signer<'info>,
-    /// CHECK: Collection mint validated via metadata PDA checks
+    /// CHECK: PDA created in handler if needed
+    #[account(mut)]
     pub collection_mint: UncheckedAccount<'info>,
-    /// CHECK: PDA checked in handler
+    /// CHECK: PDA created in handler if needed
+    #[account(mut)]
+    pub collection_token_account: UncheckedAccount<'info>,
+    /// CHECK: Created via token metadata CPI
+    #[account(mut)]
     pub collection_metadata: UncheckedAccount<'info>,
-    /// CHECK: PDA checked in handler
+    /// CHECK: Created via token metadata CPI
+    #[account(mut)]
     pub collection_master_edition: UncheckedAccount<'info>,
     /// CHECK: Program id validated
     pub token_metadata_program: UncheckedAccount<'info>,
+    pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
+    pub rent: Sysvar<'info, Rent>,
 }
 
 #[derive(Accounts)]
@@ -357,8 +528,12 @@ pub struct MintCharacter<'info> {
     /// CHECK: PDA validated in handler
     #[account(mut)]
     pub master_edition: UncheckedAccount<'info>,
-    /// CHECK: Collection mint validated against state
-    pub collection_mint: UncheckedAccount<'info>,
+    #[account(
+        mut,
+        seeds = [COLLECTION_MINT_SEED],
+        bump
+    )]
+    pub collection_mint: Account<'info, Mint>,
     /// CHECK: Mutated by collection verification CPI
     #[account(mut)]
     pub collection_metadata: UncheckedAccount<'info>,

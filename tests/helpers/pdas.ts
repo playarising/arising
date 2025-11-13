@@ -7,9 +7,19 @@ const CHARACTER_NFT_MINT_SEED = Buffer.from("character_nft_mint");
 const CHARACTER_NFT_TOKEN_SEED = Buffer.from("character_nft_token");
 const METADATA_SEED = Buffer.from("metadata");
 const MASTER_EDITION_SEED = Buffer.from("edition");
+const COLLECTION_MINT_SEED = Buffer.from("collection_mint");
+const COLLECTION_TOKEN_SEED = Buffer.from("collection_token");
 
 export const deriveMintStatePda = (programId: PublicKey): PublicKey => {
   return PublicKey.findProgramAddressSync([CHARACTER_MINT_STATE_SEED], programId)[0];
+};
+
+export const deriveCollectionMintPda = (programId: PublicKey): PublicKey => {
+  return PublicKey.findProgramAddressSync([COLLECTION_MINT_SEED], programId)[0];
+};
+
+export const deriveCollectionTokenPda = (programId: PublicKey): PublicKey => {
+  return PublicKey.findProgramAddressSync([COLLECTION_TOKEN_SEED], programId)[0];
 };
 
 export const deriveCharacterPda = (

@@ -44,12 +44,6 @@ export type AttributesShape = {
   rate: number;
 };
 
-export type CollectionSetup = {
-  mint: PublicKey;
-  metadata: PublicKey;
-  edition: PublicKey;
-};
-
 export const BASE_ENERGY = 10;
 
 export const CIVILIZATIONS: CivilizationConfig[] = [
