@@ -9,16 +9,17 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    container: projectserum/build:v0.24.2
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: List rustup toolchains
-        run: rustup toolchain list
-      - name: Set default toolchain
-        run: rustup default stable
+
+      - uses: metadaoproject/setup-solana@v1.0
+
+      - uses: metadaoproject/setup-anchor@v3.3
+
       - name: Generate new keygen
         run: solana-keygen new
+        
       - name: Sync Keys
         run: anchor sync
