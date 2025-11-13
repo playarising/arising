@@ -24,6 +24,20 @@ pub enum ArisingError {
     Unauthorized,
     #[msg("Provided character account does not match the requested civilization/id pair")]
     InvalidCharacterAccount,
+    #[msg("Allocation must contain at least one positive value")]
+    EmptyAllocation,
+    #[msg("Allocation values must be non-negative")]
+    NegativeAllocation,
+    #[msg("Not enough core points available for this allocation")]
+    InsufficientCorePoints,
+    #[msg("Not enough attribute points available for this allocation")]
+    InsufficientAttributePoints,
+    #[msg("You must reach the required level before choosing a class")]
+    ClassLevelRequirement,
+    #[msg("Character class already chosen")]
+    ClassAlreadyChosen,
+    #[msg("Selected class does not match the civilization")]
+    InvalidClassForCivilization,
     #[msg("Arithmetic overflow encountered")]
     ArithmeticOverflow,
 }

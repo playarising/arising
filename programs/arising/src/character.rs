@@ -1,7 +1,8 @@
 use anchor_lang::prelude::*;
 
 use crate::{
-    codex::{Attributes, Civilization, CoreStats, Gender},
+    codex::{Attributes, CharacterClass, Civilization, CoreStats, Gender},
+    errors::ArisingError,
     level_codex::{
         level_from_experience, total_attribute_points_for_level, total_core_points_for_level,
     },
@@ -19,6 +20,7 @@ pub struct Character {
     pub civilization: Civilization,
     pub civilization_character_id: u16,
     pub gender: Gender,
+    pub class: Option<CharacterClass>,
     pub experience: u64,
     pub stats: CoreStats,
     pub attributes: Attributes,
@@ -36,6 +38,8 @@ impl Character {
         + 1 // civilization enum
         + 2 // civilization_character_id
         + 1 // gender
+        + 1 // class option tag
+        + 1 // class value
         + 8 // experience
         + CoreStats::SIZE
         + Attributes::SIZE
@@ -82,6 +86,145 @@ impl Character {
 
     pub fn available_attribute_points(&self) -> i32 {
         self.total_attribute_points() as i32 - self.spent_attribute_points()
+    }
+
+    pub fn ensure_identity(&self, civilization: Civilization, character_id: u16) -> Result<()> {
+        require_eq!(
+            self.civilization,
+            civilization,
+            ArisingError::InvalidCharacterAccount
+        );
+        require_eq!(
+            self.civilization_character_id,
+            character_id,
+            ArisingError::InvalidCharacterAccount
+        );
+        Ok(())
+    }
+
+    pub fn grant_experience(&mut self, amount: u64) -> Result<()> {
+        self.experience = self
+            .experience
+            .checked_add(amount)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        Ok(())
+    }
+
+    pub fn ensure_min_level(&self, min_level: u8) -> Result<()> {
+        require!(
+            self.current_level() >= min_level,
+            ArisingError::ClassLevelRequirement
+        );
+        Ok(())
+    }
+
+    fn add_core_stats(&mut self, delta: CoreStats) -> Result<()> {
+        self.stats.might = self
+            .stats
+            .might
+            .checked_add(delta.might)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        self.stats.speed = self
+            .stats
+            .speed
+            .checked_add(delta.speed)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        self.stats.intellect = self
+            .stats
+            .intellect
+            .checked_add(delta.intellect)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        Ok(())
+    }
+
+    fn add_attributes(&mut self, delta: Attributes) -> Result<()> {
+        self.attributes.atk = self
+            .attributes
+            .atk
+            .checked_add(delta.atk)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        self.attributes.def = self
+            .attributes
+            .def
+            .checked_add(delta.def)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        self.attributes.mag_atk = self
+            .attributes
+            .mag_atk
+            .checked_add(delta.mag_atk)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        self.attributes.mag_def = self
+            .attributes
+            .mag_def
+            .checked_add(delta.mag_def)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        self.attributes.range = self
+            .attributes
+            .range
+            .checked_add(delta.range)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        self.attributes.rate = self
+            .attributes
+            .rate
+            .checked_add(delta.rate)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        Ok(())
+    }
+
+    pub fn allocate_core_stats(&mut self, allocation: CoreStats) -> Result<()> {
+        let allocation_total =
+            allocation.might as i32 + allocation.speed as i32 + allocation.intellect as i32;
+        require!(allocation_total > 0, ArisingError::EmptyAllocation);
+
+        let available = self.available_core_points();
+        require!(
+            allocation_total <= available,
+            ArisingError::InsufficientCorePoints
+        );
+
+        self.add_core_stats(allocation)
+    }
+
+    pub fn allocate_attributes(&mut self, allocation: Attributes) -> Result<()> {
+        require!(
+            allocation.atk >= 0
+                && allocation.def >= 0
+                && allocation.mag_atk >= 0
+                && allocation.mag_def >= 0
+                && allocation.range >= 0
+                && allocation.rate >= 0,
+            ArisingError::NegativeAllocation
+        );
+
+        let allocation_total = allocation.atk as i32
+            + allocation.def as i32
+            + allocation.mag_atk as i32
+            + allocation.mag_def as i32
+            + allocation.range as i32
+            + allocation.rate as i32;
+        require!(allocation_total > 0, ArisingError::EmptyAllocation);
+
+        let available = self.available_attribute_points();
+        require!(
+            allocation_total <= available,
+            ArisingError::InsufficientAttributePoints
+        );
+
+        self.add_attributes(allocation)
+    }
+
+    pub fn apply_class_choice(&mut self, class: CharacterClass) -> Result<()> {
+        require!(self.class.is_none(), ArisingError::ClassAlreadyChosen);
+        require_eq!(
+            class.civilization(),
+            self.civilization,
+            ArisingError::InvalidClassForCivilization
+        );
+        let bonus = class.bonuses();
+        self.add_core_stats(bonus.stats)?;
+        self.add_attributes(bonus.attributes)?;
+        self.class = Some(class);
+        Ok(())
     }
 }
 

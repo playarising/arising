@@ -12,7 +12,7 @@ use character::{
     Character, CharacterMintState, CHARACTER_MINT_STATE_SEED, CHARACTER_NFT_MINT_SEED,
     CHARACTER_NFT_TOKEN_SEED, CHARACTER_SEED,
 };
-use codex::{Attributes, Civilization, CoreStats, Gender, PassiveEffect};
+use codex::{Attributes, CharacterClass, Civilization, CoreStats, Gender, PassiveEffect};
 use errors::ArisingError;
 use nft::{master_edition_pda, metadata_pda, mint_character_nft, CharacterMetadataArgs};
 
@@ -114,6 +114,7 @@ pub mod arising {
         character.civilization = civilization;
         character.civilization_character_id = character_id;
         character.gender = gender;
+        character.class = None;
         character.experience = 0;
         character.stats = civilization.base_stats();
         character.attributes = civilization.base_attributes();
@@ -153,22 +154,78 @@ pub mod arising {
         Ok(())
     }
 
+    pub fn add_experience(
+        ctx: Context<ModifyCharacterExperience>,
+        civilization: Civilization,
+        character_id: u16,
+        amount: u64,
+    ) -> Result<()> {
+        let character = &mut ctx.accounts.character;
+        character.ensure_identity(civilization, character_id)?;
+        character.grant_experience(amount)
+    }
+
+    pub fn allocate_core_stats(
+        ctx: Context<ModifyCharacterOwned>,
+        civilization: Civilization,
+        character_id: u16,
+        allocation: CoreStats,
+    ) -> Result<()> {
+        let character = &mut ctx.accounts.character;
+        character.ensure_identity(civilization, character_id)?;
+        require_keys_eq!(
+            ctx.accounts.authority.key(),
+            character.authority,
+            ArisingError::Unauthorized
+        );
+        character.allocate_core_stats(allocation)
+    }
+
+    pub fn allocate_attributes(
+        ctx: Context<ModifyCharacterOwned>,
+        civilization: Civilization,
+        character_id: u16,
+        allocation: Attributes,
+    ) -> Result<()> {
+        let character = &mut ctx.accounts.character;
+        character.ensure_identity(civilization, character_id)?;
+        require_keys_eq!(
+            ctx.accounts.authority.key(),
+            character.authority,
+            ArisingError::Unauthorized
+        );
+        character.allocate_attributes(allocation)
+    }
+
+    pub fn choose_class(
+        ctx: Context<ModifyCharacterOwned>,
+        civilization: Civilization,
+        character_id: u16,
+        class: CharacterClass,
+    ) -> Result<()> {
+        let character = &mut ctx.accounts.character;
+        character.ensure_identity(civilization, character_id)?;
+        require_keys_eq!(
+            ctx.accounts.authority.key(),
+            character.authority,
+            ArisingError::Unauthorized
+        );
+        character.ensure_min_level(10)?;
+        require_eq!(
+            class.civilization(),
+            civilization,
+            ArisingError::InvalidClassForCivilization
+        );
+        character.apply_class_choice(class)
+    }
+
     pub fn get_character_metadata(
         ctx: Context<GetCharacterMetadata>,
         civilization: Civilization,
         character_id: u16,
     ) -> Result<()> {
         let character = &ctx.accounts.character;
-        require_eq!(
-            character.civilization,
-            civilization,
-            ArisingError::InvalidCharacterAccount
-        );
-        require_eq!(
-            character.civilization_character_id,
-            character_id,
-            ArisingError::InvalidCharacterAccount
-        );
+        character.ensure_identity(civilization, character_id)?;
 
         emit!(CharacterMetadataEvent {
             civilization,
@@ -177,6 +234,7 @@ pub mod arising {
             gender: character.gender,
             level: character.current_level(),
             experience: character.experience,
+            class: character.class,
             base_stats: civilization.base_stats(),
             stats: character.stats,
             base_attributes: civilization.base_attributes(),
@@ -290,6 +348,29 @@ pub struct UpdateCivilizationCap<'info> {
 
 #[derive(Accounts)]
 #[instruction(civilization: Civilization, character_id: u16)]
+pub struct ModifyCharacterExperience<'info> {
+    #[account(
+        mut,
+        seeds = [CHARACTER_SEED, &[civilization as u8], &character_id.to_le_bytes()],
+        bump
+    )]
+    pub character: Account<'info, Character>,
+}
+
+#[derive(Accounts)]
+#[instruction(civilization: Civilization, character_id: u16)]
+pub struct ModifyCharacterOwned<'info> {
+    #[account(
+        mut,
+        seeds = [CHARACTER_SEED, &[civilization as u8], &character_id.to_le_bytes()],
+        bump
+    )]
+    pub character: Account<'info, Character>,
+    pub authority: Signer<'info>,
+}
+
+#[derive(Accounts)]
+#[instruction(civilization: Civilization, character_id: u16)]
 pub struct GetCharacterMetadata<'info> {
     #[account(
         seeds = [CHARACTER_SEED, &[civilization as u8], &character_id.to_le_bytes()],
@@ -306,6 +387,7 @@ pub struct CharacterMetadataEvent {
     pub gender: Gender,
     pub level: u8,
     pub experience: u64,
+    pub class: Option<CharacterClass>,
     pub base_stats: CoreStats,
     pub stats: CoreStats,
     pub base_attributes: Attributes,

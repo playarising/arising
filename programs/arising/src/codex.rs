@@ -78,12 +78,12 @@ impl Civilization {
 
     pub const fn passive(self) -> PassiveEffect {
         match self {
-            Civilization::Ard => PassiveEffect::JobsBonusGold10,
-            Civilization::Hartenn => PassiveEffect::ForgeOutput15,
-            Civilization::Ikarans => PassiveEffect::FarmRawMats10,
-            Civilization::Zhand => PassiveEffect::RaidsEnergyDiscount10,
-            Civilization::Shinkari => PassiveEffect::CraftQuality5,
-            Civilization::Tarki => PassiveEffect::JobsBonusGold10,
+            Civilization::Ard => PassiveEffect::KnightsHonor,
+            Civilization::Hartenn => PassiveEffect::ForgeMastery,
+            Civilization::Ikarans => PassiveEffect::SylvanGrace,
+            Civilization::Zhand => PassiveEffect::DuneCunning,
+            Civilization::Shinkari => PassiveEffect::ArtisanFocus,
+            Civilization::Tarki => PassiveEffect::RaidersFortune,
         }
     }
 
@@ -118,11 +118,120 @@ impl fmt::Display for Civilization {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
 pub enum PassiveEffect {
-    JobsBonusGold10,
-    ForgeOutput15,
-    FarmRawMats10,
-    RaidsEnergyDiscount10,
-    CraftQuality5,
+    KnightsHonor,
+    ForgeMastery,
+    SylvanGrace,
+    DuneCunning,
+    ArtisanFocus,
+    RaidersFortune,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
+pub enum CharacterClass {
+    ArdKnight,
+    ArdTemplar,
+    HartennEngineer,
+    HartennWarden,
+    IkaransRanger,
+    IkaransDruid,
+    ZhandSandblade,
+    ZhandSeer,
+    ShinkariSamurai,
+    ShinkariOnmyoji,
+    TarkiRaider,
+    TarkiSkald,
+}
+
+pub struct ClassBonus {
+    pub stats: CoreStats,
+    pub attributes: Attributes,
+}
+
+impl CharacterClass {
+    pub fn civilization(self) -> Civilization {
+        match self {
+            CharacterClass::ArdKnight | CharacterClass::ArdTemplar => Civilization::Ard,
+            CharacterClass::HartennEngineer | CharacterClass::HartennWarden => {
+                Civilization::Hartenn
+            }
+            CharacterClass::IkaransRanger | CharacterClass::IkaransDruid => Civilization::Ikarans,
+            CharacterClass::ZhandSandblade | CharacterClass::ZhandSeer => Civilization::Zhand,
+            CharacterClass::ShinkariSamurai | CharacterClass::ShinkariOnmyoji => {
+                Civilization::Shinkari
+            }
+            CharacterClass::TarkiRaider | CharacterClass::TarkiSkald => Civilization::Tarki,
+        }
+    }
+
+    pub fn bonuses(self) -> ClassBonus {
+        match self {
+            CharacterClass::ArdKnight => ClassBonus {
+                stats: CoreStats::new(1, 0, 0),
+                attributes: Attributes::new(0, 2, 0, 0, 0, 0),
+            },
+            CharacterClass::ArdTemplar => ClassBonus {
+                stats: CoreStats::new(0, 0, 1),
+                attributes: Attributes::new(0, 1, 0, 1, 0, 0),
+            },
+            CharacterClass::HartennEngineer => ClassBonus {
+                stats: CoreStats::new(0, 0, 1),
+                attributes: Attributes::new(0, 0, 2, 0, 0, 0),
+            },
+            CharacterClass::HartennWarden => ClassBonus {
+                stats: CoreStats::new(1, 0, 0),
+                attributes: Attributes::new(1, 1, 0, 0, 0, 0),
+            },
+            CharacterClass::IkaransRanger => ClassBonus {
+                stats: CoreStats::new(0, 1, 0),
+                attributes: Attributes::new(1, 0, 0, 0, 1, 0),
+            },
+            CharacterClass::IkaransDruid => ClassBonus {
+                stats: CoreStats::new(0, 0, 1),
+                attributes: Attributes::new(0, 0, 0, 2, 0, 0),
+            },
+            CharacterClass::ZhandSandblade => ClassBonus {
+                stats: CoreStats::new(0, 1, 0),
+                attributes: Attributes::new(0, 0, 0, 0, 0, 2),
+            },
+            CharacterClass::ZhandSeer => ClassBonus {
+                stats: CoreStats::new(0, 0, 1),
+                attributes: Attributes::new(0, 0, 2, 0, 0, 0),
+            },
+            CharacterClass::ShinkariSamurai => ClassBonus {
+                stats: CoreStats::new(1, 0, 0),
+                attributes: Attributes::new(1, 0, 0, 0, 0, 1),
+            },
+            CharacterClass::ShinkariOnmyoji => ClassBonus {
+                stats: CoreStats::new(0, 0, 1),
+                attributes: Attributes::new(0, 0, 1, 1, 0, 0),
+            },
+            CharacterClass::TarkiRaider => ClassBonus {
+                stats: CoreStats::new(1, 0, 0),
+                attributes: Attributes::new(2, 0, 0, 0, 0, 0),
+            },
+            CharacterClass::TarkiSkald => ClassBonus {
+                stats: CoreStats::new(0, 1, 0),
+                attributes: Attributes::new(0, 0, 0, 0, 1, 1),
+            },
+        }
+    }
+
+    pub fn options_for(civilization: Civilization) -> &'static [CharacterClass; 2] {
+        match civilization {
+            Civilization::Ard => &[CharacterClass::ArdKnight, CharacterClass::ArdTemplar],
+            Civilization::Hartenn => &[
+                CharacterClass::HartennEngineer,
+                CharacterClass::HartennWarden,
+            ],
+            Civilization::Ikarans => &[CharacterClass::IkaransRanger, CharacterClass::IkaransDruid],
+            Civilization::Zhand => &[CharacterClass::ZhandSandblade, CharacterClass::ZhandSeer],
+            Civilization::Shinkari => &[
+                CharacterClass::ShinkariSamurai,
+                CharacterClass::ShinkariOnmyoji,
+            ],
+            Civilization::Tarki => &[CharacterClass::TarkiRaider, CharacterClass::TarkiSkald],
+        }
+    }
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
@@ -141,6 +250,10 @@ impl CoreStats {
             speed,
             intellect,
         }
+    }
+
+    pub const fn zero() -> Self {
+        Self::new(0, 0, 0)
     }
 }
 
@@ -173,6 +286,10 @@ impl Attributes {
             range,
             rate,
         }
+    }
+
+    pub const fn zero() -> Self {
+        Self::new(0, 0, 0, 0, 0, 0)
     }
 }
 
