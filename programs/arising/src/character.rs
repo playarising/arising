@@ -118,6 +118,11 @@ impl Character {
         Ok(())
     }
 
+    pub fn ensure_authority(&self, authority: Pubkey) -> Result<()> {
+        require_keys_eq!(authority, self.authority, ArisingError::Unauthorized);
+        Ok(())
+    }
+
     pub fn grant_experience(&mut self, amount: u64) -> Result<()> {
         let previous_level = self.current_level();
         self.experience = self
@@ -331,6 +336,58 @@ impl CharacterMintState {
         self.collection_metadata = collection_metadata;
         self.collection_master_edition = collection_master_edition;
         self.civilization_mints = [CivilizationMintConfig::new(); Civilization::COUNT];
+    }
+
+    pub fn ensure_authority(&self, authority: Pubkey) -> Result<()> {
+        require_keys_eq!(authority, self.authority, ArisingError::Unauthorized);
+        Ok(())
+    }
+
+    pub fn ensure_collection_binding(
+        &self,
+        collection_mint: &Pubkey,
+        collection_metadata: &Pubkey,
+        collection_master_edition: &Pubkey,
+    ) -> Result<()> {
+        require_keys_eq!(
+            *collection_mint,
+            self.collection_mint,
+            ArisingError::InvalidCollectionMint
+        );
+        require_keys_eq!(
+            *collection_metadata,
+            self.collection_metadata,
+            ArisingError::InvalidCollectionMetadata
+        );
+        require_keys_eq!(
+            *collection_master_edition,
+            self.collection_master_edition,
+            ArisingError::InvalidCollectionMasterEdition
+        );
+        Ok(())
+    }
+
+    pub fn ensure_can_mint(&self, civilization: Civilization, character_id: u16) -> Result<()> {
+        let track = self.track(civilization);
+        require_eq!(
+            character_id,
+            track.next_id,
+            ArisingError::InvalidCharacterIdSequence
+        );
+        require!(
+            character_id <= track.cap,
+            ArisingError::CivilizationCapReached
+        );
+        Ok(())
+    }
+
+    pub fn record_mint(&mut self, civilization: Civilization) -> Result<()> {
+        let track = self.track_mut(civilization);
+        track.next_id = track
+            .next_id
+            .checked_add(1)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        Ok(())
     }
 
     pub fn track_mut(&mut self, civilization: Civilization) -> &mut CivilizationMintConfig {
