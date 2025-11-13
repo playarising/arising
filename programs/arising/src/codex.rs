@@ -87,17 +87,6 @@ impl Civilization {
         }
     }
 
-    pub const fn theme(self) -> &'static str {
-        match self {
-            Civilization::Ard => "Knightly humans",
-            Civilization::Hartenn => "Dwarves",
-            Civilization::Ikarans => "Wood elves",
-            Civilization::Zhand => "Desert elves",
-            Civilization::Shinkari => "Eastern humans",
-            Civilization::Tarki => "Viking-like humans",
-        }
-    }
-
     pub const fn display_name(self) -> &'static str {
         match self {
             Civilization::Ard => "Ard",
@@ -295,7 +284,6 @@ impl Attributes {
 
 pub struct CivilizationCodexEntry {
     pub civilization: Civilization,
-    pub theme: &'static str,
     pub base_stats: CoreStats,
     pub base_attributes: Attributes,
     pub passive: PassiveEffect,
@@ -304,42 +292,36 @@ pub struct CivilizationCodexEntry {
 pub const CIVILIZATION_CODEX: [CivilizationCodexEntry; 6] = [
     CivilizationCodexEntry {
         civilization: Civilization::Ard,
-        theme: Civilization::Ard.theme(),
         base_stats: Civilization::Ard.base_stats(),
         base_attributes: Civilization::Ard.base_attributes(),
         passive: Civilization::Ard.passive(),
     },
     CivilizationCodexEntry {
         civilization: Civilization::Hartenn,
-        theme: Civilization::Hartenn.theme(),
         base_stats: Civilization::Hartenn.base_stats(),
         base_attributes: Civilization::Hartenn.base_attributes(),
         passive: Civilization::Hartenn.passive(),
     },
     CivilizationCodexEntry {
         civilization: Civilization::Ikarans,
-        theme: Civilization::Ikarans.theme(),
         base_stats: Civilization::Ikarans.base_stats(),
         base_attributes: Civilization::Ikarans.base_attributes(),
         passive: Civilization::Ikarans.passive(),
     },
     CivilizationCodexEntry {
         civilization: Civilization::Zhand,
-        theme: Civilization::Zhand.theme(),
         base_stats: Civilization::Zhand.base_stats(),
         base_attributes: Civilization::Zhand.base_attributes(),
         passive: Civilization::Zhand.passive(),
     },
     CivilizationCodexEntry {
         civilization: Civilization::Shinkari,
-        theme: Civilization::Shinkari.theme(),
         base_stats: Civilization::Shinkari.base_stats(),
         base_attributes: Civilization::Shinkari.base_attributes(),
         passive: Civilization::Shinkari.passive(),
     },
     CivilizationCodexEntry {
         civilization: Civilization::Tarki,
-        theme: Civilization::Tarki.theme(),
         base_stats: Civilization::Tarki.base_stats(),
         base_attributes: Civilization::Tarki.base_attributes(),
         passive: Civilization::Tarki.passive(),

@@ -1,8 +1,13 @@
 import * as anchor from "@coral-xyz/anchor";
-import { Program } from "@coral-xyz/anchor";
+import { AnchorError, Program } from "@coral-xyz/anchor";
 import { expect } from "chai";
 import BN from "bn.js";
-import { ComputeBudgetProgram, SystemProgram } from "@solana/web3.js";
+import {
+  ComputeBudgetProgram,
+  Keypair,
+  LAMPORTS_PER_SOL,
+  SystemProgram,
+} from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 import { Arising } from "../target/types/arising";
@@ -21,7 +26,13 @@ import {
 const toNumber = (value: BN | number): number =>
   typeof value === "number" ? value : value.toNumber();
 
-describe("arising defaults", () => {
+const genderFor = (civilizationIndex: number, characterId: number) =>
+  (civilizationIndex + characterId) % 2 === 0 ? { male: {} } : { female: {} };
+
+const genderKey = (gender: { male?: {}; female?: {} }) =>
+  "male" in gender ? "male" : "female";
+
+describe("arising program", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
@@ -47,7 +58,101 @@ describe("arising defaults", () => {
     ReturnType<ProgramMethods["mintCharacter"]>["accounts"]
   >[0];
 
+  const buildMintAccounts = (
+    civilizationIndex: number,
+    characterId: number,
+    authority: anchor.web3.PublicKey
+  ): MintCharacterAccounts => {
+    const character = deriveCharacterPda(civilizationIndex, characterId, program.programId);
+    const characterMint = deriveCharacterMintPda(
+      civilizationIndex,
+      characterId,
+      program.programId
+    );
+    const characterTokenAccount = deriveCharacterTokenPda(
+      civilizationIndex,
+      characterId,
+      program.programId
+    );
+    const metadata = findMetadataPda(characterMint, TOKEN_METADATA_PROGRAM_ID);
+    const masterEdition = findMasterEditionPda(characterMint, TOKEN_METADATA_PROGRAM_ID);
+
+    return {
+      character,
+      authority,
+      mintState: mintStatePda,
+      characterMint,
+      characterTokenAccount,
+      metadata,
+      masterEdition,
+      collectionMint: collectionMintPda,
+      collectionMetadata: collectionMetadataPda,
+      collectionMasterEdition: collectionEditionPda,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+      rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      systemProgram: SystemProgram.programId,
+    };
+  };
+
+  const mintCharacterTx = async (
+    civilization: (typeof CIVILIZATIONS)[number],
+    characterId: number,
+    authority: Keypair = wallet.payer
+  ) => {
+    const gender = genderFor(civilization.index, characterId);
+    const accounts = buildMintAccounts(civilization.index, characterId, authority.publicKey);
+    let method = program.methods
+      .mintCharacter(civilization.variant, characterId, gender)
+      .accounts(accounts)
+      .preInstructions([
+        ComputeBudgetProgram.setComputeUnitLimit({
+          units: 350_000,
+        }),
+      ]);
+
+    if (!authority.publicKey.equals(wallet.publicKey)) {
+      method = method.signers([authority]);
+    }
+
+    return method.rpc();
+  };
+
+  const updateCapTx = async (
+    civilization: (typeof CIVILIZATIONS)[number],
+    cap: number,
+    authority: Keypair = wallet.payer
+  ) => {
+    let method = program.methods
+      .updateCivilizationCap(civilization.variant, cap)
+      .accounts({
+        mintState: mintStatePda,
+        authority: authority.publicKey,
+      });
+
+    if (!authority.publicKey.equals(wallet.publicKey)) {
+      method = method.signers([authority]);
+    }
+
+    return method.rpc();
+  };
+
+  const expectAnchorError = async (fn: () => Promise<unknown>, code: string) => {
+    try {
+      await fn();
+      expect.fail(`Expected ${code} error but transaction succeeded`);
+    } catch (error) {
+      const anchorError = error as AnchorError;
+      if (!anchorError.error?.errorCode?.code) {
+        throw error;
+      }
+      expect(anchorError.error.errorCode.code).to.equal(code);
+    }
+  };
+
+
   before(async () => {
+
     const initializeAccounts = {
       mintState: mintStatePda,
       authority: wallet.publicKey,
@@ -71,81 +176,75 @@ describe("arising defaults", () => {
       .rpc();
   });
 
-  CIVILIZATIONS.forEach((civilization, index) => {
-    it(`mints ${civilization.display} and checks defaults`, async () => {
-      const characterId = 1;
-      const character = deriveCharacterPda(
-        civilization.index,
-        characterId,
-        program.programId
+  it("updates and enforces civilization caps", async () => {
+    for (const civilization of CIVILIZATIONS) {
+      await updateCapTx(civilization, 5);
+    }
+
+    for (const civilization of CIVILIZATIONS) {
+      for (let characterId = 1; characterId <= 5; characterId += 1) {
+        await mintCharacterTx(civilization, characterId);
+      }
+
+      const firstCharacter = await program.account.character.fetch(
+        deriveCharacterPda(civilization.index, 1, program.programId)
       );
-      const characterMint = deriveCharacterMintPda(
-        civilization.index,
-        characterId,
-        program.programId
-      );
-      const characterTokenAccount = deriveCharacterTokenPda(
-        civilization.index,
-        characterId,
-        program.programId
-      );
-      const metadata = findMetadataPda(characterMint, TOKEN_METADATA_PROGRAM_ID);
-      const masterEdition = findMasterEditionPda(
-        characterMint,
-        TOKEN_METADATA_PROGRAM_ID
+      const firstGender = genderFor(civilization.index, 1);
+
+      expect(firstCharacter.civilization).to.deep.equal(civilization.variant);
+      expect(firstCharacter.civilizationCharacterId).to.equal(1);
+      expect(firstCharacter.gender[genderKey(firstGender)]).to.not.be.undefined;
+      expect(firstCharacter.class).to.equal(null);
+      expect(toNumber(firstCharacter.experience)).to.equal(0);
+
+      expect(toNumber(firstCharacter.stats.might)).to.equal(civilization.stats.might);
+      expect(toNumber(firstCharacter.stats.speed)).to.equal(civilization.stats.speed);
+      expect(toNumber(firstCharacter.stats.intellect)).to.equal(
+        civilization.stats.intellect
       );
 
-      const gender = index % 2 === 0 ? { male: {} } : { female: {} };
+      expect(toNumber(firstCharacter.attributes.atk)).to.equal(
+        civilization.attributes.atk
+      );
+      expect(toNumber(firstCharacter.attributes.def)).to.equal(
+        civilization.attributes.def
+      );
+      expect(toNumber(firstCharacter.attributes.magAtk)).to.equal(
+        civilization.attributes.magAtk
+      );
+      expect(toNumber(firstCharacter.attributes.magDef)).to.equal(
+        civilization.attributes.magDef
+      );
+      expect(toNumber(firstCharacter.attributes.range)).to.equal(
+        civilization.attributes.range
+      );
+      expect(toNumber(firstCharacter.attributes.rate)).to.equal(
+        civilization.attributes.rate
+      );
 
-      const mintAccounts = {
-        character,
-        authority: wallet.publicKey,
-        mintState: mintStatePda,
-        characterMint,
-        characterTokenAccount,
-        metadata,
-        masterEdition,
-        collectionMint: collectionMintPda,
-        collectionMetadata: collectionMetadataPda,
-        collectionMasterEdition: collectionEditionPda,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-        systemProgram: SystemProgram.programId,
-      } as MintCharacterAccounts;
+      expect(toNumber(firstCharacter.energy)).to.equal(BASE_ENERGY);
+      expect(toNumber(firstCharacter.lastEnergyRefill)).to.equal(
+        toNumber(firstCharacter.createdAt)
+      );
+    }
 
-      await program.methods
-        .mintCharacter(civilization.variant, characterId, gender)
-        .accounts(mintAccounts)
-        .preInstructions([
-          ComputeBudgetProgram.setComputeUnitLimit({
-            units: 350_000,
-          }),
-        ])
-        .rpc();
+    for (const civilization of CIVILIZATIONS) {
+      await expectAnchorError(
+        () => mintCharacterTx(civilization, 6),
+        "CivilizationCapReached"
+      );
+    }
 
-      const account = await program.account.character.fetch(character);
+    const unauthorized = Keypair.generate();
 
-      expect(account.civilization).to.deep.equal(civilization.variant);
-      expect(account.civilizationCharacterId).to.equal(characterId);
-      expect(account.gender[Object.keys(gender)[0] as "male" | "female"]).to.not.be
-        .undefined;
-      expect(account.class).to.equal(null);
-      expect(toNumber(account.experience)).to.equal(0);
+    await expectAnchorError(
+      () => updateCapTx(CIVILIZATIONS[0], 6, unauthorized),
+      "Unauthorized"
+    );
 
-      expect(toNumber(account.stats.might)).to.equal(civilization.stats.might);
-      expect(toNumber(account.stats.speed)).to.equal(civilization.stats.speed);
-      expect(toNumber(account.stats.intellect)).to.equal(civilization.stats.intellect);
-
-      expect(toNumber(account.attributes.atk)).to.equal(civilization.attributes.atk);
-      expect(toNumber(account.attributes.def)).to.equal(civilization.attributes.def);
-      expect(toNumber(account.attributes.magAtk)).to.equal(civilization.attributes.magAtk);
-      expect(toNumber(account.attributes.magDef)).to.equal(civilization.attributes.magDef);
-      expect(toNumber(account.attributes.range)).to.equal(civilization.attributes.range);
-      expect(toNumber(account.attributes.rate)).to.equal(civilization.attributes.rate);
-
-      expect(toNumber(account.energy)).to.equal(BASE_ENERGY);
-      expect(toNumber(account.lastEnergyRefill)).to.equal(toNumber(account.createdAt));
-    });
+    for (const civilization of CIVILIZATIONS) {
+      await updateCapTx(civilization, 6);
+      await mintCharacterTx(civilization, 6);
+    }
   });
 });
