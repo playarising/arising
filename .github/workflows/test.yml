@@ -6,6 +6,10 @@ on:
       - main
   pull_request:
 
+env:
+  RUST_TOOLCHAIN: "1.89.0"
+  BUN_VERSION: "1.1.9"
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -14,12 +18,49 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - uses: metadaoproject/setup-solana@v1.0
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_TOOLCHAIN }}
+          components: rustfmt, clippy
 
-      - uses: metadaoproject/setup-anchor@v3.3
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - name: Set up Solana CLI
+        uses: metadaoproject/setup-solana@v1.0
+
+      - name: Set up Anchor CLI
+        uses: metadaoproject/setup-anchor@v3.3
+
+      - name: Set up Bun toolchain
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install JS dependencies
+        run: bun install --frozen-lockfile
 
       - name: Generate new keygen
-        run: solana-keygen new
-        
+        run: solana-keygen new --no-bip39-passphrase --force
+
       - name: Sync Keys
         run: anchor sync
+
+      - name: Build
+        run: anchor build
+
+      - name: Test
+        run: bun run test
