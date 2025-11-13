@@ -42,6 +42,14 @@ impl Civilization {
         }
     }
 
+    pub fn metadata_uri(self, character_id: u16) -> String {
+        format!(
+            "https://mints-{}.playarising.com/metadata/{}",
+            self.slug(),
+            character_id
+        )
+    }
+
     pub const fn seed_bytes(self) -> [u8; 1] {
         [self as u8]
     }
@@ -108,7 +116,7 @@ impl fmt::Display for Civilization {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
 pub enum PassiveEffect {
     JobsBonusGold10,
     ForgeOutput15,

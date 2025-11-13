@@ -74,7 +74,7 @@ pub fn requirement_for(level: u8) -> Option<&'static LevelCurveEntry> {
 }
 
 pub fn next_requirement_after(level: u8) -> Option<&'static LevelCurveEntry> {
-    LEVEL_CURVE.iter().find(|entry| entry.level == level)
+    LEVEL_CURVE.iter().find(|entry| entry.level == level + 1)
 }
 
 pub fn level_from_experience(total_xp: u64) -> u8 {

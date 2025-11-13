@@ -12,7 +12,7 @@ use character::{
     Character, CharacterMintState, CHARACTER_MINT_STATE_SEED, CHARACTER_NFT_MINT_SEED,
     CHARACTER_NFT_TOKEN_SEED, CHARACTER_SEED,
 };
-use codex::{Attributes, Civilization, CoreStats, Gender};
+use codex::{Attributes, Civilization, CoreStats, Gender, PassiveEffect};
 use errors::ArisingError;
 use nft::{master_edition_pda, metadata_pda, mint_character_nft, CharacterMetadataArgs};
 
@@ -64,7 +64,7 @@ pub mod arising {
         gender: Gender,
     ) -> Result<()> {
         // Extract bump first before any mutable borrows
-        let mint_state_bump = ctx.accounts.mint_state.bump;
+        let mint_state_bump = ctx.bumps.mint_state;
 
         // Validate and check in a scope that drops the mutable borrow
         {
@@ -102,11 +102,7 @@ pub mod arising {
         let metadata = CharacterMetadataArgs {
             name: format!("Arising: {}", civilization.display_name()),
             symbol: "ARISING".to_owned(),
-            uri: format!(
-                "https://mints-{}.playarising.com/metadata/{}",
-                civilization.slug(),
-                character_id
-            ),
+            uri: civilization.metadata_uri(character_id),
         };
 
         let signer_seeds: &[&[&[u8]]] = &[&[CHARACTER_MINT_STATE_SEED, &[mint_state_bump]]];
@@ -157,8 +153,8 @@ pub mod arising {
         Ok(())
     }
 
-    pub fn emit_character_metadata(
-        ctx: Context<EmitCharacterMetadata>,
+    pub fn get_character_metadata(
+        ctx: Context<GetCharacterMetadata>,
         civilization: Civilization,
         character_id: u16,
     ) -> Result<()> {
@@ -181,14 +177,18 @@ pub mod arising {
             gender: character.gender,
             level: character.current_level(),
             experience: character.experience,
+            base_stats: civilization.base_stats(),
             stats: character.stats,
+            base_attributes: civilization.base_attributes(),
             attributes: character.attributes,
             available_core_points: character.available_core_points(),
             available_attribute_points: character.available_attribute_points(),
+            passive: civilization.passive(),
             nft_mint: character.nft_mint,
             nft_metadata: character.nft_metadata,
             nft_master_edition: character.nft_master_edition,
             nft_token_account: character.nft_token_account,
+            created_at: character.created_at,
         });
 
         Ok(())
@@ -234,7 +234,7 @@ pub struct MintCharacter<'info> {
     #[account(
         mut,
         seeds = [CHARACTER_MINT_STATE_SEED],
-        bump = mint_state.bump
+        bump
     )]
     pub mint_state: Account<'info, CharacterMintState>,
     #[account(
@@ -282,8 +282,7 @@ pub struct UpdateCivilizationCap<'info> {
     #[account(
         mut,
         seeds = [CHARACTER_MINT_STATE_SEED],
-        bump = mint_state.bump,
-        has_one = authority
+        bump
     )]
     pub mint_state: Account<'info, CharacterMintState>,
     pub authority: Signer<'info>,
@@ -291,10 +290,10 @@ pub struct UpdateCivilizationCap<'info> {
 
 #[derive(Accounts)]
 #[instruction(civilization: Civilization, character_id: u16)]
-pub struct EmitCharacterMetadata<'info> {
+pub struct GetCharacterMetadata<'info> {
     #[account(
         seeds = [CHARACTER_SEED, &[civilization as u8], &character_id.to_le_bytes()],
-        bump = character.bump
+        bump
     )]
     pub character: Account<'info, Character>,
 }
@@ -307,12 +306,16 @@ pub struct CharacterMetadataEvent {
     pub gender: Gender,
     pub level: u8,
     pub experience: u64,
+    pub base_stats: CoreStats,
     pub stats: CoreStats,
+    pub base_attributes: Attributes,
     pub attributes: Attributes,
     pub available_core_points: i32,
     pub available_attribute_points: i32,
+    pub passive: PassiveEffect,
     pub nft_mint: Pubkey,
     pub nft_metadata: Pubkey,
     pub nft_master_edition: Pubkey,
     pub nft_token_account: Pubkey,
+    pub created_at: i64,
 }

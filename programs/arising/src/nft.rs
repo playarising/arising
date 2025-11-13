@@ -71,6 +71,22 @@ pub fn mint_character_nft<'info>(
         ArisingError::InvalidMasterEditionAccount
     );
 
+    require_keys_eq!(
+        accounts.collection_mint.key(),
+        accounts.mint_state.collection_mint,
+        ArisingError::InvalidCollectionMint
+    );
+    require_keys_eq!(
+        accounts.collection_metadata.key(),
+        accounts.mint_state.collection_metadata,
+        ArisingError::InvalidCollectionMetadata
+    );
+    require_keys_eq!(
+        accounts.collection_master_edition.key(),
+        accounts.mint_state.collection_master_edition,
+        ArisingError::InvalidCollectionMasterEdition
+    );
+
     let creator = Creator {
         address: accounts.authority.key(),
         verified: true,
@@ -119,6 +135,7 @@ pub fn mint_character_nft<'info>(
         accounts.authority.to_account_info(),
         accounts.system_program.to_account_info(),
         accounts.rent.to_account_info(),
+        accounts.token_metadata_program.to_account_info(),
     ];
     invoke_signed(&metadata_ix, &metadata_infos, signer_seeds)?;
 
@@ -147,6 +164,7 @@ pub fn mint_character_nft<'info>(
         accounts.token_program.to_account_info(),
         accounts.system_program.to_account_info(),
         accounts.rent.to_account_info(),
+        accounts.token_metadata_program.to_account_info(),
     ];
     invoke_signed(&master_ix, &master_infos, signer_seeds)?;
 
@@ -175,7 +193,7 @@ pub fn mint_character_nft<'info>(
     }
     .instruction();
 
-    let verify_infos = [
+    let verify_infos = vec![
         accounts.metadata.to_account_info(),
         accounts.mint_state.to_account_info(),
         accounts.authority.to_account_info(),
@@ -183,6 +201,8 @@ pub fn mint_character_nft<'info>(
         accounts.collection_mint.to_account_info(),
         accounts.collection_metadata.to_account_info(),
         accounts.collection_master_edition.to_account_info(),
+        accounts.system_program.to_account_info(),
+        accounts.token_metadata_program.to_account_info(),
     ];
     invoke_signed(&verify_ix, &verify_infos, signer_seeds)?;
 
