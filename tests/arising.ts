@@ -16,7 +16,6 @@ import {
   deriveMintStatePda,
   findMasterEditionPda,
   findMetadataPda,
-  ensureWalletHasLamports,
 } from "./helpers";
 
 const toNumber = (value: BN | number): number =>
@@ -49,8 +48,6 @@ describe("arising defaults", () => {
   >[0];
 
   before(async () => {
-    await ensureWalletHasLamports(provider, wallet);
-
     const initializeAccounts = {
       mintState: mintStatePda,
       authority: wallet.publicKey,
