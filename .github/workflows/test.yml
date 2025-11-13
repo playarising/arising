@@ -30,10 +30,10 @@ jobs:
           cache-on-failure: true
 
       - name: Set up Solana CLI
-        uses: metadaoproject/setup-solana@v1.0
+        uses: metadaoproject/setup-solana@v1.2
 
       - name: Set up Anchor CLI
-        uses: metadaoproject/setup-anchor@v3.3
+        uses: metadaoproject/setup-anchor@v3.4
 
       - name: Set up Bun toolchain
         uses: oven-sh/setup-bun@v1
