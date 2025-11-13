@@ -32,6 +32,13 @@ describe("arising defaults", () => {
   const program = anchor.workspace.arising as Program<Arising>;
   const wallet = provider.wallet as anchor.Wallet & { payer: anchor.web3.Keypair };
   const mintStatePda = deriveMintStatePda(program.programId);
+  type ProgramMethods = Program<Arising>["methods"];
+  type InitializeAccounts = Parameters<
+    ReturnType<ProgramMethods["initialize"]>["accounts"]
+  >[0];
+  type MintCharacterAccounts = Parameters<
+    ReturnType<ProgramMethods["mintCharacter"]>["accounts"]
+  >[0];
 
   let collection: CollectionSetup;
 
@@ -55,18 +62,17 @@ describe("arising defaults", () => {
 
     collection = await createCollectionNft(provider);
 
-    await program.methods
-      .initialize()
-      .accounts({
-        mintState: mintStatePda,
-        authority: wallet.publicKey,
-        collectionMint: collection.mint,
-        collectionMetadata: collection.metadata,
-        collectionMasterEdition: collection.edition,
-        tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-        systemProgram: SystemProgram.programId,
-      })
-      .rpc();
+    const initializeAccounts = {
+      mintState: mintStatePda,
+      authority: wallet.publicKey,
+      collectionMint: collection.mint,
+      collectionMetadata: collection.metadata,
+      collectionMasterEdition: collection.edition,
+      tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+      systemProgram: SystemProgram.programId,
+    } as InitializeAccounts;
+
+    await program.methods.initialize().accounts(initializeAccounts).rpc();
   });
 
   CIVILIZATIONS.forEach((civilization, index) => {
@@ -95,29 +101,31 @@ describe("arising defaults", () => {
 
       const gender = index % 2 === 0 ? { male: {} } : { female: {} };
 
+      const mintAccounts = {
+        character,
+        authority: wallet.publicKey,
+        mintState: mintStatePda,
+        characterMint,
+        characterTokenAccount,
+        metadata,
+        masterEdition,
+        collectionMint: collection.mint,
+        collectionMetadata: collection.metadata,
+        collectionMasterEdition: collection.edition,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+        systemProgram: SystemProgram.programId,
+      } as MintCharacterAccounts;
+
       await program.methods
         .mintCharacter(civilization.variant, characterId, gender)
-        .accounts({
-          character,
-          authority: wallet.publicKey,
-          mintState: mintStatePda,
-          characterMint,
-          characterTokenAccount,
-          metadata,
-          masterEdition,
-          collectionMint: collection.mint,
-          collectionMetadata: collection.metadata,
-          collectionMasterEdition: collection.edition,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
-          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-          systemProgram: SystemProgram.programId,
-        })
+        .accounts(mintAccounts)
         .rpc();
 
       const account = await program.account.character.fetch(character);
 
-      expect(account.civilization[civilization.key]).to.not.be.undefined;
+      expect(account.civilization).to.deep.equal(civilization.variant);
       expect(account.civilizationCharacterId).to.equal(characterId);
       expect(account.gender[Object.keys(gender)[0] as "male" | "female"]).to.not.be
         .undefined;

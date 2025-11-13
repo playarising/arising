@@ -1,7 +1,7 @@
 {
   "license": "ISC",
   "scripts": {
-    "test": "ts-mocha -p ./tsconfig.json -t 1000000 \"tests/**/*.spec.ts\""
+    "test": "ts-mocha -p ./tsconfig.json -t 1000000 \"tests/**/*.ts\""
   },
   "dependencies": {
     "@coral-xyz/anchor": "0.32.1",
