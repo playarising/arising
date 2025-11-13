@@ -14,6 +14,8 @@ pub enum ArisingError {
     InvalidCollectionMetadata,
     #[msg("Invalid collection master edition account provided")]
     InvalidCollectionMasterEdition,
+    #[msg("Invalid collection token account provided")]
+    InvalidCollectionTokenAccount,
     #[msg("Character id must match the next sequential id for the civilization")]
     InvalidCharacterIdSequence,
     #[msg("Civilization cap has been reached")]

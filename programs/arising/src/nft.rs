@@ -185,7 +185,7 @@ pub fn mint_character_nft<'info>(
         metadata: metadata_key,
         collection_authority: mint_authority_key,
         payer: authority_key,
-        update_authority: authority_key,
+        update_authority: mint_authority_key,
         collection_mint: accounts.collection_mint.key(),
         collection: accounts.collection_metadata.key(),
         collection_master_edition_account: accounts.collection_master_edition.key(),

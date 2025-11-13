@@ -12,8 +12,8 @@ pub const CHARACTER_SEED: &[u8] = b"character";
 pub const CHARACTER_MINT_STATE_SEED: &[u8] = b"character_mint_state";
 pub const CHARACTER_NFT_MINT_SEED: &[u8] = b"character_nft_mint";
 pub const CHARACTER_NFT_TOKEN_SEED: &[u8] = b"character_nft_token";
-pub const COLLECTION_MINT_SEED: &[u8] = b"collection_mint";
-pub const COLLECTION_TOKEN_SEED: &[u8] = b"collection_token";
+pub const COLLECTION_MINT_PDA_SEED: &[u8] = b"collection_mint";
+pub const COLLECTION_TOKEN_PDA_SEED: &[u8] = b"collection_token";
 pub const BASE_ENERGY: u16 = 10;
 pub const ENERGY_REFILL_COOLDOWN_SECS: i64 = 24 * 60 * 60;
 
