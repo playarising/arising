@@ -28,24 +28,6 @@ export async function createCollectionNft(
   const wallet = provider.wallet as anchor.Wallet & { payer: Keypair };
   const connection = provider.connection;
 
-  let balance = await connection.getBalance(wallet.publicKey);
-  if (balance < 5 * LAMPORTS_PER_SOL) {
-    const signature = await connection.requestAirdrop(
-      wallet.publicKey,
-      10 * LAMPORTS_PER_SOL
-    );
-    const latest = await connection.getLatestBlockhash();
-    await connection.confirmTransaction(
-      {
-        signature,
-        blockhash: latest.blockhash,
-        lastValidBlockHeight: latest.lastValidBlockHeight,
-      },
-      "confirmed"
-    );
-    balance = await connection.getBalance(wallet.publicKey);
-  }
-
   const mint = Keypair.generate();
   const metadata = findMetadataPda(mint.publicKey);
   const edition = findMasterEditionPda(mint.publicKey);
@@ -82,15 +64,17 @@ export async function createCollectionNft(
   const walletKeypair = fromWeb3JsKeypair(wallet.payer);
   const mintSigner = createSignerFromKeypair(umi, mintKeypair);
   const walletSigner = createSignerFromKeypair(umi, walletKeypair);
-  umi.use(signerIdentity(walletSigner));
 
   const mintPubkey = fromWeb3JsPublicKey(mint.publicKey);
   const walletPubkey = fromWeb3JsPublicKey(wallet.publicKey);
+
+  umi.use(signerIdentity(walletSigner, true));
 
   await createMetadataAccountV3(umi, {
     mint: mintPubkey,
     mintAuthority: mintSigner,
     updateAuthority: walletPubkey,
+    payer: walletSigner,
     data: {
       name: "Arising Collection",
       symbol: "ARISE",
@@ -113,6 +97,7 @@ export async function createCollectionNft(
   await createMasterEditionV3(umi, {
     mint: mintPubkey,
     updateAuthority: walletSigner,
+    payer: walletSigner,
     mintAuthority: mintSigner,
     maxSupply: null,
   }).sendAndConfirm(umi);

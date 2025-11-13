@@ -32,6 +32,7 @@ describe("arising defaults", () => {
   const program = anchor.workspace.arising as Program<Arising>;
   const wallet = provider.wallet as anchor.Wallet & { payer: anchor.web3.Keypair };
   const mintStatePda = deriveMintStatePda(program.programId);
+
   type ProgramMethods = Program<Arising>["methods"];
   type InitializeAccounts = Parameters<
     ReturnType<ProgramMethods["initialize"]>["accounts"]
@@ -43,23 +44,6 @@ describe("arising defaults", () => {
   let collection: CollectionSetup;
 
   before(async () => {
-    let balance = await provider.connection.getBalance(wallet.publicKey);
-    if (balance < 5 * anchor.web3.LAMPORTS_PER_SOL) {
-      const sig = await provider.connection.requestAirdrop(
-        wallet.publicKey,
-        10 * anchor.web3.LAMPORTS_PER_SOL
-      );
-      const latest = await provider.connection.getLatestBlockhash();
-      await provider.connection.confirmTransaction(
-        {
-          signature: sig,
-          blockhash: latest.blockhash,
-          lastValidBlockHeight: latest.lastValidBlockHeight,
-        },
-        "confirmed"
-      );
-    }
-
     collection = await createCollectionNft(provider);
 
     const initializeAccounts = {
