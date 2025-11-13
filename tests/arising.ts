@@ -51,12 +51,13 @@ describe("arising program", () => {
   );
 
   type ProgramMethods = Program<Arising>["methods"];
-  type InitializeAccounts = Parameters<
-    ReturnType<ProgramMethods["initialize"]>["accounts"]
+  type MethodsBuilderFor<T extends keyof ProgramMethods> = ReturnType<ProgramMethods[T]>;
+  type StrictAccounts<T extends keyof ProgramMethods> = Parameters<
+    MethodsBuilderFor<T>["accountsStrict"]
   >[0];
-  type MintCharacterAccounts = Parameters<
-    ReturnType<ProgramMethods["mintCharacter"]>["accounts"]
-  >[0];
+  type InitializeAccounts = StrictAccounts<"initialize">;
+  type MintCharacterAccounts = StrictAccounts<"mintCharacter">;
+  type UpdateCivilizationCapAccounts = StrictAccounts<"updateCivilizationCap">;
 
   const buildMintAccounts = (
     civilizationIndex: number,
@@ -77,7 +78,7 @@ describe("arising program", () => {
     const metadata = findMetadataPda(characterMint, TOKEN_METADATA_PROGRAM_ID);
     const masterEdition = findMasterEditionPda(characterMint, TOKEN_METADATA_PROGRAM_ID);
 
-    return {
+    const accounts: MintCharacterAccounts = {
       character,
       authority,
       mintState: mintStatePda,
@@ -93,6 +94,8 @@ describe("arising program", () => {
       rent: anchor.web3.SYSVAR_RENT_PUBKEY,
       systemProgram: SystemProgram.programId,
     };
+
+    return accounts;
   };
 
   const mintCharacterTx = async (
@@ -104,7 +107,7 @@ describe("arising program", () => {
     const accounts = buildMintAccounts(civilization.index, characterId, authority.publicKey);
     let method = program.methods
       .mintCharacter(civilization.variant, characterId, gender)
-      .accounts(accounts)
+      .accountsStrict(accounts)
       .preInstructions([
         ComputeBudgetProgram.setComputeUnitLimit({
           units: 350_000,
@@ -123,12 +126,14 @@ describe("arising program", () => {
     cap: number,
     authority: Keypair = wallet.payer
   ) => {
+    const accounts: UpdateCivilizationCapAccounts = {
+      mintState: mintStatePda,
+      authority: authority.publicKey,
+    };
+
     let method = program.methods
       .updateCivilizationCap(civilization.variant, cap)
-      .accounts({
-        mintState: mintStatePda,
-        authority: authority.publicKey,
-      });
+      .accountsStrict(accounts);
 
     if (!authority.publicKey.equals(wallet.publicKey)) {
       method = method.signers([authority]);
@@ -150,10 +155,9 @@ describe("arising program", () => {
     }
   };
 
-
   before(async () => {
 
-    const initializeAccounts = {
+    const initializeAccounts: InitializeAccounts = {
       mintState: mintStatePda,
       authority: wallet.publicKey,
       collectionMint: collectionMintPda,
@@ -164,7 +168,7 @@ describe("arising program", () => {
       tokenProgram: TOKEN_PROGRAM_ID,
       systemProgram: SystemProgram.programId,
       rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-    } as InitializeAccounts;
+    };
 
     await program.methods
       .initialize(
@@ -172,7 +176,7 @@ describe("arising program", () => {
         "ARISE",
         "https://mints.playarising.com/collection.json"
       )
-      .accounts(initializeAccounts)
+      .accountsStrict(initializeAccounts)
       .rpc();
   });
 
