@@ -2,7 +2,7 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { expect } from "chai";
 import BN from "bn.js";
-import { SystemProgram } from "@solana/web3.js";
+import { ComputeBudgetProgram, SystemProgram } from "@solana/web3.js";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 import { Arising } from "../target/types/arising";
@@ -120,6 +120,11 @@ describe("arising defaults", () => {
       await program.methods
         .mintCharacter(civilization.variant, characterId, gender)
         .accounts(mintAccounts)
+        .preInstructions([
+          ComputeBudgetProgram.setComputeUnitLimit({
+            units: 350_000,
+          }),
+        ])
         .rpc();
 
       const account = await program.account.character.fetch(character);

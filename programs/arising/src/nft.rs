@@ -6,7 +6,7 @@ use anchor_spl::token;
 use mpl_token_metadata::{
     instructions::{
         CreateMasterEditionV3, CreateMasterEditionV3InstructionArgs, CreateMetadataAccountV3,
-        CreateMetadataAccountV3InstructionArgs, SetAndVerifySizedCollectionItem,
+        CreateMetadataAccountV3InstructionArgs, VerifySizedCollectionItem,
     },
     types::{Collection, Creator, DataV2},
     ID as TOKEN_METADATA_PROGRAM_ID,
@@ -88,7 +88,7 @@ pub fn mint_character_nft<'info>(
     );
 
     let creator = Creator {
-        address: accounts.authority.key(),
+        address: accounts.mint_state.key(),
         verified: true,
         share: 100,
     };
@@ -117,7 +117,7 @@ pub fn mint_character_nft<'info>(
         mint: mint_key,
         mint_authority: mint_authority_key,
         payer: authority_key,
-        update_authority: (authority_key, true),
+        update_authority: (mint_authority_key, true),
         system_program: system_program::ID,
         rent: Some(sysvar::rent::id()),
     }
@@ -132,7 +132,7 @@ pub fn mint_character_nft<'info>(
         accounts.character_mint.to_account_info(),
         accounts.mint_state.to_account_info(),
         accounts.authority.to_account_info(),
-        accounts.authority.to_account_info(),
+        accounts.mint_state.to_account_info(),
         accounts.system_program.to_account_info(),
         accounts.rent.to_account_info(),
         accounts.token_metadata_program.to_account_info(),
@@ -155,7 +155,7 @@ pub fn mint_character_nft<'info>(
     let master_ix = CreateMasterEditionV3 {
         edition: accounts.master_edition.key(),
         mint: mint_key,
-        update_authority: authority_key,
+        update_authority: mint_authority_key,
         mint_authority: mint_authority_key,
         payer: authority_key,
         metadata: metadata_key,
@@ -170,7 +170,7 @@ pub fn mint_character_nft<'info>(
     let master_infos = [
         accounts.master_edition.to_account_info(),
         accounts.character_mint.to_account_info(),
-        accounts.authority.to_account_info(),
+        accounts.mint_state.to_account_info(),
         accounts.mint_state.to_account_info(),
         accounts.authority.to_account_info(),
         accounts.metadata.to_account_info(),
@@ -181,11 +181,10 @@ pub fn mint_character_nft<'info>(
     ];
     invoke_signed(&master_ix, &master_infos, signer_seeds)?;
 
-    let verify_ix = SetAndVerifySizedCollectionItem {
+    let verify_ix = VerifySizedCollectionItem {
         metadata: metadata_key,
         collection_authority: mint_authority_key,
         payer: authority_key,
-        update_authority: mint_authority_key,
         collection_mint: accounts.collection_mint.key(),
         collection: accounts.collection_metadata.key(),
         collection_master_edition_account: accounts.collection_master_edition.key(),
@@ -193,15 +192,13 @@ pub fn mint_character_nft<'info>(
     }
     .instruction();
 
-    let verify_infos = vec![
+    let verify_infos = [
         accounts.metadata.to_account_info(),
         accounts.mint_state.to_account_info(),
-        accounts.authority.to_account_info(),
         accounts.authority.to_account_info(),
         accounts.collection_mint.to_account_info(),
         accounts.collection_metadata.to_account_info(),
         accounts.collection_master_edition.to_account_info(),
-        accounts.system_program.to_account_info(),
         accounts.token_metadata_program.to_account_info(),
     ];
     invoke_signed(&verify_ix, &verify_infos, signer_seeds)?;

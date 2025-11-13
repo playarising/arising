@@ -16,7 +16,7 @@ cleanup() {
 trap cleanup EXIT
 
 # Give the validator a moment to boot.
-sleep 5
+sleep 2
 
 echo "Running anchor tests using external validator..."
 ANCHOR_PROVIDER_URL="http://127.0.0.1:8899" anchor test --skip-local-validator "$@"
