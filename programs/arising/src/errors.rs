@@ -38,6 +38,10 @@ pub enum ArisingError {
     ClassAlreadyChosen,
     #[msg("Selected class does not match the civilization")]
     InvalidClassForCivilization,
+    #[msg("Not enough energy available")]
+    InsufficientEnergy,
+    #[msg("Energy refill is still on cooldown")]
+    EnergyRefillCooldown,
     #[msg("Arithmetic overflow encountered")]
     ArithmeticOverflow,
 }

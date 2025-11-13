@@ -12,6 +12,8 @@ pub const CHARACTER_SEED: &[u8] = b"character";
 pub const CHARACTER_MINT_STATE_SEED: &[u8] = b"character_mint_state";
 pub const CHARACTER_NFT_MINT_SEED: &[u8] = b"character_nft_mint";
 pub const CHARACTER_NFT_TOKEN_SEED: &[u8] = b"character_nft_token";
+pub const BASE_ENERGY: u16 = 10;
+pub const ENERGY_REFILL_COOLDOWN_SECS: i64 = 24 * 60 * 60;
 
 #[account]
 pub struct Character {
@@ -24,6 +26,8 @@ pub struct Character {
     pub experience: u64,
     pub stats: CoreStats,
     pub attributes: Attributes,
+    pub energy: u16,
+    pub last_energy_refill: i64,
     pub nft_mint: Pubkey,
     pub nft_metadata: Pubkey,
     pub nft_master_edition: Pubkey,
@@ -43,6 +47,8 @@ impl Character {
         + 8 // experience
         + CoreStats::SIZE
         + Attributes::SIZE
+        + 2 // energy
+        + 8 // last_energy_refill
         + 32 // nft_mint
         + 32 // nft_metadata
         + 32 // nft_master_edition
@@ -88,6 +94,14 @@ impl Character {
         self.total_attribute_points() as i32 - self.spent_attribute_points()
     }
 
+    pub fn energy_capacity(&self) -> u16 {
+        Self::capacity_for_level(self.current_level())
+    }
+
+    fn capacity_for_level(level: u8) -> u16 {
+        BASE_ENERGY + level.saturating_sub(1) as u16
+    }
+
     pub fn ensure_identity(&self, civilization: Civilization, character_id: u16) -> Result<()> {
         require_eq!(
             self.civilization,
@@ -103,10 +117,24 @@ impl Character {
     }
 
     pub fn grant_experience(&mut self, amount: u64) -> Result<()> {
+        let previous_level = self.current_level();
         self.experience = self
             .experience
             .checked_add(amount)
             .ok_or(ArisingError::ArithmeticOverflow)?;
+        let new_level = self.current_level();
+        if new_level > previous_level {
+            let prev_capacity = Self::capacity_for_level(previous_level);
+            let new_capacity = self.energy_capacity();
+            if new_capacity > prev_capacity {
+                let gain = new_capacity - prev_capacity;
+                let increased = self
+                    .energy
+                    .checked_add(gain)
+                    .ok_or(ArisingError::ArithmeticOverflow)?;
+                self.energy = increased.min(new_capacity);
+            }
+        }
         Ok(())
     }
 
@@ -224,6 +252,29 @@ impl Character {
         self.add_core_stats(bonus.stats)?;
         self.add_attributes(bonus.attributes)?;
         self.class = Some(class);
+        Ok(())
+    }
+
+    pub fn consume_energy(&mut self, amount: u16) -> Result<()> {
+        require!(amount > 0, ArisingError::InsufficientEnergy);
+        require!(self.energy >= amount, ArisingError::InsufficientEnergy);
+        self.energy = self
+            .energy
+            .checked_sub(amount)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        Ok(())
+    }
+
+    pub fn refill_energy(&mut self, now: i64) -> Result<()> {
+        let elapsed = now
+            .checked_sub(self.last_energy_refill)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        require!(
+            elapsed >= ENERGY_REFILL_COOLDOWN_SECS,
+            ArisingError::EnergyRefillCooldown
+        );
+        self.energy = self.energy_capacity();
+        self.last_energy_refill = now;
         Ok(())
     }
 }

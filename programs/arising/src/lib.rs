@@ -123,6 +123,8 @@ pub mod arising {
         character.nft_master_edition = ctx.accounts.master_edition.key();
         character.nft_token_account = ctx.accounts.character_token_account.key();
         character.created_at = Clock::get()?.unix_timestamp;
+        character.energy = character.energy_capacity();
+        character.last_energy_refill = character.created_at;
 
         // Increment the next_id after successfully minting
         let mint_state = &mut ctx.accounts.mint_state;
@@ -219,6 +221,38 @@ pub mod arising {
         character.apply_class_choice(class)
     }
 
+    pub fn consume_energy(
+        ctx: Context<ModifyCharacterOwned>,
+        civilization: Civilization,
+        character_id: u16,
+        amount: u16,
+    ) -> Result<()> {
+        let character = &mut ctx.accounts.character;
+        character.ensure_identity(civilization, character_id)?;
+        require_keys_eq!(
+            ctx.accounts.authority.key(),
+            character.authority,
+            ArisingError::Unauthorized
+        );
+        character.consume_energy(amount)
+    }
+
+    pub fn refill_energy(
+        ctx: Context<ModifyCharacterOwned>,
+        civilization: Civilization,
+        character_id: u16,
+    ) -> Result<()> {
+        let character = &mut ctx.accounts.character;
+        character.ensure_identity(civilization, character_id)?;
+        require_keys_eq!(
+            ctx.accounts.authority.key(),
+            character.authority,
+            ArisingError::Unauthorized
+        );
+        let now = Clock::get()?.unix_timestamp;
+        character.refill_energy(now)
+    }
+
     pub fn get_character_metadata(
         ctx: Context<GetCharacterMetadata>,
         civilization: Civilization,
@@ -235,6 +269,9 @@ pub mod arising {
             level: character.current_level(),
             experience: character.experience,
             class: character.class,
+            energy: character.energy,
+            energy_capacity: character.energy_capacity(),
+            last_energy_refill: character.last_energy_refill,
             base_stats: civilization.base_stats(),
             stats: character.stats,
             base_attributes: civilization.base_attributes(),
@@ -388,6 +425,9 @@ pub struct CharacterMetadataEvent {
     pub level: u8,
     pub experience: u64,
     pub class: Option<CharacterClass>,
+    pub energy: u16,
+    pub energy_capacity: u16,
+    pub last_energy_refill: i64,
     pub base_stats: CoreStats,
     pub stats: CoreStats,
     pub base_attributes: Attributes,
