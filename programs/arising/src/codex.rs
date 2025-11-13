@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use std::fmt;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
 pub enum Gender {
@@ -17,6 +18,34 @@ pub enum Civilization {
 }
 
 impl Civilization {
+    pub const COUNT: usize = 6;
+
+    pub const fn as_index(self) -> usize {
+        match self {
+            Civilization::Ard => 0,
+            Civilization::Hartenn => 1,
+            Civilization::Ikarans => 2,
+            Civilization::Zhand => 3,
+            Civilization::Shinkari => 4,
+            Civilization::Tarki => 5,
+        }
+    }
+
+    pub const fn slug(self) -> &'static str {
+        match self {
+            Civilization::Ard => "ard",
+            Civilization::Hartenn => "hartenn",
+            Civilization::Ikarans => "ikarans",
+            Civilization::Zhand => "zhand",
+            Civilization::Shinkari => "shinkari",
+            Civilization::Tarki => "tarki",
+        }
+    }
+
+    pub const fn seed_bytes(self) -> [u8; 1] {
+        [self as u8]
+    }
+
     pub const fn base_stats(self) -> CoreStats {
         match self {
             Civilization::Ard => CoreStats::new(3, 2, 1),
@@ -70,6 +99,12 @@ impl Civilization {
             Civilization::Shinkari => "Shinkari",
             Civilization::Tarki => "Tark'i",
         }
+    }
+}
+
+impl fmt::Display for Civilization {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.display_name())
     }
 }
 

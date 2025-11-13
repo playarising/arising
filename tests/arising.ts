@@ -1,7 +1,26 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { expect } from "chai";
-import { Arising } from "../target/types/arising";
+import { Arising } from "../target/types/arising.ts";
+import {
+  TOKEN_PROGRAM_ID,
+  MINT_SIZE,
+  createInitializeMintInstruction,
+  createAssociatedTokenAccountInstruction,
+  createMintToInstruction,
+  getAccount,
+  getMint,
+  getAssociatedTokenAddressSync,
+} from "@solana/spl-token";
+import {
+  createCreateMetadataAccountV3Instruction,
+  createCreateMasterEditionV3Instruction,
+} from "@metaplex-foundation/mpl-token-metadata";
+import { Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
+
+const TOKEN_METADATA_PROGRAM_ID = new PublicKey(
+  "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+);
 
 const CIVILIZATIONS = [
   {
@@ -42,20 +61,12 @@ const CIVILIZATIONS = [
   },
 ] as const;
 
-type CnftAccounts = {
-  treeAuthority: anchor.web3.PublicKey;
-  merkleTree: anchor.web3.PublicKey;
-  treeDelegate: anchor.web3.PublicKey;
-  collectionAuthority: anchor.web3.PublicKey;
-  collectionAuthorityRecordPda: anchor.web3.PublicKey;
-  collectionMint: anchor.web3.PublicKey;
-  collectionMetadata: anchor.web3.PublicKey;
-  collectionEdition: anchor.web3.PublicKey;
-  bubblegumSigner: anchor.web3.PublicKey;
-  bubblegumProgram: anchor.web3.PublicKey;
-  compressionProgram: anchor.web3.PublicKey;
-  logWrapper: anchor.web3.PublicKey;
-  tokenMetadataProgram: anchor.web3.PublicKey;
+const CIVILIZATION_ORDER = CIVILIZATIONS.map((c) => c.key);
+
+type CollectionSetup = {
+  mint: PublicKey;
+  metadata: PublicKey;
+  edition: PublicKey;
 };
 
 describe("arising", () => {
@@ -65,108 +76,269 @@ describe("arising", () => {
   const program = anchor.workspace.arising as Program<Arising>;
   const wallet = provider.wallet as anchor.Wallet & { payer: anchor.web3.Keypair };
 
-  let cnftAccounts: CnftAccounts;
-  const [mintStatePda] = anchor.web3.PublicKey.findProgramAddressSync(
+  const [mintStatePda] = PublicKey.findProgramAddressSync(
     [Buffer.from("character_mint_state")],
     program.programId
   );
 
+  let collection: CollectionSetup;
+
   before(async () => {
-    cnftAccounts = await createCnftAccounts(provider);
+    collection = await createCollectionNft(provider);
     await program.methods
       .initialize()
       .accounts({
         mintState: mintStatePda,
         authority: wallet.publicKey,
-        systemProgram: anchor.web3.SystemProgram.programId,
+        collectionMint: collection.mint,
+        collectionMetadata: collection.metadata,
+        collectionMasterEdition: collection.edition,
+        tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
       })
       .rpc();
   });
 
-  it("mints a character for every civilization with correct defaults", async () => {
+  it("mints civilization NFTs, updates caps, and emits metadata", async () => {
     for (const [index, civilization] of CIVILIZATIONS.entries()) {
-      const characterId = new anchor.BN(index + 1);
-      const [characterPda] = anchor.web3.PublicKey.findProgramAddressSync(
-        [
-          Buffer.from("character"),
-          wallet.publicKey.toBuffer(),
-          characterId.toArrayLike(Buffer, "le", 8),
-        ],
+      const characterId = 1; // first mint per civilization
+      const civIndex = civilizationIndex(civilization.key);
+
+      const characterPda = deriveCharacterPda(civIndex, characterId, program.programId);
+      const characterMintPda = deriveCharacterMintPda(
+        civIndex,
+        characterId,
         program.programId
       );
+      const characterTokenPda = deriveCharacterTokenPda(
+        civIndex,
+        characterId,
+        program.programId
+      );
+      const metadataPda = findMetadataPda(characterMintPda);
+      const masterEditionPda = findMasterEditionPda(characterMintPda);
 
       await program.methods
         .mintCharacter(
+          civilization.variant,
           characterId,
-          index % 2 === 0 ? { male: {} } : { female: {} },
-          civilization.variant
+          index % 2 === 0 ? { male: {} } : { female: {} }
         )
         .accounts({
           character: characterPda,
           authority: wallet.publicKey,
           mintState: mintStatePda,
-          cnft: cnftAccounts,
-          systemProgram: anchor.web3.SystemProgram.programId,
+          characterMint: characterMintPda,
+          characterTokenAccount: characterTokenPda,
+          metadata: metadataPda,
+          masterEdition: masterEditionPda,
+          collectionMint: collection.mint,
+          collectionMetadata: collection.metadata,
+          collectionMasterEdition: collection.edition,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
+          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+          systemProgram: SystemProgram.programId,
         })
         .rpc();
 
       const account = await program.account.character.fetch(characterPda);
-
-      expect(account.experience.toNumber()).to.equal(0);
-      expect(account.gender).to.have.property(index % 2 === 0 ? "male" : "female");
+      expect(account.civilizationCharacterId).to.equal(characterId);
       expect(account.civilization).to.have.property(civilization.key);
-
+      expect(account.gender).to.have.property(index % 2 === 0 ? "male" : "female");
       expect(account.stats.might).to.equal(civilization.stats.might);
       expect(account.stats.speed).to.equal(civilization.stats.speed);
       expect(account.stats.intellect).to.equal(civilization.stats.intellect);
-
       expect(account.attributes.atk).to.equal(civilization.attributes.atk);
       expect(account.attributes.def).to.equal(civilization.attributes.def);
       expect(account.attributes.magAtk).to.equal(civilization.attributes.magAtk);
       expect(account.attributes.magDef).to.equal(civilization.attributes.magDef);
       expect(account.attributes.range).to.equal(civilization.attributes.range);
       expect(account.attributes.rate).to.equal(civilization.attributes.rate);
+      expect(account.nftMint.toBase58()).to.equal(characterMintPda.toBase58());
+      expect(account.nftMetadata.toBase58()).to.equal(metadataPda.toBase58());
+      expect(account.nftMasterEdition.toBase58()).to.equal(masterEditionPda.toBase58());
+      expect(account.nftTokenAccount.toBase58()).to.equal(
+        characterTokenPda.toBase58()
+      );
 
-      expect(account.cnftTree.toBase58()).to.equal(cnftAccounts.merkleTree.toBase58());
-      expect(account.cnftLeafIndex.toNumber()).to.equal(0);
-      expect(account.cnftHash).to.have.lengthOf(32);
+      const mintInfo = await getMint(provider.connection, characterMintPda);
+      expect(Number(mintInfo.supply)).to.equal(1);
+      expect(mintInfo.decimals).to.equal(0);
+
+      const tokenAccount = await getAccount(provider.connection, characterTokenPda);
+      expect(Number(tokenAccount.amount)).to.equal(1);
+      expect(tokenAccount.owner.toBase58()).to.equal(wallet.publicKey.toBase58());
+
+      await program.methods
+        .emitCharacterMetadata(civilization.variant, characterId)
+        .accounts({ character: characterPda })
+        .rpc();
     }
+
+    // Increase Ard cap to ensure admin control works
+    await program.methods
+      .updateCivilizationCap(CIVILIZATIONS[0].variant, 1200)
+      .accounts({
+        mintState: mintStatePda,
+        authority: wallet.publicKey,
+      })
+      .rpc();
   });
 });
 
-async function createCnftAccounts(provider: anchor.AnchorProvider): Promise<CnftAccounts> {
-  const createAccount = async (space = 0) => {
-    const keypair = anchor.web3.Keypair.generate();
-    const lamports =
-      (await provider.connection.getMinimumBalanceForRentExemption(space)) + 1_000_000;
+function civilizationIndex(key: string): number {
+  const idx = CIVILIZATION_ORDER.indexOf(key);
+  if (idx === -1) {
+    throw new Error(`Unknown civilization ${key}`);
+  }
+  return idx;
+}
 
-    const tx = new anchor.web3.Transaction().add(
-      anchor.web3.SystemProgram.createAccount({
-        fromPubkey: provider.wallet.publicKey,
-        newAccountPubkey: keypair.publicKey,
-        lamports,
-        space,
-        programId: anchor.web3.SystemProgram.programId,
-      })
-    );
+function deriveCharacterPda(
+  civilizationIndex: number,
+  characterId: number,
+  programId: PublicKey
+): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("character"),
+      Buffer.from([civilizationIndex]),
+      toCharacterIdBuffer(characterId),
+    ],
+    programId
+  )[0];
+}
 
-    await provider.sendAndConfirm(tx, [keypair]);
-    return keypair.publicKey;
+function deriveCharacterMintPda(
+  civilizationIndex: number,
+  characterId: number,
+  programId: PublicKey
+): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("character_nft_mint"),
+      Buffer.from([civilizationIndex]),
+      toCharacterIdBuffer(characterId),
+    ],
+    programId
+  )[0];
+}
+
+function deriveCharacterTokenPda(
+  civilizationIndex: number,
+  characterId: number,
+  programId: PublicKey
+): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("character_nft_token"),
+      Buffer.from([civilizationIndex]),
+      toCharacterIdBuffer(characterId),
+    ],
+    programId
+  )[0];
+}
+
+function toCharacterIdBuffer(characterId: number): Buffer {
+  const buf = Buffer.alloc(2);
+  buf.writeUInt16LE(characterId);
+  return buf;
+}
+
+function findMetadataPda(mint: PublicKey): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from("metadata"), TOKEN_METADATA_PROGRAM_ID.toBuffer(), mint.toBuffer()],
+    TOKEN_METADATA_PROGRAM_ID
+  )[0];
+}
+
+function findMasterEditionPda(mint: PublicKey): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("metadata"),
+      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+      mint.toBuffer(),
+      Buffer.from("edition"),
+    ],
+    TOKEN_METADATA_PROGRAM_ID
+  )[0];
+}
+
+async function createCollectionNft(
+  provider: anchor.AnchorProvider
+): Promise<CollectionSetup> {
+  const wallet = provider.wallet as anchor.Wallet & { payer: Keypair };
+  const connection = provider.connection;
+  const mint = Keypair.generate();
+  const metadata = findMetadataPda(mint.publicKey);
+  const edition = findMasterEditionPda(mint.publicKey);
+  const associatedToken = getAssociatedTokenAddressSync(
+    mint.publicKey,
+    wallet.publicKey
+  );
+  const lamports = await connection.getMinimumBalanceForRentExemption(MINT_SIZE);
+
+  const metadataArgs = {
+    data: {
+      name: "Arising Collection",
+      symbol: "ARISE",
+      uri: "https://mints.playarising.com/collection.json",
+      sellerFeeBasisPoints: 0,
+      creators: [
+        {
+          address: wallet.publicKey,
+          verified: true,
+          share: 100,
+        },
+      ],
+      collection: null,
+      uses: null,
+    },
+    isMutable: false,
+    collectionDetails: { __kind: "V1", size: new anchor.BN(0) },
   };
 
-  return {
-    treeAuthority: await createAccount(),
-    merkleTree: await createAccount(1024),
-    treeDelegate: await createAccount(),
-    collectionAuthority: await createAccount(),
-    collectionAuthorityRecordPda: await createAccount(),
-    collectionMint: await createAccount(),
-    collectionMetadata: await createAccount(256),
-    collectionEdition: await createAccount(256),
-    bubblegumSigner: await createAccount(),
-    bubblegumProgram: await createAccount(),
-    compressionProgram: await createAccount(),
-    logWrapper: await createAccount(),
-    tokenMetadataProgram: await createAccount(),
-  };
+  const tx = new Transaction().add(
+    SystemProgram.createAccount({
+      fromPubkey: wallet.publicKey,
+      newAccountPubkey: mint.publicKey,
+      lamports,
+      space: MINT_SIZE,
+      programId: TOKEN_PROGRAM_ID,
+    }),
+    createInitializeMintInstruction(mint.publicKey, 0, wallet.publicKey, wallet.publicKey),
+    createAssociatedTokenAccountInstruction(
+      wallet.publicKey,
+      associatedToken,
+      wallet.publicKey,
+      mint.publicKey
+    ),
+    createMintToInstruction(mint.publicKey, associatedToken, wallet.publicKey, 1),
+    createCreateMetadataAccountV3Instruction(
+      {
+        metadata,
+        mint: mint.publicKey,
+        mintAuthority: wallet.publicKey,
+        payer: wallet.publicKey,
+        updateAuthority: wallet.publicKey,
+      },
+      { createMetadataAccountArgsV3: metadataArgs }
+    ),
+    createCreateMasterEditionV3Instruction(
+      {
+        edition,
+        mint: mint.publicKey,
+        updateAuthority: wallet.publicKey,
+        mintAuthority: wallet.publicKey,
+        payer: wallet.publicKey,
+        metadata,
+      },
+      { createMasterEditionArgs: { maxSupply: null } }
+    )
+  );
+
+  await provider.sendAndConfirm(tx, [mint]);
+
+  return { mint: mint.publicKey, metadata, edition };
 }

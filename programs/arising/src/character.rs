@@ -9,20 +9,23 @@ use crate::{
 
 pub const CHARACTER_SEED: &[u8] = b"character";
 pub const CHARACTER_MINT_STATE_SEED: &[u8] = b"character_mint_state";
+pub const CHARACTER_NFT_MINT_SEED: &[u8] = b"character_nft_mint";
+pub const CHARACTER_NFT_TOKEN_SEED: &[u8] = b"character_nft_token";
 
 #[account]
 pub struct Character {
     pub authority: Pubkey,
     pub bump: u8,
-    pub character_id: u64,
-    pub gender: Gender,
     pub civilization: Civilization,
+    pub civilization_character_id: u16,
+    pub gender: Gender,
     pub experience: u64,
     pub stats: CoreStats,
     pub attributes: Attributes,
-    pub cnft_tree: Pubkey,
-    pub cnft_leaf_index: u64,
-    pub cnft_hash: [u8; 32],
+    pub nft_mint: Pubkey,
+    pub nft_metadata: Pubkey,
+    pub nft_master_edition: Pubkey,
+    pub nft_token_account: Pubkey,
     pub created_at: i64,
 }
 
@@ -30,15 +33,16 @@ impl Character {
     pub const LEN: usize = 8  // discriminator
         + 32 // authority
         + 1 // bump
-        + 8 // character_id
+        + 1 // civilization enum
+        + 2 // civilization_character_id
         + 1 // gender
-        + 1 // civilization
         + 8 // experience
         + CoreStats::SIZE
         + Attributes::SIZE
-        + 32 // cnft_tree
-        + 8 // cnft_leaf_index
-        + 32 // cnft_hash
+        + 32 // nft_mint
+        + 32 // nft_metadata
+        + 32 // nft_master_edition
+        + 32 // nft_token_account
         + 8; // created_at
 
     pub fn current_level(&self) -> u8 {
@@ -81,17 +85,63 @@ impl Character {
     }
 }
 
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]
+pub struct CivilizationMintConfig {
+    pub next_id: u16,
+    pub cap: u16,
+}
+
+impl CivilizationMintConfig {
+    pub const SIZE: usize = 2 + 2;
+
+    pub const fn new() -> Self {
+        Self {
+            next_id: 1,
+            cap: 1000,
+        }
+    }
+}
+
 #[account]
 pub struct CharacterMintState {
+    pub authority: Pubkey,
     pub bump: u8,
-    pub next_id: u64,
+    pub collection_mint: Pubkey,
+    pub collection_metadata: Pubkey,
+    pub collection_master_edition: Pubkey,
+    pub civilization_mints: [CivilizationMintConfig; Civilization::COUNT],
 }
 
 impl CharacterMintState {
-    pub const LEN: usize = 8 /* discriminator */ + 1 /* bump */ + 8 /* next_id */;
+    pub const LEN: usize = 8 /* discriminator */
+        + 32 /* authority */
+        + 1 /* bump */
+        + 32 /* collection_mint */
+        + 32 /* collection_metadata */
+        + 32 /* collection_master_edition */
+        + Civilization::COUNT * CivilizationMintConfig::SIZE;
 
-    pub fn initialize(&mut self, bump: u8) {
+    pub fn initialize(
+        &mut self,
+        bump: u8,
+        authority: Pubkey,
+        collection_mint: Pubkey,
+        collection_metadata: Pubkey,
+        collection_master_edition: Pubkey,
+    ) {
         self.bump = bump;
-        self.next_id = 1;
+        self.authority = authority;
+        self.collection_mint = collection_mint;
+        self.collection_metadata = collection_metadata;
+        self.collection_master_edition = collection_master_edition;
+        self.civilization_mints = [CivilizationMintConfig::new(); Civilization::COUNT];
+    }
+
+    pub fn track_mut(&mut self, civilization: Civilization) -> &mut CivilizationMintConfig {
+        &mut self.civilization_mints[civilization.as_index()]
+    }
+
+    pub fn track(&self, civilization: Civilization) -> &CivilizationMintConfig {
+        &self.civilization_mints[civilization.as_index()]
     }
 }
