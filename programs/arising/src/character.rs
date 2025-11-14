@@ -30,11 +30,35 @@ pub struct Character {
     pub attributes: Attributes,
     pub energy: u16,
     pub last_energy_refill: i64,
+    pub current_quest: Option<CharacterQuestState>,
+    pub current_recipe: Option<CharacterRecipeState>,
     pub nft_mint: Pubkey,
     pub nft_metadata: Pubkey,
     pub nft_master_edition: Pubkey,
     pub nft_token_account: Pubkey,
     pub created_at: i64,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Default)]
+pub struct CharacterQuestState {
+    pub quest_id: u16,
+    pub started_at: i64,
+    pub ready_at: i64,
+}
+
+impl CharacterQuestState {
+    pub const SIZE: usize = 2 + 8 + 8;
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Default)]
+pub struct CharacterRecipeState {
+    pub recipe_id: u16,
+    pub started_at: i64,
+    pub ready_at: i64,
+}
+
+impl CharacterRecipeState {
+    pub const SIZE: usize = 2 + 8 + 8;
 }
 
 impl Character {
@@ -51,6 +75,10 @@ impl Character {
         + Attributes::SIZE
         + 2 // energy
         + 8 // last_energy_refill
+        + 1 // quest option tag
+        + CharacterQuestState::SIZE
+        + 1 // recipe option tag
+        + CharacterRecipeState::SIZE
         + 32 // nft_mint
         + 32 // nft_metadata
         + 32 // nft_master_edition
@@ -263,12 +291,13 @@ impl Character {
     }
 
     pub fn consume_energy(&mut self, amount: u16) -> Result<()> {
-        require!(amount > 0, ArisingError::InsufficientEnergy);
-        require!(self.energy >= amount, ArisingError::InsufficientEnergy);
-        self.energy = self
-            .energy
-            .checked_sub(amount)
-            .ok_or(ArisingError::ArithmeticOverflow)?;
+        if amount > 0 {
+            require!(self.energy >= amount, ArisingError::InsufficientEnergy);
+            self.energy = self
+                .energy
+                .checked_sub(amount)
+                .ok_or(ArisingError::ArithmeticOverflow)?;
+        }
         Ok(())
     }
 
@@ -283,6 +312,70 @@ impl Character {
         self.energy = self.energy_capacity();
         self.last_energy_refill = now;
         Ok(())
+    }
+
+    pub fn has_required_stats(&self, required: CoreStats) -> bool {
+        self.stats.might >= required.might
+            && self.stats.speed >= required.speed
+            && self.stats.intellect >= required.intellect
+    }
+
+    pub fn start_quest(&mut self, quest_id: u16, cooldown_seconds: u32, now: i64) -> Result<()> {
+        require!(
+            self.current_quest.is_none(),
+            ArisingError::QuestAlreadyInProgress
+        );
+        let ready_in = i64::from(cooldown_seconds);
+        let ready_at = now
+            .checked_add(ready_in)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        self.current_quest = Some(CharacterQuestState {
+            quest_id,
+            started_at: now,
+            ready_at,
+        });
+        Ok(())
+    }
+
+    pub fn ensure_active_quest(&self) -> Result<&CharacterQuestState> {
+        self.current_quest
+            .as_ref()
+            .ok_or(ArisingError::QuestNotInProgress.into())
+    }
+
+    pub fn clear_quest(&mut self) -> Result<CharacterQuestState> {
+        self.current_quest
+            .take()
+            .ok_or(ArisingError::QuestNotInProgress.into())
+    }
+
+    pub fn start_recipe(&mut self, recipe_id: u16, cooldown_seconds: u32, now: i64) -> Result<()> {
+        require!(
+            self.current_recipe.is_none(),
+            ArisingError::RecipeAlreadyInProgress
+        );
+        let ready_in = i64::from(cooldown_seconds);
+        let ready_at = now
+            .checked_add(ready_in)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        self.current_recipe = Some(CharacterRecipeState {
+            recipe_id,
+            started_at: now,
+            ready_at,
+        });
+        Ok(())
+    }
+
+    pub fn ensure_active_recipe(&self) -> Result<&CharacterRecipeState> {
+        self.current_recipe
+            .as_ref()
+            .ok_or(ArisingError::RecipeNotInProgress.into())
+    }
+
+    pub fn clear_recipe(&mut self) -> Result<CharacterRecipeState> {
+        self.current_recipe
+            .take()
+            .ok_or(ArisingError::RecipeNotInProgress.into())
     }
 }
 

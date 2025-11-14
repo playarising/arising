@@ -327,3 +327,314 @@ pub const CIVILIZATION_CODEX: [CivilizationCodexEntry; 6] = [
         passive: Civilization::Tarki.passive(),
     },
 ];
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
+pub enum QuestType {
+    Job,
+    Farm,
+    Raid,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
+pub enum ResourceKind {
+    Gold,
+    Log,
+    Plank,
+    WoodenSword,
+}
+
+impl ResourceKind {
+    pub const fn seed_bytes(self) -> &'static [u8] {
+        match self {
+            ResourceKind::Gold => b"gold",
+            ResourceKind::Log => b"log",
+            ResourceKind::Plank => b"plank",
+            ResourceKind::WoodenSword => b"wooden_sword",
+        }
+    }
+
+    pub const fn decimals(self) -> u8 {
+        0
+    }
+
+    pub const fn symbol(self) -> &'static str {
+        match self {
+            ResourceKind::Gold => "GOLD",
+            ResourceKind::Log => "LOG",
+            ResourceKind::Plank => "PLANK",
+            ResourceKind::WoodenSword => "WOOD_SWORD",
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+pub enum QuestReward {
+    Experience { amount: u64 },
+    Resource { resource: ResourceKind, amount: u64 },
+}
+
+impl QuestReward {
+    pub const fn experience(amount: u64) -> Self {
+        Self::Experience { amount }
+    }
+
+    pub const fn resource(resource: ResourceKind, amount: u64) -> Self {
+        Self::Resource { resource, amount }
+    }
+}
+
+pub struct QuestCodexEntry {
+    pub id: u16,
+    pub quest_type: QuestType,
+    pub name: &'static str,
+    pub level_required: u8,
+    pub cooldown_seconds: u32,
+    pub base_energy_cost: u16,
+    pub minimum_stats: CoreStats,
+    pub rewards: &'static [QuestReward],
+}
+
+impl QuestCodexEntry {
+    pub const fn new(
+        id: u16,
+        quest_type: QuestType,
+        name: &'static str,
+        level_required: u8,
+        cooldown_seconds: u32,
+        base_energy_cost: u16,
+        minimum_stats: CoreStats,
+        rewards: &'static [QuestReward],
+    ) -> Self {
+        Self {
+            id,
+            quest_type,
+            name,
+            level_required,
+            cooldown_seconds,
+            base_energy_cost,
+            minimum_stats,
+            rewards,
+        }
+    }
+
+    fn efficiency(&self, stats: CoreStats) -> f32 {
+        fn ratio(stat: u16, requirement: u16) -> f32 {
+            if requirement == 0 {
+                f32::INFINITY
+            } else {
+                stat as f32 / requirement as f32
+            }
+        }
+
+        let might = ratio(stats.might, self.minimum_stats.might);
+        let speed = ratio(stats.speed, self.minimum_stats.speed);
+        let intellect = ratio(stats.intellect, self.minimum_stats.intellect);
+
+        might.min(speed).min(intellect)
+    }
+
+    pub fn energy_cost(&self, stats: CoreStats) -> u16 {
+        let eff = self.efficiency(stats);
+        if eff >= 1.5 {
+            return 0;
+        }
+
+        let penalty = if eff <= 0.0 {
+            1.5
+        } else {
+            (1.0 / eff).clamp(1.0, 1.5)
+        };
+
+        let energy = f32::from(self.base_energy_cost) * penalty;
+        energy.ceil().min(u16::MAX as f32) as u16
+    }
+
+    pub fn stats_satisfied(&self, stats: CoreStats) -> bool {
+        stats.might >= self.minimum_stats.might
+            && stats.speed >= self.minimum_stats.speed
+            && stats.intellect >= self.minimum_stats.intellect
+    }
+}
+
+const CARAVAN_GUARD_REWARDS: [QuestReward; 1] = [QuestReward::resource(ResourceKind::Gold, 100)];
+const WOODCUTTING_REWARDS: [QuestReward; 1] = [QuestReward::resource(ResourceKind::Log, 1)];
+const BANDIT_CAMP_REWARDS: [QuestReward; 1] = [QuestReward::experience(50)];
+
+pub const QUEST_CODEX: [QuestCodexEntry; 3] = [
+    QuestCodexEntry::new(
+        1,
+        QuestType::Job,
+        "Caravan Guard",
+        1,
+        60 * 60,
+        5,
+        CoreStats::new(0, 1, 1),
+        &CARAVAN_GUARD_REWARDS,
+    ),
+    QuestCodexEntry::new(
+        2,
+        QuestType::Farm,
+        "Woodcutting",
+        1,
+        60 * 60,
+        5,
+        CoreStats::new(1, 1, 0),
+        &WOODCUTTING_REWARDS,
+    ),
+    QuestCodexEntry::new(
+        3,
+        QuestType::Raid,
+        "Bandit Camp",
+        1,
+        60 * 60,
+        7,
+        CoreStats::new(1, 0, 1),
+        &BANDIT_CAMP_REWARDS,
+    ),
+];
+
+pub fn quest_by_id(id: u16) -> Option<&'static QuestCodexEntry> {
+    QUEST_CODEX.iter().find(|quest| quest.id == id)
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
+pub enum RecipeType {
+    Forge,
+    Craft,
+}
+
+#[derive(Clone, Copy)]
+pub enum RecipeInput {
+    Forge {
+        raw_material: ResourceKind,
+        amount: u64,
+    },
+    Craft {
+        base_material: ResourceKind,
+        base_amount: u64,
+        gold_amount: u64,
+    },
+}
+
+#[derive(Clone, Copy)]
+pub enum RecipeOutput {
+    Resource { resource: ResourceKind, amount: u64 },
+}
+
+pub struct RecipeCodexEntry {
+    pub id: u16,
+    pub recipe_type: RecipeType,
+    pub name: &'static str,
+    pub level_required: u8,
+    pub cooldown_seconds: u32,
+    pub base_energy_cost: u16,
+    pub minimum_stats: CoreStats,
+    pub input: RecipeInput,
+    pub output: RecipeOutput,
+}
+
+impl RecipeCodexEntry {
+    pub const fn new(
+        id: u16,
+        recipe_type: RecipeType,
+        name: &'static str,
+        level_required: u8,
+        cooldown_seconds: u32,
+        base_energy_cost: u16,
+        minimum_stats: CoreStats,
+        input: RecipeInput,
+        output: RecipeOutput,
+    ) -> Self {
+        Self {
+            id,
+            recipe_type,
+            name,
+            level_required,
+            cooldown_seconds,
+            base_energy_cost,
+            minimum_stats,
+            input,
+            output,
+        }
+    }
+
+    fn efficiency(&self, stats: CoreStats) -> f32 {
+        fn ratio(stat: u16, requirement: u16) -> f32 {
+            if requirement == 0 {
+                f32::INFINITY
+            } else {
+                stat as f32 / requirement as f32
+            }
+        }
+
+        let might = ratio(stats.might, self.minimum_stats.might);
+        let speed = ratio(stats.speed, self.minimum_stats.speed);
+        let intellect = ratio(stats.intellect, self.minimum_stats.intellect);
+
+        might.min(speed).min(intellect)
+    }
+
+    pub fn energy_cost(&self, stats: CoreStats) -> u16 {
+        let eff = self.efficiency(stats);
+        if eff >= 1.5 {
+            return 0;
+        }
+
+        let penalty = if eff <= 0.0 {
+            1.5
+        } else {
+            (1.0 / eff).clamp(1.0, 1.5)
+        };
+
+        let energy = f32::from(self.base_energy_cost) * penalty;
+        energy.ceil().min(u16::MAX as f32) as u16
+    }
+
+    pub fn stats_satisfied(&self, stats: CoreStats) -> bool {
+        stats.might >= self.minimum_stats.might
+            && stats.speed >= self.minimum_stats.speed
+            && stats.intellect >= self.minimum_stats.intellect
+    }
+}
+
+pub const RECIPE_CODEX: [RecipeCodexEntry; 2] = [
+    RecipeCodexEntry::new(
+        1,
+        RecipeType::Forge,
+        "Plank Forging",
+        1,
+        60 * 60,
+        5,
+        CoreStats::new(1, 0, 0),
+        RecipeInput::Forge {
+            raw_material: ResourceKind::Log,
+            amount: 1,
+        },
+        RecipeOutput::Resource {
+            resource: ResourceKind::Plank,
+            amount: 1,
+        },
+    ),
+    RecipeCodexEntry::new(
+        2,
+        RecipeType::Craft,
+        "Wooden Sword",
+        1,
+        2 * 60 * 60,
+        7,
+        CoreStats::new(1, 0, 1),
+        RecipeInput::Craft {
+            base_material: ResourceKind::Plank,
+            base_amount: 2,
+            gold_amount: 50,
+        },
+        RecipeOutput::Resource {
+            resource: ResourceKind::WoodenSword,
+            amount: 1,
+        },
+    ),
+];
+
+pub fn recipe_by_id(id: u16) -> Option<&'static RecipeCodexEntry> {
+    RECIPE_CODEX.iter().find(|recipe| recipe.id == id)
+}

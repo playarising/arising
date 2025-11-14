@@ -44,6 +44,38 @@ pub enum ArisingError {
     InsufficientEnergy,
     #[msg("Energy refill is still on cooldown")]
     EnergyRefillCooldown,
+    #[msg("Quest is not recognized")]
+    InvalidQuest,
+    #[msg("Character is already on a quest")]
+    QuestAlreadyInProgress,
+    #[msg("Character is not on a quest")]
+    QuestNotInProgress,
+    #[msg("Quest has not finished yet")]
+    QuestNotReady,
+    #[msg("Quest in progress does not match the requested quest id")]
+    QuestMismatch,
+    #[msg("Character does not meet the requirements for this quest")]
+    QuestRequirementsNotMet,
+    #[msg("Invalid quest recipe identifier")]
+    InvalidRecipe,
+    #[msg("Character is already processing a recipe")]
+    RecipeAlreadyInProgress,
+    #[msg("Character is not processing a recipe")]
+    RecipeNotInProgress,
+    #[msg("Recipe has not finished yet")]
+    RecipeNotReady,
+    #[msg("Recipe in progress does not match the requested recipe id")]
+    RecipeMismatch,
+    #[msg("Character does not meet the requirements for this recipe")]
+    RecipeRequirementsNotMet,
+    #[msg("Invalid resource mint provided")]
+    InvalidResourceMint,
+    #[msg("Invalid resource token account provided")]
+    InvalidResourceAccount,
+    #[msg("Missing accounts for resource instructions")]
+    MissingRewardAccounts,
+    #[msg("Missing accounts for recipe processing")]
+    MissingRecipeAccounts,
     #[msg("Arithmetic overflow encountered")]
     ArithmeticOverflow,
 }
