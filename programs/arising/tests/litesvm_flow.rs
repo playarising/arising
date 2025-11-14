@@ -86,19 +86,18 @@ fn quest_and_recipe_flow() {
     .assert_success();
 
     for _ in 0..2 {
-        ctx.execute_instruction(
-            instructions::start_recipe(
-                Civilization::Ard,
-                2,
-                1,
-                forger,
-                authority_pk,
-                mint_state,
-                tokens::reward_accounts(&authority_pk, &[ResourceKind::Log]),
-            ),
-            &[&authority],
-        )
-        .assert_success();
+        let instr = instructions::start_recipe(
+            Civilization::Ard,
+            2,
+            1,
+            forger,
+            authority_pk,
+            mint_state,
+            tokens::reward_accounts(&authority_pk, &[ResourceKind::Log]),
+        );
+        dbg!(&instr.accounts);
+        ctx.execute_instruction(instr, &[&authority])
+            .assert_success();
         clock::fast_forward_recipe(&mut ctx, &forger);
         ctx.execute_instruction(
             instructions::claim_recipe(

@@ -86,6 +86,8 @@ pub enum ArisingError {
     EquipmentRequiresHandSlot,
     #[msg("Missing accounts for equipment processing")]
     MissingEquipmentAccounts,
+    #[msg("Character does not meet the level requirement for this equipment")]
+    EquipmentLevelRequirement,
     #[msg("Arithmetic overflow encountered")]
     ArithmeticOverflow,
 }

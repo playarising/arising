@@ -575,15 +575,21 @@ fn mint_resource_reward<'info>(
     amount: u64,
     remaining_accounts: &mut std::slice::Iter<'info, AccountInfo<'info>>,
 ) -> Result<ResourceRewardEvent> {
+    let (expected_mint, mint_bump) =
+        Pubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], program_id);
     let mint_info = remaining_accounts
         .next()
         .ok_or(ArisingError::MissingRewardAccounts)?;
     let destination_info = remaining_accounts
         .next()
         .ok_or(ArisingError::MissingRewardAccounts)?;
-
-    let (expected_mint, mint_bump) =
-        Pubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], program_id);
+    let expected_ata =
+        associated_token::get_associated_token_address(&authority.key(), &mint_info.key());
+    require_keys_eq!(
+        destination_info.key(),
+        expected_ata,
+        ArisingError::InvalidResourceAccount
+    );
     require_keys_eq!(
         mint_info.key(),
         expected_mint,
@@ -604,14 +610,6 @@ fn mint_resource_reward<'info>(
     }
 
     if destination_info.data_is_empty() {
-        let expected_ata =
-            associated_token::get_associated_token_address(&authority.key(), &mint_info.key());
-        require_keys_eq!(
-            destination_info.key(),
-            expected_ata,
-            ArisingError::InvalidResourceAccount
-        );
-
         associated_token::create(CpiContext::new(
             associated_token_program.to_account_info(),
             associated_token::Create {
@@ -712,20 +710,14 @@ fn consume_resource_from_user<'info>(
     amount: u64,
     remaining_accounts: &mut std::slice::Iter<'info, AccountInfo<'info>>,
 ) -> Result<ResourceCostEvent> {
+    let (expected_mint, _) =
+        Pubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], program_id);
     let mint_info = remaining_accounts
         .next()
         .ok_or(ArisingError::MissingRecipeAccounts)?;
     let source_info = remaining_accounts
         .next()
         .ok_or(ArisingError::MissingRecipeAccounts)?;
-
-    let (expected_mint, _) =
-        Pubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], program_id);
-    require_keys_eq!(
-        mint_info.key(),
-        expected_mint,
-        ArisingError::InvalidResourceMint
-    );
 
     let source_account = Account::<TokenAccount>::try_from(source_info)
         .map_err(|_| ArisingError::InvalidResourceAccount)?;

@@ -85,7 +85,6 @@ fn recipe_consumes_available_resources() {
         None,
     );
 
-    // No resources yet; starting the recipe should fail.
     tokens::seed_resource_balance(
         &mut ctx,
         &mint_state,
@@ -93,6 +92,7 @@ fn recipe_consumes_available_resources() {
         ResourceKind::Gold,
         100,
     );
+
     ctx.execute_instruction(
         instructions::start_recipe(
             Civilization::Ard,
@@ -101,9 +101,9 @@ fn recipe_consumes_available_resources() {
             crafter,
             authority_pk,
             mint_state,
-            tokens::reward_accounts(&authority_pk, &[ResourceKind::Plank, ResourceKind::Gold]),
+            tokens::reward_accounts(&authority_pk, &[ResourceKind::Log, ResourceKind::Gold]),
         ),
         &[&authority],
     )
-    .assert_anchor_error(ArisingError::InvalidResourceAccount);
+    .assert_anchor_error(ArisingError::InvalidResourceMint);
 }

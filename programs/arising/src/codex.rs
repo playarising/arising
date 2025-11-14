@@ -450,6 +450,7 @@ pub struct EquipmentDefinition {
     pub category: EquipmentCategory,
     pub allowed_slots: &'static [EquipmentSlot],
     pub occupies_both_hands: bool,
+    pub level_required: u8,
     pub attribute_bonus: Attributes,
 }
 
@@ -459,6 +460,7 @@ impl EquipmentDefinition {
         category: EquipmentCategory,
         allowed_slots: &'static [EquipmentSlot],
         occupies_both_hands: bool,
+        level_required: u8,
         attribute_bonus: Attributes,
     ) -> Self {
         Self {
@@ -466,6 +468,7 @@ impl EquipmentDefinition {
             category,
             allowed_slots,
             occupies_both_hands,
+            level_required,
             attribute_bonus,
         }
     }
@@ -491,6 +494,7 @@ pub const EQUIPMENT_CODEX: [EquipmentDefinition; 11] = [
         EquipmentCategory::Weapon,
         &HAND_SLOTS,
         false,
+        1,
         Attributes::new(2, 0, 0, 0, 0, 0),
     ),
     EquipmentDefinition::new(
@@ -498,6 +502,7 @@ pub const EQUIPMENT_CODEX: [EquipmentDefinition; 11] = [
         EquipmentCategory::Weapon,
         &HAND_SLOTS,
         true,
+        3,
         Attributes::new(4, 0, 0, 0, 0, -1),
     ),
     EquipmentDefinition::new(
@@ -505,6 +510,7 @@ pub const EQUIPMENT_CODEX: [EquipmentDefinition; 11] = [
         EquipmentCategory::Weapon,
         &LEFT_HAND_SLOT,
         false,
+        2,
         Attributes::new(0, 2, 0, 1, 0, 0),
     ),
     EquipmentDefinition::new(
@@ -512,6 +518,7 @@ pub const EQUIPMENT_CODEX: [EquipmentDefinition; 11] = [
         EquipmentCategory::Armor,
         &CHEST_SLOT,
         false,
+        3,
         Attributes::new(0, 2, 0, 0, 0, 0),
     ),
     EquipmentDefinition::new(
@@ -519,6 +526,7 @@ pub const EQUIPMENT_CODEX: [EquipmentDefinition; 11] = [
         EquipmentCategory::Armor,
         &LEGS_SLOT,
         false,
+        2,
         Attributes::new(0, 1, 0, 0, 0, 0),
     ),
     EquipmentDefinition::new(
@@ -526,6 +534,7 @@ pub const EQUIPMENT_CODEX: [EquipmentDefinition; 11] = [
         EquipmentCategory::Armor,
         &BOOTS_SLOT,
         false,
+        2,
         Attributes::new(0, 0, 0, 0, 0, 1),
     ),
     EquipmentDefinition::new(
@@ -533,6 +542,7 @@ pub const EQUIPMENT_CODEX: [EquipmentDefinition; 11] = [
         EquipmentCategory::Armor,
         &HELMET_SLOT,
         false,
+        2,
         Attributes::new(0, 1, 0, 0, 0, 0),
     ),
     EquipmentDefinition::new(
@@ -540,6 +550,7 @@ pub const EQUIPMENT_CODEX: [EquipmentDefinition; 11] = [
         EquipmentCategory::Accessory,
         &RING_SLOTS,
         false,
+        1,
         Attributes::new(1, 0, 0, 0, 0, 0),
     ),
     EquipmentDefinition::new(
@@ -547,6 +558,7 @@ pub const EQUIPMENT_CODEX: [EquipmentDefinition; 11] = [
         EquipmentCategory::Accessory,
         &AMULET_SLOTS,
         false,
+        2,
         Attributes::new(0, 0, 2, 0, 0, 0),
     ),
     EquipmentDefinition::new(
@@ -554,6 +566,7 @@ pub const EQUIPMENT_CODEX: [EquipmentDefinition; 11] = [
         EquipmentCategory::Back,
         &BACK_SLOT,
         false,
+        1,
         Attributes::new(0, 0, 0, 1, 0, 0),
     ),
     EquipmentDefinition::new(
@@ -561,6 +574,7 @@ pub const EQUIPMENT_CODEX: [EquipmentDefinition; 11] = [
         EquipmentCategory::Back,
         &BACK_SLOT,
         false,
+        2,
         Attributes::new(0, 0, 0, 0, 1, 0),
     ),
 ];
@@ -677,8 +691,11 @@ impl QuestCodexEntry {
 const CARAVAN_GUARD_REWARDS: [QuestReward; 1] = [QuestReward::resource(ResourceKind::Gold, 100)];
 const WOODCUTTING_REWARDS: [QuestReward; 1] = [QuestReward::resource(ResourceKind::Log, 1)];
 const BANDIT_CAMP_REWARDS: [QuestReward; 1] = [QuestReward::experience(50)];
+const SCOUTING_DRILLS_REWARDS: [QuestReward; 1] = [QuestReward::experience(60)];
+const TIMBER_STOCKPILE_REWARDS: [QuestReward; 1] = [QuestReward::resource(ResourceKind::Log, 2)];
+const ARTISAN_SUPPORT_REWARDS: [QuestReward; 1] = [QuestReward::resource(ResourceKind::Gold, 150)];
 
-pub const QUEST_CODEX: [QuestCodexEntry; 3] = [
+pub const QUEST_CODEX: [QuestCodexEntry; 6] = [
     QuestCodexEntry::new(
         1,
         QuestType::Job,
@@ -708,6 +725,36 @@ pub const QUEST_CODEX: [QuestCodexEntry; 3] = [
         7,
         CoreStats::new(1, 0, 1),
         &BANDIT_CAMP_REWARDS,
+    ),
+    QuestCodexEntry::new(
+        4,
+        QuestType::Raid,
+        "Scouting Drills",
+        1,
+        45 * 60,
+        6,
+        CoreStats::new(0, 1, 0),
+        &SCOUTING_DRILLS_REWARDS,
+    ),
+    QuestCodexEntry::new(
+        5,
+        QuestType::Farm,
+        "Timber Stockpile",
+        2,
+        75 * 60,
+        7,
+        CoreStats::new(1, 1, 0),
+        &TIMBER_STOCKPILE_REWARDS,
+    ),
+    QuestCodexEntry::new(
+        6,
+        QuestType::Job,
+        "Artisan Support",
+        3,
+        80 * 60,
+        8,
+        CoreStats::new(0, 1, 1),
+        &ARTISAN_SUPPORT_REWARDS,
     ),
 ];
 
@@ -791,6 +838,24 @@ mod tests {
         let index = equipment_definition_index(ResourceKind::WoodenShield).expect("shield index");
         let from_index = equipment_definition_by_index(index).expect("shield via index");
         assert_eq!(from_index.resource, ResourceKind::WoodenShield);
+    }
+
+    #[test]
+    fn resource_mint_keys() {
+        use anchor_lang::prelude::Pubkey;
+
+        let log = Pubkey::find_program_address(
+            &[crate::RESOURCE_MINT_SEED, ResourceKind::Log.seed_bytes()],
+            &crate::ID,
+        )
+        .0;
+        let plank = Pubkey::find_program_address(
+            &[crate::RESOURCE_MINT_SEED, ResourceKind::Plank.seed_bytes()],
+            &crate::ID,
+        )
+        .0;
+        println!("log mint {}", log);
+        println!("plank mint {}", plank);
     }
 }
 
@@ -894,7 +959,7 @@ impl RecipeCodexEntry {
     }
 }
 
-pub const RECIPE_CODEX: [RecipeCodexEntry; 2] = [
+pub const RECIPE_CODEX: [RecipeCodexEntry; 12] = [
     RecipeCodexEntry::new(
         1,
         RecipeType::Forge,
@@ -927,6 +992,186 @@ pub const RECIPE_CODEX: [RecipeCodexEntry; 2] = [
         },
         RecipeOutput::Resource {
             resource: ResourceKind::WoodenSword,
+            amount: 1,
+        },
+    ),
+    RecipeCodexEntry::new(
+        3,
+        RecipeType::Craft,
+        "Shield Carpentry",
+        2,
+        90 * 60,
+        6,
+        CoreStats::new(1, 0, 0),
+        RecipeInput::Craft {
+            base_material: ResourceKind::Plank,
+            base_amount: 2,
+            gold_amount: 25,
+        },
+        RecipeOutput::Resource {
+            resource: ResourceKind::WoodenShield,
+            amount: 1,
+        },
+    ),
+    RecipeCodexEntry::new(
+        4,
+        RecipeType::Craft,
+        "Greatsword Assembly",
+        3,
+        120 * 60,
+        8,
+        CoreStats::new(2, 0, 0),
+        RecipeInput::Craft {
+            base_material: ResourceKind::Plank,
+            base_amount: 3,
+            gold_amount: 80,
+        },
+        RecipeOutput::Resource {
+            resource: ResourceKind::TrainingGreatsword,
+            amount: 1,
+        },
+    ),
+    RecipeCodexEntry::new(
+        5,
+        RecipeType::Craft,
+        "Leather Armor Weaving",
+        3,
+        100 * 60,
+        7,
+        CoreStats::new(1, 0, 1),
+        RecipeInput::Craft {
+            base_material: ResourceKind::Plank,
+            base_amount: 1,
+            gold_amount: 90,
+        },
+        RecipeOutput::Resource {
+            resource: ResourceKind::LeatherArmor,
+            amount: 1,
+        },
+    ),
+    RecipeCodexEntry::new(
+        6,
+        RecipeType::Craft,
+        "Leather Leggings",
+        2,
+        70 * 60,
+        6,
+        CoreStats::new(0, 1, 0),
+        RecipeInput::Craft {
+            base_material: ResourceKind::Plank,
+            base_amount: 1,
+            gold_amount: 70,
+        },
+        RecipeOutput::Resource {
+            resource: ResourceKind::LeatherLeggings,
+            amount: 1,
+        },
+    ),
+    RecipeCodexEntry::new(
+        7,
+        RecipeType::Craft,
+        "Leather Boots",
+        2,
+        60 * 60,
+        6,
+        CoreStats::new(0, 1, 0),
+        RecipeInput::Craft {
+            base_material: ResourceKind::Plank,
+            base_amount: 1,
+            gold_amount: 60,
+        },
+        RecipeOutput::Resource {
+            resource: ResourceKind::LeatherBoots,
+            amount: 1,
+        },
+    ),
+    RecipeCodexEntry::new(
+        8,
+        RecipeType::Craft,
+        "Leather Helmet",
+        2,
+        60 * 60,
+        6,
+        CoreStats::new(0, 0, 1),
+        RecipeInput::Craft {
+            base_material: ResourceKind::Plank,
+            base_amount: 1,
+            gold_amount: 60,
+        },
+        RecipeOutput::Resource {
+            resource: ResourceKind::LeatherHelmet,
+            amount: 1,
+        },
+    ),
+    RecipeCodexEntry::new(
+        9,
+        RecipeType::Craft,
+        "Bronze Ring",
+        1,
+        45 * 60,
+        5,
+        CoreStats::new(0, 0, 0),
+        RecipeInput::Craft {
+            base_material: ResourceKind::Plank,
+            base_amount: 1,
+            gold_amount: 40,
+        },
+        RecipeOutput::Resource {
+            resource: ResourceKind::BronzeRing,
+            amount: 1,
+        },
+    ),
+    RecipeCodexEntry::new(
+        10,
+        RecipeType::Craft,
+        "Bronze Amulet",
+        2,
+        60 * 60,
+        6,
+        CoreStats::new(0, 0, 1),
+        RecipeInput::Craft {
+            base_material: ResourceKind::Plank,
+            base_amount: 1,
+            gold_amount: 60,
+        },
+        RecipeOutput::Resource {
+            resource: ResourceKind::BronzeAmulet,
+            amount: 1,
+        },
+    ),
+    RecipeCodexEntry::new(
+        11,
+        RecipeType::Craft,
+        "Traveler's Cloak",
+        1,
+        50 * 60,
+        5,
+        CoreStats::new(0, 0, 0),
+        RecipeInput::Craft {
+            base_material: ResourceKind::Plank,
+            base_amount: 1,
+            gold_amount: 30,
+        },
+        RecipeOutput::Resource {
+            resource: ResourceKind::TravelersCloak,
+            amount: 1,
+        },
+    ),
+    RecipeCodexEntry::new(
+        12,
+        RecipeType::Craft,
+        "Hunting Quiver",
+        2,
+        60 * 60,
+        6,
+        CoreStats::new(0, 1, 0),
+        RecipeInput::Craft {
+            base_material: ResourceKind::Plank,
+            base_amount: 1,
+            gold_amount: 50,
+        },
+        RecipeOutput::Resource {
+            resource: ResourceKind::HuntingQuiver,
             amount: 1,
         },
     ),

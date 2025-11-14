@@ -482,6 +482,8 @@ impl Character {
         slot: EquipmentSlot,
         definition: EquipmentDefinition,
     ) -> Result<Vec<ResourceKind>> {
+        self.ensure_min_level(definition.level_required)
+            .map_err(|_| ArisingError::EquipmentLevelRequirement)?;
         require!(
             definition.supports_slot(slot),
             ArisingError::InvalidEquipmentSlot
@@ -976,6 +978,8 @@ mod tests {
         let shield = equipment_definition(ResourceKind::WoodenShield).unwrap();
         let greatsword = equipment_definition(ResourceKind::TrainingGreatsword).unwrap();
 
+        grant_levels(&mut character, 3);
+
         character
             .equip_item(EquipmentSlot::RightHand, sword)
             .expect("equip sword");
@@ -1000,6 +1004,7 @@ mod tests {
     fn unequipping_two_handed_from_secondary_slot_clears_item() {
         let mut character = sample_character(Civilization::Ard);
         let greatsword = equipment_definition(ResourceKind::TrainingGreatsword).unwrap();
+        grant_levels(&mut character, 3);
         character
             .equip_item(EquipmentSlot::RightHand, greatsword)
             .expect("equip two handed");
@@ -1014,5 +1019,20 @@ mod tests {
             .item
             .is_none());
         assert_eq!(character.equipment_attributes.atk, 0);
+    }
+
+    #[test]
+    fn equipment_respects_level_requirement() {
+        let mut character = sample_character(Civilization::Ard);
+        let greatsword = equipment_definition(ResourceKind::TrainingGreatsword).unwrap();
+        let err = character
+            .equip_item(EquipmentSlot::RightHand, greatsword)
+            .unwrap_err();
+        assert_error(err, ArisingError::EquipmentLevelRequirement);
+
+        grant_levels(&mut character, 3);
+        character
+            .equip_item(EquipmentSlot::RightHand, greatsword)
+            .expect("level requirement met");
     }
 }

@@ -1,6 +1,7 @@
 #[path = "common/mod.rs"]
 mod common;
 
+use anchor_lang::solana_program::pubkey::Pubkey as AnchorPubkey;
 use arising::codex::{Civilization, EquipmentSlot, Gender, ResourceKind};
 use common::{
     context::{TestContext, TransactionResultExt},
@@ -25,6 +26,8 @@ fn equips_and_swaps_items() {
         Gender::Male,
         None,
     );
+
+    level_character(&mut ctx, &character, 3);
 
     tokens::seed_resource_balance(
         &mut ctx,
@@ -145,4 +148,17 @@ fn equips_and_swaps_items() {
         tokens::token_balance(&ctx, &authority_pk, ResourceKind::TrainingGreatsword),
         1
     );
+}
+
+fn level_character(ctx: &mut TestContext, character: &AnchorPubkey, target_level: u8) {
+    use arising::level_codex::LEVEL_CURVE;
+
+    let mut account = ctx.get_anchor_account::<arising::character::Character>(character);
+    let mut total_xp = 0u64;
+    for entry in LEVEL_CURVE.iter().take(target_level.saturating_sub(1) as usize) {
+        total_xp += entry.xp_to_next as u64;
+    }
+    account.experience = total_xp;
+    account.energy = account.energy_capacity();
+    ctx.store_anchor_account(*character, arising::ID, &account, arising::character::Character::LEN);
 }
