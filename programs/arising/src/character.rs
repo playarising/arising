@@ -39,7 +39,7 @@ pub struct Character {
     pub created_at: i64,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Default)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
 pub struct CharacterQuestState {
     pub quest_id: u16,
     pub started_at: i64,
@@ -50,7 +50,7 @@ impl CharacterQuestState {
     pub const SIZE: usize = 2 + 8 + 8;
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Default)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
 pub struct CharacterRecipeState {
     pub recipe_id: u16,
     pub started_at: i64,
@@ -496,10 +496,24 @@ impl CharacterMintState {
 mod tests {
     use super::*;
     use crate::{
-        codex::{Civilization, Gender},
+        codex::{Attributes, CharacterClass, Civilization, Gender},
         level_codex::{LEVEL_CAP, LEVEL_CURVE},
     };
     use anchor_lang::error::Error as AnchorError;
+
+    fn grant_levels(character: &mut Character, target_level: u8) {
+        assert!(
+            target_level >= 1 && target_level <= LEVEL_CAP,
+            "target level must be within curve"
+        );
+        while character.current_level() < target_level {
+            let current_level = character.current_level();
+            let curve_index = (current_level - 1) as usize;
+            character
+                .grant_experience(LEVEL_CURVE[curve_index].xp_to_next as u64)
+                .expect("experience applied");
+        }
+    }
 
     fn sample_character(civilization: Civilization) -> Character {
         Character {
@@ -565,15 +579,16 @@ mod tests {
 
         let mut multi_level = sample_character(Civilization::Ard);
         multi_level.energy = Character::capacity_for_level(1) - 2;
-        let xp_to_level_three =
-            (LEVEL_CURVE[0].xp_to_next + LEVEL_CURVE[1].xp_to_next) as u64;
+        let xp_to_level_three = (LEVEL_CURVE[0].xp_to_next + LEVEL_CURVE[1].xp_to_next) as u64;
         multi_level
             .grant_experience(xp_to_level_three)
             .expect("multi level up");
         assert_eq!(multi_level.current_level(), 3);
-        let gained =
-            Character::capacity_for_level(3) - Character::capacity_for_level(1);
-        assert_eq!(multi_level.energy, Character::capacity_for_level(1) - 2 + gained);
+        let gained = Character::capacity_for_level(3) - Character::capacity_for_level(1);
+        assert_eq!(
+            multi_level.energy,
+            Character::capacity_for_level(1) - 2 + gained
+        );
     }
 
     #[test]
@@ -616,9 +631,7 @@ mod tests {
     #[test]
     fn quest_and_recipe_state_machine_enforces_exclusivity() {
         let mut character = sample_character(Civilization::Ard);
-        character
-            .start_quest(7, 10, 1)
-            .expect("should start quest");
+        character.start_quest(7, 10, 1).expect("should start quest");
         assert!(character.current_quest.is_some());
         let err = character.start_quest(8, 20, 2).unwrap_err();
         assert_error(err, ArisingError::QuestAlreadyInProgress);
@@ -633,5 +646,94 @@ mod tests {
         assert_error(err, ArisingError::RecipeAlreadyInProgress);
         character.clear_recipe().expect("recipe cleared");
         assert!(character.current_recipe.is_none());
+    }
+
+    #[test]
+    fn allocate_attributes_validates_input() {
+        let mut character = sample_character(Civilization::Shinkari);
+        let err = character
+            .allocate_attributes(Attributes::new(-1, 0, 0, 0, 0, 0))
+            .unwrap_err();
+        assert_error(err, ArisingError::NegativeAllocation);
+
+        let err = character
+            .allocate_attributes(Attributes::zero())
+            .unwrap_err();
+        assert_error(err, ArisingError::EmptyAllocation);
+
+        grant_levels(&mut character, 6);
+        assert_eq!(character.available_attribute_points(), 1);
+        character
+            .allocate_attributes(Attributes::new(1, 0, 0, 0, 0, 0))
+            .expect("spend attribute point");
+        assert_eq!(
+            character.attributes.atk,
+            Civilization::Shinkari.base_attributes().atk + 1
+        );
+
+        let err = character
+            .allocate_attributes(Attributes::new(1, 1, 0, 0, 0, 0))
+            .unwrap_err();
+        assert_error(err, ArisingError::InsufficientAttributePoints);
+    }
+
+    #[test]
+    fn consume_energy_prevents_overdraw() {
+        let mut character = sample_character(Civilization::Hartenn);
+        character.energy = 5;
+        character
+            .consume_energy(0)
+            .expect("zero-cost actions should pass");
+        assert_eq!(character.energy, 5);
+        character.consume_energy(3).expect("spend some energy");
+        assert_eq!(character.energy, 2);
+        let err = character.consume_energy(3).unwrap_err();
+        assert_error(err, ArisingError::InsufficientEnergy);
+        assert_eq!(character.energy, 2, "energy should remain unchanged");
+    }
+
+    #[test]
+    fn ensure_active_quest_and_recipe_require_state() {
+        let mut character = sample_character(Civilization::Zhand);
+        let err = character.ensure_active_quest().unwrap_err();
+        assert_error(err, ArisingError::QuestNotInProgress);
+        let err = character.clear_quest().unwrap_err();
+        assert_error(err, ArisingError::QuestNotInProgress);
+
+        character
+            .start_quest(1, 5, 10)
+            .expect("start quest for state check");
+        character.ensure_active_quest().expect("quest present");
+        character.clear_quest().expect("quest cleared");
+
+        let err = character.ensure_active_recipe().unwrap_err();
+        assert_error(err, ArisingError::RecipeNotInProgress);
+        let err = character.clear_recipe().unwrap_err();
+        assert_error(err, ArisingError::RecipeNotInProgress);
+
+        character
+            .start_recipe(1, 5, 20)
+            .expect("start recipe for state check");
+        character.ensure_active_recipe().expect("recipe present");
+        character.clear_recipe().expect("recipe cleared");
+    }
+
+    #[test]
+    fn apply_class_choice_validates_civilization_and_duplicates() {
+        let mut character = sample_character(Civilization::Ard);
+        let err = character
+            .apply_class_choice(CharacterClass::HartennEngineer)
+            .unwrap_err();
+        assert_error(err, ArisingError::InvalidClassForCivilization);
+
+        character
+            .apply_class_choice(CharacterClass::ArdKnight)
+            .expect("valid class choice");
+        assert_eq!(character.class, Some(CharacterClass::ArdKnight));
+
+        let err = character
+            .apply_class_choice(CharacterClass::ArdTemplar)
+            .unwrap_err();
+        assert_error(err, ArisingError::ClassAlreadyChosen);
     }
 }

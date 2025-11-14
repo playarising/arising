@@ -115,7 +115,7 @@ pub enum PassiveEffect {
     RaidersFortune,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum CharacterClass {
     ArdKnight,
     ArdTemplar,
@@ -521,7 +521,10 @@ mod tests {
 
         let low_stats = CoreStats::zero();
         assert!(!quest.stats_satisfied(low_stats));
-        assert_eq!(quest.energy_cost(low_stats), (f32::from(quest.base_energy_cost) * 1.5).ceil() as u16);
+        assert_eq!(
+            quest.energy_cost(low_stats),
+            (f32::from(quest.base_energy_cost) * 1.5).ceil() as u16
+        );
 
         let overqualified = CoreStats::new(
             quest.minimum_stats.might + 5,
