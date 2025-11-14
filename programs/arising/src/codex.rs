@@ -335,12 +335,22 @@ pub enum QuestType {
     Raid,
 }
 
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq, Debug)]
 pub enum ResourceKind {
     Gold,
     Log,
     Plank,
     WoodenSword,
+    TrainingGreatsword,
+    WoodenShield,
+    LeatherArmor,
+    LeatherLeggings,
+    LeatherBoots,
+    LeatherHelmet,
+    BronzeRing,
+    BronzeAmulet,
+    TravelersCloak,
+    HuntingQuiver,
 }
 
 impl ResourceKind {
@@ -350,6 +360,16 @@ impl ResourceKind {
             ResourceKind::Log => b"log",
             ResourceKind::Plank => b"plank",
             ResourceKind::WoodenSword => b"wooden_sword",
+            ResourceKind::TrainingGreatsword => b"training_greatsword",
+            ResourceKind::WoodenShield => b"wooden_shield",
+            ResourceKind::LeatherArmor => b"leather_armor",
+            ResourceKind::LeatherLeggings => b"leather_leggings",
+            ResourceKind::LeatherBoots => b"leather_boots",
+            ResourceKind::LeatherHelmet => b"leather_helmet",
+            ResourceKind::BronzeRing => b"bronze_ring",
+            ResourceKind::BronzeAmulet => b"bronze_amulet",
+            ResourceKind::TravelersCloak => b"travelers_cloak",
+            ResourceKind::HuntingQuiver => b"hunting_quiver",
         }
     }
 
@@ -363,30 +383,206 @@ impl ResourceKind {
             ResourceKind::Log => "LOG",
             ResourceKind::Plank => "PLANK",
             ResourceKind::WoodenSword => "WOOD_SWORD",
+            ResourceKind::TrainingGreatsword => "TRAIN_GSWORD",
+            ResourceKind::WoodenShield => "WOOD_SHIELD",
+            ResourceKind::LeatherArmor => "LEATHER_ARMOR",
+            ResourceKind::LeatherLeggings => "LEATHER_LEGS",
+            ResourceKind::LeatherBoots => "LEATHER_BOOTS",
+            ResourceKind::LeatherHelmet => "LEATHER_HELM",
+            ResourceKind::BronzeRing => "BRONZE_RING",
+            ResourceKind::BronzeAmulet => "BRONZE_AMULET",
+            ResourceKind::TravelersCloak => "TRAVEL_CLOAK",
+            ResourceKind::HuntingQuiver => "HUNTING_QUIVER",
         }
     }
 }
 
-#[derive(Clone, Copy)]
-pub struct WeaponAttributeModifier {
-    pub weapon: ResourceKind,
-    pub attributes: Attributes,
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq, Debug)]
+pub enum EquipmentSlot {
+    LeftHand,
+    RightHand,
+    Chest,
+    Legs,
+    Boots,
+    Helmet,
+    RingOne,
+    RingTwo,
+    AmuletOne,
+    AmuletTwo,
+    Back,
 }
 
-impl WeaponAttributeModifier {
-    pub const fn new(weapon: ResourceKind, attributes: Attributes) -> Self {
-        Self { weapon, attributes }
+impl EquipmentSlot {
+    pub const COUNT: usize = 11;
+
+    pub const fn is_hand(self) -> bool {
+        matches!(self, EquipmentSlot::LeftHand | EquipmentSlot::RightHand)
+    }
+
+    pub const fn is_ring(self) -> bool {
+        matches!(self, EquipmentSlot::RingOne | EquipmentSlot::RingTwo)
+    }
+
+    pub const fn is_amulet(self) -> bool {
+        matches!(self, EquipmentSlot::AmuletOne | EquipmentSlot::AmuletTwo)
+    }
+
+    pub const fn companion_hand(self) -> Option<EquipmentSlot> {
+        match self {
+            EquipmentSlot::LeftHand => Some(EquipmentSlot::RightHand),
+            EquipmentSlot::RightHand => Some(EquipmentSlot::LeftHand),
+            _ => None,
+        }
     }
 }
 
-pub const WEAPON_ATTRIBUTE_CODEX: [WeaponAttributeModifier; 1] = [
-    WeaponAttributeModifier::new(ResourceKind::WoodenSword, Attributes::new(2, 0, 0, 0, 0, 0)),
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum EquipmentCategory {
+    Weapon,
+    Armor,
+    Accessory,
+    Back,
+}
+
+#[derive(Clone, Copy)]
+pub struct EquipmentDefinition {
+    pub resource: ResourceKind,
+    pub category: EquipmentCategory,
+    pub allowed_slots: &'static [EquipmentSlot],
+    pub occupies_both_hands: bool,
+    pub attribute_bonus: Attributes,
+}
+
+impl EquipmentDefinition {
+    pub const fn new(
+        resource: ResourceKind,
+        category: EquipmentCategory,
+        allowed_slots: &'static [EquipmentSlot],
+        occupies_both_hands: bool,
+        attribute_bonus: Attributes,
+    ) -> Self {
+        Self {
+            resource,
+            category,
+            allowed_slots,
+            occupies_both_hands,
+            attribute_bonus,
+        }
+    }
+
+    pub fn supports_slot(&self, slot: EquipmentSlot) -> bool {
+        self.allowed_slots.iter().any(|allowed| *allowed == slot)
+    }
+}
+
+const HAND_SLOTS: [EquipmentSlot; 2] = [EquipmentSlot::LeftHand, EquipmentSlot::RightHand];
+const LEFT_HAND_SLOT: [EquipmentSlot; 1] = [EquipmentSlot::LeftHand];
+const CHEST_SLOT: [EquipmentSlot; 1] = [EquipmentSlot::Chest];
+const LEGS_SLOT: [EquipmentSlot; 1] = [EquipmentSlot::Legs];
+const BOOTS_SLOT: [EquipmentSlot; 1] = [EquipmentSlot::Boots];
+const HELMET_SLOT: [EquipmentSlot; 1] = [EquipmentSlot::Helmet];
+const RING_SLOTS: [EquipmentSlot; 2] = [EquipmentSlot::RingOne, EquipmentSlot::RingTwo];
+const AMULET_SLOTS: [EquipmentSlot; 2] = [EquipmentSlot::AmuletOne, EquipmentSlot::AmuletTwo];
+const BACK_SLOT: [EquipmentSlot; 1] = [EquipmentSlot::Back];
+
+pub const EQUIPMENT_CODEX: [EquipmentDefinition; 11] = [
+    EquipmentDefinition::new(
+        ResourceKind::WoodenSword,
+        EquipmentCategory::Weapon,
+        &HAND_SLOTS,
+        false,
+        Attributes::new(2, 0, 0, 0, 0, 0),
+    ),
+    EquipmentDefinition::new(
+        ResourceKind::TrainingGreatsword,
+        EquipmentCategory::Weapon,
+        &HAND_SLOTS,
+        true,
+        Attributes::new(4, 0, 0, 0, 0, -1),
+    ),
+    EquipmentDefinition::new(
+        ResourceKind::WoodenShield,
+        EquipmentCategory::Weapon,
+        &LEFT_HAND_SLOT,
+        false,
+        Attributes::new(0, 2, 0, 1, 0, 0),
+    ),
+    EquipmentDefinition::new(
+        ResourceKind::LeatherArmor,
+        EquipmentCategory::Armor,
+        &CHEST_SLOT,
+        false,
+        Attributes::new(0, 2, 0, 0, 0, 0),
+    ),
+    EquipmentDefinition::new(
+        ResourceKind::LeatherLeggings,
+        EquipmentCategory::Armor,
+        &LEGS_SLOT,
+        false,
+        Attributes::new(0, 1, 0, 0, 0, 0),
+    ),
+    EquipmentDefinition::new(
+        ResourceKind::LeatherBoots,
+        EquipmentCategory::Armor,
+        &BOOTS_SLOT,
+        false,
+        Attributes::new(0, 0, 0, 0, 0, 1),
+    ),
+    EquipmentDefinition::new(
+        ResourceKind::LeatherHelmet,
+        EquipmentCategory::Armor,
+        &HELMET_SLOT,
+        false,
+        Attributes::new(0, 1, 0, 0, 0, 0),
+    ),
+    EquipmentDefinition::new(
+        ResourceKind::BronzeRing,
+        EquipmentCategory::Accessory,
+        &RING_SLOTS,
+        false,
+        Attributes::new(1, 0, 0, 0, 0, 0),
+    ),
+    EquipmentDefinition::new(
+        ResourceKind::BronzeAmulet,
+        EquipmentCategory::Accessory,
+        &AMULET_SLOTS,
+        false,
+        Attributes::new(0, 0, 2, 0, 0, 0),
+    ),
+    EquipmentDefinition::new(
+        ResourceKind::TravelersCloak,
+        EquipmentCategory::Back,
+        &BACK_SLOT,
+        false,
+        Attributes::new(0, 0, 0, 1, 0, 0),
+    ),
+    EquipmentDefinition::new(
+        ResourceKind::HuntingQuiver,
+        EquipmentCategory::Back,
+        &BACK_SLOT,
+        false,
+        Attributes::new(0, 0, 0, 0, 1, 0),
+    ),
 ];
 
-pub fn weapon_modifier(weapon: ResourceKind) -> Option<&'static WeaponAttributeModifier> {
-    WEAPON_ATTRIBUTE_CODEX
+pub fn equipment_definition(resource: ResourceKind) -> Option<EquipmentDefinition> {
+    for definition in EQUIPMENT_CODEX.iter() {
+        if definition.resource == resource {
+            return Some(*definition);
+        }
+    }
+    None
+}
+
+pub fn equipment_definition_by_index(index: u8) -> Option<EquipmentDefinition> {
+    EQUIPMENT_CODEX.get(index as usize).copied()
+}
+
+pub fn equipment_definition_index(resource: ResourceKind) -> Option<u8> {
+    EQUIPMENT_CODEX
         .iter()
-        .find(|modifier| modifier.weapon == weapon)
+        .position(|definition| definition.resource == resource)
+        .map(|idx| idx as u8)
 }
 
 #[derive(Clone, Copy)]
@@ -581,10 +777,20 @@ mod tests {
     }
 
     #[test]
-    fn weapon_modifier_codex_returns_expected_attributes() {
-        let modifier = weapon_modifier(ResourceKind::WoodenSword).expect("wooden sword modifier");
-        assert_eq!(modifier.attributes.atk, 2);
-        assert!(weapon_modifier(ResourceKind::Gold).is_none());
+    fn equipment_definition_codex_returns_expected_entries() {
+        let definition =
+            equipment_definition(ResourceKind::WoodenSword).expect("wooden sword definition");
+        assert!(definition.supports_slot(EquipmentSlot::LeftHand));
+        assert_eq!(definition.attribute_bonus.atk, 2);
+        assert!(equipment_definition(ResourceKind::Gold).is_none());
+
+        let shield = equipment_definition(ResourceKind::WoodenShield).expect("shield definition");
+        assert!(shield.supports_slot(EquipmentSlot::LeftHand));
+        assert_eq!(shield.resource, ResourceKind::WoodenShield);
+
+        let index = equipment_definition_index(ResourceKind::WoodenShield).expect("shield index");
+        let from_index = equipment_definition_by_index(index).expect("shield via index");
+        assert_eq!(from_index.resource, ResourceKind::WoodenShield);
     }
 }
 

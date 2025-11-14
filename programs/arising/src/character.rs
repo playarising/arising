@@ -1,7 +1,11 @@
 use anchor_lang::prelude::*;
+use std::vec::Vec;
 
 use crate::{
-    codex::{Attributes, CharacterClass, Civilization, CoreStats, Gender},
+    codex::{
+        equipment_definition, Attributes, CharacterClass, Civilization, CoreStats,
+        EquipmentDefinition, EquipmentSlot, Gender, ResourceKind,
+    },
     errors::ArisingError,
     level_codex::{
         level_from_experience, total_attribute_points_for_level, total_core_points_for_level,
@@ -28,6 +32,8 @@ pub struct Character {
     pub experience: u64,
     pub stats: CoreStats,
     pub attributes: Attributes,
+    pub equipment_attributes: Attributes,
+    pub equipment: CharacterEquipment,
     pub energy: u16,
     pub last_energy_refill: i64,
     pub current_quest: Option<CharacterQuestState>,
@@ -61,6 +67,106 @@ impl CharacterRecipeState {
     pub const SIZE: usize = 2 + 8 + 8;
 }
 
+const SLOT_FLAG_TWO_HANDED_PRIMARY: u8 = 1 << 0;
+const SLOT_FLAG_LINKED: u8 = 1 << 1;
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+pub struct EquipmentSlotState {
+    pub item: Option<ResourceKind>,
+    pub linked_slot: Option<EquipmentSlot>,
+    pub flags: u8,
+}
+
+impl EquipmentSlotState {
+    pub const SIZE: usize = 5;
+
+    pub fn is_primary(&self) -> bool {
+        self.flags & SLOT_FLAG_LINKED == 0
+    }
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug)]
+pub struct CharacterEquipment {
+    pub slots: [EquipmentSlotState; EquipmentSlot::COUNT],
+}
+
+impl Default for CharacterEquipment {
+    fn default() -> Self {
+        Self {
+            slots: [EquipmentSlotState::default(); EquipmentSlot::COUNT],
+        }
+    }
+}
+
+impl CharacterEquipment {
+    pub const SIZE: usize = EquipmentSlot::COUNT * EquipmentSlotState::SIZE;
+
+    fn slot_index(slot: EquipmentSlot) -> usize {
+        slot as usize
+    }
+
+    fn slot_state(&self, slot: EquipmentSlot) -> &EquipmentSlotState {
+        &self.slots[Self::slot_index(slot)]
+    }
+
+    fn slot_state_mut(&mut self, slot: EquipmentSlot) -> &mut EquipmentSlotState {
+        &mut self.slots[Self::slot_index(slot)]
+    }
+
+    fn resolve_primary_slot(&self, slot: EquipmentSlot) -> EquipmentSlot {
+        let state = self.slot_state(slot);
+        if state.flags & SLOT_FLAG_LINKED != 0 {
+            state.linked_slot.unwrap_or(slot)
+        } else {
+            slot
+        }
+    }
+
+    fn clear_slot(&mut self, slot: EquipmentSlot) {
+        *self.slot_state_mut(slot) = EquipmentSlotState::default();
+    }
+
+    fn remove_from_primary(&mut self, slot: EquipmentSlot) -> Option<ResourceKind> {
+        let state = *self.slot_state(slot);
+        if !state.is_primary() {
+            return None;
+        }
+        let resource = state.item?;
+        if let Some(linked) = state.linked_slot {
+            self.clear_slot(linked);
+        }
+        self.clear_slot(slot);
+        Some(resource)
+    }
+
+    fn assign_single(&mut self, slot: EquipmentSlot, resource: ResourceKind) {
+        let state = self.slot_state_mut(slot);
+        state.item = Some(resource);
+        state.linked_slot = None;
+        state.flags = 0;
+    }
+
+    fn assign_two_handed(
+        &mut self,
+        primary: EquipmentSlot,
+        secondary: EquipmentSlot,
+        resource: ResourceKind,
+    ) {
+        {
+            let state = self.slot_state_mut(primary);
+            state.item = Some(resource);
+            state.linked_slot = Some(secondary);
+            state.flags = SLOT_FLAG_TWO_HANDED_PRIMARY;
+        }
+        {
+            let state = self.slot_state_mut(secondary);
+            state.item = Some(resource);
+            state.linked_slot = Some(primary);
+            state.flags = SLOT_FLAG_LINKED;
+        }
+    }
+}
+
 impl Character {
     pub const LEN: usize = 8  // discriminator
         + 32 // authority
@@ -73,6 +179,8 @@ impl Character {
         + 8 // experience
         + CoreStats::SIZE
         + Attributes::SIZE
+        + Attributes::SIZE // equipment_attributes
+        + CharacterEquipment::SIZE
         + 2 // energy
         + 8 // last_energy_refill
         + 1 // quest option tag
@@ -122,6 +230,55 @@ impl Character {
 
     pub fn available_attribute_points(&self) -> i32 {
         self.total_attribute_points() as i32 - self.spent_attribute_points()
+    }
+
+    fn adjust_attribute_set(target: &mut Attributes, delta: Attributes) -> Result<()> {
+        target.atk = target
+            .atk
+            .checked_add(delta.atk)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        target.def = target
+            .def
+            .checked_add(delta.def)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        target.mag_atk = target
+            .mag_atk
+            .checked_add(delta.mag_atk)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        target.mag_def = target
+            .mag_def
+            .checked_add(delta.mag_def)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        target.range = target
+            .range
+            .checked_add(delta.range)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        target.rate = target
+            .rate
+            .checked_add(delta.rate)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        Ok(())
+    }
+
+    fn adjust_equipment_attributes(&mut self, delta: Attributes) -> Result<()> {
+        Self::adjust_attribute_set(&mut self.equipment_attributes, delta)
+    }
+
+    pub fn total_attributes(&self) -> Result<Attributes> {
+        let mut combined = self.attributes;
+        Self::adjust_attribute_set(&mut combined, self.equipment_attributes)?;
+        Ok(combined)
+    }
+
+    fn negate_attributes(attrs: Attributes) -> Attributes {
+        Attributes::new(
+            -attrs.atk,
+            -attrs.def,
+            -attrs.mag_atk,
+            -attrs.mag_def,
+            -attrs.range,
+            -attrs.rate,
+        )
     }
 
     pub fn energy_capacity(&self) -> u16 {
@@ -320,6 +477,76 @@ impl Character {
             && self.stats.intellect >= required.intellect
     }
 
+    pub fn equip_item(
+        &mut self,
+        slot: EquipmentSlot,
+        definition: EquipmentDefinition,
+    ) -> Result<Vec<ResourceKind>> {
+        require!(
+            definition.supports_slot(slot),
+            ArisingError::InvalidEquipmentSlot
+        );
+
+        if definition.occupies_both_hands {
+            require!(slot.is_hand(), ArisingError::EquipmentRequiresHandSlot);
+        }
+
+        let mut removed: Vec<ResourceKind> = Vec::new();
+        let mut processed = [false; EquipmentSlot::COUNT];
+        let mut slots_to_clear = Vec::new();
+        slots_to_clear.push(slot);
+        if definition.occupies_both_hands {
+            slots_to_clear.push(
+                slot.companion_hand()
+                    .ok_or(ArisingError::EquipmentRequiresHandSlot)?,
+            );
+        }
+
+        for target in slots_to_clear.into_iter() {
+            let primary = self.equipment.resolve_primary_slot(target);
+            let idx = primary as usize;
+            if processed[idx] {
+                continue;
+            }
+            if let Some(resource) = self.equipment.remove_from_primary(primary) {
+                let prev_def =
+                    equipment_definition(resource).ok_or(ArisingError::ItemNotEquippable)?;
+                self.adjust_equipment_attributes(Self::negate_attributes(
+                    prev_def.attribute_bonus,
+                ))?;
+                removed.push(resource);
+            }
+            processed[idx] = true;
+        }
+
+        if definition.occupies_both_hands {
+            let secondary = slot
+                .companion_hand()
+                .ok_or(ArisingError::EquipmentRequiresHandSlot)?;
+            self.equipment
+                .assign_two_handed(slot, secondary, definition.resource);
+        } else {
+            self.equipment.assign_single(slot, definition.resource);
+        }
+
+        self.adjust_equipment_attributes(definition.attribute_bonus)?;
+        Ok(removed)
+    }
+
+    pub fn unequip_slot(&mut self, slot: EquipmentSlot) -> Result<ResourceKind> {
+        let primary = self.equipment.resolve_primary_slot(slot);
+        let resource = self
+            .equipment
+            .remove_from_primary(primary)
+            .ok_or(ArisingError::EquipmentSlotEmpty)?;
+
+        if let Some(definition) = equipment_definition(resource) {
+            self.adjust_equipment_attributes(Self::negate_attributes(definition.attribute_bonus))?;
+        }
+
+        Ok(resource)
+    }
+
     pub fn start_quest(&mut self, quest_id: u16, cooldown_seconds: u32, now: i64) -> Result<()> {
         require!(
             self.current_quest.is_none(),
@@ -496,7 +723,10 @@ impl CharacterMintState {
 mod tests {
     use super::*;
     use crate::{
-        codex::{Attributes, CharacterClass, Civilization, Gender},
+        codex::{
+            equipment_definition, Attributes, CharacterClass, Civilization, EquipmentSlot, Gender,
+            ResourceKind,
+        },
         level_codex::{LEVEL_CAP, LEVEL_CURVE},
     };
     use anchor_lang::error::Error as AnchorError;
@@ -526,6 +756,8 @@ mod tests {
             experience: 0,
             stats: civilization.base_stats(),
             attributes: civilization.base_attributes(),
+            equipment_attributes: Attributes::zero(),
+            equipment: CharacterEquipment::default(),
             energy: BASE_ENERGY,
             last_energy_refill: 0,
             current_quest: None,
@@ -735,5 +967,52 @@ mod tests {
             .apply_class_choice(CharacterClass::ArdTemplar)
             .unwrap_err();
         assert_error(err, ArisingError::ClassAlreadyChosen);
+    }
+
+    #[test]
+    fn equipping_items_swaps_existing_slots() {
+        let mut character = sample_character(Civilization::Ard);
+        let sword = equipment_definition(ResourceKind::WoodenSword).unwrap();
+        let shield = equipment_definition(ResourceKind::WoodenShield).unwrap();
+        let greatsword = equipment_definition(ResourceKind::TrainingGreatsword).unwrap();
+
+        character
+            .equip_item(EquipmentSlot::RightHand, sword)
+            .expect("equip sword");
+        assert_eq!(character.equipment_attributes.atk, 2);
+
+        character
+            .equip_item(EquipmentSlot::LeftHand, shield)
+            .expect("equip shield");
+        assert_eq!(character.equipment_attributes.def, 2);
+
+        let removed = character
+            .equip_item(EquipmentSlot::LeftHand, greatsword)
+            .expect("equip two handed");
+        assert_eq!(removed.len(), 2);
+        assert!(removed.contains(&ResourceKind::WoodenSword));
+        assert!(removed.contains(&ResourceKind::WoodenShield));
+        assert_eq!(character.equipment_attributes.atk, 4);
+        assert_eq!(character.equipment_attributes.def, 0);
+    }
+
+    #[test]
+    fn unequipping_two_handed_from_secondary_slot_clears_item() {
+        let mut character = sample_character(Civilization::Ard);
+        let greatsword = equipment_definition(ResourceKind::TrainingGreatsword).unwrap();
+        character
+            .equip_item(EquipmentSlot::RightHand, greatsword)
+            .expect("equip two handed");
+        let removed = character
+            .unequip_slot(EquipmentSlot::LeftHand)
+            .expect("unequip from off hand");
+        assert_eq!(removed, ResourceKind::TrainingGreatsword);
+        assert!(character.equipment.slots[EquipmentSlot::LeftHand as usize]
+            .item
+            .is_none());
+        assert!(character.equipment.slots[EquipmentSlot::RightHand as usize]
+            .item
+            .is_none());
+        assert_eq!(character.equipment_attributes.atk, 0);
     }
 }

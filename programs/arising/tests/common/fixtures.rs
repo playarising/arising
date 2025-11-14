@@ -1,10 +1,10 @@
 use crate::common::{context::TestContext, conversions};
 use anchor_lang::solana_program::pubkey::Pubkey as AnchorPubkey;
 use arising::character::{
-    Character, CharacterMintState, CivilizationMintConfig, CHARACTER_MINT_STATE_SEED,
-    CHARACTER_SEED,
+    Character, CharacterEquipment, CharacterMintState, CivilizationMintConfig,
+    CHARACTER_MINT_STATE_SEED, CHARACTER_SEED,
 };
-use arising::codex::{Civilization, CoreStats, Gender};
+use arising::codex::{Attributes, Civilization, CoreStats, Gender};
 use solana_keypair::Keypair;
 
 pub fn create_mint_state(ctx: &mut TestContext) -> AnchorPubkey {
@@ -51,6 +51,8 @@ pub fn create_character(
         experience: 0,
         stats,
         attributes: civilization.base_attributes(),
+        equipment_attributes: Attributes::zero(),
+        equipment: CharacterEquipment::default(),
         energy: arising::character::BASE_ENERGY,
         last_energy_refill: 0,
         current_quest: None,

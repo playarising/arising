@@ -15,13 +15,14 @@ pub mod level_codex;
 pub mod nft;
 
 use character::{
-    Character, CharacterMintState, CharacterQuestState, CharacterRecipeState,
+    Character, CharacterEquipment, CharacterMintState, CharacterQuestState, CharacterRecipeState,
     CHARACTER_MINT_STATE_SEED, CHARACTER_NFT_MINT_SEED, CHARACTER_NFT_TOKEN_SEED, CHARACTER_SEED,
     COLLECTION_MINT_PDA_SEED, COLLECTION_TOKEN_PDA_SEED,
 };
 use codex::{
-    quest_by_id, recipe_by_id, Attributes, CharacterClass, Civilization, CoreStats, Gender,
-    PassiveEffect, QuestReward, QuestType, RecipeInput, RecipeOutput, RecipeType, ResourceKind,
+    equipment_definition_by_index, quest_by_id, recipe_by_id, Attributes, CharacterClass,
+    Civilization, CoreStats, EquipmentSlot, Gender, PassiveEffect, QuestReward, QuestType,
+    RecipeInput, RecipeOutput, RecipeType, ResourceKind,
 };
 use collection::initialize_collection;
 use errors::ArisingError;
@@ -90,6 +91,8 @@ pub mod arising {
         character.experience = 0;
         character.stats = civilization.base_stats();
         character.attributes = civilization.base_attributes();
+        character.equipment_attributes = Attributes::zero();
+        character.equipment = CharacterEquipment::default();
         character.nft_mint = ctx.accounts.character_mint.key();
         character.nft_metadata = ctx.accounts.metadata.key();
         character.nft_master_edition = ctx.accounts.master_edition.key();
@@ -418,6 +421,103 @@ pub mod arising {
         Ok(())
     }
 
+    pub fn equip_item<'info>(
+        ctx: Context<'_, '_, 'info, 'info, ManageEquipment<'info>>,
+        civilization: Civilization,
+        character_id: u16,
+        slot: EquipmentSlot,
+        definition_index: u8,
+    ) -> Result<()> {
+        let definition = equipment_definition_by_index(definition_index)
+            .ok_or(ArisingError::ItemNotEquippable)?;
+        let resource = definition.resource;
+        let character = &mut ctx.accounts.character;
+        character.ensure_identity(civilization, character_id)?;
+        character.ensure_authority(ctx.accounts.authority.key())?;
+
+        let authority_key = ctx.accounts.authority.key();
+        let burn_accounts = equipment_account_pair(
+            ctx.program_id,
+            &ctx.remaining_accounts,
+            &authority_key,
+            resource,
+        )?;
+        let [burn_mint, burn_source] = burn_accounts;
+        burn_equipment_resource(
+            ctx.program_id,
+            &ctx.accounts.token_program,
+            &ctx.accounts.authority,
+            resource,
+            1,
+            burn_mint,
+            burn_source,
+        )?;
+
+        let removed_items = character.equip_item(slot, definition)?;
+        for removed in removed_items {
+            let reward_accounts = equipment_account_pair(
+                ctx.program_id,
+                &ctx.remaining_accounts,
+                &authority_key,
+                removed,
+            )?;
+            let [mint_info, destination_info] = reward_accounts;
+            mint_equipment_resource(
+                &ctx.accounts.mint_state,
+                &ctx.accounts.token_program,
+                &ctx.accounts.associated_token_program,
+                &ctx.accounts.system_program,
+                &ctx.accounts.rent,
+                &ctx.accounts.authority,
+                ctx.program_id,
+                ctx.bumps.mint_state,
+                removed,
+                1,
+                mint_info,
+                destination_info,
+            )?;
+        }
+
+        Ok(())
+    }
+
+    pub fn unequip_item<'info>(
+        ctx: Context<'_, '_, 'info, 'info, ManageEquipment<'info>>,
+        civilization: Civilization,
+        character_id: u16,
+        slot: EquipmentSlot,
+    ) -> Result<()> {
+        let character = &mut ctx.accounts.character;
+        character.ensure_identity(civilization, character_id)?;
+        character.ensure_authority(ctx.accounts.authority.key())?;
+
+        let removed_resource = character.unequip_slot(slot)?;
+        let authority_key = ctx.accounts.authority.key();
+        let reward_accounts = equipment_account_pair(
+            ctx.program_id,
+            &ctx.remaining_accounts,
+            &authority_key,
+            removed_resource,
+        )?;
+        let [mint_info, destination_info] = reward_accounts;
+        mint_equipment_resource(
+            &ctx.accounts.mint_state,
+            &ctx.accounts.token_program,
+            &ctx.accounts.associated_token_program,
+            &ctx.accounts.system_program,
+            &ctx.accounts.rent,
+            &ctx.accounts.authority,
+            ctx.program_id,
+            ctx.bumps.mint_state,
+            removed_resource,
+            1,
+            mint_info,
+            destination_info,
+        )?;
+
+        Ok(())
+    }
+
     pub fn get_character_metadata(
         ctx: Context<GetCharacterMetadata>,
         civilization: Civilization,
@@ -425,6 +525,8 @@ pub mod arising {
     ) -> Result<()> {
         let character = &ctx.accounts.character;
         character.ensure_identity(civilization, character_id)?;
+
+        let total_attributes = character.total_attributes()?;
 
         emit!(CharacterMetadataEvent {
             civilization,
@@ -441,6 +543,8 @@ pub mod arising {
             stats: character.stats,
             base_attributes: civilization.base_attributes(),
             attributes: character.attributes,
+            equipment_attributes: character.equipment_attributes,
+            total_attributes,
             available_core_points: character.available_core_points(),
             available_attribute_points: character.available_attribute_points(),
             passive: civilization.passive(),
@@ -451,6 +555,7 @@ pub mod arising {
             created_at: character.created_at,
             current_recipe: character.current_recipe,
             current_quest: character.current_quest,
+            equipment: character.equipment,
         });
 
         Ok(())
@@ -650,6 +755,173 @@ fn consume_resource_from_user<'info>(
     Ok(ResourceCostEvent { resource, amount })
 }
 
+fn equipment_account_pair<'info>(
+    program_id: &Pubkey,
+    accounts: &'info [AccountInfo<'info>],
+    authority: &Pubkey,
+    resource: ResourceKind,
+) -> Result<[AccountInfo<'info>; 2]> {
+    let (expected_mint, _) =
+        Pubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], program_id);
+    let expected_ata = associated_token::get_associated_token_address(authority, &expected_mint);
+
+    let mint_info = accounts
+        .iter()
+        .find(|info| info.key() == expected_mint)
+        .cloned()
+        .ok_or(ArisingError::MissingEquipmentAccounts)?;
+    let token_info = accounts
+        .iter()
+        .find(|info| info.key() == expected_ata)
+        .cloned()
+        .ok_or(ArisingError::MissingEquipmentAccounts)?;
+
+    Ok([mint_info, token_info])
+}
+
+fn burn_equipment_resource<'info>(
+    program_id: &Pubkey,
+    token_program: &Program<'info, Token>,
+    authority: &Signer<'info>,
+    resource: ResourceKind,
+    amount: u64,
+    mint_info: AccountInfo<'info>,
+    source_info: AccountInfo<'info>,
+) -> Result<()> {
+    let (expected_mint, _) =
+        Pubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], program_id);
+    require_keys_eq!(
+        mint_info.key(),
+        expected_mint,
+        ArisingError::InvalidResourceMint
+    );
+
+    {
+        let data = source_info
+            .try_borrow_data()
+            .map_err(|_| ArisingError::InvalidResourceAccount)?;
+        let source_account = spl_token::state::Account::unpack(&data)
+            .map_err(|_| ArisingError::InvalidResourceAccount)?;
+        require_keys_eq!(
+            source_account.owner,
+            authority.key(),
+            ArisingError::InvalidResourceAccount
+        );
+        require_keys_eq!(
+            source_account.mint,
+            mint_info.key(),
+            ArisingError::InvalidResourceAccount
+        );
+    }
+
+    token::burn(
+        CpiContext::new(
+            token_program.to_account_info(),
+            token::Burn {
+                mint: mint_info,
+                from: source_info,
+                authority: authority.to_account_info(),
+            },
+        ),
+        amount,
+    )?;
+
+    Ok(())
+}
+
+fn mint_equipment_resource<'info>(
+    mint_state: &Account<'info, CharacterMintState>,
+    token_program: &Program<'info, Token>,
+    associated_token_program: &Program<'info, AssociatedToken>,
+    system_program: &Program<'info, System>,
+    rent: &Sysvar<'info, Rent>,
+    authority: &Signer<'info>,
+    program_id: &Pubkey,
+    mint_state_bump: u8,
+    resource: ResourceKind,
+    amount: u64,
+    mint_info: AccountInfo<'info>,
+    destination_info: AccountInfo<'info>,
+) -> Result<()> {
+    let (expected_mint, mint_bump) =
+        Pubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], program_id);
+    require_keys_eq!(
+        mint_info.key(),
+        expected_mint,
+        ArisingError::InvalidResourceMint
+    );
+
+    if mint_info.data_is_empty() {
+        initialize_resource_mint(
+            mint_state,
+            token_program,
+            system_program,
+            rent,
+            authority,
+            &mint_info,
+            resource,
+            mint_bump,
+        )?;
+    }
+
+    if destination_info.data_is_empty() {
+        let expected_ata =
+            associated_token::get_associated_token_address(&authority.key(), &mint_info.key());
+        require_keys_eq!(
+            destination_info.key(),
+            expected_ata,
+            ArisingError::InvalidResourceAccount
+        );
+
+        associated_token::create(CpiContext::new(
+            associated_token_program.to_account_info(),
+            associated_token::Create {
+                payer: authority.to_account_info(),
+                associated_token: destination_info.clone(),
+                authority: authority.to_account_info(),
+                mint: mint_info.clone(),
+                system_program: system_program.to_account_info(),
+                token_program: token_program.to_account_info(),
+            },
+        ))?;
+    }
+
+    {
+        let data = destination_info
+            .try_borrow_data()
+            .map_err(|_| ArisingError::InvalidResourceAccount)?;
+        let destination_account = spl_token::state::Account::unpack(&data)
+            .map_err(|_| ArisingError::InvalidResourceAccount)?;
+        require_keys_eq!(
+            destination_account.owner,
+            authority.key(),
+            ArisingError::InvalidResourceAccount
+        );
+        require_keys_eq!(
+            destination_account.mint,
+            mint_info.key(),
+            ArisingError::InvalidResourceAccount
+        );
+    }
+
+    let signer_seeds: &[&[u8]] = &[CHARACTER_MINT_STATE_SEED, &[mint_state_bump]];
+
+    token::mint_to(
+        CpiContext::new_with_signer(
+            token_program.to_account_info(),
+            token::MintTo {
+                mint: mint_info,
+                to: destination_info,
+                authority: mint_state.to_account_info(),
+            },
+            &[signer_seeds],
+        ),
+        amount,
+    )?;
+
+    Ok(())
+}
+
 #[derive(Accounts)]
 pub struct Initialize<'info> {
     #[account(
@@ -817,6 +1089,28 @@ pub struct ProcessRecipe<'info> {
 
 #[derive(Accounts)]
 #[instruction(civilization: Civilization, character_id: u16)]
+pub struct ManageEquipment<'info> {
+    #[account(
+        mut,
+        seeds = [CHARACTER_SEED, &[civilization as u8], &character_id.to_le_bytes()],
+        bump
+    )]
+    pub character: Account<'info, Character>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    #[account(
+        seeds = [CHARACTER_MINT_STATE_SEED],
+        bump
+    )]
+    pub mint_state: Account<'info, CharacterMintState>,
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub system_program: Program<'info, System>,
+    pub rent: Sysvar<'info, Rent>,
+}
+
+#[derive(Accounts)]
+#[instruction(civilization: Civilization, character_id: u16)]
 pub struct GetCharacterMetadata<'info> {
     #[account(
         seeds = [CHARACTER_SEED, &[civilization as u8], &character_id.to_le_bytes()],
@@ -841,6 +1135,8 @@ pub struct CharacterMetadataEvent {
     pub stats: CoreStats,
     pub base_attributes: Attributes,
     pub attributes: Attributes,
+    pub equipment_attributes: Attributes,
+    pub total_attributes: Attributes,
     pub available_core_points: i32,
     pub available_attribute_points: i32,
     pub passive: PassiveEffect,
@@ -851,6 +1147,7 @@ pub struct CharacterMetadataEvent {
     pub created_at: i64,
     pub current_recipe: Option<CharacterRecipeState>,
     pub current_quest: Option<CharacterQuestState>,
+    pub equipment: CharacterEquipment,
 }
 
 #[event]

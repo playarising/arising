@@ -76,6 +76,16 @@ pub enum ArisingError {
     MissingRewardAccounts,
     #[msg("Missing accounts for recipe processing")]
     MissingRecipeAccounts,
+    #[msg("Item cannot be equipped")]
+    ItemNotEquippable,
+    #[msg("Selected slot cannot hold this item")]
+    InvalidEquipmentSlot,
+    #[msg("Equipment slot is empty")]
+    EquipmentSlotEmpty,
+    #[msg("Two-handed items must be placed in a hand slot")]
+    EquipmentRequiresHandSlot,
+    #[msg("Missing accounts for equipment processing")]
+    MissingEquipmentAccounts,
     #[msg("Arithmetic overflow encountered")]
     ArithmeticOverflow,
 }

@@ -74,7 +74,7 @@ pub fn seed_resource_balance(
     let mint_key = conversions::to_solana_pubkey(mint);
     let mut mint_account = ctx.svm.get_account(&mint_key).expect("mint must exist");
     let mut mint_state = Mint::unpack(&mint_account.data).unwrap();
-    mint_state.supply = amount;
+    mint_state.supply = mint_state.supply.saturating_add(amount);
     <Mint as Pack>::pack(mint_state, &mut mint_account.data).unwrap();
     ctx.svm.set_account(mint_key, mint_account).unwrap();
 }
