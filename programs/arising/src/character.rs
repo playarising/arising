@@ -499,6 +499,7 @@ mod tests {
         codex::{Civilization, Gender},
         level_codex::{LEVEL_CAP, LEVEL_CURVE},
     };
+    use anchor_lang::error::Error as AnchorError;
 
     fn sample_character(civilization: Civilization) -> Character {
         Character {
@@ -521,6 +522,10 @@ mod tests {
             nft_token_account: Pubkey::default(),
             created_at: 0,
         }
+    }
+
+    fn assert_error(err: AnchorError, expected: ArisingError) {
+        assert_eq!(err, AnchorError::from(expected));
     }
 
     #[test]
@@ -546,5 +551,87 @@ mod tests {
         }
 
         assert_eq!(character.current_level(), LEVEL_CAP);
+    }
+
+    #[test]
+    fn grant_experience_updates_energy_capacity() {
+        let mut character = sample_character(Civilization::Ard);
+        character.energy = Character::capacity_for_level(1);
+        character
+            .grant_experience(LEVEL_CURVE[0].xp_to_next as u64)
+            .expect("level up");
+        assert_eq!(character.current_level(), 2);
+        assert_eq!(character.energy, Character::capacity_for_level(2));
+
+        let mut multi_level = sample_character(Civilization::Ard);
+        multi_level.energy = Character::capacity_for_level(1) - 2;
+        let xp_to_level_three =
+            (LEVEL_CURVE[0].xp_to_next + LEVEL_CURVE[1].xp_to_next) as u64;
+        multi_level
+            .grant_experience(xp_to_level_three)
+            .expect("multi level up");
+        assert_eq!(multi_level.current_level(), 3);
+        let gained =
+            Character::capacity_for_level(3) - Character::capacity_for_level(1);
+        assert_eq!(multi_level.energy, Character::capacity_for_level(1) - 2 + gained);
+    }
+
+    #[test]
+    fn allocate_core_stats_requires_available_points() {
+        let mut character = sample_character(Civilization::Hartenn);
+        let err = character
+            .allocate_core_stats(CoreStats::new(1, 0, 0))
+            .unwrap_err();
+        assert_error(err, ArisingError::InsufficientCorePoints);
+
+        character
+            .grant_experience(LEVEL_CURVE[0].xp_to_next as u64)
+            .expect("gain first level");
+        assert_eq!(character.available_core_points(), 1);
+        character
+            .allocate_core_stats(CoreStats::new(1, 0, 0))
+            .expect("spend core point");
+        assert_eq!(character.available_core_points(), 0);
+        assert_eq!(
+            character.stats.might,
+            Civilization::Hartenn.base_stats().might + 1
+        );
+    }
+
+    #[test]
+    fn refill_energy_enforces_cooldown() {
+        let mut character = sample_character(Civilization::Zhand);
+        character.energy = 0;
+        character.last_energy_refill = 0;
+        let err = character
+            .refill_energy(ENERGY_REFILL_COOLDOWN_SECS - 1)
+            .unwrap_err();
+        assert_error(err, ArisingError::EnergyRefillCooldown);
+        character
+            .refill_energy(ENERGY_REFILL_COOLDOWN_SECS)
+            .expect("cooldown satisfied");
+        assert_eq!(character.energy, character.energy_capacity());
+    }
+
+    #[test]
+    fn quest_and_recipe_state_machine_enforces_exclusivity() {
+        let mut character = sample_character(Civilization::Ard);
+        character
+            .start_quest(7, 10, 1)
+            .expect("should start quest");
+        assert!(character.current_quest.is_some());
+        let err = character.start_quest(8, 20, 2).unwrap_err();
+        assert_error(err, ArisingError::QuestAlreadyInProgress);
+        let quest_state = character.clear_quest().expect("quest cleared");
+        assert_eq!(quest_state.ready_at, 11);
+        assert!(character.current_quest.is_none());
+
+        character
+            .start_recipe(3, 15, 5)
+            .expect("should start recipe");
+        let err = character.start_recipe(4, 25, 6).unwrap_err();
+        assert_error(err, ArisingError::RecipeAlreadyInProgress);
+        character.clear_recipe().expect("recipe cleared");
+        assert!(character.current_recipe.is_none());
     }
 }

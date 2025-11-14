@@ -494,7 +494,66 @@ pub const QUEST_CODEX: [QuestCodexEntry; 3] = [
 ];
 
 pub fn quest_by_id(id: u16) -> Option<&'static QuestCodexEntry> {
-    QUEST_CODEX.iter().find(|quest| quest.id == id)
+    if id == 0 {
+        return None;
+    }
+    let idx = (id - 1) as usize;
+    QUEST_CODEX.get(idx)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn quest_lookup_returns_expected_entries() {
+        assert_eq!(quest_by_id(1).unwrap().name, "Caravan Guard");
+        assert_eq!(quest_by_id(2).unwrap().name, "Woodcutting");
+        assert_eq!(quest_by_id(3).unwrap().name, "Bandit Camp");
+    }
+
+    #[test]
+    fn quest_energy_cost_and_requirements_behave_as_expected() {
+        let quest = quest_by_id(2).expect("woodcutting quest");
+        assert!(quest.stats_satisfied(quest.minimum_stats));
+        let exact_cost = quest.energy_cost(quest.minimum_stats);
+        assert_eq!(exact_cost, quest.base_energy_cost);
+
+        let low_stats = CoreStats::zero();
+        assert!(!quest.stats_satisfied(low_stats));
+        assert_eq!(quest.energy_cost(low_stats), (f32::from(quest.base_energy_cost) * 1.5).ceil() as u16);
+
+        let overqualified = CoreStats::new(
+            quest.minimum_stats.might + 5,
+            quest.minimum_stats.speed + 5,
+            quest.minimum_stats.intellect + 5,
+        );
+        assert_eq!(quest.energy_cost(overqualified), 0);
+    }
+
+    #[test]
+    fn recipe_energy_cost_matches_quest_logic() {
+        let recipe = recipe_by_id(2).expect("wooden sword recipe");
+        assert!(recipe.stats_satisfied(recipe.minimum_stats));
+        assert_eq!(
+            recipe.energy_cost(recipe.minimum_stats),
+            recipe.base_energy_cost
+        );
+
+        let insufficient = CoreStats::zero();
+        assert!(!recipe.stats_satisfied(insufficient));
+        assert_eq!(
+            recipe.energy_cost(insufficient),
+            (f32::from(recipe.base_energy_cost) * 1.5).ceil() as u16
+        );
+
+        let generous_stats = CoreStats::new(
+            recipe.minimum_stats.might + 10,
+            recipe.minimum_stats.speed + 10,
+            recipe.minimum_stats.intellect + 10,
+        );
+        assert_eq!(recipe.energy_cost(generous_stats), 0);
+    }
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
