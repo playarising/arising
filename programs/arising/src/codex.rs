@@ -839,24 +839,6 @@ mod tests {
         let from_index = equipment_definition_by_index(index).expect("shield via index");
         assert_eq!(from_index.resource, ResourceKind::WoodenShield);
     }
-
-    #[test]
-    fn resource_mint_keys() {
-        use anchor_lang::prelude::Pubkey;
-
-        let log = Pubkey::find_program_address(
-            &[crate::RESOURCE_MINT_SEED, ResourceKind::Log.seed_bytes()],
-            &crate::ID,
-        )
-        .0;
-        let plank = Pubkey::find_program_address(
-            &[crate::RESOURCE_MINT_SEED, ResourceKind::Plank.seed_bytes()],
-            &crate::ID,
-        )
-        .0;
-        println!("log mint {}", log);
-        println!("plank mint {}", plank);
-    }
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]

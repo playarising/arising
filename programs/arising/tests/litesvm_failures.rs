@@ -101,7 +101,7 @@ fn recipe_consumes_available_resources() {
             crafter,
             authority_pk,
             mint_state,
-            tokens::reward_accounts(&authority_pk, &[ResourceKind::Log, ResourceKind::Gold]),
+            tokens::reward_accounts(&authority_pk, &[ResourceKind::Plank, ResourceKind::Gold]),
         ),
         &[&authority],
     )

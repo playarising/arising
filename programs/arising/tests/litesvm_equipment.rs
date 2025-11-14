@@ -155,10 +155,18 @@ fn level_character(ctx: &mut TestContext, character: &AnchorPubkey, target_level
 
     let mut account = ctx.get_anchor_account::<arising::character::Character>(character);
     let mut total_xp = 0u64;
-    for entry in LEVEL_CURVE.iter().take(target_level.saturating_sub(1) as usize) {
+    for entry in LEVEL_CURVE
+        .iter()
+        .take(target_level.saturating_sub(1) as usize)
+    {
         total_xp += entry.xp_to_next as u64;
     }
     account.experience = total_xp;
     account.energy = account.energy_capacity();
-    ctx.store_anchor_account(*character, arising::ID, &account, arising::character::Character::LEN);
+    ctx.store_anchor_account(
+        *character,
+        arising::ID,
+        &account,
+        arising::character::Character::LEN,
+    );
 }

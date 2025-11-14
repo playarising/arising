@@ -715,6 +715,11 @@ fn consume_resource_from_user<'info>(
     let mint_info = remaining_accounts
         .next()
         .ok_or(ArisingError::MissingRecipeAccounts)?;
+    require_keys_eq!(
+        mint_info.key(),
+        expected_mint,
+        ArisingError::InvalidResourceMint
+    );
     let source_info = remaining_accounts
         .next()
         .ok_or(ArisingError::MissingRecipeAccounts)?;
