@@ -3,12 +3,19 @@ import { AnchorError, Program } from "@coral-xyz/anchor";
 import { expect } from "chai";
 import BN from "bn.js";
 import {
+  AccountMeta,
   ComputeBudgetProgram,
   Keypair,
-  LAMPORTS_PER_SOL,
+  PublicKey,
   SystemProgram,
+  Transaction,
 } from "@solana/web3.js";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import {
+  TOKEN_PROGRAM_ID,
+  createAssociatedTokenAccountInstruction,
+  getAccount,
+  getAssociatedTokenAddressSync,
+} from "@solana/spl-token";
 
 import { Arising } from "../target/types/arising";
 import { BASE_ENERGY, CIVILIZATIONS, TOKEN_METADATA_PROGRAM_ID } from "./constants";
@@ -19,6 +26,7 @@ import {
   deriveCollectionMintPda,
   deriveCollectionTokenPda,
   deriveMintStatePda,
+  deriveResourceMintPda,
   findMasterEditionPda,
   findMetadataPda,
 } from "./helpers";
@@ -142,6 +150,146 @@ describe("arising program", () => {
     return method.rpc();
   };
 
+  type ResourceKey = "gold" | "log" | "plank" | "woodenSword";
+
+  const ensureAta = async (mint: PublicKey, owner: PublicKey = wallet.publicKey) => {
+    const ata = getAssociatedTokenAddressSync(mint, owner, true);
+    const info = await provider.connection.getAccountInfo(ata);
+    if (!info) {
+      const tx = new Transaction().add(
+        createAssociatedTokenAccountInstruction(wallet.publicKey, ata, owner, mint)
+      );
+      await provider.sendAndConfirm(tx, []);
+    }
+    return ata;
+  };
+
+  const remainingAccountsForResources = async (
+    resources: ResourceKey[],
+    owner: PublicKey = wallet.publicKey
+  ): Promise<AccountMeta[]> => {
+    const metas: AccountMeta[] = [];
+    for (const resource of resources) {
+      const mint = deriveResourceMintPda(resource, program.programId);
+      const ata = await ensureAta(mint, owner);
+      metas.push({ pubkey: mint, isSigner: false, isWritable: true });
+      metas.push({ pubkey: ata, isSigner: false, isWritable: true });
+    }
+    return metas;
+  };
+
+  const advanceClockBySeconds = async (seconds: number) => {
+    const rpc: any = provider.connection;
+    if (typeof rpc._rpcRequest !== "function") {
+      throw new Error("warpSlot RPC method is unavailable");
+    }
+    const currentSlot = await provider.connection.getSlot();
+    const slotsToAdvance = Math.max(1, seconds * 4);
+    await rpc._rpcRequest("warpSlot", [currentSlot + slotsToAdvance]);
+  };
+
+  const advanceClockByHours = async (hours: number) => {
+    await advanceClockBySeconds(hours * 60 * 60);
+  };
+
+  const getCharacterPda = (
+    civilization: (typeof CIVILIZATIONS)[number],
+    characterId: number
+  ) => deriveCharacterPda(civilization.index, characterId, program.programId);
+
+  const mintNextCharacter = async (civilization: (typeof CIVILIZATIONS)[number]) => {
+    const mintState = await program.account.characterMintState.fetch(mintStatePda);
+    const nextId = mintState.civilizationMints[civilization.index].nextId;
+    await mintCharacterTx(civilization, nextId);
+    return {
+      characterId: nextId,
+      character: getCharacterPda(civilization, nextId),
+    };
+  };
+
+  const startQuestTx = async (
+    civilization: (typeof CIVILIZATIONS)[number],
+    characterId: number,
+    questId: number
+  ) => {
+    await program.methods
+      .startQuest(civilization.variant, characterId, questId)
+      .accountsStrict({
+        character: getCharacterPda(civilization, characterId),
+        authority: wallet.publicKey,
+      })
+      .rpc();
+  };
+
+  const claimQuestTx = async (
+    civilization: (typeof CIVILIZATIONS)[number],
+    characterId: number,
+    questId: number,
+    resourceRewards: ResourceKey[] = []
+  ) => {
+    const remaining = await remainingAccountsForResources(resourceRewards);
+    await program.methods
+      .claimQuest(civilization.variant, characterId, questId)
+      .accountsStrict({
+        character: getCharacterPda(civilization, characterId),
+        authority: wallet.publicKey,
+        mintState: mintStatePda,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      })
+      .remainingAccounts(remaining)
+      .rpc();
+  };
+
+  const startRecipeTx = async (
+    civilization: (typeof CIVILIZATIONS)[number],
+    characterId: number,
+    recipeId: number,
+    resourceCosts: ResourceKey[]
+  ) => {
+    const remaining = await remainingAccountsForResources(resourceCosts);
+    await program.methods
+      .startRecipe(civilization.variant, characterId, recipeId)
+      .accountsStrict({
+        character: getCharacterPda(civilization, characterId),
+        authority: wallet.publicKey,
+        mintState: mintStatePda,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      })
+      .remainingAccounts(remaining)
+      .rpc();
+  };
+
+  const claimRecipeTx = async (
+    civilization: (typeof CIVILIZATIONS)[number],
+    characterId: number,
+    recipeId: number,
+    resourceRewards: ResourceKey[]
+  ) => {
+    const remaining = await remainingAccountsForResources(resourceRewards);
+    await program.methods
+      .claimRecipe(civilization.variant, characterId, recipeId)
+      .accountsStrict({
+        character: getCharacterPda(civilization, characterId),
+        authority: wallet.publicKey,
+        mintState: mintStatePda,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      })
+      .remainingAccounts(remaining)
+      .rpc();
+  };
+
+  const tokenAmountFor = async (mint: PublicKey) => {
+    const ata = await ensureAta(mint);
+    const account = await getAccount(provider.connection, ata);
+    return Number(account.amount);
+  };
+
   const expectAnchorError = async (fn: () => Promise<unknown>, code: string) => {
     try {
       await fn();
@@ -250,5 +398,57 @@ describe("arising program", () => {
       await updateCapTx(civilization, 6);
       await mintCharacterTx(civilization, 6);
     }
+  });
+
+  it("runs quests, forge, and craft flows end-to-end", async () => {
+    const civilization = CIVILIZATIONS[0];
+    await updateCapTx(civilization, 50);
+
+    const gatherer = await mintNextCharacter(civilization);
+    const logMint = deriveResourceMintPda("log", program.programId);
+    const plankMint = deriveResourceMintPda("plank", program.programId);
+    const goldMint = deriveResourceMintPda("gold", program.programId);
+    const swordMint = deriveResourceMintPda("woodenSword", program.programId);
+
+    // Gather raw materials and gold via quests
+    await startQuestTx(civilization, gatherer.characterId, 2); // Woodcutting
+    await advanceClockByHours(1);
+    await claimQuestTx(civilization, gatherer.characterId, 2, ["log"]);
+
+    await startQuestTx(civilization, gatherer.characterId, 1); // Caravan Guard
+    await advanceClockByHours(1);
+    await claimQuestTx(civilization, gatherer.characterId, 1, ["gold"]);
+
+    await startQuestTx(civilization, gatherer.characterId, 2);
+    await advanceClockByHours(1);
+    await claimQuestTx(civilization, gatherer.characterId, 2, ["log"]);
+
+    expect(await tokenAmountFor(logMint)).to.equal(2);
+    expect(await tokenAmountFor(goldMint)).to.equal(100);
+
+    // Forge logs into planks
+    const forger = await mintNextCharacter(civilization);
+    for (let i = 0; i < 2; i += 1) {
+      await startRecipeTx(civilization, forger.characterId, 1, ["log"]);
+      await advanceClockByHours(1);
+      await claimRecipeTx(civilization, forger.characterId, 1, ["plank"]);
+    }
+
+    expect(await tokenAmountFor(logMint)).to.equal(0);
+    expect(await tokenAmountFor(plankMint)).to.equal(2);
+
+    // Craft a weapon using planks and gold
+    const crafter = await mintNextCharacter(civilization);
+    await startRecipeTx(civilization, crafter.characterId, 2, ["plank", "gold"]);
+    await advanceClockByHours(2);
+    await claimRecipeTx(civilization, crafter.characterId, 2, ["woodenSword"]);
+
+    expect(await tokenAmountFor(plankMint)).to.equal(0);
+    expect(await tokenAmountFor(goldMint)).to.equal(50);
+    expect(await tokenAmountFor(swordMint)).to.equal(1);
+
+    const crafterAccount = await program.account.character.fetch(crafter.character);
+    expect(toNumber(crafterAccount.energy)).to.equal(BASE_ENERGY - 7);
+    expect(crafterAccount.currentRecipe).to.equal(null);
   });
 });

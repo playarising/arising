@@ -24,7 +24,7 @@ use collection::initialize_collection;
 use errors::ArisingError;
 use nft::{mint_character_nft, CharacterMetadataArgs};
 
-declare_id!("DQRfLQoUg3kXGLR2N7WD8iwmZzmv77C7JQNTFacQtaG3");
+declare_id!("FLTa6pSm3WPWNPrqVu1pCuAmjgmVJkhDvyxMcSPSAfLA");
 
 const RESOURCE_MINT_SEED: &[u8] = b"resource_mint";
 

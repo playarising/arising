@@ -491,3 +491,61 @@ impl CharacterMintState {
         &self.civilization_mints[civilization.as_index()]
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        codex::{quest_by_id, Civilization, Gender, QuestReward},
+        level_codex::LEVEL_CAP,
+    };
+
+    fn sample_character(civilization: Civilization) -> Character {
+        Character {
+            authority: Pubkey::default(),
+            bump: 0,
+            civilization,
+            civilization_character_id: 1,
+            gender: Gender::Male,
+            class: None,
+            experience: 0,
+            stats: civilization.base_stats(),
+            attributes: civilization.base_attributes(),
+            energy: BASE_ENERGY,
+            last_energy_refill: 0,
+            current_quest: None,
+            current_recipe: None,
+            nft_mint: Pubkey::default(),
+            nft_metadata: Pubkey::default(),
+            nft_master_edition: Pubkey::default(),
+            nft_token_account: Pubkey::default(),
+            created_at: 0,
+        }
+    }
+
+    #[test]
+    fn raid_quest_loop_reaches_level_cap() {
+        let raid = quest_by_id(3).expect("raid quest exists");
+        let xp_reward = raid
+            .rewards
+            .iter()
+            .find_map(|reward| match reward {
+                QuestReward::Experience { amount } => Some(*amount),
+                _ => None,
+            })
+            .expect("raid quest should yield experience");
+
+        let mut character = sample_character(Civilization::Tarki);
+        let mut iterations = 0usize;
+        while character.current_level() < LEVEL_CAP {
+            character.grant_experience(xp_reward).expect("xp granted");
+            iterations += 1;
+            assert!(
+                iterations < 100_000,
+                "raid quest loop failed to reach the level cap"
+            );
+        }
+
+        assert_eq!(character.current_level(), LEVEL_CAP);
+    }
+}
