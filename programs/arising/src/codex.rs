@@ -368,6 +368,28 @@ impl ResourceKind {
 }
 
 #[derive(Clone, Copy)]
+pub struct WeaponAttributeModifier {
+    pub weapon: ResourceKind,
+    pub attributes: Attributes,
+}
+
+impl WeaponAttributeModifier {
+    pub const fn new(weapon: ResourceKind, attributes: Attributes) -> Self {
+        Self { weapon, attributes }
+    }
+}
+
+pub const WEAPON_ATTRIBUTE_CODEX: [WeaponAttributeModifier; 1] = [
+    WeaponAttributeModifier::new(ResourceKind::WoodenSword, Attributes::new(2, 0, 0, 0, 0, 0)),
+];
+
+pub fn weapon_modifier(weapon: ResourceKind) -> Option<&'static WeaponAttributeModifier> {
+    WEAPON_ATTRIBUTE_CODEX
+        .iter()
+        .find(|modifier| modifier.weapon == weapon)
+}
+
+#[derive(Clone, Copy)]
 pub enum QuestReward {
     Experience { amount: u64 },
     Resource { resource: ResourceKind, amount: u64 },
@@ -556,6 +578,13 @@ mod tests {
             recipe.minimum_stats.intellect + 10,
         );
         assert_eq!(recipe.energy_cost(generous_stats), 0);
+    }
+
+    #[test]
+    fn weapon_modifier_codex_returns_expected_attributes() {
+        let modifier = weapon_modifier(ResourceKind::WoodenSword).expect("wooden sword modifier");
+        assert_eq!(modifier.attributes.atk, 2);
+        assert!(weapon_modifier(ResourceKind::Gold).is_none());
     }
 }
 
