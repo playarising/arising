@@ -5,7 +5,7 @@ use arising::codex::{Civilization, CoreStats, Gender, ResourceKind};
 use arising::errors::ArisingError;
 use common::{
     context::{TestContext, TransactionResultExt},
-    conversions, fixtures, instructions, tokens,
+    conversions, fixtures, instructions, recipes, tokens,
 };
 use solana_keypair::Keypair;
 use solana_signer::Signer;
@@ -101,7 +101,7 @@ fn recipe_consumes_available_resources() {
             crafter,
             authority_pk,
             mint_state,
-            tokens::reward_accounts(&authority_pk, &[ResourceKind::Plank, ResourceKind::Gold]),
+            tokens::reward_accounts(&authority_pk, &recipes::recipe_input_resources(2)),
         ),
         &[&authority],
     )

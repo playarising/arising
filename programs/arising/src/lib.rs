@@ -245,7 +245,8 @@ pub mod arising {
 
         let mut experience_reward: u64 = 0;
         let mut resource_rewards: Vec<ResourceRewardEvent> = Vec::new();
-        let mut remaining_accounts = ctx.remaining_accounts.iter();
+        let mut remaining_accounts: Vec<&AccountInfo<'info>> =
+            ctx.remaining_accounts.iter().collect();
 
         for reward in quest.rewards.iter().copied() {
             match reward {
@@ -309,7 +310,15 @@ pub mod arising {
         character.consume_energy(energy_cost)?;
 
         let mut consumed_resources: Vec<ResourceCostEvent> = Vec::new();
-        let mut remaining_accounts = ctx.remaining_accounts.iter();
+        msg!(
+            "start recipe remaining: {:?}",
+            ctx.remaining_accounts
+                .iter()
+                .map(|acc| acc.key())
+                .collect::<Vec<_>>()
+        );
+        let mut remaining_accounts: Vec<&AccountInfo<'info>> =
+            ctx.remaining_accounts.iter().collect();
         match recipe.input {
             RecipeInput::Forge {
                 raw_material,
@@ -386,7 +395,8 @@ pub mod arising {
         require!(now >= progress.ready_at, ArisingError::RecipeNotReady);
 
         let mut outputs: Vec<ResourceRewardEvent> = Vec::new();
-        let mut remaining_accounts = ctx.remaining_accounts.iter();
+        let mut remaining_accounts: Vec<&AccountInfo<'info>> =
+            ctx.remaining_accounts.iter().collect();
         match recipe.output {
             RecipeOutput::Resource { resource, amount } => {
                 let event = mint_resource_reward(
@@ -573,28 +583,18 @@ fn mint_resource_reward<'info>(
     mint_state_bump: u8,
     resource: ResourceKind,
     amount: u64,
-    remaining_accounts: &mut std::slice::Iter<'info, AccountInfo<'info>>,
+    remaining_accounts: &mut Vec<&'info AccountInfo<'info>>,
 ) -> Result<ResourceRewardEvent> {
-    let (expected_mint, mint_bump) =
+    let authority_key = authority.key();
+    let (mint_info, destination_info) = take_resource_accounts(
+        program_id,
+        &authority_key,
+        resource,
+        remaining_accounts,
+        ArisingError::MissingRewardAccounts,
+    )?;
+    let (_, mint_bump) =
         Pubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], program_id);
-    let mint_info = remaining_accounts
-        .next()
-        .ok_or(ArisingError::MissingRewardAccounts)?;
-    let destination_info = remaining_accounts
-        .next()
-        .ok_or(ArisingError::MissingRewardAccounts)?;
-    let expected_ata =
-        associated_token::get_associated_token_address(&authority.key(), &mint_info.key());
-    require_keys_eq!(
-        destination_info.key(),
-        expected_ata,
-        ArisingError::InvalidResourceAccount
-    );
-    require_keys_eq!(
-        mint_info.key(),
-        expected_mint,
-        ArisingError::InvalidResourceMint
-    );
 
     if mint_info.data_is_empty() {
         initialize_resource_mint(
@@ -708,21 +708,16 @@ fn consume_resource_from_user<'info>(
     authority: &Signer<'info>,
     resource: ResourceKind,
     amount: u64,
-    remaining_accounts: &mut std::slice::Iter<'info, AccountInfo<'info>>,
+    remaining_accounts: &mut Vec<&'info AccountInfo<'info>>,
 ) -> Result<ResourceCostEvent> {
-    let (expected_mint, _) =
-        Pubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], program_id);
-    let mint_info = remaining_accounts
-        .next()
-        .ok_or(ArisingError::MissingRecipeAccounts)?;
-    require_keys_eq!(
-        mint_info.key(),
-        expected_mint,
-        ArisingError::InvalidResourceMint
-    );
-    let source_info = remaining_accounts
-        .next()
-        .ok_or(ArisingError::MissingRecipeAccounts)?;
+    let authority_key = authority.key();
+    let (mint_info, source_info) = take_resource_accounts(
+        program_id,
+        &authority_key,
+        resource,
+        remaining_accounts,
+        ArisingError::MissingRecipeAccounts,
+    )?;
 
     let source_account = Account::<TokenAccount>::try_from(source_info)
         .map_err(|_| ArisingError::InvalidResourceAccount)?;
@@ -750,6 +745,45 @@ fn consume_resource_from_user<'info>(
     )?;
 
     Ok(ResourceCostEvent { resource, amount })
+}
+
+fn take_resource_accounts<'info>(
+    program_id: &Pubkey,
+    authority: &Pubkey,
+    resource: ResourceKind,
+    accounts: &mut Vec<&'info AccountInfo<'info>>,
+    missing_error: ArisingError,
+) -> Result<(&'info AccountInfo<'info>, &'info AccountInfo<'info>)> {
+    let (expected_mint, _) =
+        Pubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], program_id);
+    let mint_index = accounts
+        .iter()
+        .position(|info| info.key() == expected_mint)
+        .ok_or_else(|| {
+            msg!(
+                "missing mint {:?} accounts: {:?}",
+                resource,
+                accounts.iter().map(|acc| acc.key()).collect::<Vec<_>>()
+            );
+            missing_error
+        })?;
+    let mint_info = accounts.remove(mint_index);
+
+    let expected_ata = associated_token::get_associated_token_address(authority, &expected_mint);
+    let ata_index = accounts
+        .iter()
+        .position(|info| info.key() == expected_ata)
+        .ok_or_else(|| {
+            msg!(
+                "missing ata {:?} accounts: {:?}",
+                resource,
+                accounts.iter().map(|acc| acc.key()).collect::<Vec<_>>()
+            );
+            missing_error
+        })?;
+    let ata_info = accounts.remove(ata_index);
+
+    Ok((mint_info, ata_info))
 }
 
 fn equipment_account_pair<'info>(

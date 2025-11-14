@@ -5,7 +5,7 @@ use arising::codex::{Civilization, Gender, ResourceKind};
 use common::{
     clock,
     context::{TestContext, TransactionResultExt},
-    conversions, fixtures, instructions, tokens,
+    conversions, fixtures, instructions, recipes, tokens,
 };
 use solana_keypair::Keypair;
 use solana_signer::Signer;
@@ -17,6 +17,7 @@ fn quest_and_recipe_flow() {
     let authority = Keypair::new();
     ctx.svm.airdrop(&authority.pubkey(), 5_000_000_000).unwrap();
     let authority_pk = conversions::keypair_pubkey(&authority);
+    println!("authority pk {authority_pk}");
 
     let gatherer = fixtures::create_character(
         &mut ctx,
@@ -86,19 +87,28 @@ fn quest_and_recipe_flow() {
     .assert_success();
 
     for _ in 0..2 {
-        ctx.execute_instruction(
-            instructions::start_recipe(
-                Civilization::Ard,
-                2,
-                1,
-                forger,
-                authority_pk,
-                mint_state,
-                tokens::reward_accounts(&authority_pk, &[ResourceKind::Log]),
-            ),
-            &[&authority],
-        )
-        .assert_success();
+        let reward_accounts = recipes::recipe_input_accounts(&authority_pk, 1);
+        let acct_keys: Vec<String> = reward_accounts
+            .iter()
+            .map(|meta| meta.pubkey.to_string())
+            .collect();
+        println!("recipe input accounts: {acct_keys:?}");
+        let ix = instructions::start_recipe(
+            Civilization::Ard,
+            2,
+            1,
+            forger,
+            authority_pk,
+            mint_state,
+            reward_accounts,
+        );
+        let full_accounts: Vec<String> = ix
+            .accounts
+            .iter()
+            .map(|meta| meta.pubkey.to_string())
+            .collect();
+        println!("start recipe ix accounts: {full_accounts:?}");
+        ctx.execute_instruction(ix, &[&authority]).assert_success();
         clock::fast_forward_recipe(&mut ctx, &forger);
         ctx.execute_instruction(
             instructions::claim_recipe(
@@ -108,7 +118,7 @@ fn quest_and_recipe_flow() {
                 forger,
                 authority_pk,
                 mint_state,
-                tokens::reward_accounts(&authority_pk, &[ResourceKind::Plank]),
+                recipes::recipe_output_accounts(&authority_pk, 1),
             ),
             &[&authority],
         )
@@ -123,7 +133,7 @@ fn quest_and_recipe_flow() {
             crafter,
             authority_pk,
             mint_state,
-            tokens::reward_accounts(&authority_pk, &[ResourceKind::Plank, ResourceKind::Gold]),
+            recipes::recipe_input_accounts(&authority_pk, 2),
         ),
         &[&authority],
     )
@@ -137,7 +147,7 @@ fn quest_and_recipe_flow() {
             crafter,
             authority_pk,
             mint_state,
-            tokens::reward_accounts(&authority_pk, &[ResourceKind::WoodenSword]),
+            recipes::recipe_output_accounts(&authority_pk, 2),
         ),
         &[&authority],
     )
