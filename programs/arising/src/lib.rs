@@ -2,7 +2,10 @@ use anchor_lang::{
     prelude::*,
     solana_program::{program::invoke_signed, program_pack::Pack, system_instruction},
 };
-use anchor_spl::token::{self, spl_token, Mint, Token, TokenAccount};
+use anchor_spl::{
+    associated_token::{self, AssociatedToken},
+    token::{self, spl_token, Mint, Token, TokenAccount},
+};
 
 pub mod character;
 pub mod codex;
@@ -251,6 +254,7 @@ pub mod arising {
                     let reward_event = mint_resource_reward(
                         &ctx.accounts.mint_state,
                         &ctx.accounts.token_program,
+                        &ctx.accounts.associated_token_program,
                         &ctx.accounts.system_program,
                         &ctx.accounts.rent,
                         &ctx.accounts.authority,
@@ -385,6 +389,7 @@ pub mod arising {
                 let event = mint_resource_reward(
                     &ctx.accounts.mint_state,
                     &ctx.accounts.token_program,
+                    &ctx.accounts.associated_token_program,
                     &ctx.accounts.system_program,
                     &ctx.accounts.rent,
                     &ctx.accounts.authority,
@@ -455,6 +460,7 @@ pub mod arising {
 fn mint_resource_reward<'info>(
     mint_state: &Account<'info, CharacterMintState>,
     token_program: &Program<'info, Token>,
+    associated_token_program: &Program<'info, AssociatedToken>,
     system_program: &Program<'info, System>,
     rent: &Sysvar<'info, Rent>,
     authority: &Signer<'info>,
@@ -490,6 +496,28 @@ fn mint_resource_reward<'info>(
             resource,
             mint_bump,
         )?;
+    }
+
+    if destination_info.data_is_empty() {
+        let expected_ata =
+            associated_token::get_associated_token_address(&authority.key(), &mint_info.key());
+        require_keys_eq!(
+            destination_info.key(),
+            expected_ata,
+            ArisingError::InvalidResourceAccount
+        );
+
+        associated_token::create(CpiContext::new(
+            associated_token_program.to_account_info(),
+            associated_token::Create {
+                payer: authority.to_account_info(),
+                associated_token: destination_info.clone(),
+                authority: authority.to_account_info(),
+                mint: mint_info.clone(),
+                system_program: system_program.to_account_info(),
+                token_program: token_program.to_account_info(),
+            },
+        ))?;
     }
 
     let destination_account = Account::<TokenAccount>::try_from(destination_info)
@@ -760,6 +788,7 @@ pub struct ClaimQuest<'info> {
     )]
     pub mint_state: Account<'info, CharacterMintState>,
     pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
 }
@@ -781,6 +810,7 @@ pub struct ProcessRecipe<'info> {
     )]
     pub mint_state: Account<'info, CharacterMintState>,
     pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
 }

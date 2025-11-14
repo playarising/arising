@@ -496,8 +496,8 @@ impl CharacterMintState {
 mod tests {
     use super::*;
     use crate::{
-        codex::{quest_by_id, Civilization, Gender, QuestReward},
-        level_codex::LEVEL_CAP,
+        codex::{Civilization, Gender},
+        level_codex::{LEVEL_CAP, LEVEL_CURVE},
     };
 
     fn sample_character(civilization: Civilization) -> Character {
@@ -524,25 +524,24 @@ mod tests {
     }
 
     #[test]
-    fn raid_quest_loop_reaches_level_cap() {
-        let raid = quest_by_id(3).expect("raid quest exists");
-        let xp_reward = raid
-            .rewards
-            .iter()
-            .find_map(|reward| match reward {
-                QuestReward::Experience { amount } => Some(*amount),
-                _ => None,
-            })
-            .expect("raid quest should yield experience");
-
+    fn level_curve_is_respected() {
         let mut character = sample_character(Civilization::Tarki);
-        let mut iterations = 0usize;
-        while character.current_level() < LEVEL_CAP {
-            character.grant_experience(xp_reward).expect("xp granted");
-            iterations += 1;
-            assert!(
-                iterations < 100_000,
-                "raid quest loop failed to reach the level cap"
+        assert_eq!(character.current_level(), 1);
+
+        for entry in LEVEL_CURVE.iter() {
+            assert_eq!(
+                character.current_level(),
+                entry.level,
+                "character level should match curve entry before applying XP"
+            );
+            character
+                .grant_experience(entry.xp_to_next as u64)
+                .expect("xp granted");
+            let expected_level = (entry.level + 1).min(LEVEL_CAP);
+            assert_eq!(
+                character.current_level(),
+                expected_level,
+                "character should reach next level when curve XP is applied"
             );
         }
 
