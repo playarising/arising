@@ -384,6 +384,7 @@ version = "1.0.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
+ "base64 0.22.1",
  "litesvm",
  "mpl-token-metadata",
  "solana-account 3.2.0",

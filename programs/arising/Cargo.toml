@@ -35,6 +35,7 @@ solana-message = "3.0"
 solana-transaction = "3.0"
 solana-transaction-error = "3.0"
 solana-clock = "3.0"
+base64 = "0.22"
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = [

@@ -55,7 +55,19 @@ pub mod arising {
             "Arising: Characters".to_string(),
             "ARISE".to_string(),
             "https://mints.playarising.com/collection".to_string(),
-        )
+        )?;
+
+        emit!(ProgramInitializedEvent {
+            authority: ctx.accounts.authority.key(),
+            mint_state: ctx.accounts.mint_state.key(),
+            collection_mint: ctx.accounts.collection_mint.key(),
+            collection_metadata: ctx.accounts.collection_metadata.key(),
+            collection_master_edition: ctx.accounts.collection_master_edition.key(),
+            usdc_mint: ctx.accounts.usdc_mint.key(),
+            usdc_treasury: ctx.accounts.usdc_treasury.key(),
+        });
+
+        Ok(())
     }
 
     /// Mints a brand new character NFT and seeds the character account.
@@ -103,14 +115,28 @@ pub mod arising {
         character.nft_metadata = ctx.accounts.metadata.key();
         character.nft_master_edition = ctx.accounts.master_edition.key();
         character.nft_token_account = ctx.accounts.character_token_account.key();
-        character.created_at = Clock::get()?.unix_timestamp;
+        let created_at = Clock::get()?.unix_timestamp;
+        character.created_at = created_at;
         character.energy = character.energy_capacity();
-        character.last_energy_refill = character.created_at;
+        character.last_energy_refill = created_at;
         character.energy_passes = character::EnergyPassLedger::default();
         character.current_quest = None;
         character.current_recipe = None;
 
         ctx.accounts.mint_state.record_mint(civilization)?;
+
+        emit!(CharacterMintedEvent {
+            civilization,
+            character_id,
+            authority: character.authority,
+            character: character.key(),
+            gender,
+            nft_mint: character.nft_mint,
+            nft_metadata: character.nft_metadata,
+            nft_master_edition: character.nft_master_edition,
+            nft_token_account: character.nft_token_account,
+            created_at,
+        });
 
         Ok(())
     }
@@ -127,9 +153,17 @@ pub mod arising {
 
         let track = ctx.accounts.mint_state.track_mut(civilization);
         let minted = track.next_id.saturating_sub(1);
+        let previous_cap = track.cap;
         require!(new_cap >= minted, ArisingError::CapBelowSupply);
 
         track.cap = new_cap;
+        emit!(CivilizationCapUpdatedEvent {
+            civilization,
+            authority: ctx.accounts.authority.key(),
+            previous_cap,
+            new_cap,
+            minted,
+        });
         Ok(())
     }
 
@@ -147,7 +181,16 @@ pub mod arising {
             character_id,
             ctx.accounts.authority.key()
         );
-        character.allocate_core_stats(allocation)
+        character.allocate_core_stats(allocation)?;
+        emit!(CoreStatsAllocatedEvent {
+            civilization,
+            character_id,
+            authority: character.authority,
+            allocation,
+            new_stats: character.stats,
+            available_core_points: character.available_core_points(),
+        });
+        Ok(())
     }
 
     /// Allocates attribute points gained via leveling.
@@ -164,7 +207,16 @@ pub mod arising {
             character_id,
             ctx.accounts.authority.key()
         );
-        character.allocate_attributes(allocation)
+        character.allocate_attributes(allocation)?;
+        emit!(AttributesAllocatedEvent {
+            civilization,
+            character_id,
+            authority: character.authority,
+            allocation,
+            new_attributes: character.attributes,
+            available_attribute_points: character.available_attribute_points(),
+        });
+        Ok(())
     }
 
     /// Records the permanent class choice for a character once requirements are met.
@@ -187,7 +239,19 @@ pub mod arising {
             civilization,
             ArisingError::InvalidClassForCivilization
         );
-        character.apply_class_choice(class)
+        let bonuses = class.bonuses();
+        character.apply_class_choice(class)?;
+        emit!(ClassChosenEvent {
+            civilization,
+            character_id,
+            authority: character.authority,
+            class,
+            core_bonus: bonuses.stats,
+            attribute_bonus: bonuses.attributes,
+            new_stats: character.stats,
+            new_attributes: character.attributes,
+        });
+        Ok(())
     }
 
     /// Burns character energy when a user wants to spend it manually.
@@ -204,7 +268,17 @@ pub mod arising {
             character_id,
             ctx.accounts.authority.key()
         );
-        character.consume_energy(amount)
+        let previous_energy = character.energy;
+        character.consume_energy(amount)?;
+        emit!(EnergyConsumedEvent {
+            civilization,
+            character_id,
+            authority: character.authority,
+            amount,
+            previous_energy,
+            remaining_energy: character.energy,
+        });
+        Ok(())
     }
 
     /// Refills character energy if the cooldown has elapsed.
@@ -221,7 +295,17 @@ pub mod arising {
             ctx.accounts.authority.key()
         );
         let now = Clock::get()?.unix_timestamp;
-        character.refill_energy(now)
+        let previous_energy = character.energy;
+        character.refill_energy(now)?;
+        emit!(EnergyRefilledEvent {
+            civilization,
+            character_id,
+            authority: character.authority,
+            previous_energy,
+            new_energy: character.energy,
+            refilled_at: now,
+        });
+        Ok(())
     }
 
     /// Starts a quest after validating level, stats, and energy requirements.
@@ -521,7 +605,7 @@ pub mod arising {
         )?;
 
         let removed_items = character.equip_item(slot, definition)?;
-        for removed in removed_items {
+        for removed in removed_items.iter().copied() {
             let reward_accounts = equipment_account_pair(
                 ctx.program_id,
                 &ctx.remaining_accounts,
@@ -544,6 +628,15 @@ pub mod arising {
                 destination_info,
             )?;
         }
+
+        emit!(EquipmentEquippedEvent {
+            civilization,
+            character_id,
+            authority: character.authority,
+            slot,
+            equipped: definition.resource,
+            removed_items,
+        });
 
         Ok(())
     }
@@ -586,6 +679,14 @@ pub mod arising {
             mint_info,
             destination_info,
         )?;
+
+        emit!(EquipmentUnequippedEvent {
+            civilization,
+            character_id,
+            authority: character.authority,
+            slot,
+            resource: removed_resource,
+        });
 
         Ok(())
     }
@@ -1448,6 +1549,111 @@ pub struct GetCharacterMetadata<'info> {
         bump
     )]
     pub character: Account<'info, Character>,
+}
+
+#[event]
+pub struct ProgramInitializedEvent {
+    pub authority: Pubkey,
+    pub mint_state: Pubkey,
+    pub collection_mint: Pubkey,
+    pub collection_metadata: Pubkey,
+    pub collection_master_edition: Pubkey,
+    pub usdc_mint: Pubkey,
+    pub usdc_treasury: Pubkey,
+}
+
+#[event]
+pub struct CharacterMintedEvent {
+    pub civilization: Civilization,
+    pub character_id: u16,
+    pub authority: Pubkey,
+    pub character: Pubkey,
+    pub gender: Gender,
+    pub nft_mint: Pubkey,
+    pub nft_metadata: Pubkey,
+    pub nft_master_edition: Pubkey,
+    pub nft_token_account: Pubkey,
+    pub created_at: i64,
+}
+
+#[event]
+pub struct CivilizationCapUpdatedEvent {
+    pub civilization: Civilization,
+    pub authority: Pubkey,
+    pub previous_cap: u16,
+    pub new_cap: u16,
+    pub minted: u16,
+}
+
+#[event]
+pub struct CoreStatsAllocatedEvent {
+    pub civilization: Civilization,
+    pub character_id: u16,
+    pub authority: Pubkey,
+    pub allocation: CoreStats,
+    pub new_stats: CoreStats,
+    pub available_core_points: i32,
+}
+
+#[event]
+pub struct AttributesAllocatedEvent {
+    pub civilization: Civilization,
+    pub character_id: u16,
+    pub authority: Pubkey,
+    pub allocation: Attributes,
+    pub new_attributes: Attributes,
+    pub available_attribute_points: i32,
+}
+
+#[event]
+pub struct ClassChosenEvent {
+    pub civilization: Civilization,
+    pub character_id: u16,
+    pub authority: Pubkey,
+    pub class: CharacterClass,
+    pub core_bonus: CoreStats,
+    pub attribute_bonus: Attributes,
+    pub new_stats: CoreStats,
+    pub new_attributes: Attributes,
+}
+
+#[event]
+pub struct EnergyConsumedEvent {
+    pub civilization: Civilization,
+    pub character_id: u16,
+    pub authority: Pubkey,
+    pub amount: u16,
+    pub previous_energy: u16,
+    pub remaining_energy: u16,
+}
+
+#[event]
+pub struct EnergyRefilledEvent {
+    pub civilization: Civilization,
+    pub character_id: u16,
+    pub authority: Pubkey,
+    pub previous_energy: u16,
+    pub new_energy: u16,
+    pub refilled_at: i64,
+}
+
+#[event]
+pub struct EquipmentEquippedEvent {
+    pub civilization: Civilization,
+    pub character_id: u16,
+    pub authority: Pubkey,
+    pub slot: EquipmentSlot,
+    pub equipped: ResourceKind,
+    pub removed_items: Vec<ResourceKind>,
+}
+
+#[event]
+pub struct EquipmentUnequippedEvent {
+    pub civilization: Civilization,
+    pub character_id: u16,
+    pub authority: Pubkey,
+    pub slot: EquipmentSlot,
+    pub resource: ResourceKind,
 }
 
 #[event]
