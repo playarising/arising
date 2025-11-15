@@ -27,7 +27,7 @@ use collection::initialize_collection;
 use errors::ArisingError;
 use nft::{mint_character_nft, CharacterMetadataArgs};
 
-declare_id!("FLTa6pSm3WPWNPrqVu1pCuAmjgmVJkhDvyxMcSPSAfLA");
+declare_id!("arisf5D474u42BL55eCbDFgc5qA3LHGhgVdhCYQkgrM");
 
 const RESOURCE_MINT_SEED: &[u8] = b"resource_mint";
 const ENERGY_PASS_PRICE_USDC: u64 = 2_000_000; // 2 USDC with 6 decimals
