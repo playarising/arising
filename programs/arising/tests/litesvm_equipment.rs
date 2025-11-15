@@ -16,7 +16,8 @@ use solana_signer::Signer;
 #[test]
 fn equips_and_swaps_items() {
     let mut ctx = TestContext::new();
-    let mint_state = fixtures::create_mint_state(&mut ctx);
+    let mint_fixture = fixtures::create_mint_state(&mut ctx);
+    let mint_state = mint_fixture.mint_state;
     let authority = Keypair::new();
     ctx.svm.airdrop(&authority.pubkey(), 5_000_000_000).unwrap();
     let authority_pk = conversions::keypair_pubkey(&authority);

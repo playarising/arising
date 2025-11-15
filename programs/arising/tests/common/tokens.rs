@@ -93,8 +93,82 @@ pub fn token_balance(ctx: &TestContext, owner: &AnchorPubkey, resource: Resource
     }
 }
 
+pub fn create_spl_mint(
+    ctx: &mut TestContext,
+    mint_authority: AnchorPubkey,
+    decimals: u8,
+) -> AnchorPubkey {
+    let mint = AnchorPubkey::new_unique();
+    write_mint(ctx, mint, mint_authority, decimals);
+    mint
+}
+
+pub fn write_token_account(
+    ctx: &mut TestContext,
+    address: AnchorPubkey,
+    mint: AnchorPubkey,
+    owner: AnchorPubkey,
+    amount: u64,
+) {
+    let rent = ctx
+        .svm
+        .minimum_balance_for_rent_exemption(TokenAccount::LEN);
+    let mut token_bytes = vec![0u8; TokenAccount::LEN];
+    <TokenAccount as Pack>::pack(
+        TokenAccount {
+            mint,
+            owner,
+            amount,
+            delegate: COption::None,
+            state: AccountState::Initialized,
+            is_native: COption::None,
+            delegated_amount: 0,
+            close_authority: COption::None,
+        },
+        &mut token_bytes,
+    )
+    .unwrap();
+    let account = Account {
+        lamports: rent,
+        data: token_bytes,
+        owner: conversions::to_solana_pubkey(spl_token::id()),
+        executable: false,
+        rent_epoch: 0,
+    };
+    ctx.svm
+        .set_account(conversions::to_solana_pubkey(address), account)
+        .expect("token account stored");
+}
+
+pub fn create_spl_token_account(
+    ctx: &mut TestContext,
+    owner: AnchorPubkey,
+    mint: AnchorPubkey,
+    amount: u64,
+) -> AnchorPubkey {
+    let address = AnchorPubkey::new_unique();
+    write_token_account(ctx, address, mint, owner, amount);
+    address
+}
+
+pub fn spl_account_balance(ctx: &TestContext, address: AnchorPubkey) -> u64 {
+    match ctx.svm.get_account(&conversions::to_solana_pubkey(address)) {
+        Some(account) => TokenAccount::unpack(&account.data).unwrap().amount,
+        None => 0,
+    }
+}
+
 /// Initializes the PDA mint if it has not yet been created.
 fn ensure_mint(ctx: &mut TestContext, mint_authority: AnchorPubkey, mint: AnchorPubkey) {
+    write_mint(ctx, mint, mint_authority, 0);
+}
+
+fn write_mint(
+    ctx: &mut TestContext,
+    mint: AnchorPubkey,
+    mint_authority: AnchorPubkey,
+    decimals: u8,
+) {
     let key = conversions::to_solana_pubkey(mint);
     if ctx.svm.get_account(&key).is_some() {
         return;
@@ -105,7 +179,7 @@ fn ensure_mint(ctx: &mut TestContext, mint_authority: AnchorPubkey, mint: Anchor
         Mint {
             mint_authority: Some(mint_authority).into(),
             supply: 0,
-            decimals: 0,
+            decimals,
             is_initialized: true,
             freeze_authority: Some(mint_authority).into(),
         },

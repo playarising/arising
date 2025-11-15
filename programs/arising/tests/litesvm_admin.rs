@@ -16,7 +16,8 @@ use solana_signer::Signer;
 #[test]
 fn update_cap_requires_authority() {
     let mut ctx = TestContext::new();
-    let mint_state = fixtures::create_mint_state(&mut ctx);
+    let mint_fixture = fixtures::create_mint_state(&mut ctx);
+    let mint_state = mint_fixture.mint_state;
 
     let authority = ctx.payer();
     // Signed by authority: succeeds.

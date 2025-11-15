@@ -30,6 +30,7 @@ use nft::{mint_character_nft, CharacterMetadataArgs};
 declare_id!("FLTa6pSm3WPWNPrqVu1pCuAmjgmVJkhDvyxMcSPSAfLA");
 
 const RESOURCE_MINT_SEED: &[u8] = b"resource_mint";
+const ENERGY_PASS_PRICE_USDC: u64 = 2_000_000; // 2 USDC with 6 decimals
 
 /// Validates a character's civilization/id pairing and authority signer in a single macro call.
 macro_rules! validate_character {
@@ -73,6 +74,7 @@ pub mod arising {
 
         {
             let mint_state = &ctx.accounts.mint_state;
+            mint_state.ensure_authority(ctx.accounts.mint_authority.key())?;
             mint_state.ensure_collection_binding(
                 &ctx.accounts.collection_mint.key(),
                 &ctx.accounts.collection_metadata.key(),
@@ -109,6 +111,7 @@ pub mod arising {
         character.created_at = Clock::get()?.unix_timestamp;
         character.energy = character.energy_capacity();
         character.last_energy_refill = character.created_at;
+        character.energy_passes = character::EnergyPassLedger::default();
         character.current_quest = None;
         character.current_recipe = None;
 
@@ -635,6 +638,120 @@ pub mod arising {
 
         Ok(())
     }
+
+    pub fn buy_energy_pass(
+        ctx: Context<BuyEnergyPass>,
+        civilization: Civilization,
+        character_id: u16,
+        quantity: u8,
+    ) -> Result<()> {
+        require!(quantity > 0, ArisingError::InvalidEnergyPassQuantity);
+        let character = &mut ctx.accounts.character;
+        validate_character!(
+            character,
+            civilization,
+            character_id,
+            ctx.accounts.authority.key()
+        );
+        let mint_state = &ctx.accounts.mint_state;
+        require_keys_eq!(
+            ctx.accounts.user_usdc_account.mint,
+            mint_state.usdc_mint,
+            ArisingError::InvalidUsdcMint
+        );
+        require_keys_eq!(
+            ctx.accounts.user_usdc_account.owner,
+            ctx.accounts.authority.key(),
+            ArisingError::InvalidUsdcAccount
+        );
+        require_keys_eq!(
+            ctx.accounts.treasury_usdc_account.key(),
+            mint_state.usdc_treasury,
+            ArisingError::InvalidUsdcTreasury
+        );
+        require!(
+            quantity <= character::ENERGY_PASS_PURCHASE_LIMIT,
+            ArisingError::InvalidEnergyPassQuantity
+        );
+        let now = Clock::get()?.unix_timestamp;
+        character.grant_energy_passes(quantity, now)?;
+        let total_price = ENERGY_PASS_PRICE_USDC
+            .checked_mul(quantity as u64)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        token::transfer(
+            CpiContext::new(
+                ctx.accounts.token_program.to_account_info(),
+                token::Transfer {
+                    from: ctx.accounts.user_usdc_account.to_account_info(),
+                    to: ctx.accounts.treasury_usdc_account.to_account_info(),
+                    authority: ctx.accounts.authority.to_account_info(),
+                },
+            ),
+            total_price,
+        )?;
+
+        emit!(EnergyPassPurchasedEvent {
+            civilization,
+            character_id,
+            buyer: ctx.accounts.authority.key(),
+            quantity,
+            total_price,
+        });
+
+        Ok(())
+    }
+
+    pub fn redeem_energy_pass(
+        ctx: Context<RedeemEnergyPass>,
+        civilization: Civilization,
+        character_id: u16,
+    ) -> Result<()> {
+        let character = &mut ctx.accounts.character;
+        validate_character!(
+            character,
+            civilization,
+            character_id,
+            ctx.accounts.authority.key()
+        );
+        let now = Clock::get()?.unix_timestamp;
+        character.redeem_energy_pass(now)?;
+        emit!(EnergyPassRedeemedEvent {
+            civilization,
+            character_id,
+            authority: ctx.accounts.authority.key(),
+        });
+        Ok(())
+    }
+
+    pub fn withdraw_usdc_treasury(ctx: Context<WithdrawUsdcTreasury>, amount: u64) -> Result<()> {
+        let mint_state = &ctx.accounts.mint_state;
+        mint_state.ensure_authority(ctx.accounts.mint_authority.key())?;
+        require!(amount > 0, ArisingError::InvalidEnergyPassQuantity);
+        require_keys_eq!(
+            ctx.accounts.destination.mint,
+            mint_state.usdc_mint,
+            ArisingError::InvalidUsdcMint
+        );
+        let signer_seeds: &[&[&[u8]]] = &[&[CHARACTER_MINT_STATE_SEED, &[ctx.bumps.mint_state]]];
+        token::transfer(
+            CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                token::Transfer {
+                    from: ctx.accounts.treasury_usdc_account.to_account_info(),
+                    to: ctx.accounts.destination.to_account_info(),
+                    authority: ctx.accounts.mint_state.to_account_info(),
+                },
+                signer_seeds,
+            ),
+            amount,
+        )?;
+        emit!(UsdcWithdrawnEvent {
+            authority: ctx.accounts.mint_authority.key(),
+            destination: ctx.accounts.destination.key(),
+            amount,
+        });
+        Ok(())
+    }
 }
 
 /// Locates the expected mint/ATA pair and mints SPL tokens for recipe/quest rewards.
@@ -1102,7 +1219,12 @@ pub struct Initialize<'info> {
     /// CHECK: Program id validated
     pub token_metadata_program: UncheckedAccount<'info>,
     pub token_program: Program<'info, Token>,
+    pub usdc_mint: Account<'info, Mint>,
+    /// CHECK: ATA created during initialization
+    #[account(mut)]
+    pub usdc_treasury: UncheckedAccount<'info>,
     pub system_program: Program<'info, System>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
     pub rent: Sysvar<'info, Rent>,
 }
 
@@ -1125,6 +1247,10 @@ pub struct MintCharacter<'info> {
         bump
     )]
     pub mint_state: Account<'info, CharacterMintState>,
+    #[account(
+        constraint = mint_authority.key() == mint_state.authority @ ArisingError::Unauthorized
+    )]
+    pub mint_authority: Signer<'info>,
     #[account(
         init,
         payer = authority,
@@ -1256,6 +1382,71 @@ pub struct ManageEquipment<'info> {
 
 #[derive(Accounts)]
 #[instruction(civilization: Civilization, character_id: u16)]
+pub struct BuyEnergyPass<'info> {
+    #[account(
+        mut,
+        seeds = [CHARACTER_SEED, &[civilization as u8], &character_id.to_le_bytes()],
+        bump
+    )]
+    pub character: Account<'info, Character>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    #[account(
+        seeds = [CHARACTER_MINT_STATE_SEED],
+        bump
+    )]
+    pub mint_state: Account<'info, CharacterMintState>,
+    #[account(
+        mut,
+        constraint = user_usdc_account.owner == authority.key() @ ArisingError::InvalidUsdcAccount,
+        constraint = user_usdc_account.mint == mint_state.usdc_mint @ ArisingError::InvalidUsdcMint
+    )]
+    pub user_usdc_account: Account<'info, TokenAccount>,
+    #[account(
+        mut,
+        address = mint_state.usdc_treasury @ ArisingError::InvalidUsdcTreasury
+    )]
+    pub treasury_usdc_account: Account<'info, TokenAccount>,
+    pub token_program: Program<'info, Token>,
+}
+
+#[derive(Accounts)]
+#[instruction(civilization: Civilization, character_id: u16)]
+pub struct RedeemEnergyPass<'info> {
+    #[account(
+        mut,
+        seeds = [CHARACTER_SEED, &[civilization as u8], &character_id.to_le_bytes()],
+        bump
+    )]
+    pub character: Account<'info, Character>,
+    #[account(mut)]
+    pub authority: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct WithdrawUsdcTreasury<'info> {
+    #[account(
+        mut,
+        seeds = [CHARACTER_MINT_STATE_SEED],
+        bump
+    )]
+    pub mint_state: Account<'info, CharacterMintState>,
+    pub mint_authority: Signer<'info>,
+    #[account(
+        mut,
+        address = mint_state.usdc_treasury @ ArisingError::InvalidUsdcTreasury
+    )]
+    pub treasury_usdc_account: Account<'info, TokenAccount>,
+    #[account(
+        mut,
+        constraint = destination.mint == mint_state.usdc_mint @ ArisingError::InvalidUsdcMint
+    )]
+    pub destination: Account<'info, TokenAccount>,
+    pub token_program: Program<'info, Token>,
+}
+
+#[derive(Accounts)]
+#[instruction(civilization: Civilization, character_id: u16)]
 pub struct GetCharacterMetadata<'info> {
     #[account(
         seeds = [CHARACTER_SEED, &[civilization as u8], &character_id.to_le_bytes()],
@@ -1293,6 +1484,29 @@ pub struct CharacterMetadataEvent {
     pub current_recipe: Option<CharacterRecipeState>,
     pub current_quest: Option<CharacterQuestState>,
     pub equipment: CharacterEquipment,
+}
+
+#[event]
+pub struct EnergyPassPurchasedEvent {
+    pub civilization: Civilization,
+    pub character_id: u16,
+    pub buyer: Pubkey,
+    pub quantity: u8,
+    pub total_price: u64,
+}
+
+#[event]
+pub struct EnergyPassRedeemedEvent {
+    pub civilization: Civilization,
+    pub character_id: u16,
+    pub authority: Pubkey,
+}
+
+#[event]
+pub struct UsdcWithdrawnEvent {
+    pub authority: Pubkey,
+    pub destination: Pubkey,
+    pub amount: u64,
 }
 
 #[event]

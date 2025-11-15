@@ -18,6 +18,9 @@ pub const COLLECTION_MINT_PDA_SEED: &[u8] = b"collection_mint";
 pub const COLLECTION_TOKEN_PDA_SEED: &[u8] = b"collection_token";
 pub const BASE_ENERGY: u16 = 10;
 pub const ENERGY_REFILL_COOLDOWN_SECS: i64 = 24 * 60 * 60;
+pub const ENERGY_PASS_WINDOW_SECS: i64 = 24 * 60 * 60;
+pub const ENERGY_PASS_PURCHASE_LIMIT: u8 = 5;
+pub const ENERGY_PASS_USAGE_LIMIT: u8 = 3;
 
 #[account]
 pub struct Character {
@@ -34,6 +37,7 @@ pub struct Character {
     pub equipment: CharacterEquipment,
     pub energy: u16,
     pub last_energy_refill: i64,
+    pub energy_passes: EnergyPassLedger,
     pub current_quest: Option<CharacterQuestState>,
     pub current_recipe: Option<CharacterRecipeState>,
     pub nft_mint: Pubkey,
@@ -63,6 +67,41 @@ pub struct CharacterRecipeState {
 
 impl CharacterRecipeState {
     pub const SIZE: usize = 2 + 8 + 8;
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, Debug, Default)]
+pub struct EnergyPassLedger {
+    pub passes_owned: u16,
+    pub purchase_window_start: i64,
+    pub purchases_in_window: u8,
+    pub usage_window_start: i64,
+    pub usage_in_window: u8,
+}
+
+impl EnergyPassLedger {
+    pub const SIZE: usize = 2 + 8 + 1 + 8 + 1;
+
+    pub fn reset_purchase_window(&mut self, now: i64) {
+        if self.purchase_window_start == 0 && self.purchases_in_window == 0 {
+            self.purchase_window_start = now;
+            return;
+        }
+        if now.saturating_sub(self.purchase_window_start) >= ENERGY_PASS_WINDOW_SECS {
+            self.purchase_window_start = now;
+            self.purchases_in_window = 0;
+        }
+    }
+
+    pub fn reset_usage_window(&mut self, now: i64) {
+        if self.usage_window_start == 0 && self.usage_in_window == 0 {
+            self.usage_window_start = now;
+            return;
+        }
+        if now.saturating_sub(self.usage_window_start) >= ENERGY_PASS_WINDOW_SECS {
+            self.usage_window_start = now;
+            self.usage_in_window = 0;
+        }
+    }
 }
 
 const SLOT_FLAG_TWO_HANDED_PRIMARY: u8 = 1 << 0;
@@ -181,6 +220,7 @@ impl Character {
         + CharacterEquipment::SIZE
         + 2 // energy
         + 8 // last_energy_refill
+        + EnergyPassLedger::SIZE
         + 1 // quest option tag
         + CharacterQuestState::SIZE
         + 1 // recipe option tag
@@ -469,6 +509,51 @@ impl Character {
         Ok(())
     }
 
+    pub fn grant_energy_passes(&mut self, quantity: u8, now: i64) -> Result<()> {
+        require!(quantity > 0, ArisingError::InvalidEnergyPassQuantity);
+        let ledger = &mut self.energy_passes;
+        ledger.reset_purchase_window(now);
+        let updated = ledger
+            .purchases_in_window
+            .checked_add(quantity)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        require!(
+            updated <= ENERGY_PASS_PURCHASE_LIMIT,
+            ArisingError::TooManyPassPurchases
+        );
+        ledger.purchases_in_window = updated;
+        ledger.passes_owned = ledger
+            .passes_owned
+            .checked_add(quantity as u16)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        Ok(())
+    }
+
+    pub fn redeem_energy_pass(&mut self, now: i64) -> Result<()> {
+        let ledger = &mut self.energy_passes;
+        ledger.reset_usage_window(now);
+        require!(
+            ledger.passes_owned > 0,
+            ArisingError::InsufficientEnergyPasses
+        );
+        let updated = ledger
+            .usage_in_window
+            .checked_add(1)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        require!(
+            updated <= ENERGY_PASS_USAGE_LIMIT,
+            ArisingError::TooManyPassUses
+        );
+        ledger.usage_in_window = updated;
+        ledger.passes_owned = ledger
+            .passes_owned
+            .checked_sub(1)
+            .ok_or(ArisingError::ArithmeticOverflow)?;
+        self.energy = self.energy_capacity();
+        self.last_energy_refill = now;
+        Ok(())
+    }
+
     pub fn has_required_stats(&self, required: CoreStats) -> bool {
         self.stats.might >= required.might
             && self.stats.speed >= required.speed
@@ -630,6 +715,8 @@ pub struct CharacterMintState {
     pub collection_mint: Pubkey,
     pub collection_metadata: Pubkey,
     pub collection_master_edition: Pubkey,
+    pub usdc_mint: Pubkey,
+    pub usdc_treasury: Pubkey,
     pub civilization_mints: [CivilizationMintConfig; Civilization::COUNT],
 }
 
@@ -640,6 +727,8 @@ impl CharacterMintState {
         + 32 /* collection_mint */
         + 32 /* collection_metadata */
         + 32 /* collection_master_edition */
+        + 32 /* usdc mint */
+        + 32 /* usdc treasury */
         + Civilization::COUNT * CivilizationMintConfig::SIZE;
 
     pub fn initialize(
@@ -649,12 +738,16 @@ impl CharacterMintState {
         collection_mint: Pubkey,
         collection_metadata: Pubkey,
         collection_master_edition: Pubkey,
+        usdc_mint: Pubkey,
+        usdc_treasury: Pubkey,
     ) {
         self.bump = bump;
         self.authority = authority;
         self.collection_mint = collection_mint;
         self.collection_metadata = collection_metadata;
         self.collection_master_edition = collection_master_edition;
+        self.usdc_mint = usdc_mint;
+        self.usdc_treasury = usdc_treasury;
         self.civilization_mints = [CivilizationMintConfig::new(); Civilization::COUNT];
     }
 
@@ -757,6 +850,7 @@ mod tests {
             equipment: CharacterEquipment::default(),
             energy: BASE_ENERGY,
             last_energy_refill: 0,
+            energy_passes: EnergyPassLedger::default(),
             current_quest: None,
             current_recipe: None,
             nft_mint: Pubkey::default(),
@@ -794,6 +888,18 @@ mod tests {
         }
 
         assert_eq!(character.current_level(), LEVEL_CAP);
+    }
+
+    #[test]
+    fn energy_pass_usage_limit_is_enforced() {
+        let mut character = sample_character(Civilization::Ard);
+        character.energy_passes.passes_owned = 4;
+        let now = 42;
+        character.redeem_energy_pass(now).unwrap();
+        character.redeem_energy_pass(now).unwrap();
+        character.redeem_energy_pass(now).unwrap();
+        let err = character.redeem_energy_pass(now).unwrap_err();
+        assert_error(err, ArisingError::TooManyPassUses);
     }
 
     #[test]

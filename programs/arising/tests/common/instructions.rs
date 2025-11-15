@@ -226,3 +226,75 @@ pub fn update_civilization_cap(
         .data(),
     })
 }
+
+pub fn buy_energy_pass(
+    civilization: Civilization,
+    character_id: u16,
+    quantity: u8,
+    character: AnchorPubkey,
+    authority: AnchorPubkey,
+    mint_state: AnchorPubkey,
+    user_usdc_account: AnchorPubkey,
+    treasury_usdc_account: AnchorPubkey,
+) -> Instruction {
+    let accounts = arising::accounts::BuyEnergyPass {
+        character,
+        authority,
+        mint_state,
+        user_usdc_account,
+        treasury_usdc_account,
+        token_program: anchor_spl::token::ID,
+    };
+    convert_instruction(anchor_lang::solana_program::instruction::Instruction {
+        program_id: arising::ID,
+        accounts: accounts.to_account_metas(None),
+        data: arising::instruction::BuyEnergyPass {
+            civilization,
+            character_id,
+            quantity,
+        }
+        .data(),
+    })
+}
+
+pub fn redeem_energy_pass(
+    civilization: Civilization,
+    character_id: u16,
+    character: AnchorPubkey,
+    authority: AnchorPubkey,
+) -> Instruction {
+    let accounts = arising::accounts::RedeemEnergyPass {
+        character,
+        authority,
+    };
+    convert_instruction(anchor_lang::solana_program::instruction::Instruction {
+        program_id: arising::ID,
+        accounts: accounts.to_account_metas(None),
+        data: arising::instruction::RedeemEnergyPass {
+            civilization,
+            character_id,
+        }
+        .data(),
+    })
+}
+
+pub fn withdraw_usdc_treasury(
+    mint_state: AnchorPubkey,
+    mint_authority: AnchorPubkey,
+    treasury: AnchorPubkey,
+    destination: AnchorPubkey,
+    amount: u64,
+) -> Instruction {
+    let accounts = arising::accounts::WithdrawUsdcTreasury {
+        mint_state,
+        mint_authority,
+        treasury_usdc_account: treasury,
+        destination,
+        token_program: anchor_spl::token::ID,
+    };
+    convert_instruction(anchor_lang::solana_program::instruction::Instruction {
+        program_id: arising::ID,
+        accounts: accounts.to_account_metas(None),
+        data: arising::instruction::WithdrawUsdcTreasury { amount }.data(),
+    })
+}

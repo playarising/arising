@@ -1,7 +1,9 @@
 //! Builders for PDA accounts needed during LiteSVM tests.
 
+use crate::common::tokens;
 use crate::common::{context::TestContext, conversions};
 use anchor_lang::solana_program::pubkey::Pubkey as AnchorPubkey;
+use anchor_spl::associated_token::get_associated_token_address;
 use arising::character::{
     Character, CharacterEquipment, CharacterMintState, CivilizationMintConfig,
     CHARACTER_MINT_STATE_SEED, CHARACTER_SEED,
@@ -9,21 +11,36 @@ use arising::character::{
 use arising::codex::{Attributes, Civilization, CoreStats, Gender};
 use solana_keypair::Keypair;
 
+pub struct MintStateFixture {
+    pub mint_state: AnchorPubkey,
+    pub usdc_mint: AnchorPubkey,
+    pub usdc_treasury: AnchorPubkey,
+}
+
 /// Creates and stores the mint state PDA with default civilization caps.
-pub fn create_mint_state(ctx: &mut TestContext) -> AnchorPubkey {
+pub fn create_mint_state(ctx: &mut TestContext) -> MintStateFixture {
     let (mint_state, bump) =
         AnchorPubkey::find_program_address(&[CHARACTER_MINT_STATE_SEED], &arising::ID);
     let payer = conversions::keypair_pubkey(ctx.payer());
+    let usdc_mint = tokens::create_spl_mint(ctx, payer, 6);
+    let usdc_treasury = get_associated_token_address(&mint_state, &usdc_mint);
+    tokens::write_token_account(ctx, usdc_treasury, usdc_mint, mint_state, 0);
     let account = CharacterMintState {
         authority: payer,
         bump,
         collection_mint: AnchorPubkey::new_unique(),
         collection_metadata: AnchorPubkey::new_unique(),
         collection_master_edition: AnchorPubkey::new_unique(),
+        usdc_mint,
+        usdc_treasury,
         civilization_mints: [CivilizationMintConfig::new(); Civilization::COUNT],
     };
     ctx.store_anchor_account(mint_state, arising::ID, &account, CharacterMintState::LEN);
-    mint_state
+    MintStateFixture {
+        mint_state,
+        usdc_mint,
+        usdc_treasury,
+    }
 }
 
 /// Writes a character account matching the PDA derivation used on-chain.
@@ -59,6 +76,7 @@ pub fn create_character(
         equipment: CharacterEquipment::default(),
         energy: arising::character::BASE_ENERGY,
         last_energy_refill: 0,
+        energy_passes: arising::character::EnergyPassLedger::default(),
         current_quest: None,
         current_recipe: None,
         nft_mint: AnchorPubkey::default(),

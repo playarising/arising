@@ -16,7 +16,8 @@ use solana_signer::Signer;
 #[test]
 fn cannot_claim_before_ready() {
     let mut ctx = TestContext::new();
-    let mint_state = fixtures::create_mint_state(&mut ctx);
+    let mint_fixture = fixtures::create_mint_state(&mut ctx);
+    let mint_state = mint_fixture.mint_state;
     let authority = Keypair::new();
     ctx.svm.airdrop(&authority.pubkey(), 1_000_000_000).unwrap();
     let authority_pk = conversions::keypair_pubkey(&authority);
@@ -79,7 +80,8 @@ fn quest_requires_stats() {
 #[test]
 fn recipe_consumes_available_resources() {
     let mut ctx = TestContext::new();
-    let mint_state = fixtures::create_mint_state(&mut ctx);
+    let mint_fixture = fixtures::create_mint_state(&mut ctx);
+    let mint_state = mint_fixture.mint_state;
     let authority = Keypair::new();
     ctx.svm.airdrop(&authority.pubkey(), 1_000_000_000).unwrap();
     let authority_pk = conversions::keypair_pubkey(&authority);

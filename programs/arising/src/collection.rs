@@ -2,7 +2,10 @@ use anchor_lang::{
     prelude::*,
     solana_program::{program::invoke_signed, program_pack::Pack, system_instruction, sysvar},
 };
-use anchor_spl::token::{self, spl_token};
+use anchor_spl::{
+    associated_token,
+    token::{self, spl_token},
+};
 use mpl_token_metadata::{
     instructions::{
         CreateMasterEditionV3, CreateMasterEditionV3InstructionArgs, CreateMetadataAccountV3,
@@ -42,6 +45,7 @@ pub fn initialize_collection(
         collection_symbol,
         collection_uri,
     )?;
+    ensure_usdc_treasury(accounts)?;
 
     accounts.mint_state.initialize(
         mint_state_bump,
@@ -49,6 +53,8 @@ pub fn initialize_collection(
         accounts.collection_mint.key(),
         accounts.collection_metadata.key(),
         accounts.collection_master_edition.key(),
+        accounts.usdc_mint.key(),
+        accounts.usdc_treasury.key(),
     );
 
     Ok(())
@@ -189,6 +195,34 @@ fn ensure_collection_token_account(
             ),
             1,
         )?;
+    }
+
+    Ok(())
+}
+
+fn ensure_usdc_treasury(accounts: &Initialize<'_>) -> Result<()> {
+    let expected_treasury = associated_token::get_associated_token_address(
+        &accounts.mint_state.key(),
+        &accounts.usdc_mint.key(),
+    );
+    require_keys_eq!(
+        accounts.usdc_treasury.key(),
+        expected_treasury,
+        ArisingError::InvalidUsdcTreasury
+    );
+
+    if accounts.usdc_treasury.to_account_info().data_is_empty() {
+        associated_token::create(CpiContext::new(
+            accounts.associated_token_program.to_account_info(),
+            associated_token::Create {
+                payer: accounts.authority.to_account_info(),
+                associated_token: accounts.usdc_treasury.to_account_info(),
+                authority: accounts.mint_state.to_account_info(),
+                mint: accounts.usdc_mint.to_account_info(),
+                system_program: accounts.system_program.to_account_info(),
+                token_program: accounts.token_program.to_account_info(),
+            },
+        ))?;
     }
 
     Ok(())

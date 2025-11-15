@@ -29,3 +29,10 @@ fn advance_clock(ctx: &mut TestContext, unix_timestamp: i64) {
         ctx.svm.set_sysvar(&clock);
     }
 }
+
+/// Moves the global clock forward by the provided number of seconds.
+pub fn warp_seconds(ctx: &mut TestContext, delta: i64) {
+    let mut clock = ctx.svm.get_sysvar::<Clock>();
+    clock.unix_timestamp = clock.unix_timestamp.saturating_add(delta);
+    ctx.svm.set_sysvar(&clock);
+}

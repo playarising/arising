@@ -90,4 +90,18 @@ pub enum ArisingError {
     EquipmentLevelRequirement,
     #[msg("Arithmetic overflow encountered")]
     ArithmeticOverflow,
+    #[msg("Energy pass purchase limit reached for the current window")]
+    TooManyPassPurchases,
+    #[msg("Energy pass usage limit reached for the current window")]
+    TooManyPassUses,
+    #[msg("No energy passes available")]
+    InsufficientEnergyPasses,
+    #[msg("Invalid USDC mint provided")]
+    InvalidUsdcMint,
+    #[msg("USDC account does not belong to the expected authority")]
+    InvalidUsdcAccount,
+    #[msg("Invalid USDC treasury account provided")]
+    InvalidUsdcTreasury,
+    #[msg("Invalid quantity for energy pass purchase")]
+    InvalidEnergyPassQuantity,
 }
