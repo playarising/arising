@@ -664,6 +664,20 @@ fn mint_resource_reward<'info>(
     );
 
     if mint_account.data_is_empty() {
+        require_keys_eq!(
+            *mint_account.owner,
+            system_program.key(),
+            ArisingError::InvalidResourceMint
+        );
+    } else {
+        require_keys_eq!(
+            *mint_account.owner,
+            token_program.key(),
+            ArisingError::InvalidResourceMint
+        );
+    }
+
+    if mint_account.data_is_empty() {
         initialize_resource_mint(
             mint_state,
             token_program,
@@ -677,6 +691,11 @@ fn mint_resource_reward<'info>(
     }
 
     if destination_account_info.data_is_empty() {
+        require_keys_eq!(
+            *destination_account_info.owner,
+            system_program.key(),
+            ArisingError::InvalidResourceAccount
+        );
         associated_token::create(CpiContext::new(
             associated_token_program.to_account_info(),
             associated_token::Create {
@@ -786,6 +805,12 @@ fn consume_resource_from_user<'info>(
     )?;
     let mint_info = mint_account.clone();
     let source_info = source_account_info.clone();
+
+    require_keys_eq!(
+        *source_account_info.owner,
+        token_program.key(),
+        ArisingError::InvalidResourceAccount
+    );
 
     let source_account = Account::<TokenAccount>::try_from(source_account_info)
         .map_err(|_| ArisingError::InvalidResourceAccount)?;
@@ -988,15 +1013,17 @@ fn mint_equipment_resource<'info>(
 /// Helper that clones remaining accounts and allows O(1) lookup/removal by resource kind.
 struct ResourceAccountCollector<'info> {
     program_id: Pubkey,
-    accounts: Vec<&'info AccountInfo<'info>>,
+    accounts: &'info [AccountInfo<'info>],
+    used: Vec<bool>,
 }
 
 impl<'info> ResourceAccountCollector<'info> {
-    /// Copies the remaining accounts slice to allow flexible consumption order.
+    /// Copies references to the remaining accounts and tracks consumption state.
     fn new(source: &'info [AccountInfo<'info>], program_id: &Pubkey) -> Self {
         Self {
             program_id: *program_id,
-            accounts: source.iter().collect(),
+            accounts: source,
+            used: vec![false; source.len()],
         }
     }
 
@@ -1016,24 +1043,27 @@ impl<'info> ResourceAccountCollector<'info> {
             &[RESOURCE_MINT_SEED, resource.seed_bytes()],
             &self.program_id,
         );
-
-        let mint_index = self
-            .accounts
-            .iter()
-            .position(|info| info.key() == expected_mint)
-            .ok_or(missing_error)?;
-        let mint_info = self.accounts.remove(mint_index);
+        let mint_info = self.take_account(expected_mint, missing_error)?;
 
         let expected_ata =
             associated_token::get_associated_token_address(authority, &expected_mint);
-        let ata_index = self
-            .accounts
-            .iter()
-            .position(|info| info.key() == expected_ata)
-            .ok_or(missing_error)?;
-        let ata_info = self.accounts.remove(ata_index);
+        let ata_info = self.take_account(expected_ata, missing_error)?;
 
         Ok((mint_info, ata_info))
+    }
+
+    fn take_account(
+        &mut self,
+        key: Pubkey,
+        missing_error: ArisingError,
+    ) -> Result<&'info AccountInfo<'info>> {
+        for (idx, info) in self.accounts.iter().enumerate() {
+            if info.key() == key && !self.used[idx] {
+                self.used[idx] = true;
+                return Ok(info);
+            }
+        }
+        Err(missing_error.into())
     }
 }
 
