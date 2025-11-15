@@ -45,21 +45,16 @@ pub mod arising {
     use super::*;
 
     /// Initializes the on-chain mint state and collection PDAs.
-    pub fn initialize(
-        mut ctx: Context<Initialize>,
-        collection_name: String,
-        collection_symbol: String,
-        collection_uri: String,
-    ) -> Result<()> {
+    pub fn initialize(mut ctx: Context<Initialize>) -> Result<()> {
         initialize_collection(
             &mut ctx.accounts,
             ctx.program_id,
             ctx.bumps.mint_state,
             ctx.bumps.collection_mint,
             ctx.bumps.collection_token_account,
-            collection_name,
-            collection_symbol,
-            collection_uri,
+            "Arising: Characters".to_string(),
+            "ARISE".to_string(),
+            "https://mints.playarising.com/collection".to_string(),
         )
     }
 

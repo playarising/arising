@@ -33,33 +33,42 @@ This command covers:
 
 The `--nocapture` flag prints LiteSVM logs directly if a test fails.
 
-## Gated Minting
+## Deploying to Devnet/Mainnet
 
-Character minting is protected by a gate authority so only the website (or an
-approved backend) can trigger `mintCharacter`. During `initialize` the
-`mint_state` PDA records the authority public key. Every call to
-`mintCharacter` must now include a `mintAuthority` signer that matches this
-stored key. The signer does not pay for the transaction—it simply approves the
-mint alongside the user’s wallet.
+The TypeScript helper `migrations/deploy-script.ts` automates the one-time
+`initialize` call on public clusters,
+provisioning the collection mint, metadata PDAs, and the program-owned USDC
+treasury ATA. The script enforces the real USDC mint for the selected cluster:
 
-A minimal TypeScript example lives at `tests/gated-mint.test.ts`. Run it with
-`ts-node`/`bun` after executing the `initialize` instruction (or on a cluster
-where the collection PDAs already exist). The script demonstrates:
+- Devnet USDC mint: `4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU`
+- Mainnet USDC mint: `EPjFWdd5AufqSSqeM2qCAqsD5cBA2kp4iAd4tkDWTLCh`
 
-1. Deriving the required PDAs for the mint state, character PDA, and metadata
-   accounts.
-2. Showing that a mint without the gate authority signature fails with the
-   `Unauthorized` error.
-3. Including the website signer when invoking `mintCharacter`.
+Run the deployer after `anchor build` with a wallet that should become the mint
+authority:
 
-Use that script as a reference for wiring the website flow so every mint goes
-through the authenticated backend.
+```bash
+# Devnet
+ANCHOR_PROVIDER_URL=https://api.devnet.solana.com \
+ANCHOR_WALLET=~/.config/solana/id.json \
+anchor run deploy-devnet
+
+# Mainnet
+ANCHOR_PROVIDER_URL=https://api.mainnet-beta.solana.com \
+ANCHOR_WALLET=/path/to/mint-authority.json \
+anchor run deploy-mainnet
+```
+
+If you prefer `anchor deploy`, set `ARISING_DEPLOY_CLUSTER=devnet|mainnet` (or
+use a matching RPC endpoint) so `migrations/deploy.ts` can pick the right
+USDC mint automatically.
 
 ## Energy Refill Passes
 
 Players can buy "Energy Passes" on-chain by paying 2 USDC into the program's
 USDC treasury PDA. The treasury only accepts transfers to the program-owned ATA
-and the funds can later be withdrawn by the mint authority.
+and the funds can later be withdrawn by the mint authority. Use the native USDC
+mint for the target cluster and `initialize` will create the treasury ATA if it
+does not already exist.
 
 - Up to **5 passes** may be purchased per character every 24 hours.
 - Up to **3 passes** may be redeemed per character every 24 hours.

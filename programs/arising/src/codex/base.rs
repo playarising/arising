@@ -44,7 +44,7 @@ impl Civilization {
 
     pub fn metadata_uri(self, character_id: u16) -> String {
         format!(
-            "https://mints-{}.playarising.com/metadata/{}",
+            "https://mints.playarising.com/{}/{}",
             self.slug(),
             character_id
         )

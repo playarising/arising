@@ -5,6 +5,12 @@ skip-lint = false
 [programs.localnet]
 arising = "FLTa6pSm3WPWNPrqVu1pCuAmjgmVJkhDvyxMcSPSAfLA"
 
+[programs.devnet]
+arising = "FLTa6pSm3WPWNPrqVu1pCuAmjgmVJkhDvyxMcSPSAfLA"
+
+[programs.mainnet]
+arising = "FLTa6pSm3WPWNPrqVu1pCuAmjgmVJkhDvyxMcSPSAfLA"
+
 [registry]
 url = "https://api.apr.dev"
 
@@ -14,3 +20,5 @@ wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "cargo test"
+deploy-devnet = "node -r ts-node/register migrations/deploy-script.ts devnet"
+deploy-mainnet = "node -r ts-node/register migrations/deploy-script.ts mainnet"
