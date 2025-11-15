@@ -1,3 +1,5 @@
+//! SPL-token utilities for seeding balances inside LiteSVM tests.
+
 use crate::common::{context::TestContext, conversions};
 use anchor_lang::solana_program::instruction::AccountMeta as AnchorAccountMeta;
 use anchor_lang::solana_program::program_pack::Pack;
@@ -11,10 +13,12 @@ use spl_token::state::{Account as TokenAccount, AccountState, Mint};
 
 const RESOURCE_MINT_SEED: &[u8] = b"resource_mint";
 
+/// Returns the PDA mint for a given resource kind.
 pub fn resource_mint(resource: ResourceKind) -> AnchorPubkey {
     AnchorPubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], &arising::ID).0
 }
 
+/// Builds the mint/ATA metas required to mint rewards to `authority`.
 pub fn reward_accounts(
     authority: &AnchorPubkey,
     resources: &[ResourceKind],
@@ -32,6 +36,7 @@ pub fn reward_accounts(
         .collect()
 }
 
+/// Seeds a token account with the desired amount of a resource.
 pub fn seed_resource_balance(
     ctx: &mut TestContext,
     mint_authority: &AnchorPubkey,
@@ -79,6 +84,7 @@ pub fn seed_resource_balance(
     ctx.svm.set_account(mint_key, mint_account).unwrap();
 }
 
+/// Reads the SPL token balance for a specific resource kind.
 pub fn token_balance(ctx: &TestContext, owner: &AnchorPubkey, resource: ResourceKind) -> u64 {
     let ata = get_associated_token_address(owner, &resource_mint(resource));
     match ctx.svm.get_account(&conversions::to_solana_pubkey(ata)) {
@@ -87,6 +93,7 @@ pub fn token_balance(ctx: &TestContext, owner: &AnchorPubkey, resource: Resource
     }
 }
 
+/// Initializes the PDA mint if it has not yet been created.
 fn ensure_mint(ctx: &mut TestContext, mint_authority: AnchorPubkey, mint: AnchorPubkey) {
     let key = conversions::to_solana_pubkey(mint);
     if ctx.svm.get_account(&key).is_some() {

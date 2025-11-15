@@ -1,3 +1,5 @@
+//! Convenience wrapper around LiteSVM with Anchor-friendly helpers.
+
 use crate::common::conversions;
 use anchor_lang::error::ERROR_CODE_OFFSET;
 use anchor_lang::solana_program::pubkey::Pubkey as AnchorPubkey;
@@ -13,12 +15,14 @@ use solana_transaction::versioned::VersionedTransaction;
 use solana_transaction_error::TransactionError;
 use std::io::Cursor;
 
+/// Maintains a LiteSVM instance and payer for integration tests.
 pub struct TestContext {
     pub svm: LiteSVM,
     payer: Keypair,
 }
 
 impl TestContext {
+    /// Boots a new in-memory validator and loads the compiled program artifact.
     pub fn new() -> Self {
         let mut svm = LiteSVM::new();
         let program_bytes = load_program_bytes();
@@ -29,10 +33,12 @@ impl TestContext {
         Self { svm, payer }
     }
 
+    /// Returns the payer keypair used for unsigned transactions.
     pub fn payer(&self) -> &Keypair {
         &self.payer
     }
 
+    /// Executes a single instruction, signing with the provided signers.
     pub fn execute_instruction(
         &mut self,
         instruction: Instruction,
@@ -53,6 +59,7 @@ impl TestContext {
         result
     }
 
+    /// Writes an Anchor account into the SVM state with rent-exempt lamports.
     pub fn store_anchor_account<T: AccountSerialize>(
         &mut self,
         address: AnchorPubkey,
@@ -78,6 +85,7 @@ impl TestContext {
             .expect("account stored");
     }
 
+    /// Fetches and deserializes an Anchor account stored inside LiteSVM.
     pub fn get_anchor_account<T: AccountDeserialize>(&self, address: &AnchorPubkey) -> T {
         let data = self
             .svm
@@ -88,6 +96,7 @@ impl TestContext {
     }
 }
 
+/// Reads the deployed shared object emitted by `anchor build`.
 fn load_program_bytes() -> Vec<u8> {
     let path = format!(
         "{}/../../target/deploy/arising.so",
@@ -101,6 +110,7 @@ fn load_program_bytes() -> Vec<u8> {
     })
 }
 
+/// Additional helpers for asserting LiteSVM transaction outcomes.
 pub trait TransactionResultExt {
     fn assert_success(self);
     fn assert_success_with(self, label: &str);
@@ -108,10 +118,12 @@ pub trait TransactionResultExt {
 }
 
 impl TransactionResultExt for TransactionResult {
+    /// Panics with logs if the transaction fails.
     fn assert_success(self) {
         self.assert_success_with("transaction");
     }
 
+    /// Panics with logs and the provided label on failure.
     fn assert_success_with(self, label: &str) {
         if let Err(err) = self {
             let log_output = err.meta.pretty_logs();
@@ -119,6 +131,7 @@ impl TransactionResultExt for TransactionResult {
         }
     }
 
+    /// Verifies the transaction fails with a specific Anchor error.
     fn assert_anchor_error(self, error: ArisingError) {
         match self {
             Ok(TransactionMetadata { .. }) => {

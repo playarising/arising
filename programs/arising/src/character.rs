@@ -3,13 +3,11 @@ use std::vec::Vec;
 
 use crate::{
     codex::{
-        equipment_definition, Attributes, CharacterClass, Civilization, CoreStats,
+        equipment_definition, level_from_experience, total_attribute_points_for_level,
+        total_core_points_for_level, Attributes, CharacterClass, Civilization, CoreStats,
         EquipmentDefinition, EquipmentSlot, Gender, ResourceKind,
     },
     errors::ArisingError,
-    level_codex::{
-        level_from_experience, total_attribute_points_for_level, total_core_points_for_level,
-    },
 };
 
 pub const CHARACTER_SEED: &[u8] = b"character";
@@ -724,12 +722,9 @@ impl CharacterMintState {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
-        codex::{
-            equipment_definition, Attributes, CharacterClass, Civilization, EquipmentSlot, Gender,
-            ResourceKind,
-        },
-        level_codex::{LEVEL_CAP, LEVEL_CURVE},
+    use crate::codex::{
+        equipment_definition, Attributes, CharacterClass, Civilization, EquipmentSlot, Gender,
+        ResourceKind, LEVEL_CAP, LEVEL_CURVE,
     };
     use anchor_lang::error::Error as AnchorError;
 

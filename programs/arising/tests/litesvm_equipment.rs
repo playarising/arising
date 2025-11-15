@@ -1,3 +1,5 @@
+//! Equipment lifecycle happy-path testing.
+
 #[path = "common/mod.rs"]
 mod common;
 
@@ -10,6 +12,7 @@ use common::{
 use solana_keypair::Keypair;
 use solana_signer::Signer;
 
+/// Ensures equipping/unequipping handles swapping and mint/burn flows.
 #[test]
 fn equips_and_swaps_items() {
     let mut ctx = TestContext::new();
@@ -27,6 +30,7 @@ fn equips_and_swaps_items() {
         None,
     );
 
+    // Manually boost the character to meet equipment level requirements.
     level_character(&mut ctx, &character, 3);
 
     tokens::seed_resource_balance(
@@ -51,6 +55,7 @@ fn equips_and_swaps_items() {
         1,
     );
 
+    // Equip a right-hand sword.
     ctx.execute_instruction(
         instructions::equip_item(
             Civilization::Ard,
@@ -70,6 +75,7 @@ fn equips_and_swaps_items() {
         1
     );
 
+    // Equip a shield in the left hand, ensuring swapping works.
     let meta = ctx.execute_instruction(
         instructions::equip_item(
             Civilization::Ard,
@@ -89,6 +95,7 @@ fn equips_and_swaps_items() {
         0
     );
 
+    // Equip a two-handed weapon which should return both prior items.
     ctx.execute_instruction(
         instructions::equip_item(
             Civilization::Ard,
@@ -125,6 +132,7 @@ fn equips_and_swaps_items() {
         1
     );
 
+    // Unequip to mint the weapon back.
     ctx.execute_instruction(
         instructions::unequip_item(
             Civilization::Ard,
@@ -150,8 +158,9 @@ fn equips_and_swaps_items() {
     );
 }
 
+/// Helper that sets the character XP to the provided level for tests.
 fn level_character(ctx: &mut TestContext, character: &AnchorPubkey, target_level: u8) {
-    use arising::level_codex::LEVEL_CURVE;
+    use arising::codex::LEVEL_CURVE;
 
     let mut account = ctx.get_anchor_account::<arising::character::Character>(character);
     let mut total_xp = 0u64;

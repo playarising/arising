@@ -1,3 +1,4 @@
+//! Shared helpers for LiteSVM-based integration tests.
 #![allow(dead_code)]
 pub mod clock;
 pub mod context;

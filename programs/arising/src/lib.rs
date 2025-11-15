@@ -11,7 +11,6 @@ pub mod character;
 pub mod codex;
 pub mod collection;
 pub mod errors;
-pub mod level_codex;
 pub mod nft;
 
 use character::{
@@ -32,10 +31,19 @@ declare_id!("FLTa6pSm3WPWNPrqVu1pCuAmjgmVJkhDvyxMcSPSAfLA");
 
 const RESOURCE_MINT_SEED: &[u8] = b"resource_mint";
 
+/// Validates a character's civilization/id pairing and authority signer in a single macro call.
+macro_rules! validate_character {
+    ($character:expr, $civilization:expr, $character_id:expr, $authority:expr) => {{
+        $character.ensure_identity($civilization, $character_id)?;
+        $character.ensure_authority($authority)?;
+    }};
+}
+
 #[program]
 pub mod arising {
     use super::*;
 
+    /// Initializes the on-chain mint state and collection PDAs.
     pub fn initialize(
         mut ctx: Context<Initialize>,
         collection_name: String,
@@ -54,6 +62,7 @@ pub mod arising {
         )
     }
 
+    /// Mints a brand new character NFT and seeds the character account.
     pub fn mint_character(
         ctx: Context<MintCharacter>,
         civilization: Civilization,
@@ -108,6 +117,7 @@ pub mod arising {
         Ok(())
     }
 
+    /// Updates the mint cap for a civilization; restricted to authority.
     pub fn update_civilization_cap(
         ctx: Context<UpdateCivilizationCap>,
         civilization: Civilization,
@@ -125,6 +135,7 @@ pub mod arising {
         Ok(())
     }
 
+    /// Allocates available core stat points to a character.
     pub fn allocate_core_stats(
         ctx: Context<ModifyCharacterOwned>,
         civilization: Civilization,
@@ -132,11 +143,16 @@ pub mod arising {
         allocation: CoreStats,
     ) -> Result<()> {
         let character = &mut ctx.accounts.character;
-        character.ensure_identity(civilization, character_id)?;
-        character.ensure_authority(ctx.accounts.authority.key())?;
+        validate_character!(
+            character,
+            civilization,
+            character_id,
+            ctx.accounts.authority.key()
+        );
         character.allocate_core_stats(allocation)
     }
 
+    /// Allocates attribute points gained via leveling.
     pub fn allocate_attributes(
         ctx: Context<ModifyCharacterOwned>,
         civilization: Civilization,
@@ -144,11 +160,16 @@ pub mod arising {
         allocation: Attributes,
     ) -> Result<()> {
         let character = &mut ctx.accounts.character;
-        character.ensure_identity(civilization, character_id)?;
-        character.ensure_authority(ctx.accounts.authority.key())?;
+        validate_character!(
+            character,
+            civilization,
+            character_id,
+            ctx.accounts.authority.key()
+        );
         character.allocate_attributes(allocation)
     }
 
+    /// Records the permanent class choice for a character once requirements are met.
     pub fn choose_class(
         ctx: Context<ModifyCharacterOwned>,
         civilization: Civilization,
@@ -156,8 +177,12 @@ pub mod arising {
         class: CharacterClass,
     ) -> Result<()> {
         let character = &mut ctx.accounts.character;
-        character.ensure_identity(civilization, character_id)?;
-        character.ensure_authority(ctx.accounts.authority.key())?;
+        validate_character!(
+            character,
+            civilization,
+            character_id,
+            ctx.accounts.authority.key()
+        );
         character.ensure_min_level(10)?;
         require_eq!(
             class.civilization(),
@@ -167,6 +192,7 @@ pub mod arising {
         character.apply_class_choice(class)
     }
 
+    /// Burns character energy when a user wants to spend it manually.
     pub fn consume_energy(
         ctx: Context<ModifyCharacterOwned>,
         civilization: Civilization,
@@ -174,23 +200,33 @@ pub mod arising {
         amount: u16,
     ) -> Result<()> {
         let character = &mut ctx.accounts.character;
-        character.ensure_identity(civilization, character_id)?;
-        character.ensure_authority(ctx.accounts.authority.key())?;
+        validate_character!(
+            character,
+            civilization,
+            character_id,
+            ctx.accounts.authority.key()
+        );
         character.consume_energy(amount)
     }
 
+    /// Refills character energy if the cooldown has elapsed.
     pub fn refill_energy(
         ctx: Context<ModifyCharacterOwned>,
         civilization: Civilization,
         character_id: u16,
     ) -> Result<()> {
         let character = &mut ctx.accounts.character;
-        character.ensure_identity(civilization, character_id)?;
-        character.ensure_authority(ctx.accounts.authority.key())?;
+        validate_character!(
+            character,
+            civilization,
+            character_id,
+            ctx.accounts.authority.key()
+        );
         let now = Clock::get()?.unix_timestamp;
         character.refill_energy(now)
     }
 
+    /// Starts a quest after validating level, stats, and energy requirements.
     pub fn start_quest(
         ctx: Context<ModifyCharacterOwned>,
         civilization: Civilization,
@@ -199,8 +235,12 @@ pub mod arising {
     ) -> Result<()> {
         let quest = quest_by_id(quest_id).ok_or(ArisingError::InvalidQuest)?;
         let character = &mut ctx.accounts.character;
-        character.ensure_identity(civilization, character_id)?;
-        character.ensure_authority(ctx.accounts.authority.key())?;
+        validate_character!(
+            character,
+            civilization,
+            character_id,
+            ctx.accounts.authority.key()
+        );
         character.ensure_min_level(quest.level_required)?;
         require!(
             character.has_required_stats(quest.minimum_stats),
@@ -227,6 +267,7 @@ pub mod arising {
         Ok(())
     }
 
+    /// Claims quest rewards once the cooldown has elapsed.
     pub fn claim_quest<'info>(
         ctx: Context<'_, '_, 'info, 'info, ClaimQuest<'info>>,
         civilization: Civilization,
@@ -235,8 +276,12 @@ pub mod arising {
     ) -> Result<()> {
         let quest = quest_by_id(quest_id).ok_or(ArisingError::InvalidQuest)?;
         let character = &mut ctx.accounts.character;
-        character.ensure_identity(civilization, character_id)?;
-        character.ensure_authority(ctx.accounts.authority.key())?;
+        validate_character!(
+            character,
+            civilization,
+            character_id,
+            ctx.accounts.authority.key()
+        );
         let progress = character.ensure_active_quest()?;
         require_eq!(progress.quest_id, quest.id, ArisingError::QuestMismatch);
 
@@ -245,8 +290,8 @@ pub mod arising {
 
         let mut experience_reward: u64 = 0;
         let mut resource_rewards: Vec<ResourceRewardEvent> = Vec::new();
-        let mut remaining_accounts: Vec<&AccountInfo<'info>> =
-            ctx.remaining_accounts.iter().collect();
+        let mut resource_accounts =
+            ResourceAccountCollector::new(ctx.remaining_accounts, ctx.program_id);
 
         for reward in quest.rewards.iter().copied() {
             match reward {
@@ -262,11 +307,10 @@ pub mod arising {
                         &ctx.accounts.system_program,
                         &ctx.accounts.rent,
                         &ctx.accounts.authority,
-                        ctx.program_id,
                         ctx.bumps.mint_state,
                         resource,
                         amount,
-                        &mut remaining_accounts,
+                        &mut resource_accounts,
                     )?;
                     resource_rewards.push(reward_event);
                 }
@@ -289,6 +333,7 @@ pub mod arising {
         Ok(())
     }
 
+    /// Begins processing a recipe after validating stats, level, and resources.
     pub fn start_recipe<'info>(
         ctx: Context<'_, '_, 'info, 'info, ProcessRecipe<'info>>,
         civilization: Civilization,
@@ -297,8 +342,12 @@ pub mod arising {
     ) -> Result<()> {
         let recipe = recipe_by_id(recipe_id).ok_or(ArisingError::InvalidRecipe)?;
         let character = &mut ctx.accounts.character;
-        character.ensure_identity(civilization, character_id)?;
-        character.ensure_authority(ctx.accounts.authority.key())?;
+        validate_character!(
+            character,
+            civilization,
+            character_id,
+            ctx.accounts.authority.key()
+        );
         character.ensure_min_level(recipe.level_required)?;
         require!(
             character.has_required_stats(recipe.minimum_stats),
@@ -310,51 +359,52 @@ pub mod arising {
         character.consume_energy(energy_cost)?;
 
         let mut consumed_resources: Vec<ResourceCostEvent> = Vec::new();
-        msg!(
-            "start recipe remaining: {:?}",
-            ctx.remaining_accounts
-                .iter()
-                .map(|acc| acc.key())
-                .collect::<Vec<_>>()
-        );
-        let mut remaining_accounts: Vec<&AccountInfo<'info>> =
-            ctx.remaining_accounts.iter().collect();
+        let mut resource_accounts =
+            ResourceAccountCollector::new(ctx.remaining_accounts, ctx.program_id);
         match recipe.input {
             RecipeInput::Forge {
                 raw_material,
                 amount,
             } => {
                 let cost = consume_resource_from_user(
-                    ctx.program_id,
                     &ctx.accounts.token_program,
                     &ctx.accounts.authority,
                     raw_material,
                     amount,
-                    &mut remaining_accounts,
+                    &mut resource_accounts,
                 )?;
                 consumed_resources.push(cost);
             }
             RecipeInput::Craft {
                 base_material,
                 base_amount,
+                secondary_material,
                 gold_amount,
             } => {
                 let base_cost = consume_resource_from_user(
-                    ctx.program_id,
                     &ctx.accounts.token_program,
                     &ctx.accounts.authority,
                     base_material,
                     base_amount,
-                    &mut remaining_accounts,
+                    &mut resource_accounts,
                 )?;
                 consumed_resources.push(base_cost);
+                if let Some((secondary, amount)) = secondary_material {
+                    let extra_cost = consume_resource_from_user(
+                        &ctx.accounts.token_program,
+                        &ctx.accounts.authority,
+                        secondary,
+                        amount,
+                        &mut resource_accounts,
+                    )?;
+                    consumed_resources.push(extra_cost);
+                }
                 let gold_cost = consume_resource_from_user(
-                    ctx.program_id,
                     &ctx.accounts.token_program,
                     &ctx.accounts.authority,
                     ResourceKind::Gold,
                     gold_amount,
-                    &mut remaining_accounts,
+                    &mut resource_accounts,
                 )?;
                 consumed_resources.push(gold_cost);
             }
@@ -378,6 +428,7 @@ pub mod arising {
         Ok(())
     }
 
+    /// Mints recipe outputs after processing time completes.
     pub fn claim_recipe<'info>(
         ctx: Context<'_, '_, 'info, 'info, ProcessRecipe<'info>>,
         civilization: Civilization,
@@ -386,8 +437,12 @@ pub mod arising {
     ) -> Result<()> {
         let recipe = recipe_by_id(recipe_id).ok_or(ArisingError::InvalidRecipe)?;
         let character = &mut ctx.accounts.character;
-        character.ensure_identity(civilization, character_id)?;
-        character.ensure_authority(ctx.accounts.authority.key())?;
+        validate_character!(
+            character,
+            civilization,
+            character_id,
+            ctx.accounts.authority.key()
+        );
         let progress = character.ensure_active_recipe()?;
         require_eq!(progress.recipe_id, recipe.id, ArisingError::RecipeMismatch);
 
@@ -395,8 +450,8 @@ pub mod arising {
         require!(now >= progress.ready_at, ArisingError::RecipeNotReady);
 
         let mut outputs: Vec<ResourceRewardEvent> = Vec::new();
-        let mut remaining_accounts: Vec<&AccountInfo<'info>> =
-            ctx.remaining_accounts.iter().collect();
+        let mut resource_accounts =
+            ResourceAccountCollector::new(ctx.remaining_accounts, ctx.program_id);
         match recipe.output {
             RecipeOutput::Resource { resource, amount } => {
                 let event = mint_resource_reward(
@@ -406,11 +461,10 @@ pub mod arising {
                     &ctx.accounts.system_program,
                     &ctx.accounts.rent,
                     &ctx.accounts.authority,
-                    ctx.program_id,
                     ctx.bumps.mint_state,
                     resource,
                     amount,
-                    &mut remaining_accounts,
+                    &mut resource_accounts,
                 )?;
                 outputs.push(event);
             }
@@ -431,6 +485,7 @@ pub mod arising {
         Ok(())
     }
 
+    /// Equips an item, burning the token and minting any swapped-out items back.
     pub fn equip_item<'info>(
         ctx: Context<'_, '_, 'info, 'info, ManageEquipment<'info>>,
         civilization: Civilization,
@@ -442,8 +497,12 @@ pub mod arising {
             .ok_or(ArisingError::ItemNotEquippable)?;
         let resource = definition.resource;
         let character = &mut ctx.accounts.character;
-        character.ensure_identity(civilization, character_id)?;
-        character.ensure_authority(ctx.accounts.authority.key())?;
+        validate_character!(
+            character,
+            civilization,
+            character_id,
+            ctx.accounts.authority.key()
+        );
 
         let authority_key = ctx.accounts.authority.key();
         let burn_accounts = equipment_account_pair(
@@ -491,6 +550,7 @@ pub mod arising {
         Ok(())
     }
 
+    /// Unequips an item, minting the resource token back to the player.
     pub fn unequip_item<'info>(
         ctx: Context<'_, '_, 'info, 'info, ManageEquipment<'info>>,
         civilization: Civilization,
@@ -498,8 +558,12 @@ pub mod arising {
         slot: EquipmentSlot,
     ) -> Result<()> {
         let character = &mut ctx.accounts.character;
-        character.ensure_identity(civilization, character_id)?;
-        character.ensure_authority(ctx.accounts.authority.key())?;
+        validate_character!(
+            character,
+            civilization,
+            character_id,
+            ctx.accounts.authority.key()
+        );
 
         let removed_resource = character.unequip_slot(slot)?;
         let authority_key = ctx.accounts.authority.key();
@@ -528,6 +592,7 @@ pub mod arising {
         Ok(())
     }
 
+    /// Emits a rich metadata view of the character account for clients.
     pub fn get_character_metadata(
         ctx: Context<GetCharacterMetadata>,
         civilization: Civilization,
@@ -572,6 +637,7 @@ pub mod arising {
     }
 }
 
+/// Locates the expected mint/ATA pair and mints SPL tokens for recipe/quest rewards.
 fn mint_resource_reward<'info>(
     mint_state: &Account<'info, CharacterMintState>,
     token_program: &Program<'info, Token>,
@@ -579,37 +645,38 @@ fn mint_resource_reward<'info>(
     system_program: &Program<'info, System>,
     rent: &Sysvar<'info, Rent>,
     authority: &Signer<'info>,
-    program_id: &Pubkey,
     mint_state_bump: u8,
     resource: ResourceKind,
     amount: u64,
-    remaining_accounts: &mut Vec<&'info AccountInfo<'info>>,
+    remaining_accounts: &mut ResourceAccountCollector<'info>,
 ) -> Result<ResourceRewardEvent> {
     let authority_key = authority.key();
-    let (mint_info, destination_info) = take_resource_accounts(
-        program_id,
+    let (mint_account, destination_account_info) = remaining_accounts.take(
         &authority_key,
         resource,
-        remaining_accounts,
         ArisingError::MissingRewardAccounts,
     )?;
-    let (_, mint_bump) =
-        Pubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], program_id);
+    let mint_info = mint_account.clone();
+    let destination_info = destination_account_info.clone();
+    let (_, mint_bump) = Pubkey::find_program_address(
+        &[RESOURCE_MINT_SEED, resource.seed_bytes()],
+        remaining_accounts.program_id(),
+    );
 
-    if mint_info.data_is_empty() {
+    if mint_account.data_is_empty() {
         initialize_resource_mint(
             mint_state,
             token_program,
             system_program,
             rent,
             authority,
-            mint_info,
+            &mint_info,
             resource,
             mint_bump,
         )?;
     }
 
-    if destination_info.data_is_empty() {
+    if destination_account_info.data_is_empty() {
         associated_token::create(CpiContext::new(
             associated_token_program.to_account_info(),
             associated_token::Create {
@@ -623,7 +690,7 @@ fn mint_resource_reward<'info>(
         ))?;
     }
 
-    let destination_account = Account::<TokenAccount>::try_from(destination_info)
+    let destination_account = Account::<TokenAccount>::try_from(destination_account_info)
         .map_err(|_| ArisingError::InvalidResourceAccount)?;
     require_keys_eq!(
         destination_account.owner,
@@ -658,6 +725,7 @@ fn mint_resource_reward<'info>(
     })
 }
 
+/// Creates the PDA mint for a resource kind if it does not yet exist.
 fn initialize_resource_mint<'info>(
     mint_state: &Account<'info, CharacterMintState>,
     token_program: &Program<'info, Token>,
@@ -702,24 +770,24 @@ fn initialize_resource_mint<'info>(
     Ok(())
 }
 
+/// Burns resource tokens from the authority, returning the accounting event entry.
 fn consume_resource_from_user<'info>(
-    program_id: &Pubkey,
     token_program: &Program<'info, Token>,
     authority: &Signer<'info>,
     resource: ResourceKind,
     amount: u64,
-    remaining_accounts: &mut Vec<&'info AccountInfo<'info>>,
+    remaining_accounts: &mut ResourceAccountCollector<'info>,
 ) -> Result<ResourceCostEvent> {
     let authority_key = authority.key();
-    let (mint_info, source_info) = take_resource_accounts(
-        program_id,
+    let (mint_account, source_account_info) = remaining_accounts.take(
         &authority_key,
         resource,
-        remaining_accounts,
         ArisingError::MissingRecipeAccounts,
     )?;
+    let mint_info = mint_account.clone();
+    let source_info = source_account_info.clone();
 
-    let source_account = Account::<TokenAccount>::try_from(source_info)
+    let source_account = Account::<TokenAccount>::try_from(source_account_info)
         .map_err(|_| ArisingError::InvalidResourceAccount)?;
     require_keys_eq!(
         source_account.owner,
@@ -747,45 +815,7 @@ fn consume_resource_from_user<'info>(
     Ok(ResourceCostEvent { resource, amount })
 }
 
-fn take_resource_accounts<'info>(
-    program_id: &Pubkey,
-    authority: &Pubkey,
-    resource: ResourceKind,
-    accounts: &mut Vec<&'info AccountInfo<'info>>,
-    missing_error: ArisingError,
-) -> Result<(&'info AccountInfo<'info>, &'info AccountInfo<'info>)> {
-    let (expected_mint, _) =
-        Pubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], program_id);
-    let mint_index = accounts
-        .iter()
-        .position(|info| info.key() == expected_mint)
-        .ok_or_else(|| {
-            msg!(
-                "missing mint {:?} accounts: {:?}",
-                resource,
-                accounts.iter().map(|acc| acc.key()).collect::<Vec<_>>()
-            );
-            missing_error
-        })?;
-    let mint_info = accounts.remove(mint_index);
-
-    let expected_ata = associated_token::get_associated_token_address(authority, &expected_mint);
-    let ata_index = accounts
-        .iter()
-        .position(|info| info.key() == expected_ata)
-        .ok_or_else(|| {
-            msg!(
-                "missing ata {:?} accounts: {:?}",
-                resource,
-                accounts.iter().map(|acc| acc.key()).collect::<Vec<_>>()
-            );
-            missing_error
-        })?;
-    let ata_info = accounts.remove(ata_index);
-
-    Ok((mint_info, ata_info))
-}
-
+/// Fetches the mint/account pair for equipment resources from the remaining accounts.
 fn equipment_account_pair<'info>(
     program_id: &Pubkey,
     accounts: &'info [AccountInfo<'info>],
@@ -810,6 +840,7 @@ fn equipment_account_pair<'info>(
     Ok([mint_info, token_info])
 }
 
+/// Burns an equipment token from the owner's ATA prior to equipping.
 fn burn_equipment_resource<'info>(
     program_id: &Pubkey,
     token_program: &Program<'info, Token>,
@@ -860,6 +891,7 @@ fn burn_equipment_resource<'info>(
     Ok(())
 }
 
+/// Mints an equipment token back to the owner when a slot is vacated.
 fn mint_equipment_resource<'info>(
     mint_state: &Account<'info, CharacterMintState>,
     token_program: &Program<'info, Token>,
@@ -951,6 +983,58 @@ fn mint_equipment_resource<'info>(
     )?;
 
     Ok(())
+}
+
+/// Helper that clones remaining accounts and allows O(1) lookup/removal by resource kind.
+struct ResourceAccountCollector<'info> {
+    program_id: Pubkey,
+    accounts: Vec<&'info AccountInfo<'info>>,
+}
+
+impl<'info> ResourceAccountCollector<'info> {
+    /// Copies the remaining accounts slice to allow flexible consumption order.
+    fn new(source: &'info [AccountInfo<'info>], program_id: &Pubkey) -> Self {
+        Self {
+            program_id: *program_id,
+            accounts: source.iter().collect(),
+        }
+    }
+
+    /// Returns the cached program id used to derive PDAs.
+    fn program_id(&self) -> &Pubkey {
+        &self.program_id
+    }
+
+    /// Removes and returns the mint + ATA pair for the requested resource.
+    fn take(
+        &mut self,
+        authority: &Pubkey,
+        resource: ResourceKind,
+        missing_error: ArisingError,
+    ) -> Result<(&'info AccountInfo<'info>, &'info AccountInfo<'info>)> {
+        let (expected_mint, _) = Pubkey::find_program_address(
+            &[RESOURCE_MINT_SEED, resource.seed_bytes()],
+            &self.program_id,
+        );
+
+        let mint_index = self
+            .accounts
+            .iter()
+            .position(|info| info.key() == expected_mint)
+            .ok_or(missing_error)?;
+        let mint_info = self.accounts.remove(mint_index);
+
+        let expected_ata =
+            associated_token::get_associated_token_address(authority, &expected_mint);
+        let ata_index = self
+            .accounts
+            .iter()
+            .position(|info| info.key() == expected_ata)
+            .ok_or(missing_error)?;
+        let ata_info = self.accounts.remove(ata_index);
+
+        Ok((mint_info, ata_info))
+    }
 }
 
 #[derive(Accounts)]

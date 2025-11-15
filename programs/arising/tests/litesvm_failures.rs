@@ -1,3 +1,5 @@
+//! Failure-mode coverage for quests, recipes, and permissions.
+
 #[path = "common/mod.rs"]
 mod common;
 
@@ -10,6 +12,7 @@ use common::{
 use solana_keypair::Keypair;
 use solana_signer::Signer;
 
+/// Verifies quests cannot be claimed before their cooldown expires.
 #[test]
 fn cannot_claim_before_ready() {
     let mut ctx = TestContext::new();
@@ -26,12 +29,14 @@ fn cannot_claim_before_ready() {
         None,
     );
 
+    // Start the quest but do not advance the clock long enough.
     ctx.execute_instruction(
         instructions::start_quest(Civilization::Ard, 1, 1, gatherer, authority_pk),
         &[&authority],
     )
     .assert_success();
 
+    // Attempt to claim and expect an Anchor error.
     ctx.execute_instruction(
         instructions::claim_quest(
             Civilization::Ard,
@@ -47,6 +52,7 @@ fn cannot_claim_before_ready() {
     .assert_anchor_error(ArisingError::QuestNotReady);
 }
 
+/// Ensures stat requirements are enforced during quest start.
 #[test]
 fn quest_requires_stats() {
     let mut ctx = TestContext::new();
@@ -69,6 +75,7 @@ fn quest_requires_stats() {
     .assert_anchor_error(ArisingError::QuestRequirementsNotMet);
 }
 
+/// Validates recipe processing errors when accounts point at the wrong mint.
 #[test]
 fn recipe_consumes_available_resources() {
     let mut ctx = TestContext::new();
@@ -93,6 +100,7 @@ fn recipe_consumes_available_resources() {
         100,
     );
 
+    // Provide only the gold accounts, which should trip validation.
     ctx.execute_instruction(
         instructions::start_recipe(
             Civilization::Ard,
@@ -101,9 +109,9 @@ fn recipe_consumes_available_resources() {
             crafter,
             authority_pk,
             mint_state,
-            tokens::reward_accounts(&authority_pk, &recipes::recipe_input_resources(2)),
+            recipes::recipe_input_accounts(&authority_pk, 2),
         ),
         &[&authority],
     )
-    .assert_anchor_error(ArisingError::InvalidResourceMint);
+    .assert_anchor_error(ArisingError::InvalidResourceAccount);
 }

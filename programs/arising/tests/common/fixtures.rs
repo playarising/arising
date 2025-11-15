@@ -1,3 +1,5 @@
+//! Builders for PDA accounts needed during LiteSVM tests.
+
 use crate::common::{context::TestContext, conversions};
 use anchor_lang::solana_program::pubkey::Pubkey as AnchorPubkey;
 use arising::character::{
@@ -7,6 +9,7 @@ use arising::character::{
 use arising::codex::{Attributes, Civilization, CoreStats, Gender};
 use solana_keypair::Keypair;
 
+/// Creates and stores the mint state PDA with default civilization caps.
 pub fn create_mint_state(ctx: &mut TestContext) -> AnchorPubkey {
     let (mint_state, bump) =
         AnchorPubkey::find_program_address(&[CHARACTER_MINT_STATE_SEED], &arising::ID);
@@ -23,6 +26,7 @@ pub fn create_mint_state(ctx: &mut TestContext) -> AnchorPubkey {
     mint_state
 }
 
+/// Writes a character account matching the PDA derivation used on-chain.
 pub fn create_character(
     ctx: &mut TestContext,
     civilization: Civilization,

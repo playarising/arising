@@ -1,19 +1,26 @@
+//! Helpers for deriving recipe resource metadata used in tests.
+
 use crate::common::tokens;
 use anchor_lang::solana_program::{
     instruction::AccountMeta as AnchorAccountMeta, pubkey::Pubkey as AnchorPubkey,
 };
 use arising::codex::{recipe_by_id, RecipeInput, RecipeOutput, ResourceKind};
 
+/// Returns the ordered list of resource inputs required for a recipe.
 pub fn recipe_input_resources(recipe_id: u16) -> Vec<ResourceKind> {
     let recipe = recipe_by_id(recipe_id).expect("invalid recipe id");
     match recipe.input {
         RecipeInput::Forge { raw_material, .. } => vec![raw_material],
         RecipeInput::Craft {
             base_material,
+            secondary_material,
             gold_amount,
             ..
         } => {
             let mut resources = vec![base_material];
+            if let Some((secondary, _)) = secondary_material {
+                resources.push(secondary);
+            }
             if gold_amount > 0 {
                 resources.push(ResourceKind::Gold);
             }
@@ -22,6 +29,7 @@ pub fn recipe_input_resources(recipe_id: u16) -> Vec<ResourceKind> {
     }
 }
 
+/// Returns the resource outputs produced by a recipe.
 pub fn recipe_output_resources(recipe_id: u16) -> Vec<ResourceKind> {
     let recipe = recipe_by_id(recipe_id).expect("invalid recipe id");
     match recipe.output {
@@ -29,6 +37,7 @@ pub fn recipe_output_resources(recipe_id: u16) -> Vec<ResourceKind> {
     }
 }
 
+/// Builds mint/ATA metas for recipe inputs owned by `authority`.
 pub fn recipe_input_accounts(authority: &AnchorPubkey, recipe_id: u16) -> Vec<AnchorAccountMeta> {
     let resources = recipe_input_resources(recipe_id);
     let accounts = tokens::reward_accounts(authority, &resources);
@@ -36,6 +45,7 @@ pub fn recipe_input_accounts(authority: &AnchorPubkey, recipe_id: u16) -> Vec<An
     accounts
 }
 
+/// Builds mint/ATA metas for recipe outputs owned by `authority`.
 pub fn recipe_output_accounts(authority: &AnchorPubkey, recipe_id: u16) -> Vec<AnchorAccountMeta> {
     let resources = recipe_output_resources(recipe_id);
     let accounts = tokens::reward_accounts(authority, &resources);
@@ -66,6 +76,6 @@ mod tests {
     #[test]
     fn forge_input_returns_raw_material() {
         let resources = recipe_input_resources(1);
-        assert_eq!(resources, vec![ResourceKind::Log]);
+        assert_eq!(resources, vec![ResourceKind::Wood]);
     }
 }

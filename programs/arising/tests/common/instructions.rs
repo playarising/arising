@@ -1,3 +1,5 @@
+//! Builders for invoking program instructions inside LiteSVM tests.
+
 use crate::common::conversions;
 use anchor_lang::solana_program::instruction::AccountMeta as AnchorAccountMeta;
 use anchor_lang::solana_program::pubkey::Pubkey as AnchorPubkey;
@@ -6,10 +8,12 @@ use arising::accounts;
 use arising::codex::{equipment_definition_index, Civilization, EquipmentSlot, ResourceKind};
 use solana_instruction::Instruction;
 
+/// Converts Anchor instructions to native Solana instructions.
 fn convert_instruction(ix: anchor_lang::solana_program::instruction::Instruction) -> Instruction {
     conversions::convert_instruction(ix)
 }
 
+/// Builds a `start_quest` instruction for the provided character.
 pub fn start_quest(
     civilization: Civilization,
     character_id: u16,
@@ -33,6 +37,7 @@ pub fn start_quest(
     })
 }
 
+/// Builds a `claim_quest` instruction with the provided reward accounts.
 pub fn claim_quest(
     civilization: Civilization,
     character_id: u16,
@@ -65,6 +70,7 @@ pub fn claim_quest(
     })
 }
 
+/// Builds a `start_recipe` instruction including the remaining resource accounts.
 pub fn start_recipe(
     civilization: Civilization,
     character_id: u16,
@@ -97,6 +103,7 @@ pub fn start_recipe(
     })
 }
 
+/// Builds a `claim_recipe` instruction wiring the reward accounts.
 pub fn claim_recipe(
     civilization: Civilization,
     character_id: u16,
@@ -129,6 +136,7 @@ pub fn claim_recipe(
     })
 }
 
+/// Builds an `equip_item` instruction for the given slot/resource.
 pub fn equip_item(
     civilization: Civilization,
     character_id: u16,
@@ -150,6 +158,7 @@ pub fn equip_item(
     }
     .to_account_metas(None);
     accounts.extend(resource_accounts);
+    let definition_index = equipment_definition_index(resource).expect("equipment index") as u8;
     convert_instruction(anchor_lang::solana_program::instruction::Instruction {
         program_id: arising::ID,
         accounts,
@@ -157,12 +166,13 @@ pub fn equip_item(
             civilization,
             character_id,
             slot,
-            definition_index: equipment_definition_index(resource).expect("equipment index") as u8,
+            definition_index,
         }
         .data(),
     })
 }
 
+/// Builds an `unequip_item` instruction.
 pub fn unequip_item(
     civilization: Civilization,
     character_id: u16,
@@ -195,6 +205,7 @@ pub fn unequip_item(
     })
 }
 
+/// Builds an authority-only instruction to update a civilization cap.
 pub fn update_civilization_cap(
     mint_state: AnchorPubkey,
     authority: AnchorPubkey,

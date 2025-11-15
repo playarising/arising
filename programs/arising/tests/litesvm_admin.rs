@@ -1,3 +1,5 @@
+//! Administrative guard-rail tests.
+
 #[path = "common/mod.rs"]
 mod common;
 
@@ -10,12 +12,14 @@ use common::{
 use solana_keypair::Keypair;
 use solana_signer::Signer;
 
+/// Ensures only the contract authority can update civilization caps.
 #[test]
 fn update_cap_requires_authority() {
     let mut ctx = TestContext::new();
     let mint_state = fixtures::create_mint_state(&mut ctx);
 
     let authority = ctx.payer();
+    // Signed by authority: succeeds.
     ctx.execute_instruction(
         instructions::update_civilization_cap(
             mint_state,
@@ -29,6 +33,7 @@ fn update_cap_requires_authority() {
 
     let outsider = Keypair::new();
     ctx.svm.airdrop(&outsider.pubkey(), 1_000_000_000).unwrap();
+    // Outsider attempt must fail with Unauthorized.
     ctx.execute_instruction(
         instructions::update_civilization_cap(
             mint_state,
