@@ -15,7 +15,14 @@ interface ClusterConfig {
   usdcMint: PublicKey;
 }
 
-const PROGRAM_ID = new PublicKey("FLTa6pSm3WPWNPrqVu1pCuAmjgmVJkhDvyxMcSPSAfLA");
+/**
+ * Program ID resolution:
+ * - Allow overriding via env (useful for deploying to a freshly created program address)
+ * - Fall back to the IDL address (kept in sync with Anchor.toml / declare_id!)
+ */
+const PROGRAM_ID = new PublicKey(
+  process.env.ARISING_PROGRAM_ID ?? idlJson.address,
+);
 
 const TOKEN_METADATA_PROGRAM_ID = new PublicKey(
   "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s",
@@ -42,6 +49,19 @@ type ArisingIdl = anchor.Idl & Arising;
 type ArisingProgram = anchor.Program<ArisingIdl>;
 
 const idl: ArisingIdl = idlJson as ArisingIdl;
+
+async function ensureProgramIsDeployed(
+  provider: anchor.AnchorProvider,
+  programId: PublicKey,
+): Promise<void> {
+  const accountInfo = await provider.connection.getAccountInfo(programId);
+  if (!accountInfo || !accountInfo.executable) {
+    throw new Error(
+      `Program ${programId.toBase58()} is not deployed to ${provider.connection.rpcEndpoint}. ` +
+        "Deploy the program (e.g. `anchor deploy --provider.cluster devnet`) or set ARISING_PROGRAM_ID to the deployed address.",
+    );
+  }
+}
 
 function metadataPda(mint: PublicKey): PublicKey {
   return PublicKey.findProgramAddressSync(
@@ -138,6 +158,7 @@ export async function runDeployment(
   }
 
   const program = getProgram(provider);
+  await ensureProgramIsDeployed(provider, program.programId);
   const [mintState] = PublicKey.findProgramAddressSync(
     [SEEDS.mintState],
     program.programId,
