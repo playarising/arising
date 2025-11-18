@@ -12,15 +12,10 @@ pub fn recipe_input_resources(recipe_id: u16) -> Vec<ResourceKind> {
     match recipe.input {
         RecipeInput::Forge { raw_material, .. } => vec![raw_material],
         RecipeInput::Craft {
-            base_material,
-            secondary_material,
+            materials,
             gold_amount,
-            ..
         } => {
-            let mut resources = vec![base_material];
-            if let Some((secondary, _)) = secondary_material {
-                resources.push(secondary);
-            }
+            let mut resources = materials.iter().map(|m| m.kind).collect::<Vec<_>>();
             if gold_amount > 0 {
                 resources.push(ResourceKind::Gold);
             }

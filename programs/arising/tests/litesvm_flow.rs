@@ -141,16 +141,25 @@ fn quest_and_recipe_flow() {
         2
     );
 
-    // Craft a wooden sword using the planks and gold
+    // Seed leather needed for the crafted weapon
+    tokens::seed_resource_balance(
+        &mut ctx,
+        &mint_state,
+        &authority_pk,
+        ResourceKind::Leather,
+        1,
+    );
+
+    // Craft a wooden sword using the planks, leather, and gold
     ctx.execute_instruction(
         instructions::start_recipe(
             Civilization::Ard,
             3,
-            2,
+            18,
             crafter,
             authority_pk,
             mint_state,
-            recipes::recipe_input_accounts(&authority_pk, 2),
+            recipes::recipe_input_accounts(&authority_pk, 18),
         ),
         &[&authority],
     )
@@ -160,11 +169,11 @@ fn quest_and_recipe_flow() {
         instructions::claim_recipe(
             Civilization::Ard,
             3,
-            2,
+            18,
             crafter,
             authority_pk,
             mint_state,
-            recipes::recipe_output_accounts(&authority_pk, 2),
+            recipes::recipe_output_accounts(&authority_pk, 18),
         ),
         &[&authority],
     )
@@ -179,7 +188,7 @@ fn quest_and_recipe_flow() {
         0
     );
     assert_eq!(
-        tokens::token_balance(&ctx, &authority_pk, ResourceKind::WoodenSword),
+        tokens::token_balance(&ctx, &authority_pk, ResourceKind::WoodSword),
         1
     );
 

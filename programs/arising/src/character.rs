@@ -1075,44 +1075,45 @@ mod tests {
     #[test]
     fn equipping_items_swaps_existing_slots() {
         let mut character = sample_character(Civilization::Ard);
-        let sword = equipment_definition(ResourceKind::WoodenSword).unwrap();
-        let shield = equipment_definition(ResourceKind::WoodenShield).unwrap();
-        let greatsword = equipment_definition(ResourceKind::TrainingGreatsword).unwrap();
+        let sword = equipment_definition(ResourceKind::WoodSword).unwrap();
+        let shield = equipment_definition(ResourceKind::WoodBigShield).unwrap();
+        let halberd = equipment_definition(ResourceKind::WoodHalberd).unwrap();
 
-        grant_levels(&mut character, 3);
+        character.experience = 1_000_000; // ensure high level for any requirement
+        grant_levels(&mut character, 10);
 
         character
             .equip_item(EquipmentSlot::RightHand, sword)
             .expect("equip sword");
-        assert_eq!(character.equipment_attributes.atk, 2);
+        assert_eq!(character.equipment_attributes.atk, 5);
 
         character
             .equip_item(EquipmentSlot::LeftHand, shield)
             .expect("equip shield");
-        assert_eq!(character.equipment_attributes.def, 2);
+        assert_eq!(character.equipment_attributes.def, 4);
 
         let removed = character
-            .equip_item(EquipmentSlot::LeftHand, greatsword)
+            .equip_item(EquipmentSlot::LeftHand, halberd)
             .expect("equip two handed");
         assert_eq!(removed.len(), 2);
-        assert!(removed.contains(&ResourceKind::WoodenSword));
-        assert!(removed.contains(&ResourceKind::WoodenShield));
-        assert_eq!(character.equipment_attributes.atk, 4);
-        assert_eq!(character.equipment_attributes.def, 0);
+        assert!(removed.contains(&ResourceKind::WoodSword));
+        assert!(removed.contains(&ResourceKind::WoodBigShield));
+        assert_eq!(character.equipment_attributes.atk, 8);
+        assert_eq!(character.equipment_attributes.def, 2);
     }
 
     #[test]
     fn unequipping_two_handed_from_secondary_slot_clears_item() {
         let mut character = sample_character(Civilization::Ard);
-        let greatsword = equipment_definition(ResourceKind::TrainingGreatsword).unwrap();
-        grant_levels(&mut character, 3);
+        let halberd = equipment_definition(ResourceKind::WoodHalberd).unwrap();
+        grant_levels(&mut character, 10);
         character
-            .equip_item(EquipmentSlot::RightHand, greatsword)
+            .equip_item(EquipmentSlot::RightHand, halberd)
             .expect("equip two handed");
         let removed = character
             .unequip_slot(EquipmentSlot::LeftHand)
             .expect("unequip from off hand");
-        assert_eq!(removed, ResourceKind::TrainingGreatsword);
+        assert_eq!(removed, ResourceKind::WoodHalberd);
         assert!(character.equipment.slots[EquipmentSlot::LeftHand as usize]
             .item
             .is_none());
@@ -1125,15 +1126,15 @@ mod tests {
     #[test]
     fn equipment_respects_level_requirement() {
         let mut character = sample_character(Civilization::Ard);
-        let greatsword = equipment_definition(ResourceKind::TrainingGreatsword).unwrap();
+        let halberd = equipment_definition(ResourceKind::WoodHalberd).unwrap();
         let err = character
-            .equip_item(EquipmentSlot::RightHand, greatsword)
+            .equip_item(EquipmentSlot::RightHand, halberd)
             .unwrap_err();
         assert_error(err, ArisingError::EquipmentLevelRequirement);
 
-        grant_levels(&mut character, 3);
+        grant_levels(&mut character, 5);
         character
-            .equip_item(EquipmentSlot::RightHand, greatsword)
+            .equip_item(EquipmentSlot::RightHand, halberd)
             .expect("level requirement met");
     }
 }

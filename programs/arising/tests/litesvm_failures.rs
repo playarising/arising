@@ -107,11 +107,11 @@ fn recipe_consumes_available_resources() {
         instructions::start_recipe(
             Civilization::Ard,
             9,
-            2,
+            17,
             crafter,
             authority_pk,
             mint_state,
-            recipes::recipe_input_accounts(&authority_pk, 2),
+            recipes::recipe_input_accounts(&authority_pk, 17),
         ),
         &[&authority],
     )

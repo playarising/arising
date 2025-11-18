@@ -32,27 +32,27 @@ fn equips_and_swaps_items() {
     );
 
     // Manually boost the character to meet equipment level requirements.
-    level_character(&mut ctx, &character, 3);
+    level_character(&mut ctx, &character, 5);
 
     tokens::seed_resource_balance(
         &mut ctx,
         &mint_state,
         &authority_pk,
-        ResourceKind::WoodenSword,
+        ResourceKind::WoodSword,
         2,
     );
     tokens::seed_resource_balance(
         &mut ctx,
         &mint_state,
         &authority_pk,
-        ResourceKind::WoodenShield,
+        ResourceKind::WoodBigShield,
         1,
     );
     tokens::seed_resource_balance(
         &mut ctx,
         &mint_state,
         &authority_pk,
-        ResourceKind::TrainingGreatsword,
+        ResourceKind::WoodHalberd,
         1,
     );
 
@@ -62,17 +62,17 @@ fn equips_and_swaps_items() {
             Civilization::Ard,
             11,
             EquipmentSlot::RightHand,
-            ResourceKind::WoodenSword,
+            ResourceKind::WoodSword,
             character,
             authority_pk,
             mint_state,
-            tokens::reward_accounts(&authority_pk, &[ResourceKind::WoodenSword]),
+            tokens::reward_accounts(&authority_pk, &[ResourceKind::WoodSword]),
         ),
         &[&authority],
     )
     .assert_success();
     assert_eq!(
-        tokens::token_balance(&ctx, &authority_pk, ResourceKind::WoodenSword),
+        tokens::token_balance(&ctx, &authority_pk, ResourceKind::WoodSword),
         1
     );
 
@@ -82,17 +82,17 @@ fn equips_and_swaps_items() {
             Civilization::Ard,
             11,
             EquipmentSlot::LeftHand,
-            ResourceKind::WoodenShield,
+            ResourceKind::WoodBigShield,
             character,
             authority_pk,
             mint_state,
-            tokens::reward_accounts(&authority_pk, &[ResourceKind::WoodenShield]),
+            tokens::reward_accounts(&authority_pk, &[ResourceKind::WoodBigShield]),
         ),
         &[&authority],
     );
     meta.assert_success();
     assert_eq!(
-        tokens::token_balance(&ctx, &authority_pk, ResourceKind::WoodenShield),
+        tokens::token_balance(&ctx, &authority_pk, ResourceKind::WoodBigShield),
         0
     );
 
@@ -102,16 +102,16 @@ fn equips_and_swaps_items() {
             Civilization::Ard,
             11,
             EquipmentSlot::LeftHand,
-            ResourceKind::TrainingGreatsword,
+            ResourceKind::WoodHalberd,
             character,
             authority_pk,
             mint_state,
             tokens::reward_accounts(
                 &authority_pk,
                 &[
-                    ResourceKind::TrainingGreatsword,
-                    ResourceKind::WoodenSword,
-                    ResourceKind::WoodenShield,
+                    ResourceKind::WoodHalberd,
+                    ResourceKind::WoodSword,
+                    ResourceKind::WoodBigShield,
                 ],
             ),
         ),
@@ -122,14 +122,14 @@ fn equips_and_swaps_items() {
     let character_after = ctx.get_anchor_account::<arising::character::Character>(&character);
     let left_slot = character_after.equipment.slots[EquipmentSlot::LeftHand as usize];
     let right_slot = character_after.equipment.slots[EquipmentSlot::RightHand as usize];
-    assert_eq!(left_slot.item, Some(ResourceKind::TrainingGreatsword));
-    assert_eq!(right_slot.item, Some(ResourceKind::TrainingGreatsword));
+    assert_eq!(left_slot.item, Some(ResourceKind::WoodHalberd));
+    assert_eq!(right_slot.item, Some(ResourceKind::WoodHalberd));
     assert_eq!(
-        tokens::token_balance(&ctx, &authority_pk, ResourceKind::WoodenSword),
+        tokens::token_balance(&ctx, &authority_pk, ResourceKind::WoodSword),
         2
     );
     assert_eq!(
-        tokens::token_balance(&ctx, &authority_pk, ResourceKind::WoodenShield),
+        tokens::token_balance(&ctx, &authority_pk, ResourceKind::WoodBigShield),
         1
     );
 
@@ -142,7 +142,7 @@ fn equips_and_swaps_items() {
             character,
             authority_pk,
             mint_state,
-            tokens::reward_accounts(&authority_pk, &[ResourceKind::TrainingGreatsword]),
+            tokens::reward_accounts(&authority_pk, &[ResourceKind::WoodHalberd]),
         ),
         &[&authority],
     )
@@ -154,7 +154,7 @@ fn equips_and_swaps_items() {
     assert!(left_final.item.is_none());
     assert!(right_final.item.is_none());
     assert_eq!(
-        tokens::token_balance(&ctx, &authority_pk, ResourceKind::TrainingGreatsword),
+        tokens::token_balance(&ctx, &authority_pk, ResourceKind::WoodHalberd),
         1
     );
 }

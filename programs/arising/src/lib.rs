@@ -458,28 +458,18 @@ pub mod arising {
                 consumed_resources.push(cost);
             }
             RecipeInput::Craft {
-                base_material,
-                base_amount,
-                secondary_material,
+                materials,
                 gold_amount,
             } => {
-                let base_cost = consume_resource_from_user(
-                    &ctx.accounts.token_program,
-                    &ctx.accounts.authority,
-                    base_material,
-                    base_amount,
-                    &mut resource_accounts,
-                )?;
-                consumed_resources.push(base_cost);
-                if let Some((secondary, amount)) = secondary_material {
-                    let extra_cost = consume_resource_from_user(
+                for material in materials.iter().copied() {
+                    let cost = consume_resource_from_user(
                         &ctx.accounts.token_program,
                         &ctx.accounts.authority,
-                        secondary,
-                        amount,
+                        material.kind,
+                        material.amount,
                         &mut resource_accounts,
                     )?;
-                    consumed_resources.push(extra_cost);
+                    consumed_resources.push(cost);
                 }
                 let gold_cost = consume_resource_from_user(
                     &ctx.accounts.token_program,
