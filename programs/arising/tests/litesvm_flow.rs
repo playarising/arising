@@ -7,7 +7,7 @@ use arising::codex::{Civilization, Gender, ResourceKind};
 use common::{
     clock,
     context::{TestContext, TransactionResultExt},
-    conversions, fixtures, instructions, recipes, tokens,
+    conversions, fixtures, instructions, tokens,
 };
 use solana_keypair::Keypair;
 use solana_signer::Signer;
@@ -143,7 +143,6 @@ fn quest_and_recipe_flow() {
     );
 
     assert!(tokens::token_balance(&ctx, &authority_pk, ResourceKind::Gold) >= 50);
-    assert!(tokens::token_balance(&ctx, &authority_pk, ResourceKind::Plank) >= 0);
     assert_eq!(
         tokens::token_balance(&ctx, &authority_pk, ResourceKind::WoodSword),
         1

@@ -883,6 +883,44 @@ mod tests {
     }
 
     #[test]
+    fn forearm_items_can_be_equipped_independently() {
+        let mut character = sample_character(Civilization::Ard);
+        grant_levels(&mut character, 5);
+
+        // Equip a forearm-only item in the left forearm slot.
+        let vambrace = equipment_definition(ResourceKind::CooperVambraces).unwrap();
+        character
+            .equip_item(EquipmentSlot::LeftForearm, vambrace)
+            .expect("vambrace equipped");
+        assert_eq!(
+            character.equipment.slots[EquipmentSlot::LeftForearm as usize].item,
+            Some(ResourceKind::CooperVambraces)
+        );
+        // Ensure hand remains free.
+        assert!(character.equipment.slots[EquipmentSlot::LeftHand as usize]
+            .item
+            .is_none());
+    }
+
+    #[test]
+    fn gauntlets_occupy_hand_and_forearm() {
+        let mut character = sample_character(Civilization::Ard);
+        grant_levels(&mut character, 5);
+
+        let gauntlet = equipment_definition(ResourceKind::CooperGauntlets).unwrap();
+        character
+            .equip_item(EquipmentSlot::RightHand, gauntlet)
+            .expect("gauntlet equipped");
+
+        let hand_state = &character.equipment.slots[EquipmentSlot::RightHand as usize];
+        let forearm_state = &character.equipment.slots[EquipmentSlot::RightForearm as usize];
+        assert_eq!(hand_state.item, Some(ResourceKind::CooperGauntlets));
+        assert_eq!(forearm_state.item, Some(ResourceKind::CooperGauntlets));
+        assert!(hand_state.linked_slot.is_some());
+        assert!(forearm_state.linked_slot.is_some());
+    }
+
+    #[test]
     fn level_curve_is_respected() {
         let mut character = sample_character(Civilization::Tarki);
         assert_eq!(character.current_level(), 1);
