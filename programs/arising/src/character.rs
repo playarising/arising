@@ -183,17 +183,18 @@ impl CharacterEquipment {
         state.flags = 0;
     }
 
-    fn assign_two_handed(
+    fn assign_linked(
         &mut self,
         primary: EquipmentSlot,
         secondary: EquipmentSlot,
         resource: ResourceKind,
+        primary_flags: u8,
     ) {
         {
             let state = self.slot_state_mut(primary);
             state.item = Some(resource);
             state.linked_slot = Some(secondary);
-            state.flags = SLOT_FLAG_TWO_HANDED_PRIMARY;
+            state.flags = primary_flags;
         }
         {
             let state = self.slot_state_mut(secondary);
@@ -572,7 +573,7 @@ impl Character {
             ArisingError::InvalidEquipmentSlot
         );
 
-        if definition.occupies_both_hands {
+        if definition.occupies_both_hands || definition.occupies_forearm {
             require!(slot.is_hand(), ArisingError::EquipmentRequiresHandSlot);
         }
 
@@ -583,6 +584,12 @@ impl Character {
         if definition.occupies_both_hands {
             slots_to_clear.push(
                 slot.companion_hand()
+                    .ok_or(ArisingError::EquipmentRequiresHandSlot)?,
+            );
+        }
+        if definition.occupies_forearm {
+            slots_to_clear.push(
+                slot.companion_forearm()
                     .ok_or(ArisingError::EquipmentRequiresHandSlot)?,
             );
         }
@@ -608,8 +615,18 @@ impl Character {
             let secondary = slot
                 .companion_hand()
                 .ok_or(ArisingError::EquipmentRequiresHandSlot)?;
+            self.equipment.assign_linked(
+                slot,
+                secondary,
+                definition.resource,
+                SLOT_FLAG_TWO_HANDED_PRIMARY,
+            );
+        } else if definition.occupies_forearm {
+            let secondary = slot
+                .companion_forearm()
+                .ok_or(ArisingError::EquipmentRequiresHandSlot)?;
             self.equipment
-                .assign_two_handed(slot, secondary, definition.resource);
+                .assign_linked(slot, secondary, definition.resource, 0);
         } else {
             self.equipment.assign_single(slot, definition.resource);
         }
