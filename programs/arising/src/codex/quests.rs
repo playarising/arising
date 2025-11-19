@@ -252,9 +252,9 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         "Timber Stockpile - Rongden Delta",
         2,
         4500,
-        7,
+        6,
         CoreStats::new(1, 1, 0),
-        &[QuestReward::resource(ResourceKind::Wood, 2)],
+        &[QuestReward::resource(ResourceKind::Wood, 1)],
     ),
     QuestCodexEntry::new(
         7,
@@ -273,7 +273,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         2,
         4500,
         9,
-        CoreStats::new(1, 2, 1),
+        CoreStats::new(1, 1, 0),
         &[QuestReward::resource(ResourceKind::Wood, 1)],
     ),
     QuestCodexEntry::new(
@@ -293,7 +293,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         3,
         7200,
         7,
-        CoreStats::new(2, 1, 0),
+        CoreStats::new(1, 1, 0),
         &[QuestReward::resource(ResourceKind::RawLeather, 2)],
     ),
     QuestCodexEntry::new(
@@ -302,12 +302,9 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         "Wood Smuggler Run - Elderwood Edge",
         3,
         7200,
-        10,
-        CoreStats::new(2, 1, 1),
-        &[
-            QuestReward::resource(ResourceKind::Gold, 120),
-            QuestReward::resource(ResourceKind::Wood, 1),
-        ],
+        9,
+        CoreStats::new(1, 1, 1),
+        &[QuestReward::resource(ResourceKind::Wood, 2)],
     ),
     QuestCodexEntry::new(
         12,
@@ -327,10 +324,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         4800,
         8,
         CoreStats::new(2, 1, 1),
-        &[
-            QuestReward::experience(67),
-            QuestReward::resource(ResourceKind::Wood, 1),
-        ],
+        &[QuestReward::experience(67)],
     ),
     QuestCodexEntry::new(
         14,
@@ -340,10 +334,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         4800,
         7,
         CoreStats::new(1, 2, 1),
-        &[
-            QuestReward::resource(ResourceKind::Gold, 90),
-            QuestReward::experience(60),
-        ],
+        &[QuestReward::resource(ResourceKind::Gold, 90)],
     ),
     QuestCodexEntry::new(
         15,
@@ -373,10 +364,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         7200,
         11,
         CoreStats::new(3, 1, 1),
-        &[
-            QuestReward::resource(ResourceKind::Gold, 150),
-            QuestReward::resource(ResourceKind::BronzeOre, 1),
-        ],
+        &[QuestReward::resource(ResourceKind::BronzeOre, 2)],
     ),
     QuestCodexEntry::new(
         18,
@@ -386,10 +374,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         5400,
         11,
         CoreStats::new(3, 2, 1),
-        &[
-            QuestReward::experience(120),
-            QuestReward::resource(ResourceKind::BronzeOre, 1),
-        ],
+        &[QuestReward::experience(120)],
     ),
     QuestCodexEntry::new(
         19,
@@ -439,10 +424,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         7200,
         12,
         CoreStats::new(4, 2, 2),
-        &[
-            QuestReward::resource(ResourceKind::Gold, 180),
-            QuestReward::resource(ResourceKind::IronOre, 1),
-        ],
+        &[QuestReward::resource(ResourceKind::IronOre, 2)],
     ),
     QuestCodexEntry::new(
         24,
@@ -452,10 +434,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         5400,
         9,
         CoreStats::new(3, 3, 2),
-        &[
-            QuestReward::resource(ResourceKind::Gold, 140),
-            QuestReward::experience(90),
-        ],
+        &[QuestReward::resource(ResourceKind::Gold, 140)],
     ),
     QuestCodexEntry::new(
         25,
@@ -465,10 +444,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         5400,
         10,
         CoreStats::new(3, 3, 2),
-        &[
-            QuestReward::resource(ResourceKind::Gold, 160),
-            QuestReward::experience(105),
-        ],
+        &[QuestReward::resource(ResourceKind::Gold, 160)],
     ),
     QuestCodexEntry::new(
         26,
@@ -478,10 +454,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         6000,
         12,
         CoreStats::new(4, 3, 3),
-        &[
-            QuestReward::resource(ResourceKind::SteelOre, 1),
-            QuestReward::experience(135),
-        ],
+        &[QuestReward::resource(ResourceKind::SteelOre, 1)],
     ),
     QuestCodexEntry::new(
         27,
@@ -511,10 +484,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         7200,
         13,
         CoreStats::new(5, 3, 3),
-        &[
-            QuestReward::resource(ResourceKind::Gold, 220),
-            QuestReward::resource(ResourceKind::SteelOre, 1),
-        ],
+        &[QuestReward::resource(ResourceKind::SteelOre, 3)],
     ),
     QuestCodexEntry::new(
         30,
@@ -564,10 +534,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         7200,
         14,
         CoreStats::new(6, 4, 3),
-        &[
-            QuestReward::resource(ResourceKind::Gold, 260),
-            QuestReward::resource(ResourceKind::SilverOre, 1),
-        ],
+        &[QuestReward::resource(ResourceKind::SilverOre, 3)],
     ),
     QuestCodexEntry::new(
         35,
@@ -577,10 +544,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         6000,
         14,
         CoreStats::new(6, 5, 4),
-        &[
-            QuestReward::experience(180),
-            QuestReward::resource(ResourceKind::SilverOre, 1),
-        ],
+        &[QuestReward::experience(180)],
     ),
     QuestCodexEntry::new(
         36,
@@ -622,7 +586,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(7, 5, 4),
         &[
             QuestReward::resource(ResourceKind::Gold, 300),
-            QuestReward::resource(ResourceKind::GoldOre, 1),
+            QuestReward::resource(ResourceKind::GoldOre, 3),
         ],
     ),
     QuestCodexEntry::new(
@@ -656,7 +620,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         5400,
         13,
         CoreStats::new(6, 5, 3),
-        &[QuestReward::resource(ResourceKind::PlatinumOre, 3)],
+        &[QuestReward::resource(ResourceKind::PlatinumOre, 2)],
     ),
     QuestCodexEntry::new(
         43,
@@ -678,7 +642,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(8, 6, 5),
         &[
             QuestReward::resource(ResourceKind::Gold, 340),
-            QuestReward::resource(ResourceKind::PlatinumOre, 1),
+            QuestReward::resource(ResourceKind::PlatinumOre, 3),
         ],
     ),
     QuestCodexEntry::new(
@@ -701,7 +665,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(8, 7, 5),
         &[
             QuestReward::experience(240),
-            QuestReward::resource(ResourceKind::PlatinumOre, 1),
+            QuestReward::resource(ResourceKind::PlatinumOre, 3),
         ],
     ),
     QuestCodexEntry::new(
@@ -712,7 +676,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         5400,
         13,
         CoreStats::new(6, 6, 4),
-        &[QuestReward::resource(ResourceKind::AdamantineOre, 3)],
+        &[QuestReward::resource(ResourceKind::AdamantineOre, 2)],
     ),
     QuestCodexEntry::new(
         48,
@@ -734,7 +698,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(9, 7, 6),
         &[
             QuestReward::resource(ResourceKind::Gold, 380),
-            QuestReward::resource(ResourceKind::AdamantineOre, 2),
+            QuestReward::resource(ResourceKind::AdamantineOre, 3),
         ],
     ),
     QuestCodexEntry::new(
@@ -758,7 +722,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         6600,
         17,
         CoreStats::new(9, 8, 6),
-        &[QuestReward::resource(ResourceKind::AdamantineOre, 2)],
+        &[QuestReward::resource(ResourceKind::AdamantineOre, 3)],
     ),
     QuestCodexEntry::new(
         52,
@@ -770,7 +734,6 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(10, 8, 6),
         &[
             QuestReward::resource(ResourceKind::Gold, 240),
-            QuestReward::experience(232),
             QuestReward::resource(ResourceKind::CobaltOre, 1),
         ],
     ),
@@ -782,7 +745,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         5400,
         14,
         CoreStats::new(7, 6, 5),
-        &[QuestReward::resource(ResourceKind::CobaltOre, 3)],
+        &[QuestReward::resource(ResourceKind::CobaltOre, 2)],
     ),
     QuestCodexEntry::new(
         54,
@@ -804,7 +767,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(10, 8, 6),
         &[
             QuestReward::resource(ResourceKind::Gold, 430),
-            QuestReward::resource(ResourceKind::CobaltOre, 2),
+            QuestReward::resource(ResourceKind::CobaltOre, 3),
         ],
     ),
     QuestCodexEntry::new(
@@ -817,7 +780,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(11, 9, 7),
         &[
             QuestReward::experience(270),
-            QuestReward::resource(ResourceKind::CobaltOre, 1),
+            QuestReward::resource(ResourceKind::CobaltOre, 3),
         ],
     ),
     QuestCodexEntry::new(
@@ -830,7 +793,6 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(11, 10, 7),
         &[
             QuestReward::resource(ResourceKind::Gold, 260),
-            QuestReward::experience(225),
             QuestReward::resource(ResourceKind::AngelicEssence, 1),
         ],
     ),
@@ -842,7 +804,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         5400,
         15,
         CoreStats::new(8, 7, 5),
-        &[QuestReward::resource(ResourceKind::AngelicEssence, 4)],
+        &[QuestReward::resource(ResourceKind::AngelicEssence, 2)],
     ),
     QuestCodexEntry::new(
         59,
@@ -864,7 +826,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(11, 9, 7),
         &[
             QuestReward::resource(ResourceKind::Gold, 480),
-            QuestReward::resource(ResourceKind::AngelicEssence, 2),
+            QuestReward::resource(ResourceKind::AngelicEssence, 3),
         ],
     ),
     QuestCodexEntry::new(
@@ -875,7 +837,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         7200,
         16,
         CoreStats::new(12, 11, 7),
-        &[QuestReward::resource(ResourceKind::RawLeather, 4)],
+        &[QuestReward::resource(ResourceKind::RawLeather, 3)],
     ),
     QuestCodexEntry::new(
         62,
@@ -935,7 +897,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         5400,
         16,
         CoreStats::new(9, 8, 6),
-        &[QuestReward::resource(ResourceKind::CrimsonEssence, 4)],
+        &[QuestReward::resource(ResourceKind::CrimsonEssence, 2)],
     ),
     QuestCodexEntry::new(
         67,
@@ -957,7 +919,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(12, 10, 8),
         &[
             QuestReward::resource(ResourceKind::Gold, 540),
-            QuestReward::resource(ResourceKind::CrimsonEssence, 2),
+            QuestReward::resource(ResourceKind::CrimsonEssence, 3),
         ],
     ),
     QuestCodexEntry::new(
@@ -965,13 +927,13 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         QuestType::Job,
         "Crimson Reinforcement - Oldholm Pass",
         110,
-        7200,
+        6000,
         19,
         CoreStats::new(14, 12, 9),
         &[
             QuestReward::resource(ResourceKind::Gold, 300),
             QuestReward::experience(285),
-            QuestReward::resource(ResourceKind::CrimsonEssence, 1),
+            QuestReward::resource(ResourceKind::CrimsonEssence, 2),
         ],
     ),
     QuestCodexEntry::new(
@@ -984,7 +946,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(14, 12, 9),
         &[
             QuestReward::experience(315),
-            QuestReward::resource(ResourceKind::CrimsonEssence, 2),
+            QuestReward::resource(ResourceKind::CrimsonEssence, 3),
         ],
     ),
     QuestCodexEntry::new(
@@ -1006,7 +968,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         20,
         CoreStats::new(15, 13, 10),
         &[
-            QuestReward::resource(ResourceKind::FatefulEssence, 2),
+            QuestReward::resource(ResourceKind::FatefulEssence, 3),
             QuestReward::experience(315),
         ],
     ),
@@ -1018,7 +980,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         5400,
         18,
         CoreStats::new(11, 9, 7),
-        &[QuestReward::resource(ResourceKind::FatefulEssence, 5)],
+        &[QuestReward::resource(ResourceKind::FatefulEssence, 2)],
     ),
     QuestCodexEntry::new(
         74,
@@ -1040,7 +1002,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(14, 12, 9),
         &[
             QuestReward::resource(ResourceKind::Gold, 600),
-            QuestReward::resource(ResourceKind::FatefulEssence, 2),
+            QuestReward::resource(ResourceKind::FatefulEssence, 3),
         ],
     ),
     QuestCodexEntry::new(
@@ -1051,7 +1013,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         7200,
         19,
         CoreStats::new(16, 14, 10),
-        &[QuestReward::resource(ResourceKind::RawLeather, 5)],
+        &[QuestReward::resource(ResourceKind::RawLeather, 3)],
     ),
     QuestCodexEntry::new(
         77,
@@ -1098,7 +1060,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         5400,
         19,
         CoreStats::new(12, 10, 8),
-        &[QuestReward::resource(ResourceKind::AltairEssence, 5)],
+        &[QuestReward::resource(ResourceKind::AltairEssence, 2)],
     ),
     QuestCodexEntry::new(
         81,
@@ -1120,7 +1082,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(15, 13, 10),
         &[
             QuestReward::resource(ResourceKind::Gold, 660),
-            QuestReward::resource(ResourceKind::AltairEssence, 2),
+            QuestReward::resource(ResourceKind::AltairEssence, 3),
         ],
     ),
     QuestCodexEntry::new(
@@ -1133,7 +1095,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(18, 16, 12),
         &[
             QuestReward::experience(390),
-            QuestReward::resource(ResourceKind::AltairEssence, 2),
+            QuestReward::resource(ResourceKind::AltairEssence, 3),
         ],
     ),
     QuestCodexEntry::new(
