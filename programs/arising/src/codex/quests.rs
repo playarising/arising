@@ -195,7 +195,7 @@ impl QuestCodexEntry {
     }
 }
 
-pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
+pub const QUEST_CODEX: [QuestCodexEntry; 90] = [
     // === LEVEL 1-10: Basic Resources (Wood, Leather, Bronze intro) ===
     QuestCodexEntry::new(
         1,
@@ -1171,6 +1171,17 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         20,
         CoreStats::new(44, 34, 30),
         &[QuestReward::resource(ResourceKind::AltairEssence, 2)],
+    ),
+    // === LEVEL 1: Starter Quests (Very Low Requirements - prevents user lockout) ===
+    QuestCodexEntry::new(
+        90,
+        QuestType::Raid,
+        "Village Patrol - Oldholm Village",
+        1,
+        1800,
+        1,
+        CoreStats::new(1, 1, 1),
+        &[QuestReward::experience(30)],
     ),
 ];
 #[inline]
