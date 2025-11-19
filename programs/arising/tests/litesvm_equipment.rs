@@ -110,8 +110,8 @@ fn equips_and_swaps_items() {
                 &authority_pk,
                 &[
                     ResourceKind::WoodHalberd,
-                    ResourceKind::WoodSword,
                     ResourceKind::WoodBigShield,
+                    ResourceKind::WoodSword,
                 ],
             ),
         ),

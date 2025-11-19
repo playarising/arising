@@ -51,11 +51,11 @@ pub fn recipe_output_accounts(authority: &AnchorPubkey, recipe_id: u16) -> Vec<A
 fn assert_account_alignment(accounts: &[AnchorAccountMeta], resources: &[ResourceKind]) {
     assert_eq!(
         accounts.len(),
-        resources.len() * 2,
-        "each resource needs mint+ata"
+        resources.len() * 3,
+        "each resource needs mint+metadata+ata"
     );
-    for (chunk, resource) in accounts.chunks(2).zip(resources.iter()) {
-        assert_eq!(chunk.len(), 2, "missing account pair for recipe resource");
+    for (chunk, resource) in accounts.chunks(3).zip(resources.iter()) {
+        assert_eq!(chunk.len(), 3, "missing account triple for recipe resource");
         assert_eq!(
             chunk[0].pubkey,
             tokens::resource_mint(*resource),

@@ -198,6 +198,11 @@ impl RecipeCodexEntry {
     }
 }
 
+// TODO: Implement "Crafting Mastery" system.
+// Concept: Players gain mastery points for crafting specific items or categories.
+// Mastery levels could reduce energy cost, reduce cooldowns, or increase chance of "Great Success" (double output).
+// This would encourage specialization and long-term engagement with the crafting system.
+
 pub const RECIPE_CODEX: [RecipeCodexEntry; 616] = [
     RecipeCodexEntry::new(
         1,

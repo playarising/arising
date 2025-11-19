@@ -104,9 +104,12 @@ impl QuestCodexEntry {
     }
 
     pub fn effective_base_energy(&self) -> u16 {
-        self.base_energy_cost
-            .max(self.level_based_energy_floor())
-            .max(MINIMUM_ENERGY_COST)
+        let floor = if self.bypass_stat_floors {
+            MINIMUM_ENERGY_COST
+        } else {
+            self.level_based_energy_floor()
+        };
+        self.base_energy_cost.max(floor).max(MINIMUM_ENERGY_COST)
     }
 
     fn level_stat_floor(&self) -> CoreStats {
@@ -230,9 +233,21 @@ impl QuestCodexEntry {
 }
 
 pub const QUEST_CODEX: [QuestCodexEntry; 90] = [
-    // === LEVEL 1-10: Basic Resources (Wood, Leather, Bronze intro) ===
-    QuestCodexEntry::new(
+    // === LEVEL 1: Starter Quests (Very Low Requirements - prevents user lockout) ===
+    // Quest 1: Village Patrol - Oldholm Village (Moved from end, ID 90 -> 1)
+    QuestCodexEntry::new_bypass_floors(
         1,
+        QuestType::Raid,
+        "Village Patrol - Oldholm Village",
+        1,
+        2700,
+        4, // Low base energy cost to cap at 10
+        CoreStats::new(0, 0, 0),
+        &[QuestReward::experience(30)],
+    ),
+    // Quest 90: Caravan Guard - Ard Trading Road (Moved from ID 1 -> 90)
+    QuestCodexEntry::new(
+        90,
         QuestType::Job,
         "Caravan Guard - Ard Trading Road",
         1,
@@ -1206,23 +1221,8 @@ pub const QUEST_CODEX: [QuestCodexEntry; 90] = [
         CoreStats::new(44, 34, 30),
         &[QuestReward::resource(ResourceKind::AltairEssence, 2)],
     ),
-    // === LEVEL 1: Starter Quests (Very Low Requirements - prevents user lockout) ===
-    QuestCodexEntry::new_bypass_floors(
-        90,
-        QuestType::Raid,
-        "Village Patrol - Oldholm Village",
-        1,
-        2700,
-        1,
-        CoreStats::new(0, 0, 0),
-        &[QuestReward::experience(30)],
-    ),
 ];
 #[inline]
 pub fn quest_by_id(id: u16) -> Option<&'static QuestCodexEntry> {
-    if id == 0 {
-        return None;
-    }
-    let idx = (id - 1) as usize;
-    QUEST_CODEX.get(idx)
+    QUEST_CODEX.iter().find(|q| q.id == id)
 }

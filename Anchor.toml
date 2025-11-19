@@ -5,13 +5,13 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-arising = "arisFmS4ovGjBoxAwfuPX3iJaAvW2KtBAver3uknfMp"
+arising = "arisrYLSKUei59PvwWzxtgkNTypLNKmd3u3jHeNQAn9"
 
 [programs.localnet]
-arising = "arisFmS4ovGjBoxAwfuPX3iJaAvW2KtBAver3uknfMp"
+arising = "arisrYLSKUei59PvwWzxtgkNTypLNKmd3u3jHeNQAn9"
 
 [programs.mainnet]
-arising = "arisFmS4ovGjBoxAwfuPX3iJaAvW2KtBAver3uknfMp"
+arising = "arisrYLSKUei59PvwWzxtgkNTypLNKmd3u3jHeNQAn9"
 
 [registry]
 url = "https://api.apr.dev"

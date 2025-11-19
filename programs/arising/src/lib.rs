@@ -27,7 +27,7 @@ use collection::initialize_collection;
 use errors::ArisingError;
 use nft::{mint_character_nft, CharacterMetadataArgs};
 
-declare_id!("arisFmS4ovGjBoxAwfuPX3iJaAvW2KtBAver3uknfMp");
+declare_id!("arisrYLSKUei59PvwWzxtgkNTypLNKmd3u3jHeNQAn9");
 
 const RESOURCE_MINT_SEED: &[u8] = b"resource_mint";
 const ENERGY_PASS_PRICE_USDC: u64 = 2_000_000; // 2 USDC with 6 decimals
@@ -71,6 +71,12 @@ pub mod arising {
     }
 
     /// Mints a brand new character NFT and seeds the character account.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context containing accounts.
+    /// * `civilization` - The civilization the character belongs to.
+    /// * `character_id` - The unique ID of the character within the civilization.
+    /// * `gender` - The gender of the character.
     pub fn mint_character(
         ctx: Context<MintCharacter>,
         civilization: Civilization,
@@ -142,6 +148,11 @@ pub mod arising {
     }
 
     /// Updates the mint cap for a civilization; restricted to authority.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The civilization to update.
+    /// * `new_cap` - The new maximum number of characters allowed.
     pub fn update_civilization_cap(
         ctx: Context<UpdateCivilizationCap>,
         civilization: Civilization,
@@ -168,6 +179,12 @@ pub mod arising {
     }
 
     /// Allocates available core stat points to a character.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
+    /// * `allocation` - The stats to add to the character's current stats.
     pub fn allocate_core_stats(
         ctx: Context<ModifyCharacterOwned>,
         civilization: Civilization,
@@ -194,6 +211,12 @@ pub mod arising {
     }
 
     /// Allocates attribute points gained via leveling.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
+    /// * `allocation` - The attributes to add.
     pub fn allocate_attributes(
         ctx: Context<ModifyCharacterOwned>,
         civilization: Civilization,
@@ -220,6 +243,12 @@ pub mod arising {
     }
 
     /// Records the permanent class choice for a character once requirements are met.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
+    /// * `class` - The class to select.
     pub fn choose_class(
         ctx: Context<ModifyCharacterOwned>,
         civilization: Civilization,
@@ -255,6 +284,12 @@ pub mod arising {
     }
 
     /// Burns character energy when a user wants to spend it manually.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
+    /// * `amount` - The amount of energy to consume.
     pub fn consume_energy(
         ctx: Context<ModifyCharacterOwned>,
         civilization: Civilization,
@@ -282,6 +317,11 @@ pub mod arising {
     }
 
     /// Refills character energy if the cooldown has elapsed.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
     pub fn refill_energy(
         ctx: Context<ModifyCharacterOwned>,
         civilization: Civilization,
@@ -309,6 +349,12 @@ pub mod arising {
     }
 
     /// Starts a quest after validating level, stats, and energy requirements.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
+    /// * `quest_id` - The ID of the quest to start.
     pub fn start_quest(
         ctx: Context<ModifyCharacterOwned>,
         civilization: Civilization,
@@ -352,6 +398,12 @@ pub mod arising {
     }
 
     /// Claims quest rewards once the cooldown has elapsed.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
+    /// * `quest_id` - The ID of the quest to claim.
     pub fn claim_quest<'info>(
         ctx: Context<'_, '_, 'info, 'info, ClaimQuest<'info>>,
         civilization: Civilization,
@@ -387,6 +439,7 @@ pub mod arising {
                     let reward_event = mint_resource_reward(
                         &ctx.accounts.mint_state,
                         &ctx.accounts.token_program,
+                        &ctx.accounts.token_metadata_program.to_account_info(),
                         &ctx.accounts.associated_token_program,
                         &ctx.accounts.system_program,
                         &ctx.accounts.rent,
@@ -418,6 +471,12 @@ pub mod arising {
     }
 
     /// Begins processing a recipe after validating stats, level, and resources.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
+    /// * `recipe_id` - The ID of the recipe to start.
     pub fn start_recipe<'info>(
         ctx: Context<'_, '_, 'info, 'info, ProcessRecipe<'info>>,
         civilization: Civilization,
@@ -505,6 +564,12 @@ pub mod arising {
     }
 
     /// Mints recipe outputs after processing time completes.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
+    /// * `recipe_id` - The ID of the recipe to claim.
     pub fn claim_recipe<'info>(
         ctx: Context<'_, '_, 'info, 'info, ProcessRecipe<'info>>,
         civilization: Civilization,
@@ -533,6 +598,7 @@ pub mod arising {
                 let event = mint_resource_reward(
                     &ctx.accounts.mint_state,
                     &ctx.accounts.token_program,
+                    &ctx.accounts.token_metadata_program.to_account_info(),
                     &ctx.accounts.associated_token_program,
                     &ctx.accounts.system_program,
                     &ctx.accounts.rent,
@@ -562,6 +628,13 @@ pub mod arising {
     }
 
     /// Equips an item, burning the token and minting any swapped-out items back.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
+    /// * `slot` - The slot to equip the item into.
+    /// * `definition_index` - The index of the item definition in the codex.
     pub fn equip_item<'info>(
         ctx: Context<'_, '_, 'info, 'info, ManageEquipment<'info>>,
         civilization: Civilization,
@@ -587,7 +660,7 @@ pub mod arising {
             &authority_key,
             resource,
         )?;
-        let [burn_mint, burn_source] = burn_accounts;
+        let [burn_mint, _burn_metadata, burn_source] = burn_accounts;
         burn_equipment_resource(
             ctx.program_id,
             &ctx.accounts.token_program,
@@ -606,10 +679,11 @@ pub mod arising {
                 &authority_key,
                 removed,
             )?;
-            let [mint_info, destination_info] = reward_accounts;
+            let [mint_info, metadata_info, destination_info] = reward_accounts;
             mint_equipment_resource(
                 &ctx.accounts.mint_state,
                 &ctx.accounts.token_program,
+                &ctx.accounts.token_metadata_program.to_account_info(),
                 &ctx.accounts.associated_token_program,
                 &ctx.accounts.system_program,
                 &ctx.accounts.rent,
@@ -619,6 +693,7 @@ pub mod arising {
                 removed,
                 1,
                 mint_info,
+                metadata_info,
                 destination_info,
             )?;
         }
@@ -636,6 +711,12 @@ pub mod arising {
     }
 
     /// Unequips an item, minting the resource token back to the player.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
+    /// * `slot` - The slot to unequip.
     pub fn unequip_item<'info>(
         ctx: Context<'_, '_, 'info, 'info, ManageEquipment<'info>>,
         civilization: Civilization,
@@ -658,10 +739,11 @@ pub mod arising {
             &authority_key,
             removed_resource,
         )?;
-        let [mint_info, destination_info] = reward_accounts;
+        let [mint_info, metadata_info, destination_info] = reward_accounts;
         mint_equipment_resource(
             &ctx.accounts.mint_state,
             &ctx.accounts.token_program,
+            &ctx.accounts.token_metadata_program.to_account_info(),
             &ctx.accounts.associated_token_program,
             &ctx.accounts.system_program,
             &ctx.accounts.rent,
@@ -671,6 +753,7 @@ pub mod arising {
             removed_resource,
             1,
             mint_info,
+            metadata_info,
             destination_info,
         )?;
 
@@ -686,6 +769,11 @@ pub mod arising {
     }
 
     /// Emits a rich metadata view of the character account for clients.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
     pub fn get_character_metadata(
         ctx: Context<GetCharacterMetadata>,
         civilization: Civilization,
@@ -729,6 +817,13 @@ pub mod arising {
         Ok(())
     }
 
+    /// Purchases energy passes using USDC.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
+    /// * `quantity` - The number of passes to buy.
     pub fn buy_energy_pass(
         ctx: Context<BuyEnergyPass>,
         civilization: Civilization,
@@ -791,6 +886,12 @@ pub mod arising {
         Ok(())
     }
 
+    /// Redeems an energy pass to refill energy immediately.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `civilization` - The character's civilization.
+    /// * `character_id` - The character's ID.
     pub fn redeem_energy_pass(
         ctx: Context<RedeemEnergyPass>,
         civilization: Civilization,
@@ -813,6 +914,11 @@ pub mod arising {
         Ok(())
     }
 
+    /// Withdraws accumulated USDC from the treasury to a destination account.
+    ///
+    /// # Arguments
+    /// * `ctx` - The instruction context.
+    /// * `amount` - The amount of USDC to withdraw.
     pub fn withdraw_usdc_treasury(ctx: Context<WithdrawUsdcTreasury>, amount: u64) -> Result<()> {
         let mint_state = &ctx.accounts.mint_state;
         mint_state.ensure_authority(ctx.accounts.mint_authority.key())?;
@@ -848,6 +954,7 @@ pub mod arising {
 fn mint_resource_reward<'info>(
     mint_state: &Account<'info, CharacterMintState>,
     token_program: &Program<'info, Token>,
+    token_metadata_program: &AccountInfo<'info>,
     associated_token_program: &Program<'info, AssociatedToken>,
     system_program: &Program<'info, System>,
     rent: &Sysvar<'info, Rent>,
@@ -858,12 +965,13 @@ fn mint_resource_reward<'info>(
     remaining_accounts: &mut ResourceAccountCollector<'info>,
 ) -> Result<ResourceRewardEvent> {
     let authority_key = authority.key();
-    let (mint_account, destination_account_info) = remaining_accounts.take(
+    let (mint_account, metadata_account, destination_account_info) = remaining_accounts.take(
         &authority_key,
         resource,
         ArisingError::MissingRewardAccounts,
     )?;
     let mint_info = mint_account.clone();
+    let metadata_info = metadata_account.clone();
     let destination_info = destination_account_info.clone();
     let (_, mint_bump) = Pubkey::find_program_address(
         &[RESOURCE_MINT_SEED, resource.seed_bytes()],
@@ -888,10 +996,12 @@ fn mint_resource_reward<'info>(
         initialize_resource_mint(
             mint_state,
             token_program,
+            token_metadata_program,
             system_program,
             rent,
             authority,
             &mint_info,
+            &metadata_info,
             resource,
             mint_bump,
         )?;
@@ -955,13 +1065,22 @@ fn mint_resource_reward<'info>(
 fn initialize_resource_mint<'info>(
     mint_state: &Account<'info, CharacterMintState>,
     token_program: &Program<'info, Token>,
+    token_metadata_program: &AccountInfo<'info>,
     system_program: &Program<'info, System>,
     rent: &Sysvar<'info, Rent>,
     authority: &Signer<'info>,
     mint_info: &AccountInfo<'info>,
+    metadata_info: &AccountInfo<'info>,
     resource: ResourceKind,
     mint_bump: u8,
 ) -> Result<()> {
+    use anchor_lang::solana_program::sysvar;
+    use mpl_token_metadata::{
+        instructions::{CreateMetadataAccountV3, CreateMetadataAccountV3InstructionArgs},
+        types::{Creator, DataV2},
+        ID as TOKEN_METADATA_PROGRAM_ID,
+    };
+
     let rent_lamports = rent.minimum_balance(spl_token::state::Mint::LEN);
     let create_ix = system_instruction::create_account(
         &authority.key(),
@@ -993,6 +1112,68 @@ fn initialize_resource_mint<'info>(
         Some(&mint_state.key()),
     )?;
 
+    // Validate token metadata program
+    let metadata_program = Pubkey::new_from_array(TOKEN_METADATA_PROGRAM_ID.to_bytes());
+    require_keys_eq!(
+        token_metadata_program.key(),
+        metadata_program,
+        ArisingError::InvalidTokenMetadataProgram
+    );
+
+    // Validate metadata PDA
+    let expected_metadata = nft::metadata_pda(mint_info.key, &metadata_program);
+    require_keys_eq!(
+        metadata_info.key(),
+        expected_metadata,
+        ArisingError::InvalidMetadataAccount
+    );
+
+    // Create metadata account
+    let metadata_data = DataV2 {
+        name: resource.name(),
+        symbol: resource.symbol().to_string(),
+        uri: resource.metadata_uri(),
+        seller_fee_basis_points: 0,
+        creators: Some(vec![Creator {
+            address: mint_state.key(),
+            verified: true,
+            share: 100,
+        }]),
+        collection: None,
+        uses: None,
+    };
+
+    let metadata_ix = CreateMetadataAccountV3 {
+        metadata: metadata_info.key(),
+        mint: mint_info.key(),
+        mint_authority: mint_state.key(),
+        payer: authority.key(),
+        update_authority: (mint_state.key(), true),
+        system_program: system_program.key(),
+        rent: Some(sysvar::rent::id()),
+    }
+    .instruction(CreateMetadataAccountV3InstructionArgs {
+        data: metadata_data,
+        is_mutable: false,
+        collection_details: None,
+    });
+
+    let mint_state_signer: &[&[u8]] = &[CHARACTER_MINT_STATE_SEED, &[mint_state.bump]];
+    invoke_signed(
+        &metadata_ix,
+        &[
+            metadata_info.clone(),
+            mint_info.clone(),
+            mint_state.to_account_info(),
+            authority.to_account_info(),
+            mint_state.to_account_info(),
+            system_program.to_account_info(),
+            rent.to_account_info(),
+            token_metadata_program.clone(),
+        ],
+        &[mint_state_signer],
+    )?;
+
     Ok(())
 }
 
@@ -1005,7 +1186,7 @@ fn consume_resource_from_user<'info>(
     remaining_accounts: &mut ResourceAccountCollector<'info>,
 ) -> Result<ResourceCostEvent> {
     let authority_key = authority.key();
-    let (mint_account, source_account_info) = remaining_accounts.take(
+    let (mint_account, _metadata_account, source_account_info) = remaining_accounts.take(
         &authority_key,
         resource,
         ArisingError::MissingRecipeAccounts,
@@ -1047,20 +1228,29 @@ fn consume_resource_from_user<'info>(
     Ok(ResourceCostEvent { resource, amount })
 }
 
-/// Fetches the mint/account pair for equipment resources from the remaining accounts.
+/// Fetches the mint/metadata/account triple for equipment resources from the remaining accounts.
 fn equipment_account_pair<'info>(
     program_id: &Pubkey,
     accounts: &'info [AccountInfo<'info>],
     authority: &Pubkey,
     resource: ResourceKind,
-) -> Result<[AccountInfo<'info>; 2]> {
+) -> Result<[AccountInfo<'info>; 3]> {
+    use mpl_token_metadata::ID as TOKEN_METADATA_PROGRAM_ID;
+
     let (expected_mint, _) =
         Pubkey::find_program_address(&[RESOURCE_MINT_SEED, resource.seed_bytes()], program_id);
+    let metadata_program = Pubkey::new_from_array(TOKEN_METADATA_PROGRAM_ID.to_bytes());
+    let expected_metadata = nft::metadata_pda(&expected_mint, &metadata_program);
     let expected_ata = associated_token::get_associated_token_address(authority, &expected_mint);
 
     let mint_info = accounts
         .iter()
         .find(|info| info.key() == expected_mint)
+        .cloned()
+        .ok_or(ArisingError::MissingEquipmentAccounts)?;
+    let metadata_info = accounts
+        .iter()
+        .find(|info| info.key() == expected_metadata)
         .cloned()
         .ok_or(ArisingError::MissingEquipmentAccounts)?;
     let token_info = accounts
@@ -1069,7 +1259,7 @@ fn equipment_account_pair<'info>(
         .cloned()
         .ok_or(ArisingError::MissingEquipmentAccounts)?;
 
-    Ok([mint_info, token_info])
+    Ok([mint_info, metadata_info, token_info])
 }
 
 /// Burns an equipment token from the owner's ATA prior to equipping.
@@ -1127,6 +1317,7 @@ fn burn_equipment_resource<'info>(
 fn mint_equipment_resource<'info>(
     mint_state: &Account<'info, CharacterMintState>,
     token_program: &Program<'info, Token>,
+    token_metadata_program: &AccountInfo<'info>,
     associated_token_program: &Program<'info, AssociatedToken>,
     system_program: &Program<'info, System>,
     rent: &Sysvar<'info, Rent>,
@@ -1136,6 +1327,7 @@ fn mint_equipment_resource<'info>(
     resource: ResourceKind,
     amount: u64,
     mint_info: AccountInfo<'info>,
+    metadata_info: AccountInfo<'info>,
     destination_info: AccountInfo<'info>,
 ) -> Result<()> {
     let (expected_mint, mint_bump) =
@@ -1150,10 +1342,12 @@ fn mint_equipment_resource<'info>(
         initialize_resource_mint(
             mint_state,
             token_program,
+            token_metadata_program,
             system_program,
             rent,
             authority,
             &mint_info,
+            &metadata_info,
             resource,
             mint_bump,
         )?;
@@ -1239,24 +1433,34 @@ impl<'info> ResourceAccountCollector<'info> {
         &self.program_id
     }
 
-    /// Removes and returns the mint + ATA pair for the requested resource.
+    /// Removes and returns the mint + metadata + ATA triple for the requested resource.
     fn take(
         &mut self,
         authority: &Pubkey,
         resource: ResourceKind,
         missing_error: ArisingError,
-    ) -> Result<(&'info AccountInfo<'info>, &'info AccountInfo<'info>)> {
+    ) -> Result<(
+        &'info AccountInfo<'info>,
+        &'info AccountInfo<'info>,
+        &'info AccountInfo<'info>,
+    )> {
+        use mpl_token_metadata::ID as TOKEN_METADATA_PROGRAM_ID;
+
         let (expected_mint, _) = Pubkey::find_program_address(
             &[RESOURCE_MINT_SEED, resource.seed_bytes()],
             &self.program_id,
         );
         let mint_info = self.take_account(expected_mint, missing_error)?;
 
+        let metadata_program = Pubkey::new_from_array(TOKEN_METADATA_PROGRAM_ID.to_bytes());
+        let expected_metadata = nft::metadata_pda(&expected_mint, &metadata_program);
+        let metadata_info = self.take_account(expected_metadata, missing_error)?;
+
         let expected_ata =
             associated_token::get_associated_token_address(authority, &expected_mint);
         let ata_info = self.take_account(expected_ata, missing_error)?;
 
-        Ok((mint_info, ata_info))
+        Ok((mint_info, metadata_info, ata_info))
     }
 
     fn take_account(
@@ -1421,6 +1625,8 @@ pub struct ClaimQuest<'info> {
     )]
     pub mint_state: Account<'info, CharacterMintState>,
     pub token_program: Program<'info, Token>,
+    /// CHECK: Program id validated in initialize_resource_mint
+    pub token_metadata_program: UncheckedAccount<'info>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
@@ -1443,6 +1649,8 @@ pub struct ProcessRecipe<'info> {
     )]
     pub mint_state: Account<'info, CharacterMintState>,
     pub token_program: Program<'info, Token>,
+    /// CHECK: Program id validated in initialize_resource_mint
+    pub token_metadata_program: UncheckedAccount<'info>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
@@ -1465,6 +1673,8 @@ pub struct ManageEquipment<'info> {
     )]
     pub mint_state: Account<'info, CharacterMintState>,
     pub token_program: Program<'info, Token>,
+    /// CHECK: Program id validated in initialize_resource_mint
+    pub token_metadata_program: UncheckedAccount<'info>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,

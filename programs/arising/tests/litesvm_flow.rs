@@ -70,9 +70,13 @@ fn quest_and_recipe_flow() {
         arising::character::Character::LEN,
     );
 
-    // Run a job quest to earn starting gold
+    // Seed resource mints to avoid invoking the missing Metaplex program during tests.
+    tokens::seed_resource_balance(&mut ctx, &mint_state, &authority_pk, ResourceKind::Gold, 0);
+    tokens::seed_resource_balance(&mut ctx, &mint_state, &authority_pk, ResourceKind::Wood, 0);
+
+    // Run a job quest to earn starting gold (Quest 90: Caravan Guard)
     ctx.execute_instruction(
-        instructions::start_quest(Civilization::Ard, 1, 1, gatherer, authority_pk),
+        instructions::start_quest(Civilization::Ard, 1, 90, gatherer, authority_pk),
         &[&authority],
     )
     .assert_success();
@@ -81,7 +85,7 @@ fn quest_and_recipe_flow() {
         instructions::claim_quest(
             Civilization::Ard,
             1,
-            1,
+            90,
             gatherer,
             authority_pk,
             mint_state,

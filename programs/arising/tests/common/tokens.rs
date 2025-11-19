@@ -28,8 +28,14 @@ pub fn reward_accounts(
         .flat_map(|resource| {
             let mint = resource_mint(*resource);
             let ata = get_associated_token_address(authority, &mint);
+            let metadata = AnchorPubkey::find_program_address(
+                &[b"metadata", mpl_token_metadata::ID.as_ref(), mint.as_ref()],
+                &mpl_token_metadata::ID,
+            )
+            .0;
             vec![
                 AnchorAccountMeta::new(mint, false),
+                AnchorAccountMeta::new(metadata, false),
                 AnchorAccountMeta::new(ata, false),
             ]
         })

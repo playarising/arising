@@ -2064,4 +2064,27 @@ impl ResourceKind {
             ResourceKind::AltairSkirt => "ALTAIR_SKIRT",
         }
     }
+
+    pub fn name(self) -> String {
+        let symbol = self.symbol();
+        symbol
+            .split('_')
+            .map(|word| {
+                let mut chars = word.chars();
+                match chars.next() {
+                    None => String::new(),
+                    Some(first) => {
+                        let rest: String =
+                            chars.map(|c| c.to_lowercase().next().unwrap()).collect();
+                        format!("{}{}", first, rest)
+                    }
+                }
+            })
+            .collect::<Vec<_>>()
+            .join(" ")
+    }
+
+    pub fn metadata_uri(self) -> String {
+        format!("https://mints.playarising.com/resources/{}", self.id())
+    }
 }
