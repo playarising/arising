@@ -838,6 +838,7 @@ pub mod arising {
         });
         Ok(())
     }
+
 }
 
 /// Locates the expected mint/ATA pair and mints SPL tokens for recipe/quest rewards.

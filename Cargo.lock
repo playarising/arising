@@ -371,6 +371,8 @@ dependencies = [
  "base64 0.22.1",
  "litesvm",
  "mpl-token-metadata",
+ "serde",
+ "serde_json",
  "solana-account 3.0.0",
  "solana-clock 3.0.0",
  "solana-instruction 3.0.0",

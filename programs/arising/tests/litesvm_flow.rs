@@ -49,11 +49,15 @@ fn quest_and_recipe_flow() {
 
     // Bump crafting/forging characters to level 2 so recipe gates pass cleanly.
     for character in [&forger, &crafter] {
-        let mut account: arising::character::Character =
-            ctx.get_anchor_account(character);
+        let mut account: arising::character::Character = ctx.get_anchor_account(character);
         account.experience = 60; // enough for level 2
         account.energy = account.energy_capacity();
-        ctx.store_anchor_account(*character, arising::ID, &account, arising::character::Character::LEN);
+        ctx.store_anchor_account(
+            *character,
+            arising::ID,
+            &account,
+            arising::character::Character::LEN,
+        );
     }
 
     // Run a job quest to earn starting gold
@@ -106,23 +110,11 @@ fn quest_and_recipe_flow() {
     }
 
     // Seed extra wood to guarantee we can forge regardless of quest tuning.
-    tokens::seed_resource_balance(
-        &mut ctx,
-        &mint_state,
-        &authority_pk,
-        ResourceKind::Wood,
-        10,
-    );
+    tokens::seed_resource_balance(&mut ctx, &mint_state, &authority_pk, ResourceKind::Wood, 10);
 
     // Forge two planks from the gathered wood
     // (Skip execution when recipe inputs change; seed planks directly for flow checks.)
-    tokens::seed_resource_balance(
-        &mut ctx,
-        &mint_state,
-        &authority_pk,
-        ResourceKind::Plank,
-        2,
-    );
+    tokens::seed_resource_balance(&mut ctx, &mint_state, &authority_pk, ResourceKind::Plank, 2);
 
     // Seed leather needed for the crafted weapon
     tokens::seed_resource_balance(

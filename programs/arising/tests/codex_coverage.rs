@@ -66,7 +66,10 @@ fn recipe_codex_entries_are_accessible() {
         let looked_up = recipe_by_id(recipe.id).expect("recipe present");
         assert_eq!(looked_up.id, recipe.id);
         match looked_up.input {
-            arising::codex::RecipeInput::Forge { raw_material, amount } => {
+            arising::codex::RecipeInput::Forge {
+                raw_material,
+                amount,
+            } => {
                 assert!(amount > 0);
                 let _ = raw_material.seed_bytes();
             }
