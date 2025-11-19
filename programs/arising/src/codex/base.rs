@@ -244,6 +244,33 @@ impl CoreStats {
     pub const fn zero() -> Self {
         Self::new(0, 0, 0)
     }
+
+    pub const fn sum(&self) -> u16 {
+        self.might + self.speed + self.intellect
+    }
+
+    pub fn max_components(self, floor: CoreStats) -> Self {
+        Self::new(
+            self.might.max(floor.might),
+            self.speed.max(floor.speed),
+            self.intellect.max(floor.intellect),
+        )
+    }
+
+    pub fn enforce_total_floor(mut self, floor: u16) -> Self {
+        let mut deficit = floor.saturating_sub(self.sum());
+        while deficit > 0 {
+            if self.might <= self.speed && self.might <= self.intellect {
+                self.might = self.might.saturating_add(1);
+            } else if self.speed <= self.intellect {
+                self.speed = self.speed.saturating_add(1);
+            } else {
+                self.intellect = self.intellect.saturating_add(1);
+            }
+            deficit -= 1;
+        }
+        self
+    }
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy)]

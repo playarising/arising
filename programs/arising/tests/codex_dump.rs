@@ -202,8 +202,8 @@ fn dump_quests() -> DynResult {
             name: q.name.to_string(),
             level_required: q.level_required,
             cooldown_seconds: q.cooldown_seconds,
-            base_energy_cost: q.base_energy_cost,
-            minimum_stats: core_stats_out(q.minimum_stats),
+            base_energy_cost: q.effective_base_energy(),
+            minimum_stats: core_stats_out(q.effective_minimum_stats()),
             rewards: q
                 .rewards
                 .iter()
@@ -232,8 +232,8 @@ fn dump_recipes() -> DynResult {
             name: r.name.to_string(),
             level_required: r.level_required,
             cooldown_seconds: r.cooldown_seconds,
-            base_energy_cost: r.base_energy_cost,
-            minimum_stats: core_stats_out(r.minimum_stats),
+            base_energy_cost: r.effective_base_energy(),
+            minimum_stats: core_stats_out(r.effective_minimum_stats()),
             input: match r.input {
                 RecipeInput::Forge {
                     raw_material,

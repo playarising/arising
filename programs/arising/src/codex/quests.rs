@@ -3,6 +3,21 @@ use anchor_lang::prelude::*;
 use super::base::CoreStats;
 use super::resources::ResourceKind;
 
+const LOW_LEVEL_PROTECTION: u8 = 10;
+const LOW_LEVEL_ENERGY_STEP: f32 = 0.04;
+const MINIMUM_EFFICIENCY_FLOOR: u16 = 1;
+const MAX_EFFICIENCY_DISCOUNT: f32 = 0.6;
+const MAX_EFFICIENCY_PENALTY: f32 = 1.4;
+const MINIMUM_ENERGY_COST: u16 = 1;
+const ENERGY_LEVEL_DIVISOR: u16 = 12;
+const ENERGY_LEVEL_BASE: u16 = 5;
+const STAT_MIGHT_DIVISOR: u16 = 6;
+const STAT_SPEED_DIVISOR: u16 = 8;
+const STAT_INTELLECT_DIVISOR: u16 = 9;
+const STAT_SUM_LEVEL_DIVISOR: u16 = 4;
+const STAT_SUM_LEVEL_BASE: u16 = 3;
+const STAT_SUM_ENERGY_OFFSET: u16 = 2;
+
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Copy, PartialEq, Eq)]
 pub enum QuestType {
     Job,
@@ -59,42 +74,124 @@ impl QuestCodexEntry {
         }
     }
 
-    fn efficiency(&self, stats: CoreStats) -> f32 {
-        fn ratio(stat: u16, requirement: u16) -> f32 {
-            if requirement == 0 {
-                f32::INFINITY
-            } else {
-                stat as f32 / requirement as f32
-            }
-        }
+    fn level_based_energy_floor(&self) -> u16 {
+        ENERGY_LEVEL_BASE + (self.level_required as u16 / ENERGY_LEVEL_DIVISOR.max(1))
+    }
 
-        let might = ratio(stats.might, self.minimum_stats.might);
-        let speed = ratio(stats.speed, self.minimum_stats.speed);
-        let intellect = ratio(stats.intellect, self.minimum_stats.intellect);
+    pub fn effective_base_energy(&self) -> u16 {
+        self.base_energy_cost
+            .max(self.level_based_energy_floor())
+            .max(MINIMUM_ENERGY_COST)
+    }
+
+    fn level_stat_floor(&self) -> CoreStats {
+        let level = self.level_required as u16;
+        CoreStats::new(
+            1 + level / STAT_MIGHT_DIVISOR.max(1),
+            1 + level / STAT_SPEED_DIVISOR.max(1),
+            1 + level / STAT_INTELLECT_DIVISOR.max(1),
+        )
+    }
+
+    fn stat_sum_floor(&self) -> u16 {
+        let level_floor =
+            STAT_SUM_LEVEL_BASE + (self.level_required as u16 / STAT_SUM_LEVEL_DIVISOR.max(1));
+        let energy_floor = STAT_SUM_ENERGY_OFFSET + self.effective_base_energy() as u16;
+        level_floor.max(energy_floor)
+    }
+
+    pub fn effective_minimum_stats(&self) -> CoreStats {
+        let floored = self.minimum_stats.max_components(self.level_stat_floor());
+        floored.enforce_total_floor(self.stat_sum_floor())
+    }
+
+    fn efficiency_requirement_floor(&self, character_level: u8) -> u16 {
+        let quest_floor = MINIMUM_EFFICIENCY_FLOOR + (self.level_required as u16 / 10);
+        let missing_levels = LOW_LEVEL_PROTECTION.saturating_sub(character_level) as u16;
+        quest_floor + (missing_levels + 1) / 2
+    }
+
+    fn ratio(stat: u16, requirement: u16, floor: u16) -> f32 {
+        let effective = requirement.max(floor).max(1);
+        stat as f32 / effective as f32
+    }
+
+    fn efficiency(&self, stats: CoreStats, character_level: u8, required: CoreStats) -> f32 {
+        let floor = self.efficiency_requirement_floor(character_level);
+        let might = Self::ratio(stats.might, required.might, floor);
+        let speed = Self::ratio(stats.speed, required.speed, floor);
+        let intellect = Self::ratio(stats.intellect, required.intellect, floor);
 
         might.min(speed).min(intellect)
     }
 
-    pub fn energy_cost(&self, stats: CoreStats) -> u16 {
-        let eff = self.efficiency(stats);
-        if eff >= 1.5 {
-            return 0;
-        }
-
-        let penalty = if eff <= 0.0 {
-            1.5
+    fn low_level_penalty(level: u8) -> f32 {
+        if level >= LOW_LEVEL_PROTECTION {
+            1.0
         } else {
-            (1.0 / eff).clamp(1.0, 1.5)
+            1.0 + f32::from(LOW_LEVEL_PROTECTION - level) * LOW_LEVEL_ENERGY_STEP
+        }
+    }
+
+    fn cooldown_hours(&self) -> f32 {
+        (self.cooldown_seconds as f32 / 3600.0).max(0.25)
+    }
+
+    fn cooldown_pressure(&self) -> f32 {
+        let hours = self.cooldown_hours();
+        (1.0 / hours).clamp(0.85, 1.25)
+    }
+
+    fn reward_weight(&self) -> f32 {
+        self.rewards
+            .iter()
+            .copied()
+            .map(|reward| match reward {
+                QuestReward::Experience { amount } => (amount as f32 / 100.0).max(0.5),
+                QuestReward::Resource { amount, .. } => (amount as f32).sqrt().max(0.5),
+            })
+            .sum::<f32>()
+            .max(0.5)
+    }
+
+    fn reward_pressure(&self) -> f32 {
+        let density = self.reward_weight() / self.cooldown_hours();
+        (density / 1.5).clamp(0.85, 1.3)
+    }
+
+    pub fn energy_cost(&self, stats: CoreStats, character_level: u8) -> u16 {
+        let required = self.effective_minimum_stats();
+        let efficiency = self.efficiency(stats, character_level, required);
+        let stat_modifier = if efficiency >= 1.0 {
+            (1.0 / efficiency).clamp(MAX_EFFICIENCY_DISCOUNT, 1.0)
+        } else if efficiency <= 0.0 {
+            MAX_EFFICIENCY_PENALTY
+        } else {
+            (1.0 / efficiency).clamp(1.0, MAX_EFFICIENCY_PENALTY)
         };
 
-        let energy = f32::from(self.base_energy_cost) * penalty;
-        energy.ceil().min(u16::MAX as f32) as u16
+        let energy = f32::from(self.effective_base_energy())
+            * stat_modifier
+            * Self::low_level_penalty(character_level)
+            * self.cooldown_pressure()
+            * self.reward_pressure()
+            * self.stats_pressure(required);
+
+        energy
+            .ceil()
+            .clamp(f32::from(MINIMUM_ENERGY_COST), f32::from(u16::MAX)) as u16
+    }
+
+    fn stats_pressure(&self, required: CoreStats) -> f32 {
+        let total = required.sum() as f32;
+        (total / 12.0).clamp(1.0, 1.35)
     }
 
     pub fn stats_satisfied(&self, stats: CoreStats) -> bool {
-        stats.might >= self.minimum_stats.might
-            && stats.speed >= self.minimum_stats.speed
-            && stats.intellect >= self.minimum_stats.intellect
+        let required = self.effective_minimum_stats();
+        stats.might >= required.might
+            && stats.speed >= required.speed
+            && stats.intellect >= required.intellect
     }
 }
 
@@ -127,7 +224,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         3600,
         7,
         CoreStats::new(1, 0, 1),
-        &[QuestReward::experience(50)],
+        &[QuestReward::experience(37)],
     ),
     QuestCodexEntry::new(
         4,
@@ -137,7 +234,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         2700,
         6,
         CoreStats::new(0, 1, 0),
-        &[QuestReward::experience(60)],
+        &[QuestReward::experience(45)],
     ),
     QuestCodexEntry::new(
         5,
@@ -231,7 +328,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         8,
         CoreStats::new(2, 1, 1),
         &[
-            QuestReward::experience(90),
+            QuestReward::experience(67),
             QuestReward::resource(ResourceKind::Wood, 1),
         ],
     ),
@@ -245,7 +342,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(1, 2, 1),
         &[
             QuestReward::resource(ResourceKind::Gold, 90),
-            QuestReward::experience(80),
+            QuestReward::experience(60),
         ],
     ),
     QuestCodexEntry::new(
@@ -290,7 +387,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         11,
         CoreStats::new(3, 2, 1),
         &[
-            QuestReward::experience(160),
+            QuestReward::experience(120),
             QuestReward::resource(ResourceKind::BronzeOre, 1),
         ],
     ),
@@ -357,7 +454,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(3, 3, 2),
         &[
             QuestReward::resource(ResourceKind::Gold, 140),
-            QuestReward::experience(120),
+            QuestReward::experience(90),
         ],
     ),
     QuestCodexEntry::new(
@@ -370,7 +467,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(3, 3, 2),
         &[
             QuestReward::resource(ResourceKind::Gold, 160),
-            QuestReward::experience(140),
+            QuestReward::experience(105),
         ],
     ),
     QuestCodexEntry::new(
@@ -383,7 +480,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(4, 3, 3),
         &[
             QuestReward::resource(ResourceKind::SteelOre, 1),
-            QuestReward::experience(180),
+            QuestReward::experience(135),
         ],
     ),
     QuestCodexEntry::new(
@@ -481,7 +578,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         14,
         CoreStats::new(6, 5, 4),
         &[
-            QuestReward::experience(240),
+            QuestReward::experience(180),
             QuestReward::resource(ResourceKind::SilverOre, 1),
         ],
     ),
@@ -538,7 +635,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(5, 5, 4),
         &[
             QuestReward::resource(ResourceKind::Gold, 190),
-            QuestReward::experience(180),
+            QuestReward::experience(135),
         ],
     ),
     QuestCodexEntry::new(
@@ -603,7 +700,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         17,
         CoreStats::new(8, 7, 5),
         &[
-            QuestReward::experience(320),
+            QuestReward::experience(240),
             QuestReward::resource(ResourceKind::PlatinumOre, 1),
         ],
     ),
@@ -650,7 +747,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(9, 8, 6),
         &[
             QuestReward::resource(ResourceKind::Gold, 240),
-            QuestReward::experience(260),
+            QuestReward::experience(195),
         ],
     ),
     QuestCodexEntry::new(
@@ -673,7 +770,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(10, 8, 6),
         &[
             QuestReward::resource(ResourceKind::Gold, 240),
-            QuestReward::experience(310),
+            QuestReward::experience(232),
             QuestReward::resource(ResourceKind::CobaltOre, 1),
         ],
     ),
@@ -719,7 +816,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         18,
         CoreStats::new(11, 9, 7),
         &[
-            QuestReward::experience(360),
+            QuestReward::experience(270),
             QuestReward::resource(ResourceKind::CobaltOre, 1),
         ],
     ),
@@ -733,7 +830,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(11, 10, 7),
         &[
             QuestReward::resource(ResourceKind::Gold, 260),
-            QuestReward::experience(300),
+            QuestReward::experience(225),
             QuestReward::resource(ResourceKind::AngelicEssence, 1),
         ],
     ),
@@ -790,7 +887,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(12, 11, 8),
         &[
             QuestReward::resource(ResourceKind::Gold, 280),
-            QuestReward::experience(340),
+            QuestReward::experience(255),
         ],
     ),
     QuestCodexEntry::new(
@@ -813,7 +910,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(13, 11, 8),
         &[
             QuestReward::resource(ResourceKind::CrimsonEssence, 2),
-            QuestReward::experience(360),
+            QuestReward::experience(270),
         ],
     ),
     QuestCodexEntry::new(
@@ -826,7 +923,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(13, 11, 9),
         &[
             QuestReward::resource(ResourceKind::Gold, 280),
-            QuestReward::experience(350),
+            QuestReward::experience(262),
             QuestReward::resource(ResourceKind::CrimsonEssence, 1),
         ],
     ),
@@ -873,7 +970,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(14, 12, 9),
         &[
             QuestReward::resource(ResourceKind::Gold, 300),
-            QuestReward::experience(380),
+            QuestReward::experience(285),
             QuestReward::resource(ResourceKind::CrimsonEssence, 1),
         ],
     ),
@@ -886,7 +983,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         21,
         CoreStats::new(14, 12, 9),
         &[
-            QuestReward::experience(420),
+            QuestReward::experience(315),
             QuestReward::resource(ResourceKind::CrimsonEssence, 2),
         ],
     ),
@@ -910,7 +1007,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(15, 13, 10),
         &[
             QuestReward::resource(ResourceKind::FatefulEssence, 2),
-            QuestReward::experience(420),
+            QuestReward::experience(315),
         ],
     ),
     QuestCodexEntry::new(
@@ -966,7 +1063,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(16, 14, 10),
         &[
             QuestReward::resource(ResourceKind::Gold, 320),
-            QuestReward::experience(400),
+            QuestReward::experience(300),
         ],
     ),
     QuestCodexEntry::new(
@@ -979,7 +1076,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         CoreStats::new(16, 14, 11),
         &[
             QuestReward::resource(ResourceKind::Gold, 300),
-            QuestReward::experience(410),
+            QuestReward::experience(307),
             QuestReward::resource(ResourceKind::AltairEssence, 1),
         ],
     ),
@@ -1035,7 +1132,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 89] = [
         24,
         CoreStats::new(18, 16, 12),
         &[
-            QuestReward::experience(520),
+            QuestReward::experience(390),
             QuestReward::resource(ResourceKind::AltairEssence, 2),
         ],
     ),

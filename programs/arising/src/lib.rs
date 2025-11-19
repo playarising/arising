@@ -324,13 +324,15 @@ pub mod arising {
             ctx.accounts.authority.key()
         );
         character.ensure_min_level(quest.level_required)?;
+        let character_level = character.current_level();
+        let quest_required_stats = quest.effective_minimum_stats();
         require!(
-            character.has_required_stats(quest.minimum_stats),
+            character.has_required_stats(quest_required_stats),
             ArisingError::QuestRequirementsNotMet
         );
 
         let now = Clock::get()?.unix_timestamp;
-        let energy_cost = quest.energy_cost(character.stats);
+        let energy_cost = quest.energy_cost(character.stats, character_level);
         character.consume_energy(energy_cost)?;
         character.start_quest(quest.id, quest.cooldown_seconds, now)?;
         let quest_state = character.ensure_active_quest()?;
@@ -431,13 +433,15 @@ pub mod arising {
             ctx.accounts.authority.key()
         );
         character.ensure_min_level(recipe.level_required)?;
+        let character_level = character.current_level();
+        let recipe_required_stats = recipe.effective_minimum_stats();
         require!(
-            character.has_required_stats(recipe.minimum_stats),
+            character.has_required_stats(recipe_required_stats),
             ArisingError::RecipeRequirementsNotMet
         );
 
         let now = Clock::get()?.unix_timestamp;
-        let energy_cost = recipe.energy_cost(character.stats);
+        let energy_cost = recipe.energy_cost(character.stats, character_level);
         character.consume_energy(energy_cost)?;
 
         let mut consumed_resources: Vec<ResourceCostEvent> = Vec::new();
