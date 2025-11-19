@@ -27,7 +27,7 @@ use collection::initialize_collection;
 use errors::ArisingError;
 use nft::{mint_character_nft, CharacterMetadataArgs};
 
-declare_id!("arisf5D474u42BL55eCbDFgc5qA3LHGhgVdhCYQkgrM");
+declare_id!("arisFmS4ovGjBoxAwfuPX3iJaAvW2KtBAver3uknfMp");
 
 const RESOURCE_MINT_SEED: &[u8] = b"resource_mint";
 const ENERGY_PASS_PRICE_USDC: u64 = 2_000_000; // 2 USDC with 6 decimals
@@ -838,7 +838,6 @@ pub mod arising {
         });
         Ok(())
     }
-
 }
 
 /// Locates the expected mint/ATA pair and mints SPL tokens for recipe/quest rewards.

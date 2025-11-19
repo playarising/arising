@@ -5,13 +5,13 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-arising = "arisf5D474u42BL55eCbDFgc5qA3LHGhgVdhCYQkgrM"
+arising = "arisFmS4ovGjBoxAwfuPX3iJaAvW2KtBAver3uknfMp"
 
 [programs.localnet]
-arising = "arisf5D474u42BL55eCbDFgc5qA3LHGhgVdhCYQkgrM"
+arising = "arisFmS4ovGjBoxAwfuPX3iJaAvW2KtBAver3uknfMp"
 
 [programs.mainnet]
-arising = "arisf5D474u42BL55eCbDFgc5qA3LHGhgVdhCYQkgrM"
+arising = "arisFmS4ovGjBoxAwfuPX3iJaAvW2KtBAver3uknfMp"
 
 [registry]
 url = "https://api.apr.dev"
@@ -21,6 +21,6 @@ cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-deploy-devnet = "node -r ts-node/register migrations/deploy-script.ts devnet"
-deploy-mainnet = "node -r ts-node/register migrations/deploy-script.ts mainnet"
+deploy-devnet = "bun run migrations/deploy-script.ts devnet"
+deploy-mainnet = "bun run migrations/deploy-script.ts mainnet"
 test = "cargo test"

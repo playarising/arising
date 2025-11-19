@@ -1,0 +1,19 @@
+{
+  "name": "arising-deployer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "deploy-devnet": "bun run migrations/deploy-script.ts devnet",
+    "deploy-mainnet": "bun run migrations/deploy-script.ts mainnet"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "0.32.1",
+    "@solana/spl-token": "0.4.14",
+    "@solana/web3.js": "1.98.4"
+  },
+  "devDependencies": {
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  }
+}

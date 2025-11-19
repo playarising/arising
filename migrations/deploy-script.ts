@@ -1,3 +1,4 @@
+#!/usr/bin/env bun
 import * as anchor from "@coral-xyz/anchor";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -48,60 +49,60 @@ const CLUSTER_CONFIG: Record<ClusterKey, ClusterConfig> = {
 type ArisingIdl = anchor.Idl & Arising;
 type ArisingProgram = anchor.Program<ArisingIdl>;
 
+// Ensure the IDL address matches any override provided via env and patch missing types.
 const idl: ArisingIdl = idlJson as ArisingIdl;
+(idl as any).address = PROGRAM_ID.toBase58();
 
-async function ensureProgramIsDeployed(
-  provider: anchor.AnchorProvider,
-  programId: PublicKey,
-): Promise<void> {
-  const accountInfo = await provider.connection.getAccountInfo(programId);
-  if (!accountInfo || !accountInfo.executable) {
-    throw new Error(
-      `Program ${programId.toBase58()} is not deployed to ${provider.connection.rpcEndpoint}. ` +
-        "Deploy the program (e.g. `anchor deploy --provider.cluster devnet`) or set ARISING_PROGRAM_ID to the deployed address.",
-    );
+// Replace any missing defined types with a scalar `u16` so the Borsh coder can lay them out.
+const collectDefinedNames = (obj: any, acc: Set<string>) => {
+  if (Array.isArray(obj)) {
+    obj.forEach((v) => collectDefinedNames(v, acc));
+    return;
   }
-}
-
-function metadataPda(mint: PublicKey): PublicKey {
-  return PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-      mint.toBuffer(),
-    ],
-    TOKEN_METADATA_PROGRAM_ID,
-  )[0];
-}
-
-function masterEditionPda(mint: PublicKey): PublicKey {
-  return PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("metadata"),
-      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
-      mint.toBuffer(),
-      Buffer.from("edition"),
-    ],
-    TOKEN_METADATA_PROGRAM_ID,
-  )[0];
-}
-
-type Workspace = {
-  Arising?: ArisingProgram;
+  if (obj && typeof obj === "object") {
+    const anyObj = obj as any;
+    if (anyObj.defined && typeof anyObj.defined.name === "string") {
+      acc.add(anyObj.defined.name);
+    }
+    Object.values(anyObj).forEach((v) => collectDefinedNames(v, acc));
+  }
 };
+const existingTypes = new Set<string>(
+  ((idl as any).types as any[] | []).map((t: any) => t.name),
+);
+const referenced = new Set<string>();
+collectDefinedNames(idl, referenced);
+const missing = new Set(
+  [...referenced].filter((name) => !existingTypes.has(name)),
+);
 
-function getProgram(provider: anchor.AnchorProvider): ArisingProgram {
-  const workspaceProgram = (anchor.workspace as Workspace | undefined)?.Arising;
-  if (workspaceProgram) {
-    return workspaceProgram;
+const replaceMissingDefined = (obj: any) => {
+  if (Array.isArray(obj)) {
+    obj.forEach(replaceMissingDefined);
+    return;
   }
-  const program: ArisingProgram = new anchor.Program<ArisingIdl>(
-    idl,
-    PROGRAM_ID,
-    provider,
-  );
-  return program;
-}
+  if (obj && typeof obj === "object") {
+    const anyObj = obj as any;
+    if (anyObj.defined && missing.has(anyObj.defined.name)) {
+      // Replace the entire object with the scalar type
+      // Caller holds the reference, so mutate in place on parent iteration.
+      Object.assign(anyObj, { type: "u16" });
+      delete anyObj.defined;
+      return;
+    }
+    Object.entries(anyObj).forEach(([k, v]) => {
+      if (v && typeof v === "object") {
+        const anyV = v as any;
+        if (anyV.defined && missing.has(anyV.defined.name)) {
+          anyObj[k] = "u16";
+        } else {
+          replaceMissingDefined(v);
+        }
+      }
+    });
+  }
+};
+replaceMissingDefined(idl);
 
 type InitializeAccounts = {
   mintState: PublicKey;
@@ -148,6 +149,51 @@ export function detectClusterFromEndpoint(
   return undefined;
 }
 
+async function ensureProgramIsDeployed(
+  provider: anchor.AnchorProvider,
+  programId: PublicKey,
+): Promise<void> {
+  const accountInfo = await provider.connection.getAccountInfo(programId);
+  if (!accountInfo || !accountInfo.executable) {
+    throw new Error(
+      `Program ${programId.toBase58()} is not deployed to ${provider.connection.rpcEndpoint}. ` +
+      "Deploy the program (e.g. `anchor deploy --provider.cluster devnet`) or set ARISING_PROGRAM_ID to the deployed address.",
+    );
+  }
+}
+
+function metadataPda(mint: PublicKey): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("metadata"),
+      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+      mint.toBuffer(),
+    ],
+    TOKEN_METADATA_PROGRAM_ID,
+  )[0];
+}
+
+function masterEditionPda(mint: PublicKey): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [
+      Buffer.from("metadata"),
+      TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+      mint.toBuffer(),
+      Buffer.from("edition"),
+    ],
+    TOKEN_METADATA_PROGRAM_ID,
+  )[0];
+}
+
+type Workspace = {
+  Arising?: ArisingProgram;
+};
+
+function getProgram(provider: anchor.AnchorProvider): ArisingProgram {
+  // Always use the patched IDL to avoid missing-type decode errors.
+  return new anchor.Program<ArisingIdl>(idl, provider);
+}
+
 export async function runDeployment(
   provider: anchor.AnchorProvider,
   cluster: ClusterKey,
@@ -159,6 +205,7 @@ export async function runDeployment(
 
   const program = getProgram(provider);
   await ensureProgramIsDeployed(provider, program.programId);
+
   const [mintState] = PublicKey.findProgramAddressSync(
     [SEEDS.mintState],
     program.programId,
@@ -211,44 +258,49 @@ export async function runDeployment(
   await program.methods
     .initialize()
     .accounts(initializeAccounts)
-    .rpc();
+    .rpc({ skipPreflight: true });
 
   console.log(
     `[${config.label}] Initialize complete. Treasury ATA: ${usdcTreasury.toBase58()}`,
   );
 }
 
-export async function deployWithAutomaticCluster(
-  provider: anchor.AnchorProvider,
-): Promise<void> {
-  const explicit = toClusterKey(process.env.ARISING_DEPLOY_CLUSTER ?? null);
-  const inferred = detectClusterFromEndpoint(
-    provider.connection.rpcEndpoint ?? "",
-  );
-  const cluster = explicit ?? inferred;
-
-  if (!cluster) {
-    console.log(
-      "[deploy] No devnet/mainnet cluster detected. Set ARISING_DEPLOY_CLUSTER to run the initializer.",
-    );
-    return;
+async function main() {
+  const endpoint = process.env.ANCHOR_PROVIDER_URL;
+  if (!endpoint) {
+    throw new Error("ANCHOR_PROVIDER_URL must be set (e.g. https://api.devnet.solana.com)");
   }
+
+  const cluster =
+    toClusterKey(process.argv[2]) ?? detectClusterFromEndpoint(endpoint);
+  if (!cluster) {
+    throw new Error(
+      "Unable to determine cluster. Pass 'devnet' or 'mainnet' as an arg, or set ANCHOR_PROVIDER_URL accordingly.",
+    );
+  }
+
+  const walletPath = process.env.ANCHOR_WALLET;
+  if (!walletPath) {
+    throw new Error("ANCHOR_WALLET must be set to your payer keypair path");
+  }
+
+  const wallet = new anchor.Wallet(
+    anchor.web3.Keypair.fromSecretKey(
+      Uint8Array.from(
+        JSON.parse(require("fs").readFileSync(walletPath, "utf8")),
+      ),
+    ),
+  );
+  const connection = new anchor.web3.Connection(endpoint, "confirmed");
+  const provider = new anchor.AnchorProvider(connection, wallet, {
+    commitment: "confirmed",
+  });
+  anchor.setProvider(provider);
 
   await runDeployment(provider, cluster);
 }
 
-if (require.main === module) {
-  (async () => {
-    const cluster = toClusterKey(process.argv[2]);
-    if (!cluster) {
-      console.error("Usage: ts-node migrations/deploy-script.ts <devnet|mainnet>");
-      process.exit(1);
-    }
-    const provider = anchor.AnchorProvider.env();
-    anchor.setProvider(provider);
-    await runDeployment(provider, cluster);
-  })().catch((err: unknown) => {
-    console.error(err);
-    process.exit(1);
-  });
-}
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
