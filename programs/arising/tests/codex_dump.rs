@@ -52,6 +52,17 @@ struct QuestOut {
     base_energy_cost: u16,
     minimum_stats: CoreStatsOut,
     rewards: Vec<QuestRewardOut>,
+    energy_cost_calculation: EnergyCostCalculationOut,
+}
+
+#[derive(Serialize)]
+struct EnergyCostCalculationOut {
+    /// Minimum possible energy cost (with perfect stats, high level)
+    min_energy_cost: u16,
+    /// Maximum possible energy cost (with minimal stats, low level)
+    max_energy_cost: u16,
+    /// Energy cost at exact requirements (character stats = quest requirements)
+    at_requirements: u16,
 }
 
 #[derive(Serialize)]
@@ -196,28 +207,52 @@ fn write_json_file<T: Serialize>(path: &Path, value: &T) -> DynResult {
 fn dump_quests() -> DynResult {
     let quests: Vec<QuestOut> = QUEST_CODEX
         .iter()
-        .map(|q| QuestOut {
-            id: q.id,
-            quest_type: quest_type_name(q.quest_type).to_string(),
-            name: q.name.to_string(),
-            level_required: q.level_required,
-            cooldown_seconds: q.cooldown_seconds,
-            base_energy_cost: q.effective_base_energy(),
-            minimum_stats: core_stats_out(q.effective_minimum_stats()),
-            rewards: q
-                .rewards
-                .iter()
-                .map(|r| match r {
-                    QuestReward::Experience { amount } => {
-                        QuestRewardOut::Experience { amount: *amount }
-                    }
-                    QuestReward::Resource { resource, amount } => QuestRewardOut::Resource {
-                        resource_id: resource.id(),
-                        resource: resource_name(*resource),
-                        amount: *amount,
-                    },
-                })
-                .collect(),
+        .map(|q| {
+            let required_stats = q.effective_minimum_stats();
+
+            // Calculate energy cost scenarios
+            // Min: High stats (2x requirements), max level
+            let high_stats = CoreStats::new(
+                required_stats.might.saturating_mul(2).max(100),
+                required_stats.speed.saturating_mul(2).max(100),
+                required_stats.intellect.saturating_mul(2).max(100),
+            );
+            let min_energy = q.energy_cost(high_stats, 100);
+
+            // Max: At requirements, at quest level (worst case for modifiers)
+            let max_energy = q.energy_cost(required_stats, q.level_required);
+
+            // At requirements: Exact stats, at quest level
+            let at_req = q.energy_cost(required_stats, q.level_required);
+
+            QuestOut {
+                id: q.id,
+                quest_type: quest_type_name(q.quest_type).to_string(),
+                name: q.name.to_string(),
+                level_required: q.level_required,
+                cooldown_seconds: q.cooldown_seconds,
+                base_energy_cost: q.effective_base_energy(),
+                minimum_stats: core_stats_out(required_stats),
+                rewards: q
+                    .rewards
+                    .iter()
+                    .map(|r| match r {
+                        QuestReward::Experience { amount } => {
+                            QuestRewardOut::Experience { amount: *amount }
+                        }
+                        QuestReward::Resource { resource, amount } => QuestRewardOut::Resource {
+                            resource_id: resource.id(),
+                            resource: resource_name(*resource),
+                            amount: *amount,
+                        },
+                    })
+                    .collect(),
+                energy_cost_calculation: EnergyCostCalculationOut {
+                    min_energy_cost: min_energy,
+                    max_energy_cost: max_energy,
+                    at_requirements: at_req,
+                },
+            }
         })
         .collect();
     write_json_file(Path::new(OUTPUT_DIR).join("quests.json").as_path(), &quests)
