@@ -3,6 +3,7 @@
 #[path = "common/mod.rs"]
 mod common;
 
+use arising::character::Character;
 use arising::codex::{Civilization, CoreStats, Gender, ResourceKind};
 use arising::errors::ArisingError;
 use common::{
@@ -27,8 +28,13 @@ fn cannot_claim_before_ready() {
         1,
         &authority,
         Gender::Male,
-        None,
+        Some(CoreStats::new(3, 2, 2)), // Meet quest 1 requirements after stat floor
     );
+
+    // Give character enough energy for the quest
+    let mut char_account: Character = ctx.get_anchor_account(&gatherer);
+    char_account.energy = 20; // Ensure enough energy for quest
+    ctx.store_anchor_account(gatherer, arising::ID, &char_account, Character::LEN);
 
     // Start the quest but do not advance the clock long enough.
     ctx.execute_instruction(
@@ -91,8 +97,13 @@ fn recipe_consumes_available_resources() {
         9,
         &authority,
         Gender::Female,
-        None,
+        Some(CoreStats::new(5, 4, 4)), // Provide stats that meet recipe 17's requirements (4,4,4 minimum)
     );
+
+    // Give character enough energy for the recipe
+    let mut char_account: Character = ctx.get_anchor_account(&crafter);
+    char_account.energy = 30; // Ensure enough energy for recipe
+    ctx.store_anchor_account(crafter, arising::ID, &char_account, Character::LEN);
 
     tokens::seed_resource_balance(
         &mut ctx,

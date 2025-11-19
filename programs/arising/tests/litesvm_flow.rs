@@ -3,7 +3,7 @@
 #[path = "common/mod.rs"]
 mod common;
 
-use arising::codex::{Civilization, Gender, ResourceKind};
+use arising::codex::{Civilization, CoreStats, Gender, ResourceKind};
 use common::{
     clock,
     context::{TestContext, TransactionResultExt},
@@ -28,7 +28,7 @@ fn quest_and_recipe_flow() {
         1,
         &authority,
         Gender::Male,
-        None,
+        Some(CoreStats::new(3, 2, 2)), // Meet quest requirements
     );
     let forger = fixtures::create_character(
         &mut ctx,
@@ -59,6 +59,16 @@ fn quest_and_recipe_flow() {
             arising::character::Character::LEN,
         );
     }
+
+    // Give gatherer enough energy for quests
+    let mut gatherer_account: arising::character::Character = ctx.get_anchor_account(&gatherer);
+    gatherer_account.energy = 100; // Plenty of energy for all quests
+    ctx.store_anchor_account(
+        gatherer,
+        arising::ID,
+        &gatherer_account,
+        arising::character::Character::LEN,
+    );
 
     // Run a job quest to earn starting gold
     ctx.execute_instruction(
