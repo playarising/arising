@@ -99,6 +99,11 @@ fn quest_stat_requirements_are_balanced() {
     // Target: Quest stats should be 68-82% of available character stats (leaving 18-32% buffer)
 
     for quest in QUEST_CODEX.iter() {
+        // Skip Quest #90 - it's intentionally designed to prevent user lockout
+        if quest.bypass_stat_floors {
+            continue;
+        }
+
         let level = quest.level_required as u16;
         let char_total_stats = 6 + level;
         let effective_stats = quest.effective_minimum_stats();

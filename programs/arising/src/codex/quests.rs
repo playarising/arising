@@ -49,6 +49,7 @@ pub struct QuestCodexEntry {
     pub base_energy_cost: u16,
     pub minimum_stats: CoreStats,
     pub rewards: &'static [QuestReward],
+    pub bypass_stat_floors: bool,
 }
 
 impl QuestCodexEntry {
@@ -71,6 +72,30 @@ impl QuestCodexEntry {
             base_energy_cost,
             minimum_stats,
             rewards,
+            bypass_stat_floors: false,
+        }
+    }
+
+    pub const fn new_bypass_floors(
+        id: u16,
+        quest_type: QuestType,
+        name: &'static str,
+        level_required: u8,
+        cooldown_seconds: u32,
+        base_energy_cost: u16,
+        minimum_stats: CoreStats,
+        rewards: &'static [QuestReward],
+    ) -> Self {
+        Self {
+            id,
+            quest_type,
+            name,
+            level_required,
+            cooldown_seconds,
+            base_energy_cost,
+            minimum_stats,
+            rewards,
+            bypass_stat_floors: true,
         }
     }
 
@@ -101,8 +126,17 @@ impl QuestCodexEntry {
     }
 
     pub fn effective_minimum_stats(&self) -> CoreStats {
-        let floored = self.minimum_stats.max_components(self.level_stat_floor());
-        floored.enforce_total_floor(self.stat_sum_floor())
+        if self.bypass_stat_floors {
+            // Special case: ensure minimum 1,1,1 to prevent lockout but skip floor enforcement
+            CoreStats::new(
+                self.minimum_stats.might.max(1),
+                self.minimum_stats.speed.max(1),
+                self.minimum_stats.intellect.max(1),
+            )
+        } else {
+            let floored = self.minimum_stats.max_components(self.level_stat_floor());
+            floored.enforce_total_floor(self.stat_sum_floor())
+        }
     }
 
     fn efficiency_requirement_floor(&self, character_level: u8) -> u16 {
@@ -1173,14 +1207,14 @@ pub const QUEST_CODEX: [QuestCodexEntry; 90] = [
         &[QuestReward::resource(ResourceKind::AltairEssence, 2)],
     ),
     // === LEVEL 1: Starter Quests (Very Low Requirements - prevents user lockout) ===
-    QuestCodexEntry::new(
+    QuestCodexEntry::new_bypass_floors(
         90,
         QuestType::Raid,
         "Village Patrol - Oldholm Village",
         1,
         2700,
         1,
-        CoreStats::new(1, 1, 1),
+        CoreStats::new(0, 0, 0),
         &[QuestReward::experience(30)],
     ),
 ];
