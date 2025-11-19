@@ -1178,7 +1178,7 @@ pub const QUEST_CODEX: [QuestCodexEntry; 90] = [
         QuestType::Raid,
         "Village Patrol - Oldholm Village",
         1,
-        1800,
+        2700,
         1,
         CoreStats::new(1, 1, 1),
         &[QuestReward::experience(30)],
