@@ -53,6 +53,7 @@ struct QuestOut {
     minimum_stats: CoreStatsOut,
     rewards: Vec<QuestRewardOut>,
     energy_cost_calculation: EnergyCostCalculationOut,
+    bypass_stat_floors: bool,
 }
 
 #[derive(Serialize)]
@@ -252,6 +253,7 @@ fn dump_quests() -> DynResult {
                     max_energy_cost: max_energy,
                     at_requirements: at_req,
                 },
+                bypass_stat_floors: q.bypass_stat_floors,
             }
         })
         .collect();
